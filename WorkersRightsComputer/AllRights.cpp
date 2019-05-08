@@ -1,0 +1,257 @@
+﻿#include "stdafx.h"
+#include "AllRights.h"
+#include "Notice.h"
+#include "Recuperation.h"
+#include "Severance.h"
+#include "Vacation.h"
+#include "Holidays.h"
+#include "Pension.h"
+#include "Additional.h"
+#include "Utils.h"
+#include "WorkPeriod.h"
+#include "MinWage.h"
+#include "WorkersRightsComputerDlg.h"
+#include "LogoWriter.h"
+#include "HtmlWriter.h"
+#include "Person.h"
+
+CAllRights gAllRights;
+
+CAllRights::CAllRights()
+	: mpHolidays(NULL)
+{
+}
+CAllRights::~CAllRights()
+{
+}
+bool CAllRights::Init()
+{
+	Clear();
+
+	mRights.AddTail(new CSeverance);
+	mRights.AddTail(new CNotice);
+	mpHolidays = new CHolidays;
+	mRights.AddTail(mpHolidays);
+	mRights.AddTail(new CVacation);
+	mRights.AddTail(new CRecuperation);
+	mRights.AddTail(new CPension);
+	mRights.AddTail(new CAdditional);
+
+	/*
+	for (int i = 0; i < mn; i++)
+	{
+		ma[i]->msNameHebrew = hebrew->Get(ma[i]->msName);
+	}*/
+	return true;
+}
+void CAllRights::Clear(void)
+{
+	while (mRights.GetSize() > 0)
+	{
+		delete mRights.GetTail();
+		mRights.RemoveTail();
+	}
+	mpHolidays = NULL;
+}
+bool CAllRights::SetCheckRef(CButtonRef *pButton)
+{
+	bool bFound = false;
+	POSITION pos = mRights.GetHeadPosition();
+	while (pos)
+	{
+		CRight *pRight = mRights.GetNext(pos);
+		if (pRight->SetCheckRef(pButton))
+			bFound = true;
+	}
+	if (!bFound)
+	{
+		CString s = L"CAllRights::SetCheckRef failed: missing ";
+		s += pButton->msName;
+		CUtils::MessBox(s, L"SW Error");
+		return false;
+	}
+	return true;
+}
+bool CAllRights::SetEditRef(CEditRef *pRef)
+{
+	bool bFound = false;
+	POSITION pos = mRights.GetHeadPosition();
+	while (pos && !bFound)
+	{
+		CRight *pRight = mRights.GetNext(pos);
+		bFound = pRight->SetEditRef(pRef);
+	}
+	if (!bFound)
+	{
+		CString s = L"CAllRights::SetEditRef failed: missing ";
+		s += pRef->msName;
+		CUtils::MessBox(s, L"SW Error");
+		return false;
+	}
+	return true;
+}
+bool CAllRights::Compute(void)
+{
+	static int iCompute = 0;
+	static int iComputing = 0;
+	iCompute++;
+
+	static bool bInCompute = false;
+	if (bInCompute)
+		return false;
+	bInCompute = true;
+	bool bOK = true;
+
+	iComputing = iCompute;
+	bOK = ComputeInternal();
+
+	bInCompute = false;
+	return bOK;
+}
+bool CAllRights::ComputeInternal()
+{
+	//double totalDue = 0;
+
+	bool bOK = true;
+	POSITION pos = mRights.GetHeadPosition();
+	while (pos)
+	{
+		CRight *pRight = mRights.GetNext(pos);
+		pRight->Init();
+	}
+
+	if (gMinWage.mn < 1)
+	{
+		CUtils::MessBox(L"Wage Table not initialized!", L"Installation Error");
+		return false;
+	}
+
+	if (!gWorkPeriod.IsValid())
+	{
+		if (gpDlg)
+			gpDlg->DisplaySummary(L"Please define work period");
+		return false;
+	}
+
+	//  Compute
+	pos = mRights.GetHeadPosition();
+	while (pos)
+	{
+		CRight *pRight = mRights.GetNext(pos);
+		pRight->ComputeEnvelop();
+	}
+
+	FILE *pfWrite = CUtils::OpenLogFile(L"Total");
+	mSumDue = 0;
+	CString sAll(gWorkPeriod.GetTextSummary());
+	pos = mRights.GetHeadPosition();
+	while (pos)
+	{
+		CRight *pRight = mRights.GetNext(pos);
+		mSumDue += pRight->mDuePay;
+		if (pRight->mDuePay > 0 || !pRight->mbSkipIfZero)
+		{
+			if (!sAll.IsEmpty())
+				sAll += L"\r\n";
+			sAll += pRight->msDue;
+			CRight::WriteLine(pfWrite, pRight->msDue);
+		}
+	}
+
+	CRight::WriteLine(pfWrite, L"----------------");
+
+	sAll += L"==> Total Due ";
+	sAll += CRight::ToString(mSumDue);
+	if (gpDlg)
+		gpDlg->DisplaySummary(sAll);
+
+	CRight::WriteLine(pfWrite, (const wchar_t *)sAll);
+	CRight::WriteLine(pfWrite, L"");
+	CRight::WriteLine(pfWrite, L"Computations by Worker's Rights Application SW - v0.8, build March, 2019");
+	fclose(pfWrite);
+
+	return bOK;
+}
+void CAllRights::WriteLetter(void)
+{
+	CLogoWriter logo(L"logo_letter");
+
+	gWorker.StartLetter(logo);
+	gWorkPeriod.WriteToLetter(logo);
+
+	logo.WriteLine(L"Please find below the list of payments due from your employer");
+
+	logo.WriteLine(L"In Short:");
+
+	POSITION pos = mRights.GetHeadPosition();
+	while (pos)
+	{
+		CRight *pRight = mRights.GetNext(pos);
+		if (pRight->mDuePay > 0)
+		{
+			CString sLine = pRight->GetSumLineForLetter();
+			logo.WriteLine(sLine);
+		}
+	}
+
+	CString sSum (L"Total: ");
+	sSum += CRight::ToString(mSumDue);
+	sSum += L"  ";
+	//sSum += hebrew->Get("Total");
+	logo.WriteLine(sSum);
+
+	logo.Close();
+}
+void CAllRights::WriteLetterToHtml(CHtmlWriter &html)
+{
+	gWorkPeriod.WriteToLetter(html);
+	html.WriteLine(L"Please find below the list of payments due from your employer");
+	html.WriteLine(L"In Short:");
+
+	POSITION pos = mRights.GetHeadPosition();
+	while (pos)
+	{
+		CRight *pRight = mRights.GetNext(pos);
+		if (pRight->mDuePay > 0)
+		{
+			pRight->WriteLineToHtmlTable(html);
+		}
+	}
+	WriteTotalLineToHtmlTable(html);
+}
+void CAllRights::WriteTotalLineToHtmlTable(CHtmlWriter &html)
+{
+	html.WriteL(L"<tr>");
+	
+	CString s(L"Total Due");
+	CRight::WriteItemToHtmlTable(html, s);
+
+	s = L"";
+	CRight::WriteItemToHtmlTable(html, s);
+
+	s = CRight::ToString(mSumDue);
+	CRight::WriteItemToHtmlTable(html, s);
+
+	s = L"סך הכל";
+	CRight::WriteItemToHtmlTable(html, s);
+
+	html.WriteL(L"</tr>");
+}
+
+CString CAllRights::GetHolidaysSelection()
+{
+	if (!mpHolidays)
+		return CString();
+	return mpHolidays->msSelection;
+}
+void CAllRights::Save(FILE *pfWrite)
+{
+	fwprintf(pfWrite, L"<CRights::Save>\n");
+
+	POSITION pos = mRights.GetHeadPosition();
+	while (pos)
+	{
+		CRight *pRight = mRights.GetNext(pos);
+		pRight->Save(pfWrite);
+	}
+}

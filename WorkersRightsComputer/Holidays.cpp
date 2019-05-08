@@ -1,0 +1,427 @@
+﻿#include "StdAfx.h"
+#include "Holidays.h"
+#include "WorkPeriod.h"
+#include "MinWage.h"
+#include "Utils.h"
+#include "WorkersRightsComputerDlg.h"
+
+void CHoliday::Log(FILE *pf)
+{
+	if (!pf)
+		return;
+	fwprintf(pf, L"%s m %d d %d\n", (const wchar_t *)msName, mMonth, mDay);
+}
+
+CHolidays::CHolidays(void)
+	: CRight(L"Holidays", L"חגים")
+	, mpNDaysInLastYearBox(NULL)
+	, mpNDaysWorkedLastYearBox(NULL)
+	, mpNDaysPaidLastYearBox(NULL)
+	, mpNDaysWorkedPrevYearsBox(NULL)
+	, mpNDaysPaidPrevYearsBox(NULL)
+	, mpPrevYearsFromBox(NULL)
+	, mpPrevNYearsBox(NULL)
+{
+	mnWorkedLastYear = -1;
+	mnPaidLastYear = -1;
+
+	for (int i = 0; i < MAX_HOLIDAYS_DEFINED; i++)
+		map[i] = NULL;
+}
+bool CHolidays::SetEditRef(class CEditRef *pRef)
+{
+	if (pRef->msName == "LastYearWork")
+	{
+		mpNDaysWorkedLastYearBox = &pRef->mEdit;
+		return true;
+	}
+	if (pRef->msName == "LastYearPaid")
+	{
+		mpNDaysPaidLastYearBox = &pRef->mEdit;
+		return true;
+	}
+	if (pRef->msName == "LastYearFrom")
+	{
+		mpNDaysInLastYearBox = &pRef->mEdit;
+		return true;
+	}
+	if (pRef->msName == "PrevYearWork")
+	{
+		mpNDaysWorkedPrevYearsBox = &pRef->mEdit;
+		return true;
+	}
+	if (pRef->msName == "PrevYearPaid")
+	{
+		mpNDaysPaidPrevYearsBox = &pRef->mEdit;
+		return true;
+	}
+	if (pRef->msName == "PrevYearFrom")
+	{
+		mpPrevYearsFromBox = &pRef->mEdit;
+		return true;
+	}
+	if (pRef->msName == "PrevNYear")
+	{
+		mpPrevNYearsBox = &pRef->mEdit;
+		return true;
+	}
+
+	return false;
+}
+bool CHolidays::InitFromFile(const wchar_t *zfName)
+{
+	CString sSelected(zfName);
+	if (sSelected.Left(6) == "Select")
+		return false;
+
+	mbValid = false;
+	CString sfName = L"..\\release\\Input\\Holidays\\";
+	sfName = sfName + zfName;
+	sfName = sfName + L"Holidays.txt";
+
+	FILE *pfRead = NULL;
+	_wfopen_s(&pfRead, sfName, L"r");
+	if(!pfRead)
+	{
+		CString s = L"Missing File for Holidays: ";
+		s += sfName;
+		MessageBox(NULL, s , L"Installation Error", MB_OK);
+		static int nErr = 0;
+		nErr++;
+		return false;
+	}
+	//mStatusLabel = sfName;
+	msfName = sfName;
+
+	FILE *pfLog = CUtils::OpenLogFile(L"ReadHolidays");
+	if (pfLog)
+		fwprintf(pfLog, L"Reading File: %s\n\n", (const wchar_t *)sfName);
+
+	bool bOK = InitFromFileInternals(pfRead, pfLog);
+
+	if (pfLog)
+	{
+		if (bOK)
+			fwprintf(pfLog, L"Succeeded\n");
+		else
+			fwprintf(pfLog, L"Failed\n");
+
+		fclose(pfLog);
+	}
+	return bOK;
+}
+bool CHolidays::InitFromFileInternals(FILE *pfRead, FILE *pfLog)
+{
+	mn = 0;
+
+	for (int i = 0; i < MAX_HOLIDAYS_DEFINED; i++)
+	{
+		// Read name or end
+		CString sLine = CUtils::ReadLine(pfRead);
+		if (pfLog)
+			fwprintf(pfLog, L"%s\n", (const wchar_t *)sLine);
+		if (sLine == L"end")
+			break;
+
+		map[i] = new CHoliday(sLine);
+
+		// Read Year
+
+		sLine = CUtils::ReadLine(pfRead);
+		if (pfLog)
+			fwprintf(pfLog, L"%s\n", (const wchar_t *)sLine);
+		if (sLine == L"*")
+		{
+			map[i]->mbAllYears = true;
+		}
+		else
+		{
+			int year = 0;
+			if (!TryConvertInt(sLine, L"year", year))
+				return false;
+			map[i]->mYear = year;
+		}
+
+		// Read Month
+		int month = 0;
+		if (!TryReadInt(pfRead, L"month", month))
+			return false;
+		map[i]->mMonth = month;
+
+		// Read Day
+		int day = 0;
+		if (!TryReadInt(pfRead, L"day", day))
+			return false;
+		map[i]->mDay = day;
+
+		mn++;
+	}
+
+	mbValid = true;
+	PrintLog();
+	return true;
+}
+
+void CHolidays::PrintLog()
+{
+	FILE *pfLog = CUtils::OpenLogFile(L"HolidaysDefinition");
+	if (!pfLog)
+		return;
+	fwprintf(pfLog, L"Input File: %s\n\n", (const wchar_t *)msfName);
+	fwprintf(pfLog, L"%d holidays defined\n", mn);
+
+	for (int i = 0; i < mn; i++)
+	{
+		fwprintf(pfLog, L"%40s - ", (const wchar_t *)map[i]->msName);
+		if (map[i]->mbAllYears)
+			fwprintf(pfLog, L"*        ");
+		else
+			fwprintf(pfLog, L"year %4d\n", map[i]->mYear);
+
+		fwprintf(pfLog, L" - month %d, day %d\n", map[i]->mMonth, map[i]->mDay);
+		fwprintf(pfLog, L"\n");
+	}
+	fclose(pfLog);
+}
+void CHolidays::AddToDebug(int i, bool bPrice)
+{
+	CString s = map[i]->msName; 
+	s += L" ";
+	s += CRight::ToString(map[i]->mDay); 
+	s += L".";
+	s += CRight::ToString(map[i]->mMonth);
+	if (map[i]->mYear > 0)
+	{
+		s += L".";
+		s += CRight::ToString(map[i]->mYear);
+	}
+
+	if (bPrice)
+	{
+		s += L" ";
+		s += CRight::ToString(map[i]->mPrice);
+	}
+	LogLine(s);
+
+	msDebug += L" ";
+	msDebug += s;
+}
+int CHolidays::NInLastYear(void)
+{
+	msDebug = L"Holidays:";
+	FILE *pfWrite = CUtils::OpenLogFile(L"HolidaysInLastYear");
+	fwprintf(pfWrite, L"Input File: %s\n\n", (const wchar_t *)msfName);
+	fwprintf(pfWrite, L"%d holidays defined\n", mn);
+
+	if (mn < 1)
+	{
+		fclose(pfWrite);
+		return 0;
+	}
+
+	int n = 0;
+	for (int i = 0; i < mn; i++)
+	{
+		if (gWorkPeriod.LastYearContains(*map[i]))
+		{
+			n++;
+			map[i]->Log(pfWrite);
+			AddToDebug(i,false);
+		}
+	}
+
+	if ( n > MAX_HOLIDAYS_PER_YEAR )
+	{
+		n = MAX_HOLIDAYS_PER_YEAR;
+		fprintf(pfWrite, "Max Holidays Per Year: %d\n", n);
+	}
+	fprintf(pfWrite, "Return %d", n);
+	fclose(pfWrite);
+	return n;
+}
+
+void CHolidays::ComputePayLastYear(void)
+{
+	if (mnWorkedLastYear < 0 || mnPaidLastYear < 0)
+	{
+		return;
+	}
+
+	for (int i = 0; i < mn; i++)
+	{
+		map[i]->mbInLastYearPaySum = false;
+		if (map[i]->mbInLastYear)
+		{
+			gMinWage.ComputeHolidayPrice(*map[i]);
+		}
+	}
+
+	int nToSum = mnWorkedLastYear - mnPaidLastYear;
+	if (nToSum > MAX_HOLIDAYS_PER_YEAR)
+		nToSum = MAX_HOLIDAYS_PER_YEAR;
+	if (nToSum < 1)
+	{
+		msDebug = "Holiday Pay - None";
+		nToSum = 0;
+		msDue += msSelection;
+		msDue += " - None last year ";
+		return;
+	}
+
+	msDebug = "Holiday Pay";
+	int nSummed = 0;
+	while (nSummed < nToSum)
+	{
+		double bestPay = 0;
+		int iBest = -1;
+		for (int i = 0; i < mn; i++)
+		{
+			if (map[i]->mbInLastYear && !map[i]->mbInLastYearPaySum)
+			{
+				if (map[i]->mPrice > bestPay)
+				{
+					bestPay = map[i]->mPrice;
+					iBest = i;
+				}
+			}
+		}
+		if (iBest >= 0)
+		{
+			mDuePay += bestPay;
+			map[iBest]->mbInLastYearPaySum = true;
+			nSummed++;
+			AddToDebug(iBest,true);
+			mnDaysToPay += 1;
+			RememberPayParDay(bestPay);
+		}
+		else
+			break;
+
+	}
+	LogLine(L"Pay Last Year", mDuePay);
+
+	msDebug += L" SUM(";
+	msDebug += ToString(nSummed);
+	msDebug += L")=";
+
+	//msDue += L" - ";
+	msDue += msSelection;
+	msDue += L" - Last Year ";
+	msDue += ToString(nSummed);
+	msDue += L" days ";
+}
+void CHolidays::ComputePayPrevYears(void)
+{
+	//msw->WriteLine("ComputePayPrevYears");
+
+	int nWorked = SafeGetIntFromTextBox(*mpNDaysWorkedPrevYearsBox);
+	int nPaid = SafeGetIntFromTextBox(*mpNDaysPaidPrevYearsBox);
+	double nYears = SafeGetDoubleFromTextBox(*mpPrevNYearsBox);
+	int nDaysPerYear = nWorked - nPaid;
+
+	LogLine(L"nWorked", nWorked);
+	LogLine(L"nPaid", nPaid);
+	LogLine(L"nYears", nYears);
+	LogLine(L"nDaysPerYear to pay", nDaysPerYear);
+	if (nDaysPerYear < 1)
+	{
+		//msw->WriteLine("No Need to compute Prev Years");
+		return;
+	}
+
+	CMyTime payDate = gWorkPeriod.mLastYearStart;
+	payDate.SubDay();
+	double rest = nYears;
+	while (rest > 0)
+	{
+		double payPerDay = gMinWage.ComputeHolidayPrice(payDate.mYear, payDate.mMonth);
+		double payPerYear = payPerDay * nDaysPerYear;
+		RememberPayParDay(payPerDay);
+		LogLine(L"pay per day", payPerDay);
+		if (rest >= 1)
+		{
+			mnDaysToPay += nDaysPerYear;
+			rest -= 1;
+		}
+		else
+		{
+			mnDaysToPay += nDaysPerYear * rest;
+			payPerYear *= rest;
+			rest = 0;
+		}
+		LogLine(L"pay per year", payPerYear);
+		mDuePay += payPerYear;
+		payDate.AddYears(-1);
+	}
+
+	// msw->WriteLine("");
+	msDue += L" + ";
+	msDue += ToString(nYears);
+	msDue += L" years ";
+}
+void CHolidays::RememberPayParDay(double value)
+{
+	if (mMinPayPerDay == 0)
+	{
+		mMinPayPerDay = value;
+		mMaxPayPerDay = value;
+	}
+	else
+	{
+		if (value > mMaxPayPerDay)
+			mMaxPayPerDay = value;
+		if (value < mMinPayPerDay)
+			mMinPayPerDay = value;
+	}
+}
+bool CHolidays::Compute(void)
+{
+	msSelection = gpDlg->GetHolidaysSet();
+	if (!InitFromFile(msSelection))
+		return false;
+
+	mnDaysToPay = 0;
+	mMinPayPerDay = 0;
+	mMaxPayPerDay = 0;
+
+	mnInLastYear = NInLastYear();
+	// TEMP - This edit box role is not clear -
+	// Should it be written from SW or the text should be read from user text?????
+	mpNDaysInLastYearBox->SetWindowText (ToString(mnInLastYear));
+	LogLine(L"n days in last year", mnInLastYear);
+
+	if (GetIntFromEditBox(mpNDaysPaidLastYearBox, L"mpNDaysPaidLastYearBox", mnPaidLastYear))
+		LogLine(L"n paid last year", mnPaidLastYear);
+
+	if (GetIntFromEditBox(mpNDaysWorkedLastYearBox, L"mpNDaysWorkedLastYearBox", mnWorkedLastYear))
+		LogLine(L"n worked last year", mnWorkedLastYear);
+
+	ComputePayLastYear();
+	ComputePayPrevYears();
+
+	msDebug += ToString(mDuePay);
+
+	msDue += L" ==> ";
+	msDue += ToString(mDuePay);
+	return true;
+}
+CString CHolidays::GetDecriptionForLetter(void)
+{
+	CString s = ToString(mnDaysToPay);
+	s += L" days * ";
+	if (mMinPayPerDay == mMaxPayPerDay)
+	{
+		s += ToString(mMinPayPerDay);
+	}
+	else
+	{
+		s += L"[";
+		s += ToString(mMinPayPerDay);
+		s += L"-";
+		s += ToString(mMaxPayPerDay);
+		s += L"]";
+	}
+	
+	return s;
+
+}
