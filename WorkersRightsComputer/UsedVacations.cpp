@@ -134,6 +134,7 @@ void CUsedVacations::Save(FILE *pfSave)
 }
 void CUsedVacations::Restore(FILE *pfRead)
 {
+	ClearAllVacations();
 	CString s = CUtils::ReadLine(pfRead);
 	while (s == "Vacation")
 	{

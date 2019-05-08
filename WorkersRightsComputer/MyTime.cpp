@@ -12,6 +12,16 @@ CMyTime::CMyTime()
 	, mbInitialized(false)
 {
 }
+CMyTime::CMyTime(CTime time)
+	: mYear(0)
+	, mMonth(0)
+	, mDay(0)
+	, mDayOfWeek(0)
+	, mTime(0)
+	, mbInitialized(false)
+{
+	Set(time);
+}
 CMyTime::CMyTime(int year, int month, int day)
 	: mYear(year)
 	, mMonth(month)
@@ -267,4 +277,24 @@ bool CMyTime::MonthContains(CMyTime date)
 void CMyTime::SetClearDate()
 {
 	Set(mYear, mMonth, mDay);
+}
+bool CMyTime::IsMonthBefore(int year, int month)
+{
+	if (mYear < year)
+		return true;
+	if (mYear > year)
+		return false;
+	return mMonth < month;
+}
+bool CMyTime::IsMonthBefore(CMyTime &other)
+{
+	if (mYear < other.mYear)
+		return true;
+	if (mYear > other.mYear)
+		return false;
+	return mMonth < other.mMonth;
+}
+bool CMyTime::IsMonthSame(CMyTime &other)
+{
+	return (mYear == other.mYear) && (mMonth == other.mMonth);
 }

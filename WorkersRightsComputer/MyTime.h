@@ -4,6 +4,7 @@ class CMyTime
 {
 public:
 	CMyTime();
+	CMyTime(CTime time);
 	CMyTime(int year, int month, int day);
 	~CMyTime();
 
@@ -44,5 +45,8 @@ public:
 	bool IsOnPrevMonthsTo(CMyTime &time);
 	bool MonthContains(CMyTime date);
 	void SetClearDate();
+	bool IsMonthBefore(int year, int month);
+	bool IsMonthBefore(CMyTime &other);
+	bool IsMonthSame(CMyTime &other);
 };
 

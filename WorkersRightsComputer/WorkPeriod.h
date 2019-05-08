@@ -111,6 +111,10 @@ public:
 	CList<CMyTime *, CMyTime *> mFullYearsStart;
 	void ClearFullYears(void);
 	void ComputeFullYears(void);
+	bool IncludesMonthButNotFirst(int year, int month);
+
+	void SetWeekDaysPaidByCompany(class CCompanyPartPeriod *pFrom, class CCompanyPartPeriod *pUntil);
+	double ComputeFamilyPart(void);
 };
 
 extern CWorkPeriod gWorkPeriod;

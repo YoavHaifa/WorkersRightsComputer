@@ -5,6 +5,7 @@
 #include "VacationsDlg.h"
 #include "UsedVacations.h"
 #include "HtmlWriter.h"
+#include "FamilyPart.h"
 
 CWorkPeriod gWorkPeriod;
 
@@ -425,6 +426,7 @@ void CWorkPeriod::Save(FILE *pfSave)
 	}
 
 	gUsedVacations.Save(pfSave);
+	gFamilyPart.Save(pfSave);
 }
 void CWorkPeriod::Restore(FILE *pfRead)
 {
@@ -461,7 +463,12 @@ void CWorkPeriod::Restore(FILE *pfRead)
 		
 	s = CUtils::ReadLine(pfRead);
 	if (s == "Vacations")
+	{
 		gUsedVacations.Restore(pfRead);
+		s = CUtils::ReadLine(pfRead);
+	}
+	if (s == "FamilyPart")
+		gFamilyPart.Restore(pfRead);
 	gWorkPeriod.Compute();
 }
 CString CWorkPeriod::GetShortSummary()
@@ -716,4 +723,41 @@ void CWorkPeriod::ComputeFullYears(void)
 		mnFullWorkYears = 0;
 	}
 }
+bool CWorkPeriod::IncludesMonthButNotFirst(int year, int month)
+{
+	if (!mFirst.IsMonthBefore(year, month))
+		return false;
+	if (mLast.IsMonthBefore(year, month))
+		return false;
+	return true;
+}
+void CWorkPeriod::SetWeekDaysPaidByCompany(class CCompanyPartPeriod *pFrom, class CCompanyPartPeriod *pUntil)
+{
+	for (int i = 0; i < MAX_MONTHS; i++)
+	{
+		if (maMonths[i].IsMonthBefore(pFrom->mFrom))
+			continue;
+		if (pUntil && !maMonths[i].IsMonthBefore(pUntil->mFrom))
+			return;
+		maMonths[i].mHoursPerWeekPaidByCompany = pFrom->mCompanyHoursPerWeek;
+		if (maMonths[i].mbLast)
+			return;
+	}
+}
+double CWorkPeriod::ComputeFamilyPart(void)
+{
+	double sumFractions = 0;
+	double sumCompanyRatio = 0;
 
+	for (int i = 0; i < MAX_MONTHS; i++)
+	{
+		double companyRatio = maMonths[i].mHoursPerWeekPaidByCompany / maMonths[i].mHoursPerWeek;
+		sumFractions += maMonths[i].mFraction;
+		sumCompanyRatio += companyRatio * maMonths[i].mFraction;
+		if (maMonths[i].mbLast)
+			break;
+	}
+
+	double companyTotalRatio = sumCompanyRatio / sumFractions;
+	return 1 - companyTotalRatio;
+}

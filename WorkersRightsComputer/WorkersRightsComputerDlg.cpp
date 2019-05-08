@@ -480,8 +480,6 @@ void CWorkersRightsComputerDlg::OnBnClickedEmployer()
 	CEmployerDlg dlg;
 	dlg.DoModal();
 }
-
-
 void CWorkersRightsComputerDlg::OnBnClickedComments()
 {
 	// TODO: Add your control notification handler code here
