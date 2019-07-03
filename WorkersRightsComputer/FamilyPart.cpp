@@ -1,0 +1,177 @@
+#include "stdafx.h"
+#include "FamilyPart.h"
+#include "WorkPeriod.h"
+#include "Utils.h"
+
+CFamilyPart gFamilyPart;
+
+CFamilyPart::CFamilyPart()
+	: mbAskOnlyForFamilyPart(false)
+	, mRatio(0)
+	, mbDefined(false)
+{
+}
+CFamilyPart::~CFamilyPart()
+{
+	Clear();
+}
+void CFamilyPart::Clear(void)
+{
+	while (!mPeriods.IsEmpty())
+	{
+		delete mPeriods.GetTail();
+		mPeriods.RemoveTail();
+	}
+	mbDefined = false;
+	mRatio = 0;
+	mbAskOnlyForFamilyPart = false;
+}
+bool CFamilyPart::AddPeriod(CTime startTime, double hoursPerWeek)
+{
+	CMyTime start(startTime);
+	if (mPeriods.IsEmpty())
+	{
+		if (start.mMonth != gWorkPeriod.mFirst.mMonth || start.mYear != gWorkPeriod.mFirst.mYear)
+		{
+			CUtils::MessBox(L"First period must start from first day of work", L"Input Error");
+			return false;
+		}
+	}
+	if ((start.mYear < gWorkPeriod.mFirst.mYear)
+		|| (start.mYear == gWorkPeriod.mFirst.mYear && start.mMonth < gWorkPeriod.mFirst.mMonth))
+	{
+		CUtils::MessBox(L"Period starts before first day of work", L"Input Error");
+		return false;
+	}
+	if ((start.mYear > gWorkPeriod.mLast.mYear)
+		|| (start.mYear == gWorkPeriod.mLast.mYear && start.mMonth > gWorkPeriod.mLast.mMonth))
+	{
+		CUtils::MessBox(L"Period starts after last day of work", L"Input Error");
+		return false;
+	}
+
+	if (mPeriods.IsEmpty())
+	{
+		CCompanyPartPeriod *pPeriod = new CCompanyPartPeriod(startTime, hoursPerWeek);
+		mPeriods.AddTail(pPeriod);
+		if (!mbDefined)
+		{
+			mbDefined = true;
+			mbAskOnlyForFamilyPart = true;
+		}
+		CMyTime april18(2018, 4, 1);
+		CCompanyPartPeriod *pDummyPeriod = new CCompanyPartPeriod(april18.mTime, 0, true);
+		mPeriods.AddTail(pDummyPeriod);
+	}
+	else // Enter new period according to order
+	{
+		bool bFound = false;
+		POSITION pos = mPeriods.GetHeadPosition();
+		while (pos)
+		{
+			POSITION prevPos = pos;
+			CCompanyPartPeriod *pPeriod = mPeriods.GetNext(pos);
+			if (start.IsMonthBefore(pPeriod->mFrom))
+			{
+				mPeriods.InsertBefore(prevPos, new CCompanyPartPeriod(startTime, hoursPerWeek));
+				bFound = true;
+				break;
+			}
+			else if (start.IsMonthSame(pPeriod->mFrom))
+			{
+				pPeriod->UpdateHours(hoursPerWeek);
+				bFound = true;
+				break;
+			}
+		}
+		if (!bFound)
+			mPeriods.AddTail(new CCompanyPartPeriod(startTime, hoursPerWeek));
+	}
+
+	return true;
+}
+CString CFamilyPart::GetFullText()
+{
+	CString s(gWorkPeriod.GetShortSummary());
+	s += "\r\n";
+	if (mPeriods.IsEmpty())
+	{
+		s += "Division of hours between company and family was not reported.";
+		return s;
+	}
+	Compute();
+
+	CCompanyPartPeriod *pPrevPeriod = NULL;
+	POSITION pos = mPeriods.GetHeadPosition();
+	while (pos)
+	{
+		CCompanyPartPeriod *pPeriod = mPeriods.GetNext(pos);
+		s += pPeriod->GetLine(pPrevPeriod);
+		s += "\r\n";
+		pPrevPeriod = pPeriod;
+	}
+	
+	char zBuf[128];
+	sprintf_s(zBuf, sizeof(zBuf), "Family Part is %5.2f%%", mRatio*100);
+	s += zBuf;
+	return s;
+}
+void CFamilyPart::Compute()
+{
+	CCompanyPartPeriod *pPrevPeriod = NULL;
+	POSITION pos = mPeriods.GetHeadPosition();
+	while (pos)
+	{
+		CCompanyPartPeriod *pPeriod = mPeriods.GetNext(pos);
+		if (!pPeriod->mbDummyForApril18)
+		{
+			if (pPrevPeriod)
+				gWorkPeriod.SetWeekDaysPaidByCompany(pPrevPeriod, pPeriod);
+			pPrevPeriod = pPeriod;
+		}
+	}
+	if (pPrevPeriod)
+		gWorkPeriod.SetWeekDaysPaidByCompany(pPrevPeriod, NULL);
+
+	mRatio = gWorkPeriod.ComputeFamilyPart();
+}
+void CFamilyPart::Save(FILE *pfSave)
+{
+	if (mPeriods.IsEmpty())
+		return;
+
+	fwprintf(pfSave, L"FamilyPart\n");
+
+	POSITION pos = mPeriods.GetHeadPosition();
+	while (pos)
+	{
+		CCompanyPartPeriod *pPeriod = mPeriods.GetNext(pos);
+		if (!pPeriod->mbDummyForApril18)
+		{
+			fwprintf(pfSave, L"Period\n");
+			pPeriod->mFrom.Write(pfSave);
+			fwprintf(pfSave, L"%.2f\n", pPeriod->mCompanyHoursPerWeek);
+		}
+	}
+	if (mbAskOnlyForFamilyPart)
+		fwprintf(pfSave, L"bAskOnlyForFamilyPart\n");
+
+	fwprintf(pfSave, L"EndFamilyPart\n");
+}
+void CFamilyPart::Restore(FILE *pfRead)
+{
+	CString s = CUtils::ReadLine(pfRead);
+	while (s == "Period")
+	{
+		CMyTime from;
+		from.Read(pfRead);
+		double nHours = CUtils::ReadFloat(pfRead);
+		AddPeriod(from.mTime, nHours);
+		s = CUtils::ReadLine(pfRead);
+	}
+	if (s == "bAskOnlyForFamilyPart")
+	{
+		mbAskOnlyForFamilyPart = true;
+		s = CUtils::ReadLine(pfRead); // read last line
+	}
+}

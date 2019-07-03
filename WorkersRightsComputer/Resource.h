@@ -13,6 +13,7 @@
 #define IDD_DIALOG_WORK_PERIOD          131
 #define IDD_DIALOG_EMPLOYER             133
 #define IDD_DIALOG_VACATIONS            135
+#define IDD_DIALOG_FAMILY_PART          137
 #define IDC_WORK_PERIOD                 1000
 #define IDC_DATETIMEPICKER_START        1001
 #define IDC_EMPLOYER                    1001
@@ -89,8 +90,17 @@
 #define IDC_BUTTON_VAC_CLEAR            1075
 #define IDC_EDIT_VAC_LIST               1076
 #define IDC_BUTTON_VAC_CLEAR_LAST       1077
-#define IDC_CHECK1                      1078
 #define IDC_CHECK_14DAYS_VAC4SEVRANCE   1078
+#define IDC_BUTTON_FAMILY_PART          1079
+#define IDC_CHECK_FAMILY_PART           1080
+#define IDC_DATETIMEPICKER1             1081
+#define IDC_EDIT_HOURS_BY_COMPANY       1082
+#define IDC_BUTTON1                     1083
+#define IDC_BUTTON_ADD_PERIOD           1083
+#define IDC_EDIT_FAMILY_PART_STATUS     1084
+#define IDC_BUTTON_FAMILY_PART_CLEAR    1085
+#define IDC_CHECK_FAMILY_PART2          1086
+#define IDC_BUTTON_FAMILY_PART_CLEAR2   1087
 #define ID_FILE_EXIT                    32771
 #define ID_COMPUTE_ALL                  32772
 #define ID_FILE_LOAD                    32773
@@ -105,9 +115,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        137
+#define _APS_NEXT_RESOURCE_VALUE        139
 #define _APS_NEXT_COMMAND_VALUE         32780
-#define _APS_NEXT_CONTROL_VALUE         1079
+#define _APS_NEXT_CONTROL_VALUE         1086
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

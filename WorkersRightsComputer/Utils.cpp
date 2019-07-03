@@ -155,6 +155,13 @@ double CUtils::ReadFloat(FILE *pfRead)
 		MessageBox(NULL, L"CUtils::ReadFloat failed - file end", L"Input Error", MB_OK);
 		return 0;
 	}
+	if (zBuf[0] == '\n')
+		if (fgetws(zBuf, sizeof(zBuf), pfRead) == NULL)
+		{
+			MessageBox(NULL, L"CUtils::ReadFloat failed - file end", L"Input Error", MB_OK);
+			return 0;
+		}
+
 	if (!isdigit(zBuf[0]))
 	{
 		MessageBox(NULL, L"CUtils::ReadFloat failed - wrong input", L"Input Error", MB_OK);

@@ -17,7 +17,10 @@ public:
 	int mnAllWorkingDays;
 	int mnDaysUnpaidVacation;
 	int mnDaysWorked;
+	int mHoursPerWeek;
+	double mHoursPerWeekPaidByCompany;
 	double mFraction;
 	void SetUnpaid(int nAnpaidDaysToAdd);
+	void SetDaysPerWeek(void);
 };
 

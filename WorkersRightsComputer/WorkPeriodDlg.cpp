@@ -10,6 +10,7 @@
 #include "Right.h"
 #include "VacationsDlg.h"
 #include "UsedVacations.h"
+#include "FamilyPartDlg.h"
 
 
 // CWorkPeriodDlg dialog
@@ -73,6 +74,7 @@ BEGIN_MESSAGE_MAP(CWorkPeriodDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_CHECK_FRIDAY, &CWorkPeriodDlg::OnBnClickedCheckFriday)
 	ON_BN_CLICKED(IDC_CHECK_SATURDAY, &CWorkPeriodDlg::OnBnClickedCheckSaturday)
 	ON_BN_CLICKED(IDOK3, &CWorkPeriodDlg::OnBnClickedOk3)
+	ON_BN_CLICKED(IDC_BUTTON_FAMILY_PART, &CWorkPeriodDlg::OnBnClickedButtonFamilyPart)
 END_MESSAGE_MAP()
 
 BOOL CWorkPeriodDlg::OnInitDialog()
@@ -413,4 +415,9 @@ void CWorkPeriodDlg::OnBnClickedOk3()
 	dlg.DoModal();
 
 	UpdateText();
+}
+void CWorkPeriodDlg::OnBnClickedButtonFamilyPart()
+{
+	CFamilyPartDlg dlg;
+	dlg.DoModal();
 }

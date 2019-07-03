@@ -186,6 +186,8 @@
     <ClInclude Include="Additional.h" />
     <ClInclude Include="AllRights.h" />
     <ClInclude Include="EmployerDlg.h" />
+    <ClInclude Include="FamilyPart.h" />
+    <ClInclude Include="FamilyPartDlg.h" />
     <ClInclude Include="FileName.h" />
     <ClInclude Include="FilesList.h" />
     <ClInclude Include="Hebrew.h" />
@@ -228,6 +230,8 @@
     <ClCompile Include="Additional.cpp" />
     <ClCompile Include="AllRights.cpp" />
     <ClCompile Include="EmployerDlg.cpp" />
+    <ClCompile Include="FamilyPart.cpp" />
+    <ClCompile Include="FamilyPartDlg.cpp" />
     <ClCompile Include="FileName.cpp" />
     <ClCompile Include="FilesList.cpp" />
     <ClCompile Include="Hebrew.cpp" />

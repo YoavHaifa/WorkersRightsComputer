@@ -67,4 +67,5 @@ public:
 	afx_msg void OnBnClickedCheckFriday();
 	afx_msg void OnBnClickedCheckSaturday();
 	afx_msg void OnBnClickedOk3();
+	afx_msg void OnBnClickedButtonFamilyPart();
 };

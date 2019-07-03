@@ -135,6 +135,12 @@
     <ClInclude Include="MonthInfo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="FamilyPart.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FamilyPartDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WorkersRightsComputer.cpp">
@@ -249,6 +255,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MonthInfo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FamilyPart.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FamilyPartDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
