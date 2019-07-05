@@ -30,6 +30,9 @@ protected:
 	virtual BOOL OnInitDialog();
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	afx_msg void OnPaint();
+	virtual void OnOK();
+	virtual void OnCancel();
+
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
 public:
@@ -95,6 +98,7 @@ public:
 	CEdit mFilledBy;
 	CEdit mAddress;
 	CEdit mEmail;
+	void SaveToXml(class CXMLDump &xmlDump);
 };
 
 extern CWorkersRightsComputerDlg *gpDlg;

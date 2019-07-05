@@ -5,6 +5,7 @@
 #include "VacationsDlg.h"
 #include "VacationUsed.h"
 #include "VacationTable.h"
+#include "XMLDump.h"
 
 CUsedVacations gUsedVacations;
 
@@ -111,6 +112,23 @@ CString CUsedVacations::GetVacationsFullText(void)
 	}
 	return s;
 }
+void CUsedVacations::SaveToXml(CXMLDump &xmlDump)
+{
+	if (mVacationsUsed.GetSize() < 1)
+		return;
+
+	CXMLDumpScope scope(L"UsedVacations", xmlDump);
+
+	POSITION pos = mVacationsUsed.GetHeadPosition();
+	while (pos)
+	{
+		CVacationUsed *pVac = mVacationsUsed.GetNext(pos);
+		CXMLDumpScope scope1(L"Vacation", xmlDump);
+		xmlDump.Write(L"FirstDay", pVac->mFirstDay);
+		xmlDump.Write(L"LastDay", pVac->mLastDay);
+	}
+	xmlDump.Write(L"bAdd14DaysUnpaidVacation4Severance", mbAdd14DaysUnpaidVacation4Severance);
+}
 void CUsedVacations::Save(FILE *pfSave)
 {
 	if (mVacationsUsed.GetSize() < 1)
@@ -130,7 +148,6 @@ void CUsedVacations::Save(FILE *pfSave)
 		fprintf(pfSave, "mbAdd14DaysUnpaidVacation4Severance\n");
 
 	fwprintf(pfSave, L"EndVacations\n");
-
 }
 void CUsedVacations::Restore(FILE *pfRead)
 {

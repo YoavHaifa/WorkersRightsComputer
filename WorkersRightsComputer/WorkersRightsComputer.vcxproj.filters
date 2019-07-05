@@ -141,6 +141,12 @@
     <ClInclude Include="FamilyPartDlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="XMLDump.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MyAskDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WorkersRightsComputer.cpp">
@@ -261,6 +267,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="FamilyPartDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="XMLDump.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MyAskDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

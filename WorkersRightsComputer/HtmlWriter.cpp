@@ -14,9 +14,10 @@ CHtmlWriter::~CHtmlWriter()
 	if (mpfWrite)
 		fclose(mpfWrite);
 }
-int CHtmlWriter::Try()
+int CHtmlWriter::WriteLetter()
 {
-	msfName = L"C:\\WorkersRights\\Try\\HtmlTry.html";
+	//msfName = L"C:\\WorkersRights\\Try\\HtmlTry.html";
+	msfName = CRight::GetSaveFileName(L"logo_letter", L"html");
 	mpfWrite = MyFOpenWithErrorBox(msfName, L"w, ccs=UNICODE", L"HTML Unicode");
 	//unsigned char1 = 0xff;
 	//unsigned char2 = 0xfe;

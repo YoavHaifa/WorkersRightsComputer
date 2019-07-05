@@ -17,6 +17,8 @@
 #include "EmployerDlg.h"
 #include "Person.h"
 #include "Saver.h"
+#include "MyAskDlg.h"
+#include "XmlDump.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -258,7 +260,22 @@ HCURSOR CWorkersRightsComputerDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
+void CWorkersRightsComputerDlg::OnOK()
+{
+	CMyAskDlg dlg(L"Verify OK", L"Do you want save and to exit?");
+	if (dlg.Ask())
+	{
+		OnBnClickedButtonSave();
+		CDialogEx::OnOK();
+	}
+}
 
+void CWorkersRightsComputerDlg::OnCancel()
+{
+	CMyAskDlg dlg(L"Verify Cancel", L"Do you want to exit without saving?");
+	if (dlg.Ask())
+		CDialogEx::OnCancel();
+}
 
 void CWorkersRightsComputerDlg::OnFileExit()
 {
@@ -473,7 +490,7 @@ void CWorkersRightsComputerDlg::OnTestReadhebrew()
 void CWorkersRightsComputerDlg::OnTestWritehtml()
 {
 	CHtmlWriter writer;
-	writer.Try();
+	writer.WriteLetter();
 }
 void CWorkersRightsComputerDlg::OnBnClickedEmployer()
 {
@@ -483,4 +500,41 @@ void CWorkersRightsComputerDlg::OnBnClickedEmployer()
 void CWorkersRightsComputerDlg::OnBnClickedComments()
 {
 	// TODO: Add your control notification handler code here
+}
+void CWorkersRightsComputerDlg::SaveToXml(CXMLDump &xmlDump)
+{
+	CXMLDumpScope mainScope(L"MainDialog", xmlDump);
+
+	{
+		CXMLDumpScope scope(L"EditBoxes", xmlDump);
+		POSITION pos = mEditBoxes.GetHeadPosition();
+		while (pos)
+		{
+			CString sText;
+			CEditRef *pRef = mEditBoxes.GetNext(pos);
+			pRef->mEdit.GetWindowText(sText);
+			if (sText.IsEmpty())
+				sText = L"0";
+			xmlDump.Write((const wchar_t *)pRef->msName, (const wchar_t *)sText);
+		}
+	}
+	// Holidays
+	CString sText;
+	mComboHolidays.GetWindowText(sText);
+	if (sText.IsEmpty())
+		sText = L"-";
+	xmlDump.Write(L"Holidays", (const wchar_t *)sText);
+
+	{
+		CXMLDumpScope scope(L"Buttons", xmlDump);
+		POSITION pos = mButtons.GetHeadPosition();
+		while (pos)
+		{
+			CButtonRef *pRef = mButtons.GetNext(pos);
+			if (pRef->mButton.GetCheck() == BST_CHECKED)
+				xmlDump.Write((const wchar_t *)pRef->msName, L"checked\n");
+			else
+				xmlDump.Write((const wchar_t *)pRef->msName, L"not_checked\n");
+		}
+	}
 }

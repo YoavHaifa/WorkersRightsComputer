@@ -6,8 +6,20 @@
 #include "UsedVacations.h"
 #include "HtmlWriter.h"
 #include "FamilyPart.h"
+#include "XMLDump.h"
 
 CWorkPeriod gWorkPeriod;
+
+const wchar_t *uasDaysNames[7] = 
+{
+	L"Sunday",
+	L"Monday",
+	L"Tuesday",
+	L"Wednesday",
+	L"Thursday",
+	L"Friday",
+	L"Saturday"
+};
 
 CWorkPeriod::CWorkPeriod(void)
 	: mbMinWage(true)
@@ -398,6 +410,43 @@ void CWorkPeriod::WriteToLetter(class CHtmlWriter &html)
 	s += mLast.ToString();
 	html.WriteLine(s);
 }
+void CWorkPeriod::SaveToXml(CXMLDump &xmlDump)
+{
+	CXMLDumpScope mainScope(L"WorkPeriod", xmlDump);
+
+	xmlDump.Write(L"first", mFirst);
+	xmlDump.Write(L"last", mLast);
+	xmlDump.Write(L"notice", mNotice);
+
+	{
+		CXMLDumpScope scope(L"Days", xmlDump);
+		for (int iDay = 0; iDay < 7; iDay++)
+		{
+			xmlDump.Write(uasDaysNames[iDay], maWorkingDays[iDay] > 0 ? 1: 0);
+		}
+	}
+	if (mbMinWage)
+	{
+		xmlDump.Write(L"bMinWage", mbMinWage);
+	}
+	else if (mbMonthlyWage)
+	{
+		xmlDump.Write(L"bMonthlyWage", mbMonthlyWage);
+		xmlDump.Write(L"MonthlyWage", mMonthlyWage);
+	}
+	else
+	{
+		xmlDump.Write(L"bHourlyWage", true);
+		xmlDump.Write(L"HourlyWage", mHourlyWage);
+		xmlDump.Write(L"HoursPerWeek", mHoursPerWeek);
+	}
+
+	xmlDump.Write(L"bNotIncludingLastSalary", mbNotIncludingLastSalary);
+	xmlDump.Write(L"last_salary_until", mLastSalaryUntil);
+
+	gUsedVacations.SaveToXml(xmlDump);
+	gFamilyPart.SaveToXml(xmlDump);
+}
 void CWorkPeriod::Save(FILE *pfSave)
 {
 	fwprintf(pfSave, L"WorkPeriod\n");
@@ -495,6 +544,11 @@ CString CWorkPeriod::GetTextSummary()
 
 	s += "\r\n";
 	s += gWorkPeriod.mSpanString;
+	if (gFamilyPart.mbAskOnlyForFamilyPart)
+	{
+		s += "\r\n";
+		s += gFamilyPart.GetShortText();
+	}
 	return s;
 }
 CString CWorkPeriod::GetDaysText()

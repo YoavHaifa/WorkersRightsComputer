@@ -8,6 +8,7 @@ public:
 	void Save(const wchar_t *zfName = NULL);
 	void Restore(const wchar_t *zfName = NULL);
 
+	void SaveToXml(void);
 	void SaveToFile(void);
 	void SaveEditBox(FILE *pfSave, class CEditRef *pRef);
 	void SaveButton(FILE *pfSave, class CButtonRef *pRef);

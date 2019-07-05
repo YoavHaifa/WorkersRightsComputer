@@ -1,5 +1,5 @@
 #include "StdAfx.h"
-#include ".\xmlparse.h"
+#include "XmlParse.h"
 #include "Utils.h"
 #include "FileName.h"
 //#include "XMLDump.h"

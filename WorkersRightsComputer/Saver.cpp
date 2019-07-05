@@ -6,6 +6,7 @@
 #include "Resource.h"
 #include "AllRights.h"
 #include "UsedVacations.h"
+#include "XmlDump.h"
 
 
 CSaver::CSaver()
@@ -31,6 +32,7 @@ void CSaver::Save(const wchar_t *zfName)
 	}
 
 	SaveToFile();
+	SaveToXml();
 
 	WriteLetter();
 }
@@ -43,6 +45,20 @@ void CSaver::Restore(const wchar_t *zfName)
 
 	LoadFromFile();
 
+}
+void CSaver::SaveToXml(void)
+{
+	CFileName fName(msfName);
+	fName.ChangeType(L"xml");
+	CXMLDump xmlDump((const wchar_t *)fName, L"WorkersRights");
+	if (!xmlDump)
+		return;
+
+	gpDlg->SaveToXml(xmlDump);
+
+	gWorkPeriod.SaveToXml(xmlDump);
+
+	xmlDump.Close();
 }
 void CSaver::SaveToFile(void)
 {
@@ -151,6 +167,7 @@ void CSaver::WriteLetter()
 	msfName = sSaveDir;
 	msfName += L"Save.txt";
 	SaveToFile();
+	SaveToXml();
 
 	CRight::SetSaveDirAndName(sSaveDir, sName);
 	gpDlg->OnInputChange(); //  Recompute all and save all relevant logs to special dir

@@ -20,6 +20,7 @@ public:
 	CString msAddress;
 	CString msEmail;
 	CString msRole;
+	bool mbIsPassport; // Otherwise ID
 	class CMyDialogEx *mpDlg;
 	int miFirstName;
 	int miFamilyName;

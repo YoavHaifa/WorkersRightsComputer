@@ -3,10 +3,12 @@
 #include "LogoWriter.h"
 #include "HtmlWriter.h"
 #include "MyDialogEx.h"
+#include "resource.h"
 
 CPerson gWorker;
 
 CPerson::CPerson(void)
+	: mbIsPassport(true)
 {
 }
 void CPerson::StartLetter(CLogoWriter &logo)
@@ -19,7 +21,11 @@ void CPerson::StartLetter(CLogoWriter &logo)
 	logo.WriteLine(s);
 	if (msPassport && msPassport != L"0")
 	{
-		s = L"Pasport: ";
+		if (mbIsPassport)
+			s = L"Pasport: ";
+		else
+			s = L"ID: ";
+
 		s += msPassport;
 		logo.WriteLine(s);
 	}
@@ -39,6 +45,7 @@ void CPerson::StartLetter(CHtmlWriter &html)
 	msPassport = mpDlg->GetText(miId);
 	msTelephone = mpDlg->GetText(miTel);
 	msEmail = mpDlg->GetText(miEmail);
+	mbIsPassport = mpDlg->IsChecked(IDC_RADIO_PASSPORT);
 
 	CString s = msPrivateName;
 	s += " ";

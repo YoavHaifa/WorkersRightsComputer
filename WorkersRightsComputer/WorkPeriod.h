@@ -52,6 +52,8 @@ public:
 	CMyTime mLast;
 	CMyTime mNotice;
 	CMyTime mLastYearStart;
+	CMyTime mLastSalaryUntil;
+	bool mbNotIncludingLastSalary;
 
 	//System::TimeSpan mSpan;
 	CString mSpanString;
@@ -89,6 +91,7 @@ public:
 	int CountDaysToEndOfMonth(CMyTime &date);
 	int CountWorkDaysToEndOfMonthFrom(CMyTime &firstDate);
 	void Save(FILE *pfSave);
+	void SaveToXml(class CXMLDump &xmlDump);
 	void Restore(FILE *pfRead);
 	bool mbMinWage;
 	bool mbMonthlyWage;
@@ -115,6 +118,7 @@ public:
 
 	void SetWeekDaysPaidByCompany(class CCompanyPartPeriod *pFrom, class CCompanyPartPeriod *pUntil);
 	double ComputeFamilyPart(void);
+
 };
 
 extern CWorkPeriod gWorkPeriod;

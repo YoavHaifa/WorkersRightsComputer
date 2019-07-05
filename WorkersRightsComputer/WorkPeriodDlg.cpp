@@ -11,6 +11,7 @@
 #include "VacationsDlg.h"
 #include "UsedVacations.h"
 #include "FamilyPartDlg.h"
+#include "FamilyPart.h"
 
 
 // CWorkPeriodDlg dialog
@@ -200,6 +201,12 @@ int CWorkPeriodDlg::UpdateText()
 
 	sAll += GetWageText();
 	sAll += "\r\n";
+
+	if (gFamilyPart.mbAskOnlyForFamilyPart)
+	{
+		sAll += gFamilyPart.GetShortText();
+		sAll += "\r\n";
+	}
 
 	mShow.SetWindowText(sAll);
 	//CWnd wnd = GetDialogEl
@@ -420,4 +427,6 @@ void CWorkPeriodDlg::OnBnClickedButtonFamilyPart()
 {
 	CFamilyPartDlg dlg;
 	dlg.DoModal();
+
+	UpdateText();
 }

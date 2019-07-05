@@ -8,6 +8,8 @@ public:
 
 	void AddVacation(class CVacationUsed *pVacationUsed);
 	void Save(FILE *pfSave);
+	void SaveToXml(class CXMLDump &xmlDump);
+
 	void Restore(FILE *pfRead);
 	bool IsEmpty(void) { return mVacationsUsed.IsEmpty(); }
 

@@ -45,6 +45,15 @@ void CRight::Save(FILE *pfWrite)
 	WriteLine(pfWrite, msDebug);
 	WriteLine(pfWrite, L"*");
 }
+CString CRight::GetSaveFileName(const wchar_t *zfName, const wchar_t *zExtension)
+{
+	CString sfName = umsSaveDir;
+	sfName += umsName;
+	sfName += zfName;
+	sfName += ".";
+	sfName += zExtension;
+	return sfName;
+}
 FILE * CRight::OpenFile(const wchar_t *zfName, const wchar_t *zExtension)
 {
 	CString sfName = umsSaveDir;

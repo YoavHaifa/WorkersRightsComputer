@@ -174,6 +174,9 @@ bool CAllRights::ComputeInternal()
 }
 void CAllRights::WriteLetter(void)
 {
+	CHtmlWriter writer;
+	writer.WriteLetter();
+	/*
 	CLogoWriter logo(L"logo_letter");
 
 	gWorker.StartLetter(logo);
@@ -200,7 +203,7 @@ void CAllRights::WriteLetter(void)
 	//sSum += hebrew->Get("Total");
 	logo.WriteLine(sSum);
 
-	logo.Close();
+	logo.Close(); */
 }
 void CAllRights::WriteLetterToHtml(CHtmlWriter &html)
 {

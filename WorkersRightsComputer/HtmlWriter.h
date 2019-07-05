@@ -4,7 +4,7 @@ class CHtmlWriter
 public:
 	CHtmlWriter();
 	~CHtmlWriter();
-	int Try();
+	int WriteLetter();
 	FILE *mpfWrite;
 	CString msfName;
 	void BREOL();

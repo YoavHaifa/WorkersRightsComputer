@@ -88,6 +88,7 @@ public:
 	static void SetSaveDirAndName(const wchar_t *zSaveDir, const wchar_t *zName);
 	static void ResetSaveDirAndName(void);
 	static FILE * OpenFile(const wchar_t *zfName, const wchar_t *zExtension);
+	static CString GetSaveFileName(const wchar_t *zfName, const wchar_t *zExtension);
 	bool TryReadInt(FILE *pfRead, const wchar_t *zText, int &value);
 	static bool TryConvertInt(const wchar_t *zSource, const wchar_t *zText, int &value);
 	int SafeGetIntFromTextBox(CEdit &box);

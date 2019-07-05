@@ -68,7 +68,9 @@ public:
 
 	CList<CCompanyPartPeriod *, CCompanyPartPeriod *> mPeriods;
 	CString GetFullText();
+	CString GetShortText();
 	void Compute();
+	void SaveToXml(class CXMLDump &xmlDump);
 	void Save(FILE *pfSave);
 	void Restore(FILE *pfRead);
 };

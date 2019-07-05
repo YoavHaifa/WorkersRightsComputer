@@ -2,6 +2,7 @@
 #include "FamilyPart.h"
 #include "WorkPeriod.h"
 #include "Utils.h"
+#include "XMLDump.h"
 
 CFamilyPart gFamilyPart;
 
@@ -110,11 +111,24 @@ CString CFamilyPart::GetFullText()
 		s += "\r\n";
 		pPrevPeriod = pPeriod;
 	}
-	
+
 	char zBuf[128];
-	sprintf_s(zBuf, sizeof(zBuf), "Family Part is %5.2f%%", mRatio*100);
+	sprintf_s(zBuf, sizeof(zBuf), "Family Part is %5.2f%%", mRatio * 100);
 	s += zBuf;
 	return s;
+}
+CString CFamilyPart::GetShortText()
+{
+	if (mPeriods.IsEmpty())
+	{
+		CString s("Division of hours between company and family was not reported.");
+		return s;
+	}
+	Compute();
+
+	char zBuf[128];
+	sprintf_s(zBuf, sizeof(zBuf), "Ask only for Family Part - %5.2f%%", mRatio * 100);
+	return CString(zBuf);
 }
 void CFamilyPart::Compute()
 {
@@ -134,6 +148,26 @@ void CFamilyPart::Compute()
 		gWorkPeriod.SetWeekDaysPaidByCompany(pPrevPeriod, NULL);
 
 	mRatio = gWorkPeriod.ComputeFamilyPart();
+}
+void CFamilyPart::SaveToXml(CXMLDump &xmlDump)
+{
+	if (mPeriods.IsEmpty())
+		return;
+
+	CXMLDumpScope scope(L"FamilyPart", xmlDump);
+
+	POSITION pos = mPeriods.GetHeadPosition();
+	while (pos)
+	{
+		CCompanyPartPeriod *pPeriod = mPeriods.GetNext(pos);
+		if (!pPeriod->mbDummyForApril18)
+		{
+			CXMLDumpScope scope1(L"Period", xmlDump);
+			xmlDump.Write(L"From", pPeriod->mFrom);
+			xmlDump.Write(L"CompanyHoursPerWeek", pPeriod->mCompanyHoursPerWeek);
+		}
+	}
+	xmlDump.Write(L"bAskOnlyForFamilyPart", mbAskOnlyForFamilyPart);
 }
 void CFamilyPart::Save(FILE *pfSave)
 {
