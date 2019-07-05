@@ -17,8 +17,7 @@ public:
 
 	void Save(FILE *pfWrite);
 
-	void WriteLetter(void);
-	void WriteLetterToHtml(class CHtmlWriter &html);
+	void WriteLetterToHtml(class CHtmlWriter &html, bool bUsingTemplate);
 	void WriteTotalLineToHtmlTable(class CHtmlWriter &html);
 
 	bool Compute(void);

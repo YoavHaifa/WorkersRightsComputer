@@ -3,16 +3,88 @@
 #include "Utils.h"
 #include "Person.h"
 #include "AllRights.h"
+#include "WorkPeriod.h"
+#include "FamilyPart.h"
 
 
 CHtmlWriter::CHtmlWriter()
 	: mpfWrite(NULL)
+	, mpfRead(NULL)
 {
 }
 CHtmlWriter::~CHtmlWriter()
 {
+	if (mpfRead)
+		fclose(mpfRead);
 	if (mpfWrite)
 		fclose(mpfWrite);
+}
+int CHtmlWriter::WriteLetterFromTemplate()
+{
+	mpfRead = MyFOpenWithErrorBox(L"..\\HTML\\letterTemplate.html", L"r, ccs=UNICODE", L"letter template");
+
+	msfName = CRight::GetSaveFileName(L"logo_letter_temp", L"html");
+	mpfWrite = MyFOpenWithErrorBox(msfName, L"w, ccs=UNICODE", L"HTML Unicode");
+	//mpfWrite = MyFOpenWithErrorBox(msfName, L"wb", L"HTML Unicode");
+
+	CString s;
+	int n = 0;
+	//wchar_t prevChar = 0;
+	wchar_t ch = (wchar_t)getwc(mpfRead);
+	//while (fread(&ch, sizeof(ch), 1, mpfRead))
+	while (ch != 0 && ch != WEOF)
+		{
+		n++;
+		s += ch;
+		if (ch == '{')
+		{
+			ReplaceTemplateVariable();
+		}
+		//fwrite(&ch,sizeof(ch), 1, mpfWrite);
+		//prevChar = ch;
+		else
+			fwprintf(mpfWrite, L"%c", ch);
+		ch = (wchar_t)getwc(mpfRead);
+	}
+	return n;
+}
+void CHtmlWriter::ReplaceTemplateVariable(void)
+{
+	wchar_t ch = (wchar_t)getwc(mpfRead);
+	if (ch == '{')
+		ch = (wchar_t)getwc(mpfRead);
+	CString sToken(ch);
+	ch = (wchar_t)getwc(mpfRead);
+	while (ch != 0 && ch != WEOF && ch != '}')
+	{
+		sToken += ch;
+		ch = (wchar_t)getwc(mpfRead);
+	}
+
+	if (ch == '}')
+		ch = (wchar_t)getwc(mpfRead); // Get rid of second '}'
+
+	if (sToken == L"firstName")
+		Print(gWorker.GetFirstName());
+	else if (sToken == L"lastName")
+		Print(gWorker.GetLastName());
+	else if (sToken == L"passport")
+		Print(gWorker.GetPassport());
+	else if (sToken == L"telephone")
+		Print(gWorker.GetTel());
+	else if (sToken == L"workPeriod")
+		Print(gWorkPeriod.GetPeriodForLetter());
+	else if (sToken == L"table")
+		WriteTable(true);
+	else if (sToken == L"familyPart")
+		gFamilyPart.WriteToLetter(*this);
+
+	else
+		fwprintf(mpfWrite, L"{{Unexpeted Token: %s}}", (const wchar_t *)sToken);
+}
+void CHtmlWriter::Print(const CString &s)
+{
+	fwprintf(mpfWrite, L"%s", (const wchar_t *)s);
 }
 int CHtmlWriter::WriteLetter()
 {
@@ -45,7 +117,7 @@ int CHtmlWriter::WriteLetter()
 	gWorker.StartLetter(*this);
 	WriteLine(L"");
 
-	WriteTable();
+	WriteTable(false);
 
 	WriteL(L"</body>");
 	WriteL(L"</html>");
@@ -81,9 +153,9 @@ void CHtmlWriter::WriteHeadline(const wchar_t *zText, int iH)
 }
 
 
-void CHtmlWriter::WriteTable()
+void CHtmlWriter::WriteTable(bool bUsingTemplate)
 {
-	WriteL(L"<table style=\"width:50%\">");
+	WriteL(L"<table style=\"width:50%\" border=1>");
 
 	WriteL(L"<tr>");
 	WriteL(L"<th>Topic</th>");
@@ -92,7 +164,15 @@ void CHtmlWriter::WriteTable()
 	WriteL(L"<th>בעניין</th>");
 	WriteL(L"</tr>");
 
-	gAllRights.WriteLetterToHtml(*this);
+	gAllRights.WriteLetterToHtml(*this, bUsingTemplate);
 
 	WriteL(L"</table>");
+}
+void CHtmlWriter::StartParagraph(void)
+{
+	WriteL(L"<p>");
+}
+void CHtmlWriter::EndParagraph(void)
+{
+	WriteL(L"</p>");
 }

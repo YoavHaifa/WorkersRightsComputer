@@ -99,6 +99,7 @@ public:
 	CEdit mAddress;
 	CEdit mEmail;
 	void SaveToXml(class CXMLDump &xmlDump);
+	afx_msg void OnTestLoadxml();
 };
 
 extern CWorkersRightsComputerDlg *gpDlg;

@@ -27,6 +27,7 @@ public:
 	void Reset(void);
 	void WriteToLetter(CLogoWriter &lw);
 	void WriteToLetter(class CHtmlWriter &html);
+	CString GetPeriodForLetter(void);
 
 	bool IsValid(void)
 	{

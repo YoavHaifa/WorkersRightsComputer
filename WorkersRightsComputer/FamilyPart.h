@@ -73,6 +73,7 @@ public:
 	void SaveToXml(class CXMLDump &xmlDump);
 	void Save(FILE *pfSave);
 	void Restore(FILE *pfRead);
+	void WriteToLetter(class CHtmlWriter &writer);
 };
 
 extern CFamilyPart gFamilyPart;

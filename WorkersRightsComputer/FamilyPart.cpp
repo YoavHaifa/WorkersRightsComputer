@@ -3,6 +3,7 @@
 #include "WorkPeriod.h"
 #include "Utils.h"
 #include "XMLDump.h"
+#include "HtmlWriter.h"
 
 CFamilyPart gFamilyPart;
 
@@ -208,4 +209,22 @@ void CFamilyPart::Restore(FILE *pfRead)
 		mbAskOnlyForFamilyPart = true;
 		s = CUtils::ReadLine(pfRead); // read last line
 	}
+}
+void CFamilyPart::WriteToLetter(CHtmlWriter &writer)
+{
+	writer.StartParagraph();
+	if (mbDefined && mbAskOnlyForFamilyPart)
+	{
+		writer.WriteL(L"This computation only relates to the part that is due from the employing family.");
+		fwprintf(writer.mpfWrite, L"Family Part is %5.2f%%\n", mRatio * 100);
+		//wchar_t zBuf[128];
+		//swprintf_s(zBuf, sizeof(zBuf), L"Family Part is %5.2f%%%%", mRatio * 100);
+		//writer.WriteL(zBuf);
+	}
+	else
+	{
+		writer.WriteL(L"This computation includes the amounts paid by bituakh leumi for severance and pension payment.");
+
+	}
+	writer.EndParagraph();
 }

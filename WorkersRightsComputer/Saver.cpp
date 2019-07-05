@@ -7,6 +7,7 @@
 #include "AllRights.h"
 #include "UsedVacations.h"
 #include "XmlDump.h"
+#include "HtmlWriter.h"
 
 
 CSaver::CSaver()
@@ -171,7 +172,15 @@ void CSaver::WriteLetter()
 
 	CRight::SetSaveDirAndName(sSaveDir, sName);
 	gpDlg->OnInputChange(); //  Recompute all and save all relevant logs to special dir
-	gAllRights.WriteLetter();
+	{
+		CHtmlWriter writer;
+		writer.WriteLetter();
+	}
+	{
+		CHtmlWriter writer;
+		writer.WriteLetterFromTemplate();
+	}
+
 	CRight::ResetSaveDirAndName();
 }
 void CSaver::LoadFromFile()

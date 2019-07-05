@@ -22,7 +22,7 @@ void CPerson::StartLetter(CLogoWriter &logo)
 	if (msPassport && msPassport != L"0")
 	{
 		if (mbIsPassport)
-			s = L"Pasport: ";
+			s = L"Passport: ";
 		else
 			s = L"ID: ";
 
@@ -36,6 +36,23 @@ void CPerson::StartLetter(CLogoWriter &logo)
 		logo.WriteLine(s);
 	}
 }
+CString CPerson::GetFirstName(void)
+{
+	return mpDlg->GetText(miFirstName);
+}
+CString CPerson::GetLastName(void)
+{
+	return mpDlg->GetText(miFamilyName);
+}
+CString CPerson::GetPassport(void)
+{
+	return mpDlg->GetText(miId);
+}
+CString CPerson::GetTel(void)
+{
+	return mpDlg->GetText(miTel);
+}
+
 void CPerson::StartLetter(CHtmlWriter &html)
 {
 	html.WriteLine(L"To");
@@ -53,7 +70,7 @@ void CPerson::StartLetter(CHtmlWriter &html)
 	html.WriteLine(s);
 	if (!msPassport.IsEmpty() && msPassport != L"0")
 	{
-		s = L"Pasport: ";
+		s = L"Passport: ";
 		s += msPassport;
 		html.WriteLine(s);
 	}

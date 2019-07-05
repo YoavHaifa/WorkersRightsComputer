@@ -161,6 +161,7 @@ BEGIN_MESSAGE_MAP(CWorkersRightsComputerDlg, CDialogEx)
 	ON_COMMAND(ID_TEST_WRITEHTML, &CWorkersRightsComputerDlg::OnTestWritehtml)
 	ON_BN_CLICKED(IDC_EMPLOYER, &CWorkersRightsComputerDlg::OnBnClickedEmployer)
 	ON_BN_CLICKED(IDC_COMMENTS, &CWorkersRightsComputerDlg::OnBnClickedComments)
+	ON_COMMAND(ID_TEST_LOADXML, &CWorkersRightsComputerDlg::OnTestLoadxml)
 END_MESSAGE_MAP()
 
 
@@ -489,8 +490,14 @@ void CWorkersRightsComputerDlg::OnTestReadhebrew()
 }
 void CWorkersRightsComputerDlg::OnTestWritehtml()
 {
-	CHtmlWriter writer;
-	writer.WriteLetter();
+	{
+		CHtmlWriter writer;
+		writer.WriteLetter();
+	}
+	{
+		CHtmlWriter writer;
+		writer.WriteLetterFromTemplate();
+	}
 }
 void CWorkersRightsComputerDlg::OnBnClickedEmployer()
 {
@@ -537,4 +544,10 @@ void CWorkersRightsComputerDlg::SaveToXml(CXMLDump &xmlDump)
 				xmlDump.Write((const wchar_t *)pRef->msName, L"not_checked\n");
 		}
 	}
+}
+
+
+void CWorkersRightsComputerDlg::OnTestLoadxml()
+{
+	// TODO: Add your command handler code here
 }

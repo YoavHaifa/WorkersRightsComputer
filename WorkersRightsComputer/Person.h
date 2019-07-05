@@ -5,6 +5,11 @@ class CPerson
 public:
 	CPerson(void);
 
+	CString GetFirstName(void);
+	CString GetLastName(void);
+	CString GetPassport(void);
+	CString GetTel(void);
+
 	void StartLetter(class CLogoWriter &lw);
 	void StartLetter(class CHtmlWriter &html);
 	void SetDlg(class CMyDialogEx *pDlg, int iFirstName, int iFamilyName, int iId, int iTel, int iAdd, int iEmail, int iRole = 0);

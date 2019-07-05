@@ -410,6 +410,13 @@ void CWorkPeriod::WriteToLetter(class CHtmlWriter &html)
 	s += mLast.ToString();
 	html.WriteLine(s);
 }
+CString CWorkPeriod::GetPeriodForLetter(void)
+{
+	CString s(mFirst.ToString());
+	s += " - ";
+	s += mLast.ToString();
+	return s;
+}
 void CWorkPeriod::SaveToXml(CXMLDump &xmlDump)
 {
 	CXMLDumpScope mainScope(L"WorkPeriod", xmlDump);

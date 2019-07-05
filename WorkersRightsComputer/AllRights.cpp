@@ -172,11 +172,9 @@ bool CAllRights::ComputeInternal()
 
 	return bOK;
 }
-void CAllRights::WriteLetter(void)
+/*
+//void CAllRights::WriteLetter(void)
 {
-	CHtmlWriter writer;
-	writer.WriteLetter();
-	/*
 	CLogoWriter logo(L"logo_letter");
 
 	gWorker.StartLetter(logo);
@@ -203,13 +201,16 @@ void CAllRights::WriteLetter(void)
 	//sSum += hebrew->Get("Total");
 	logo.WriteLine(sSum);
 
-	logo.Close(); */
-}
-void CAllRights::WriteLetterToHtml(CHtmlWriter &html)
+	logo.Close();
+} */
+void CAllRights::WriteLetterToHtml(CHtmlWriter &html, bool bUsingTemplate)
 {
-	gWorkPeriod.WriteToLetter(html);
-	html.WriteLine(L"Please find below the list of payments due from your employer");
-	html.WriteLine(L"In Short:");
+	if (!bUsingTemplate)
+	{
+		gWorkPeriod.WriteToLetter(html);
+		html.WriteLine(L"Please find below the list of payments due from your employer");
+		html.WriteLine(L"In Short:");
+	}
 
 	POSITION pos = mRights.GetHeadPosition();
 	while (pos)
