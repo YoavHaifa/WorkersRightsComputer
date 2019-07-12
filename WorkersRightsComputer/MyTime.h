@@ -8,6 +8,7 @@ public:
 	CMyTime(int year, int month, int day);
 	~CMyTime();
 
+	void SetNow(void);
 	void Set(CTime time);
 	void SetDate(CTime time);
 	void Set(int year, int month, int day);

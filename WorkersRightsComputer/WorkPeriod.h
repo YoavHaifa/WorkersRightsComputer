@@ -119,6 +119,7 @@ public:
 
 	void SetWeekDaysPaidByCompany(class CCompanyPartPeriod *pFrom, class CCompanyPartPeriod *pUntil);
 	double ComputeFamilyPart(void);
+	void WriteLastSalary(class CHtmlWriter& html);
 
 };
 

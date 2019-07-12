@@ -160,7 +160,7 @@ bool CAllRights::ComputeInternal()
 
 	CRight::WriteLine(pfWrite, L"----------------");
 
-	sAll += L"==> Total Due ";
+	sAll += L"\r\n==> Total Due ";
 	sAll += CRight::ToString(mSumDue);
 	if (gpDlg)
 		gpDlg->DisplaySummary(sAll);

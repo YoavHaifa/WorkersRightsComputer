@@ -2,9 +2,13 @@
 #include "HtmlWriter.h"
 #include "Utils.h"
 #include "Person.h"
+#include "MyTime.h"
 #include "AllRights.h"
 #include "WorkPeriod.h"
 #include "FamilyPart.h"
+#include "UsedVacations.h"
+#include "WorkersRightsComputerDlg.h"
+#include "Pension.h"
 
 
 CHtmlWriter::CHtmlWriter()
@@ -64,20 +68,30 @@ void CHtmlWriter::ReplaceTemplateVariable(void)
 	if (ch == '}')
 		ch = (wchar_t)getwc(mpfRead); // Get rid of second '}'
 
-	if (sToken == L"firstName")
-		Print(gWorker.GetFirstName());
-	else if (sToken == L"lastName")
-		Print(gWorker.GetLastName());
-	else if (sToken == L"passport")
-		Print(gWorker.GetPassport());
-	else if (sToken == L"telephone")
-		Print(gWorker.GetTel());
+	if (sToken == L"headerAddress")
+		WritePara(L"iris.bar@kavlaoved.org.il - טל. 04-8643350 פקס 04-8644238 דואל");
+	else if (sToken == L"startLetter")
+		gWorker.StartLetter(*this);
 	else if (sToken == L"workPeriod")
 		Print(gWorkPeriod.GetPeriodForLetter());
 	else if (sToken == L"table")
 		WriteTable(true);
+	else if (sToken == L"pension")
+		gpPension->WriteToLetter(*this);
+	else if (sToken == L"vacations")
+		gUsedVacations.WriteToLetter(*this);
 	else if (sToken == L"familyPart")
 		gFamilyPart.WriteToLetter(*this);
+	else if (sToken == L"lastSalary")
+		gWorkPeriod.WriteLastSalary(*this);
+	else if (sToken == L"editor")
+		gpDlg->WriteEditorToLetter(*this);
+	else if (sToken == L"date")
+	{
+		CMyTime now;
+		now.SetNow();
+		WriteL(now.ToString());
+	}
 
 	else
 		fwprintf(mpfWrite, L"{{Unexpeted Token: %s}}", (const wchar_t *)sToken);
@@ -142,17 +156,20 @@ void CHtmlWriter::WriteL(const wchar_t *zText)
 	fwprintf(mpfWrite, L"%s\n", zText);
 	EOL();
 }
+void CHtmlWriter::WritePara(const wchar_t *zText)
+{
+	fwprintf(mpfWrite, L"<p> %s </p>\n", zText);
+}
 void CHtmlWriter::WriteLine(const wchar_t *zText)
 {
 	fwprintf(mpfWrite, L"%s<br>\n", zText);
+	fflush(mpfWrite);
 }
 void CHtmlWriter::WriteHeadline(const wchar_t *zText, int iH)
 {
 	fwprintf(mpfWrite, L"<h%d style=\"text-align:center;\">", iH);
 	fwprintf(mpfWrite, L"%s</h%d>\n", zText, iH);
 }
-
-
 void CHtmlWriter::WriteTable(bool bUsingTemplate)
 {
 	WriteL(L"<table style=\"width:50%\" border=1>");
@@ -175,4 +192,62 @@ void CHtmlWriter::StartParagraph(void)
 void CHtmlWriter::EndParagraph(void)
 {
 	WriteL(L"</p>");
+}
+void CHtmlWriter::StartTabLine(void)
+{
+	WriteL(L"<tr>");
+}
+void CHtmlWriter::EndTabLine(void)
+{
+	WriteL(L"</tr>");
+}
+void CHtmlWriter::StartPensionTable(void)
+{
+	WriteL(L"<table style=\"width:50%\" border=1>");
+
+	WriteL(L"<tr>");
+	WriteL(L"<th>From</th>");
+	WriteL(L"<th>Till</th>");
+	WriteL(L"<th>Salary</th>");
+	WriteL(L"<th>Months</th>");
+	WriteL(L"<th>Total</th>");
+	WriteL(L"<th>Pension</th>");
+	WriteL(L"<th>Due</th>");
+	if (gpPension->mbSeverance)
+	{
+		WriteL(L"<th>Severance</th>");
+		WriteL(L"<th>Due</th>");
+		WriteL(L"<th>All</th>");
+	}
+	WriteL(L"</tr>");
+}
+void CHtmlWriter::EndPensionTable(void)
+{
+	WriteL(L"</table>");
+}
+void CHtmlWriter::Write2Tab(CString &sItem)
+{
+	CString s("<td>");
+	s += sItem;
+	s += "</td>";
+	WriteL(s);
+}
+void CHtmlWriter::Write2Tab(const char *zText)
+{
+	CString s("<td>");
+	s += zText;
+	s += "</td>";
+	WriteL(s);
+}
+void CHtmlWriter::Write2Tab(double value)
+{
+	char zBuf[128];
+	sprintf_s(zBuf, 128, "%.2f", value);
+	Write2Tab(zBuf);
+}
+void CHtmlWriter::Write2Tab(const char *zFormat, double value)
+{
+	char zBuf[128];
+	sprintf_s(zBuf, 128, zFormat, value);
+	Write2Tab(zBuf);
 }

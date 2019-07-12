@@ -19,7 +19,7 @@
 IMPLEMENT_DYNAMIC(CWorkPeriodDlg, CDialogEx)
 
 CWorkPeriodDlg::CWorkPeriodDlg(CWnd* pParent /*=nullptr*/)
-	: CDialogEx(IDD_DIALOG_WORK_PERIOD, pParent)
+	: CMyDialogEx(IDD_DIALOG_WORK_PERIOD, pParent)
 	, mWageMode(IDC_RADIO_MIN_WAGE)
 {
 	mapCheckDays[0] = &mCheckSunday;
@@ -53,6 +53,7 @@ void CWorkPeriodDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_CHECK_SATURDAY, mCheckSaturday);
 	DDX_Control(pDX, IDC_RADIO_MONTHLY, mRadioMonthly);
 	DDX_Control(pDX, IDC_RADIO_HOURLY, mRadioHourly);
+	DDX_Control(pDX, IDC_DATETIMEPICKER_NOTICE2, mLastSalaryDate);
 }
 
 
@@ -331,6 +332,14 @@ void CWorkPeriodDlg::UpdateDataFromDialog(void)
 		mHoursPerWeek.GetWindowTextW(snHoursText);
 		gWorkPeriod.SetHourlyWage(_wtof(sWageText), _wtof(snHoursText));
 	}
+
+	if (IsChecked(IDC_CHECK_NOT_INCLUDING))
+		gWorkPeriod.mbNotIncludingLastSalary = true;
+	else
+		gWorkPeriod.mbNotIncludingLastSalary = false;
+
+	flags = mLastSalaryDate.GetTime(time);
+	gWorkPeriod.mLastSalaryUntil.SetDate(time);
 }
 void CWorkPeriodDlg::OnBnClickedOk()
 {

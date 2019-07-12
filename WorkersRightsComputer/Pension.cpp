@@ -4,18 +4,20 @@
 #include "MonthlyRates.h"
 #include "Utils.h"
 #include "MonthInfo.h"
+#include "HtmlWriter.h"
 
+CPension *gpPension = NULL;
 
 CPension::CPension(void)
 	: CRight(L"Pension", L"פנסיה")
 {
 	mpPensionRates = new CMonthlyRates(L"Pension", 2008);
 	mpSeveranceRates = new CYearlyRates(L"Severance", 2008);
+	gpPension = this;
 }
-
-
 CPension::~CPension(void)
 {
+	gpPension = NULL;
 }
 bool CPension::SetCheckRef(CButtonRef *pButton)
 {
@@ -31,9 +33,9 @@ bool CPension::SetCheckRef(CButtonRef *pButton)
 	}
 	return false;
 }
-
 bool CPension::Compute(void)
 {
+	mbSeverance = false;
 	gWorkPeriod.Log(L"Pension_Compute");
 
 	if (!mpbEntitledToSeveranceFund)
@@ -70,6 +72,7 @@ bool CPension::Compute(void)
 
 	if (mpbEntitledToSeveranceFund->IsChecked())
 	{
+		mbSeverance = true;
 		CString sLog = L"Pension Due ";
 		sLog += ToString(mPensionDue);
 		LogLine(sLog);
@@ -125,9 +128,10 @@ void CPension::AddMonth(int year, int month, int nDays /* if 0 - full */)
 	sLine += L" ";
 	sLine += ToString(pensionDue);
 
+	double sevRate = 0;
 	if (mpbEntitledToSeveranceFund->IsChecked())
 	{
-		double sevRate = mpSeveranceRates->RatePerYear(year);
+		sevRate = mpSeveranceRates->RatePerYear(year);
 		double severanceDue = monthlyPay * sevRate * part;
 		mSeveranceDue += severanceDue;
 		mSeverancePerYear += severanceDue;
@@ -143,9 +147,11 @@ void CPension::AddMonth(int year, int month, int nDays /* if 0 - full */)
 	LogLine(sLine);
 	if (month == 12)
 		OnYearEnd();
+	mReport.AddMonth(year, month, monthlyPay, part, penRate, sevRate);
 }
 bool CPension::DoCompute()
 {
+	mReport.Clear();
 
 	if (mpbHadActivePensionBefore->IsChecked())
 	{
@@ -254,4 +260,20 @@ CString CPension::GetDecriptionForLetter(void)
 	}
 	
 	return s;
+}
+void CPension::WriteToLetter(class CHtmlWriter& html)
+{
+	if (mReport.IsEmpty())
+		return;
+
+	html.StartParagraph();
+	html.WriteLine(L"Computation of due pension by month:");
+
+	CString sDate = L"First day for pension: ";
+	sDate += mStartDateForPension.ToString();
+	html.WriteLine(sDate);
+	html.WriteLine(L"");
+	mReport.WriteToLetter(html);
+
+	html.EndParagraph();
 }

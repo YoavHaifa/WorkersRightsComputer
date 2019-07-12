@@ -19,6 +19,7 @@
 #include "Saver.h"
 #include "MyAskDlg.h"
 #include "XmlDump.h"
+#include "HtmlWriter.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -545,9 +546,17 @@ void CWorkersRightsComputerDlg::SaveToXml(CXMLDump &xmlDump)
 		}
 	}
 }
-
-
 void CWorkersRightsComputerDlg::OnTestLoadxml()
 {
 	// TODO: Add your command handler code here
+}
+void CWorkersRightsComputerDlg::WriteEditorToLetter(CHtmlWriter& html)
+{
+	CString s(L"Prepared by: ");
+	CString sEditor(GetText(IDC_EDIT_FILLED_BY));
+	if (!sEditor.IsEmpty() && sEditor != L"0")
+	{
+		s += sEditor;
+	}
+	html.WritePara(s);
 }

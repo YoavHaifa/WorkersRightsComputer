@@ -201,6 +201,7 @@
     <ClInclude Include="MyTime.h" />
     <ClInclude Include="Notice.h" />
     <ClInclude Include="Pension.h" />
+    <ClInclude Include="PensionReport.h" />
     <ClInclude Include="Recuperation.h" />
     <ClInclude Include="Saver.h" />
     <ClInclude Include="Seniority.h" />
@@ -247,6 +248,7 @@
     <ClCompile Include="MyTime.cpp" />
     <ClCompile Include="Notice.cpp" />
     <ClCompile Include="Pension.cpp" />
+    <ClCompile Include="PensionReport.cpp" />
     <ClCompile Include="Recuperation.cpp" />
     <ClCompile Include="Saver.cpp" />
     <ClCompile Include="Seniority.cpp" />

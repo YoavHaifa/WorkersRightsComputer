@@ -6,6 +6,7 @@
 #include "VacationUsed.h"
 #include "VacationTable.h"
 #include "XMLDump.h"
+#include "HtmlWriter.h"
 
 CUsedVacations gUsedVacations;
 
@@ -222,4 +223,26 @@ void CUsedVacations::Log()
 			fprintf(pfLog, "mbAdd14DaysUnpaidVacation4Severance\n");
 	}
 	fclose(pfLog);
+}
+void CUsedVacations::WriteToLetter(CHtmlWriter& html)
+{
+	int nVacations = mVacationsUsed.GetSize();
+	if (nVacations < 1)
+		return;
+
+	html.StartParagraph();
+	wchar_t zBuf[128];
+	swprintf_s(zBuf, 128, L"This computation takes into account the following %d vacations:", nVacations);
+	html.WriteLine(zBuf);
+	POSITION pos = mVacationsUsed.GetHeadPosition();
+	while (pos)
+	{
+		CVacationUsed *pVac = mVacationsUsed.GetNext(pos);
+		CString s(L"Vacation: ");
+		s += pVac->mFirstDay.ToString();
+		s += " - ";
+		s += pVac->mLastDay.ToString();
+		html.WriteLine(s);
+	}
+	html.EndParagraph();
 }

@@ -55,8 +55,6 @@ CString CPerson::GetTel(void)
 
 void CPerson::StartLetter(CHtmlWriter &html)
 {
-	html.WriteLine(L"To");
-	//logo->WriteLine("");
 	msPrivateName = mpDlg->GetText(miFirstName);
 	msFamilyName = mpDlg->GetText(miFamilyName);
 	msPassport = mpDlg->GetText(miId);
@@ -64,7 +62,8 @@ void CPerson::StartLetter(CHtmlWriter &html)
 	msEmail = mpDlg->GetText(miEmail);
 	mbIsPassport = mpDlg->IsChecked(IDC_RADIO_PASSPORT);
 
-	CString s = msPrivateName;
+	CString s(L"To: ");
+	s += msPrivateName;
 	s += " ";
 	s += msFamilyName;
 	html.WriteLine(s);

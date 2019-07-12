@@ -1,6 +1,8 @@
 #pragma once
 
 #include "right.h"
+#include "PensionReport.h"
+
 
 class CPension :
 public CRight
@@ -33,5 +35,10 @@ public:
 	double mSeverancePerYear;
 	double mPensionDue;
 	double mSeveranceDue;
+	bool mbSeverance;
+	CPensionReport mReport;
+
+	void WriteToLetter(class CHtmlWriter& html);
 };
 
+extern CPension *gpPension;

@@ -36,6 +36,10 @@ CMyTime::CMyTime(int year, int month, int day)
 CMyTime::~CMyTime()
 {
 }
+void CMyTime::SetNow(void)
+{
+	Set(CTime::GetCurrentTime());
+}
 void CMyTime::Set(CTime time)
 {
 	mTime = time;

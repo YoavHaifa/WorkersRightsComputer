@@ -408,7 +408,15 @@ void CWorkPeriod::WriteToLetter(class CHtmlWriter &html)
 	s += mFirst.ToString();
 	s += " - ";
 	s += mLast.ToString();
-	html.WriteLine(s);
+	html.WritePara(s);
+}
+void CWorkPeriod::WriteLastSalary(class CHtmlWriter& html)
+{
+	if (!mbNotIncludingLastSalary)
+		return;
+	CString s = L"This computation does not include last salary until ";
+	s += mLastSalaryUntil.ToString();
+	html.WritePara(s);
 }
 CString CWorkPeriod::GetPeriodForLetter(void)
 {

@@ -100,6 +100,7 @@ public:
 	CEdit mEmail;
 	void SaveToXml(class CXMLDump &xmlDump);
 	afx_msg void OnTestLoadxml();
+	void WriteEditorToLetter(class CHtmlWriter& html);
 };
 
 extern CWorkersRightsComputerDlg *gpDlg;

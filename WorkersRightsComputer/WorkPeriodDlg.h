@@ -1,9 +1,10 @@
 #pragma once
+#include "MyDialogEx.h"
 
 
 // CWorkPeriodDlg dialog
 
-class CWorkPeriodDlg : public CDialogEx
+class CWorkPeriodDlg : public CMyDialogEx
 {
 	DECLARE_DYNAMIC(CWorkPeriodDlg)
 
@@ -68,4 +69,5 @@ public:
 	afx_msg void OnBnClickedCheckSaturday();
 	afx_msg void OnBnClickedOk3();
 	afx_msg void OnBnClickedButtonFamilyPart();
+	CDateTimeCtrl mLastSalaryDate;
 };
