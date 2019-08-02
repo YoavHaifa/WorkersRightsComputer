@@ -69,6 +69,7 @@ public:
 	static const int N_WEEK_DAYS = 7;
 	double maWorkingDays[N_WEEK_DAYS];
 	void SetWorkingDay(int iDay, double fraction);
+	void CountWorkingDays(void);
 
 	static const int MAX_MONTHS = 600;
 	CMonthInfo maMonths[MAX_MONTHS];
@@ -93,6 +94,8 @@ public:
 	int CountWorkDaysToEndOfMonthFrom(CMyTime &firstDate);
 	void Save(FILE *pfSave);
 	void SaveToXml(class CXMLDump &xmlDump);
+	void LoadFromXml(class CXMLParseNode* pRoot);
+
 	void Restore(FILE *pfRead);
 	bool mbMinWage;
 	bool mbMonthlyWage;

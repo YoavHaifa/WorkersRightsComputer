@@ -4,6 +4,7 @@
 #include "Utils.h"
 #include "XMLDump.h"
 #include "HtmlWriter.h"
+#include "XMLParse.h"
 
 CFamilyPart gFamilyPart;
 
@@ -169,6 +170,28 @@ void CFamilyPart::SaveToXml(CXMLDump &xmlDump)
 		}
 	}
 	xmlDump.Write(L"bAskOnlyForFamilyPart", mbAskOnlyForFamilyPart);
+}
+void CFamilyPart::LoadFromXml(class CXMLParseNode* pRoot)
+{
+	CXMLParseNode* pMain = pRoot->GetFirst(L"FamilyPart");
+	if (!pMain)
+		return;
+
+	CXMLParseNode* pPeriod = pMain->GetFirst(L"Period");
+	while (pPeriod)
+	{
+		CMyTime from;
+		double companyHoursPerWeek;
+		if (pPeriod->GetValue(L"From", from))
+		{
+			if (pPeriod->GetValue(L"CompanyHoursPerWeek", companyHoursPerWeek))
+			{
+				AddPeriod(from.mTime, companyHoursPerWeek);
+			}
+		}
+		pPeriod = pMain->GetNext(L"Period", pPeriod);
+	}
+	pMain->GetValue(L"bAskOnlyForFamilyPart", mbAskOnlyForFamilyPart);
 }
 void CFamilyPart::Save(FILE *pfSave)
 {

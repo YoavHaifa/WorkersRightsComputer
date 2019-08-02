@@ -38,8 +38,10 @@ public:
     bool GetHexaValue(unsigned long & value);
     bool GetValue(unsigned long & value);
     bool GetValue(long & value);
-    bool GetValue(float & value);
-    bool GetValue(CString & sValue);
+	bool GetValue(float& value);
+	bool GetValue(double& value);
+	bool GetValue(CString & sValue);
+	bool GetValue(class CMyTime& time);
 
     int GetValues(const wchar_t * zName, CList<CString*, CString*> &valuesList);
     bool ValueIs(const wchar_t *zValue);

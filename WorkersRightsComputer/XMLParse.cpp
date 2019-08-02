@@ -2,6 +2,7 @@
 #include "XmlParse.h"
 #include "Utils.h"
 #include "FileName.h"
+#include "MyTime.h"
 //#include "XMLDump.h"
 
 FILE *CXMLParseNode::umpfDebug = NULL;
@@ -374,17 +375,29 @@ bool CXMLParseNode::GetValue(long & value)
     }
     return false;
 }
-bool CXMLParseNode::GetValue(float & value)
+bool CXMLParseNode::GetValue(float& value)
 {
-    if (msValue.IsEmpty())
-        return false;
-    wchar_t first = msValue[0];
-    if (isdigit(first) || first == '-')
-    {
-        value = (float)_wtof(msValue);
-        return true;
-    }
-    return false;
+	if (msValue.IsEmpty())
+		return false;
+	wchar_t first = msValue[0];
+	if (isdigit(first) || first == '-')
+	{
+		value = (float)_wtof(msValue);
+		return true;
+	}
+	return false;
+}
+bool CXMLParseNode::GetValue(double& value)
+{
+	if (msValue.IsEmpty())
+		return false;
+	wchar_t first = msValue[0];
+	if (isdigit(first) || first == '-')
+	{
+		value = _wtof(msValue);
+		return true;
+	}
+	return false;
 }
 bool CXMLParseNode::GetValue(CString & sValue)
 {
@@ -392,6 +405,28 @@ bool CXMLParseNode::GetValue(CString & sValue)
         return false;
     sValue = msValue;
     return true;
+}
+bool CXMLParseNode::GetValue(CMyTime& time)
+{
+	CString sTime;
+	if (!GetValue(L"time", sTime))
+	{
+		time.Reset();
+        return false;
+	}
+
+	if (sTime.IsEmpty())
+	{
+		time.Reset();
+        return false;
+	}
+
+	__int64 t = _wtoi64(sTime);
+	if (t == 0)
+		time.Reset();
+	else
+		time.Set(t);
+	return true;
 }
 bool CXMLParseNode::ValueIs(const wchar_t *zValue)
 {
@@ -665,8 +700,8 @@ bool CXMLParse::ReadNextChar(void)
 		}
 		else
 		{
-			int ch = fgetc(mpf);
-			if (ch == EOF)
+			int ch = fgetwc(mpf);
+			if (ch == WEOF)
 				return false;
 			mNextChar = (wchar_t)ch;
 		}

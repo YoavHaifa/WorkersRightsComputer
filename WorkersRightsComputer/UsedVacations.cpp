@@ -7,6 +7,7 @@
 #include "VacationTable.h"
 #include "XMLDump.h"
 #include "HtmlWriter.h"
+#include "XMLParse.h"
 
 CUsedVacations gUsedVacations;
 
@@ -129,6 +130,29 @@ void CUsedVacations::SaveToXml(CXMLDump &xmlDump)
 		xmlDump.Write(L"LastDay", pVac->mLastDay);
 	}
 	xmlDump.Write(L"bAdd14DaysUnpaidVacation4Severance", mbAdd14DaysUnpaidVacation4Severance);
+}
+void CUsedVacations::LoadFromXml(class CXMLParseNode* pRoot)
+{
+	CXMLParseNode* pMain = pRoot->GetFirst(L"UsedVacations");
+	if (!pMain)
+		return;
+
+	CXMLParseNode* pVacation = pMain->GetFirst(L"Vacation");
+	while (pVacation)
+	{
+		CMyTime first;
+		CMyTime last;
+		if (pVacation->GetValue(L"FirstDay", first))
+		{
+			if (pVacation->GetValue(L"LastDay", last))
+			{
+				CVacationUsed* pVac = new CVacationUsed(first, last);
+				AddVacation(pVac);
+			}
+		}
+		pVacation = pMain->GetNext(L"Vacation", pVacation);
+	}
+	pMain->GetValue(L"bAdd14DaysUnpaidVacation4Severance", mbAdd14DaysUnpaidVacation4Severance);
 }
 void CUsedVacations::Save(FILE *pfSave)
 {

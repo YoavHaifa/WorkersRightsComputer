@@ -216,7 +216,8 @@ void CXMLDump::Write(const wchar_t * zName, class CMyTime &time)
     if (!mpf)
         return;
     Ident();
-    fwprintf (mpf, L"<%s> ", zName);
+    fwprintf (mpf, L"<%s> <time> ", zName);
 	time.WriteInLine(mpf);
-    fwprintf (mpf, L" </%s>\n", zName);
+	fwprintf(mpf, L" </time>");
+	fwprintf(mpf, L" <date> %d.%d.%d </date> </%s>\n", time.mDay, time.mMonth, time.mYear, zName);
 }

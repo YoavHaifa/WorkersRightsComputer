@@ -23,6 +23,12 @@ CSaver::~CSaver()
 	if (mpfRead)
 		fclose(mpfRead);
 }
+void CSaver::ResetAllInputs(void)
+{
+	if (gpDlg)
+		gpDlg->ResetAllInputs();
+	gWorkPeriod.Reset();
+}
 void CSaver::Save(const wchar_t *zfName)
 {
 	if (zfName)
@@ -40,6 +46,7 @@ void CSaver::Save(const wchar_t *zfName)
 }
 void CSaver::Restore(const wchar_t* zfName)
 {
+	ResetAllInputs();
 	if (zfName)
 		msfName = zfName;
 	else
@@ -195,7 +202,9 @@ void CSaver::LoadFromXmlFile()
 		return;
 
 	gpDlg->mbDisableComputations = true;
+
 	gpDlg->LoadFromXml(pRoot);
+	gWorkPeriod.LoadFromXml(pRoot);
 
 	gpDlg->mbDisableComputations = false;
 	gpDlg->OnInputChange();

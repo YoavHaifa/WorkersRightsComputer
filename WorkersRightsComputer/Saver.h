@@ -5,9 +5,11 @@ public:
 	CSaver();
 	~CSaver();
 
+	static void ResetAllInputs(void);
 	void Save(const wchar_t *zfName = NULL);
 	void Restore(const wchar_t *zfName = NULL);
 
+private:
 	void SaveToXml(void);
 	void SaveToTxtFile(void);
 	void SaveEditBox(FILE *pfSave, class CEditRef *pRef);

@@ -58,6 +58,7 @@ public:
 	CList<CEditRef *, CEditRef *> mEditBoxes;
 	CComboBox mComboHolidays;
 	afx_msg void OnBnClickedButtonReset();
+	void ResetAllInputs(void);
 
 	CButton mAllowSevLess;
 	CButton mDemandVac4Prev;

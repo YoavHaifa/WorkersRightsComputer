@@ -308,23 +308,26 @@ void CWorkersRightsComputerDlg::OnBnClickedButtonLoad()
 }
 void CWorkersRightsComputerDlg::OnBnClickedButtonReset()
 {
+	CSaver::ResetAllInputs();
+	OnInputChange();
+}
+void CWorkersRightsComputerDlg::ResetAllInputs(void)
+{
 	POSITION pos = mEditBoxes.GetHeadPosition();
 	while (pos)
 	{
-		CEditRef *pEdit = mEditBoxes.GetNext(pos);
+		CEditRef* pEdit = mEditBoxes.GetNext(pos);
 		pEdit->mEdit.SetWindowTextW(L"0");
 	}
 
 	pos = mButtons.GetHeadPosition();
 	while (pos)
 	{
-		CButtonRef *pButton = mButtons.GetNext(pos);
+		CButtonRef* pButton = mButtons.GetNext(pos);
 		pButton->mButton.SetCheck(BST_UNCHECKED);
 	}
 	mComboHolidays.SetWindowTextW(L"Select set of Holidays");
-	gWorkPeriod.Reset();
 
-	OnInputChange();
 }
 void CWorkersRightsComputerDlg::InitHolidaysCombo()
 {
@@ -554,18 +557,32 @@ void CWorkersRightsComputerDlg::LoadFromXml(CXMLParseNode* pRoot)
 	CXMLParseNode *pMain = pRoot->GetFirst(L"MainDialog");
 	if (!pMain)
 		return;
+
 	CXMLParseNode *pEdit = pMain->GetFirst(L"EditBoxes");
 	if (!pEdit)
 		return;
+	CString sText;
 	POSITION pos = mEditBoxes.GetHeadPosition();
 	while (pos)
 	{
-		CString sText;
 		CEditRef* pRef = mEditBoxes.GetNext(pos);
 		if (pEdit->GetValue((const wchar_t*)pRef->msName, sText))
 			pRef->mEdit.SetWindowText(sText);
 	}
 
+	if (pMain->GetValue(L"Holidays", sText))
+		mComboHolidays.SetWindowTextW(sText);
+
+	CXMLParseNode* pButtons = pMain->GetFirst(L"Buttons");
+	if (!pButtons)
+		return;
+	pos = mButtons.GetHeadPosition();
+	while (pos)
+	{
+		CButtonRef* pRef = mButtons.GetNext(pos);
+		if (pButtons->GetValue((const wchar_t*)pRef->msName, sText))
+			pRef->mButton.SetCheck(sText == L"checked" ? BST_CHECKED : 0);
+	}
 }
 void CWorkersRightsComputerDlg::OnTestLoadxml()
 {

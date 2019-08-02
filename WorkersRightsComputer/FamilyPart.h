@@ -71,6 +71,8 @@ public:
 	CString GetShortText();
 	void Compute();
 	void SaveToXml(class CXMLDump &xmlDump);
+	void LoadFromXml(class CXMLParseNode* pRoot);
+
 	void Save(FILE *pfSave);
 	void Restore(FILE *pfRead);
 	void WriteToLetter(class CHtmlWriter &writer);

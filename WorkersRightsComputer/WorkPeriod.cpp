@@ -7,6 +7,7 @@
 #include "HtmlWriter.h"
 #include "FamilyPart.h"
 #include "XMLDump.h"
+#include "XMLParse.h"
 
 CWorkPeriod gWorkPeriod;
 
@@ -124,6 +125,9 @@ void CWorkPeriod::SetNotice(CTime date)
 }*/
 bool CWorkPeriod::Compute(void)
 {
+	if (mnWorkDaysPerWeek < 0.1)
+		CountWorkingDays();
+
 	// Init for invalid work span
 	mnCalendarYears = 0;
 	mnMonths = 0;
@@ -335,6 +339,17 @@ double CWorkPeriod::GetLastYearAsFraction(void)
 void CWorkPeriod::SetWorkingDay(int iDay, double fraction)
 {
 	maWorkingDays[iDay] = fraction;
+	CountWorkingDays();
+
+	CString s = CRight::ToString(mnWorkDaysPerWeek);
+	//String ^ s = mnWorkDaysPerWeek.ToString("F0");
+	s += L" Work Days";
+	// TEMP
+	// mWorkingDaysLabel->Text = s;
+	Compute();
+}
+void CWorkPeriod::CountWorkingDays(void)
+{
 	mnWorkDaysPerWeek = 0;
 	for (int i = 0; i < N_WEEK_DAYS; i++)
 	{
@@ -345,13 +360,6 @@ void CWorkPeriod::SetWorkingDay(int iDay, double fraction)
 		mnDaysInMonthForDailySalary = 21.6666;
 	else
 		mnDaysInMonthForDailySalary = 25;
-
-	CString s = CRight::ToString(mnWorkDaysPerWeek);
-	//String ^ s = mnWorkDaysPerWeek.ToString("F0");
-	s += L" Work Days";
-	// TEMP
-	// mWorkingDaysLabel->Text = s;
-	Compute();
 }
 bool CWorkPeriod::WorkedAtLeastNMonths(int nMonths)
 {
@@ -461,6 +469,51 @@ void CWorkPeriod::SaveToXml(CXMLDump &xmlDump)
 
 	gUsedVacations.SaveToXml(xmlDump);
 	gFamilyPart.SaveToXml(xmlDump);
+}
+void CWorkPeriod::LoadFromXml(class CXMLParseNode* pRoot)
+{
+	CXMLParseNode* pMain = pRoot->GetFirst(L"WorkPeriod");
+	if (!pMain)
+		return;
+
+	pMain->GetValue(L"first", mFirst);
+	pMain->GetValue(L"last", mLast);
+	pMain->GetValue(L"notice", mNotice);
+
+	{
+		CXMLParseNode* pDays = pMain->GetFirst(L"Days");
+		if (pDays)
+		{
+			for (int iDay = 0; iDay < 7; iDay++)
+			{
+				pDays->GetValue(uasDaysNames[iDay], maWorkingDays[iDay]);
+			}
+		}
+	}
+
+	bool bHourly = false;
+	if (pMain->GetValue(L"bMinWage", mbMinWage))
+	{
+	}
+	else if (pMain->GetValue(L"bMonthlyWage", mbMonthlyWage))
+	{
+		pMain->GetValue(L"MonthlyWage", mMonthlyWage);
+	}
+	else if (pMain->GetValue(L"bHourlyWage", bHourly))
+	{
+		pMain->GetValue(L"HourlyWage", mHourlyWage);
+		pMain->GetValue(L"HoursPerWeek", mHoursPerWeek);
+	}
+
+	pMain->GetValue(L"bNotIncludingLastSalary", mbNotIncludingLastSalary);
+	pMain->GetValue(L"last_salary_until", mLastSalaryUntil);
+
+	Compute();
+
+	gUsedVacations.LoadFromXml(pMain);
+	gFamilyPart.LoadFromXml(pMain);
+
+	Compute();
 }
 void CWorkPeriod::Save(FILE *pfSave)
 {

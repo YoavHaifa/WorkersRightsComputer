@@ -13,6 +13,7 @@ public:
 	void SetDate(CTime time);
 	void Set(int year, int month, int day);
 	void Set(__int64 t64);
+
 	void Read(FILE *pf);
 	void Write(FILE* pf);
 	void WriteInLine(FILE* pf);
