@@ -7,6 +7,7 @@
 #include "AllRights.h"
 #include "UsedVacations.h"
 #include "XmlDump.h"
+#include "XmlParse.h"
 #include "HtmlWriter.h"
 
 
@@ -32,20 +33,23 @@ void CSaver::Save(const wchar_t *zfName)
 		gUsedVacations.Log();
 	}
 
-	SaveToFile();
+	SaveToTxtFile();
 	SaveToXml();
 
 	WriteLetter();
 }
-void CSaver::Restore(const wchar_t *zfName)
+void CSaver::Restore(const wchar_t* zfName)
 {
 	if (zfName)
 		msfName = zfName;
 	else
 		msfName = L"..\\release\\Save\\Last.txt";
 
-	LoadFromFile();
-
+	CFileName fName(msfName);
+	if (fName.IsOfType(L"xml"))
+		LoadFromXmlFile();
+	else
+		LoadFromTxtFile();
 }
 void CSaver::SaveToXml(void)
 {
@@ -61,7 +65,7 @@ void CSaver::SaveToXml(void)
 
 	xmlDump.Close();
 }
-void CSaver::SaveToFile(void)
+void CSaver::SaveToTxtFile(void)
 {
 	mpfWrite = MyFOpenWithErrorBox(msfName, L"w, ccs=UNICODE", L"for saving");
 	if (!mpfWrite)
@@ -167,7 +171,7 @@ void CSaver::WriteLetter()
 
 	msfName = sSaveDir;
 	msfName += L"Save.txt";
-	SaveToFile();
+	SaveToTxtFile();
 	SaveToXml();
 
 	CRight::SetSaveDirAndName(sSaveDir, sName);
@@ -183,7 +187,20 @@ void CSaver::WriteLetter()
 
 	CRight::ResetSaveDirAndName();
 }
-void CSaver::LoadFromFile()
+void CSaver::LoadFromXmlFile()
+{
+	CXMLParse XMLParse(msfName, true);
+	CXMLParseNode* pRoot = XMLParse.GetRoot();
+	if (!pRoot)
+		return;
+
+	gpDlg->mbDisableComputations = true;
+	gpDlg->LoadFromXml(pRoot);
+
+	gpDlg->mbDisableComputations = false;
+	gpDlg->OnInputChange();
+}
+void CSaver::LoadFromTxtFile()
 {
 	mpfRead = MyFOpenWithErrorBox(msfName, L"r, ccs=UNICODE", L"for restoring");
 	if (!mpfRead)

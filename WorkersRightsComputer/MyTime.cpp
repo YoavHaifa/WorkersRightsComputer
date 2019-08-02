@@ -87,6 +87,13 @@ void CMyTime::Write(FILE *pf)
 	else
 		fwprintf(pf, L"0\n");
 }
+void CMyTime::WriteInLine(FILE* pf)
+{
+	if (mbInitialized)
+		fwprintf(pf, L"%I64d", (__int64)mTime.GetTime());
+	else
+		fwprintf(pf, L"0");
+}
 void CMyTime::Reset(void)
 {
 	mbInitialized = false;

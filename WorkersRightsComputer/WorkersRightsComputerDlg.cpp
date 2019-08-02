@@ -19,6 +19,7 @@
 #include "Saver.h"
 #include "MyAskDlg.h"
 #include "XmlDump.h"
+#include "XmlParse.h"
 #include "HtmlWriter.h"
 
 #ifdef _DEBUG
@@ -163,6 +164,7 @@ BEGIN_MESSAGE_MAP(CWorkersRightsComputerDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_EMPLOYER, &CWorkersRightsComputerDlg::OnBnClickedEmployer)
 	ON_BN_CLICKED(IDC_COMMENTS, &CWorkersRightsComputerDlg::OnBnClickedComments)
 	ON_COMMAND(ID_TEST_LOADXML, &CWorkersRightsComputerDlg::OnTestLoadxml)
+	ON_COMMAND(ID_TEST_LOADTXT, &CWorkersRightsComputerDlg::OnTestLoadtxt)
 END_MESSAGE_MAP()
 
 
@@ -203,6 +205,7 @@ BOOL CWorkersRightsComputerDlg::OnInitDialog()
 	InitHolidaysCombo();
 	InitializeAllRights();
 	mRadioPassport.SetCheck(1);
+	SetTitle(L"Workers Rights Computer - Experimental Beta Version 0.1");
 
 	CUtils::CreateThread(&StaticThreadFunc, NULL);
 
@@ -540,15 +543,47 @@ void CWorkersRightsComputerDlg::SaveToXml(CXMLDump &xmlDump)
 		{
 			CButtonRef *pRef = mButtons.GetNext(pos);
 			if (pRef->mButton.GetCheck() == BST_CHECKED)
-				xmlDump.Write((const wchar_t *)pRef->msName, L"checked\n");
+				xmlDump.Write((const wchar_t *)pRef->msName, L"checked");
 			else
-				xmlDump.Write((const wchar_t *)pRef->msName, L"not_checked\n");
+				xmlDump.Write((const wchar_t *)pRef->msName, L"not_checked");
 		}
 	}
 }
+void CWorkersRightsComputerDlg::LoadFromXml(CXMLParseNode* pRoot)
+{
+	CXMLParseNode *pMain = pRoot->GetFirst(L"MainDialog");
+	if (!pMain)
+		return;
+	CXMLParseNode *pEdit = pMain->GetFirst(L"EditBoxes");
+	if (!pEdit)
+		return;
+	POSITION pos = mEditBoxes.GetHeadPosition();
+	while (pos)
+	{
+		CString sText;
+		CEditRef* pRef = mEditBoxes.GetNext(pos);
+		if (pEdit->GetValue((const wchar_t*)pRef->msName, sText))
+			pRef->mEdit.SetWindowText(sText);
+	}
+
+}
 void CWorkersRightsComputerDlg::OnTestLoadxml()
 {
-	// TODO: Add your command handler code here
+	CMyFileDialog dlg(CMyFileDialog::FD_OPEN, L"Select XML File");
+	if (dlg.DoModal())
+	{
+		CSaver saver;
+		saver.Restore(dlg.GetPathName());
+	}
+}
+void CWorkersRightsComputerDlg::OnTestLoadtxt()
+{
+	CMyFileDialog dlg(CMyFileDialog::FD_OPEN, L"Select TXT File");
+	if (dlg.DoModal())
+	{
+		CSaver saver;
+		saver.Restore(dlg.GetPathName());
+	}
 }
 void CWorkersRightsComputerDlg::WriteEditorToLetter(CHtmlWriter& html)
 {
@@ -560,3 +595,5 @@ void CWorkersRightsComputerDlg::WriteEditorToLetter(CHtmlWriter& html)
 	}
 	html.WritePara(s);
 }
+
+

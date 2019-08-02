@@ -15,8 +15,8 @@ public:
 	void SetDlg(class CMyDialogEx *pDlg, int iFirstName, int iFamilyName, int iId, int iTel, int iAdd, int iEmail, int iRole = 0);
 	int UpdateFromDlg();
 	void UpdateDlg();
-	void SaveToFile();
-	void LoadFromFile();
+	void SaveToTxtFile();
+	void LoadFromTxtFile();
 
 	CString msPrivateName;
 	CString msFamilyName;

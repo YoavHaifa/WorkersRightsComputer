@@ -104,9 +104,9 @@ int CPerson::UpdateFromDlg()
 void CPerson::UpdateDlg()
 {
 }
-void CPerson::SaveToFile()
+void CPerson::SaveToTxtFile()
 {
 }
-void CPerson::LoadFromFile()
+void CPerson::LoadFromTxtFile()
 {
 }

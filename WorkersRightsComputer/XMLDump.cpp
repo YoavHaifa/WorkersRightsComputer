@@ -217,6 +217,6 @@ void CXMLDump::Write(const wchar_t * zName, class CMyTime &time)
         return;
     Ident();
     fwprintf (mpf, L"<%s> ", zName);
-	time.Write(mpf);
+	time.WriteInLine(mpf);
     fwprintf (mpf, L" </%s>\n", zName);
 }
