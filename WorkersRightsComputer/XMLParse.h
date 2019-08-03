@@ -125,4 +125,5 @@ public:
     void Dump(void);
 	CString GetName(void){return msName;}
 	static bool GetValueByKey(const wchar_t *zfName, int key, float &oValue);
+	int mnCharsRead;
 };

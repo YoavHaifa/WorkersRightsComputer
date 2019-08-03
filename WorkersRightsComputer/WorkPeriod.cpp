@@ -433,6 +433,13 @@ CString CWorkPeriod::GetPeriodForLetter(void)
 	s += mLast.ToString();
 	return s;
 }
+CString CWorkPeriod::GetPeriodForLetterHebrew(void)
+{
+	CString s(mFirst.ToHebrewString());
+	s += " - ";
+	s += mLast.ToHebrewString();
+	return s;
+}
 void CWorkPeriod::SaveToXml(CXMLDump &xmlDump)
 {
 	CXMLDumpScope mainScope(L"WorkPeriod", xmlDump);

@@ -21,6 +21,7 @@
 #include "XmlDump.h"
 #include "XmlParse.h"
 #include "HtmlWriter.h"
+#include "Config.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -205,7 +206,9 @@ BOOL CWorkersRightsComputerDlg::OnInitDialog()
 	InitHolidaysCombo();
 	InitializeAllRights();
 	mRadioPassport.SetCheck(1);
-	SetTitle(L"Workers Rights Computer - Experimental Beta Version 0.1");
+	gConfig.InitFromXml();
+	CString sTitle(L"Workers Rights Computer - Experimental Beta Version ");
+	SetTitle(sTitle + gConfig.msVersion);
 
 	CUtils::CreateThread(&StaticThreadFunc, NULL);
 
@@ -497,13 +500,11 @@ void CWorkersRightsComputerDlg::OnTestReadhebrew()
 }
 void CWorkersRightsComputerDlg::OnTestWritehtml()
 {
+	CMyFileDialog dlg(CMyFileDialog::FD_SAVE, L"Save Letter");
+	if (dlg.DoModal())
 	{
 		CHtmlWriter writer;
-		writer.WriteLetter();
-	}
-	{
-		CHtmlWriter writer;
-		writer.WriteLetterFromTemplate();
+		writer.WriteLetterFromTemplate(dlg.GetPathName());
 	}
 }
 void CWorkersRightsComputerDlg::OnBnClickedEmployer()

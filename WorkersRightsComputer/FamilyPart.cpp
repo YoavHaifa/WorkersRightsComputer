@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "FamilyPart.h"
 #include "WorkPeriod.h"
 #include "Utils.h"
@@ -238,12 +238,18 @@ void CFamilyPart::WriteToLetter(CHtmlWriter &writer)
 	writer.StartParagraph();
 	if (mbDefined && mbAskOnlyForFamilyPart)
 	{
-		writer.WriteL(L"This computation only relates to the part that is due from the employing family.");
-		fwprintf(writer.mpfWrite, L"Family Part is %5.2f%%\n", mRatio * 100);
+		writer.WriteLEH(L"This computation only relates to the part that is due from the employing family. ",
+			L"חישוב זה מתייחס רק לחלק התשלום המגיע מהמשפחה המעסיקה.");
+
+		writer.WriteLEH(L"Family Part is ", L"חלקה של המשפחה הוא ");
+		wchar_t zBuf[128];
+		swprintf_s(zBuf, 128, L"%5.2f%%", mRatio * 100);
+		writer.WriteLine(zBuf);
 	}
 	else
 	{
-		writer.WriteL(L"This computation includes the amounts paid by bituakh leumi for severance and pension payment.");
+		writer.WriteLEH(L"This computation includes the amounts paid by bituakh leumi for severance and pension payment.",
+			L"חישוב זה כולל את הסכומים ששולמו על ידי הביטוח הלאומי עבור פיצויים ופנסיה.");
 	}
 	writer.EndParagraph();
 }

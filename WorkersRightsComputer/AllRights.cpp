@@ -172,37 +172,6 @@ bool CAllRights::ComputeInternal()
 
 	return bOK;
 }
-/*
-//void CAllRights::WriteLetter(void)
-{
-	CLogoWriter logo(L"logo_letter");
-
-	gWorker.StartLetter(logo);
-	gWorkPeriod.WriteToLetter(logo);
-
-	logo.WriteLine(L"Please find below the list of payments due from your employer");
-
-	logo.WriteLine(L"In Short:");
-
-	POSITION pos = mRights.GetHeadPosition();
-	while (pos)
-	{
-		CRight *pRight = mRights.GetNext(pos);
-		if (pRight->mDuePay > 0)
-		{
-			CString sLine = pRight->GetSumLineForLetter();
-			logo.WriteLine(sLine);
-		}
-	}
-
-	CString sSum (L"Total: ");
-	sSum += CRight::ToString(mSumDue);
-	sSum += L"  ";
-	//sSum += hebrew->Get("Total");
-	logo.WriteLine(sSum);
-
-	logo.Close();
-} */
 void CAllRights::WriteLetterToHtml(CHtmlWriter &html, bool bUsingTemplate)
 {
 	if (!bUsingTemplate)

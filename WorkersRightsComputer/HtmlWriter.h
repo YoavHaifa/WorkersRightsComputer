@@ -4,21 +4,26 @@ class CHtmlWriter
 public:
 	CHtmlWriter();
 	~CHtmlWriter();
-	int WriteLetter();
-	int WriteLetterFromTemplate();
-	FILE *mpfWrite;
+	bool CopyLogo(const wchar_t* zfName);
+	int WriteLetterFromTemplate(const wchar_t* zfName);
+	FILE* mpfWrite;
+	FILE* mpfHebrewWrite;
 	FILE *mpfRead;
 	CString msfName;
-	void BREOL();
-	void EOL();
+	CString msfHebrewName;
 	void Write(const wchar_t *zText);
-	void WriteL(const wchar_t *zText);
-	void WritePara(const wchar_t *zText);
-	void WriteLine(const wchar_t *zText);
+	void WriteL(const wchar_t* zText);
+	void WriteLEH(const wchar_t* zText, const wchar_t* zHebrewText);
+	void WritePara(const wchar_t* zText);
+	void WriteParaLTR(const wchar_t* zText);
+	void WriteLine(const wchar_t* zText);
+	void WriteLineEH(const wchar_t* zText, const wchar_t* zHebrewText);
+	void WriteLineEH(const wchar_t* zText, const wchar_t* zHebrewText, const wchar_t* zExtraText);
 	void WriteHeadline(const wchar_t *zText, int iH = 1);
 	void WriteTable(bool bUsingTemplate);
 	void ReplaceTemplateVariable(void);
-	void Print(const CString &s);
+	void Print(const CString& s);
+	void PrintEH(const CString& s, const CString& sh);
 	void StartParagraph(void);
 	void EndParagraph(void);
 	void StartTabLine(void);
@@ -30,5 +35,8 @@ public:
 	void Write2Tab(double value);
 	void Write2Tab(const char *zFormat, double value);
 
+	bool OpenHebrewLetter();
+	bool mbEng;
+	bool mbHeb;
 };
 

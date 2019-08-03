@@ -600,6 +600,7 @@ CXMLParse::~CXMLParse(void)
 }
 bool CXMLParse::OpenFile(const wchar_t *zfName, int offset, bool bUnicode)
 {
+	mnCharsRead = 0;
 	msName = zfName;
     if (mpRoot)
         delete mpRoot;
@@ -707,6 +708,7 @@ bool CXMLParse::ReadNextChar(void)
 		}
         mbNextCharReady = true;
     }
+	mnCharsRead++;
     return true;
 }
 bool CXMLParse::ReadNextNonBlankChar(void)

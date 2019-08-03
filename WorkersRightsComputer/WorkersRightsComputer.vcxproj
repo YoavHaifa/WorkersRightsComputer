@@ -185,6 +185,7 @@
   <ItemGroup>
     <ClInclude Include="Additional.h" />
     <ClInclude Include="AllRights.h" />
+    <ClInclude Include="Config.h" />
     <ClInclude Include="MyAskDlg.h" />
     <ClInclude Include="EmployerDlg.h" />
     <ClInclude Include="FamilyPart.h" />
@@ -232,6 +233,7 @@
   <ItemGroup>
     <ClCompile Include="Additional.cpp" />
     <ClCompile Include="AllRights.cpp" />
+    <ClCompile Include="Config.cpp" />
     <ClCompile Include="MyAskDlg.cpp" />
     <ClCompile Include="EmployerDlg.cpp" />
     <ClCompile Include="FamilyPart.cpp" />

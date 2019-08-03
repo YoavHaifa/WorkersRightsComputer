@@ -9,6 +9,7 @@
 #include "XmlDump.h"
 #include "XmlParse.h"
 #include "HtmlWriter.h"
+#include "Config.h"
 
 
 CSaver::CSaver()
@@ -35,11 +36,10 @@ void CSaver::Save(const wchar_t *zfName)
 		msfName = zfName;
 	else
 	{
-		msfName = L"..\\release\\Save\\Last.txt";
+		msfName = L"..\\release\\Save\\Last.xml";
 		gUsedVacations.Log();
 	}
 
-	SaveToTxtFile();
 	SaveToXml();
 
 	WriteLetter();
@@ -50,7 +50,7 @@ void CSaver::Restore(const wchar_t* zfName)
 	if (zfName)
 		msfName = zfName;
 	else
-		msfName = L"..\\release\\Save\\Last.txt";
+		msfName = L"..\\release\\Save\\Last.xml";
 
 	CFileName fName(msfName);
 	if (fName.IsOfType(L"xml"))
@@ -162,35 +162,40 @@ void CSaver::SaveButton(FILE *pfSave, CButtonRef *pRef)
 void CSaver::WriteLetter()
 {
 	// Get Worker's name for save dir & files
-	CString sName(gpDlg->GetText(IDC_EDIT_FIRST_NAME));
-	sName += "_";
-	sName += gpDlg->GetText(IDC_EDIT_FAMILY_NAME);
-	sName += "_";
-	sName.Replace(L" ", L"_");
+	msSaveId = gpDlg->GetText(IDC_EDIT_FIRST_NAME);
+	msSaveId += "_";
+	msSaveId += gpDlg->GetText(IDC_EDIT_FAMILY_NAME);
+	msSaveId += "_";
+	msSaveId += gpDlg->GetText(IDC_EDIT_ID);
+	msSaveId.Replace(L" ", L"_");
 
 	// SAVE
 	// Set Target Directory
-	CString sSaveDir(L"C:\\WorkersRights\\Save\\");
-	sSaveDir += sName;
-	sSaveDir += gpDlg->GetText(IDC_EDIT_ID);
+	CString sSaveDir(gConfig.msSaveRoot);
+	sSaveDir += "\\";
+	sSaveDir += msSaveId;
 	CUtils::VerifyDirectory(sSaveDir);
 	sSaveDir += "\\";
 
+	msSaveId += "_";
 	msfName = sSaveDir;
-	msfName += L"Save.txt";
-	SaveToTxtFile();
+	msfName += msSaveId;
+	msfName += L"save.xml";
 	SaveToXml();
 
-	CRight::SetSaveDirAndName(sSaveDir, sName);
+	CString sLogDir = sSaveDir + "Log";
+	CUtils::VerifyDirectory(sLogDir);
+	sLogDir += "\\";
+
+	CRight::SetSaveDirAndName(sLogDir, msSaveId);
 	gpDlg->OnInputChange(); //  Recompute all and save all relevant logs to special dir
-	{
-		CHtmlWriter writer;
-		writer.WriteLetter();
-	}
-	{
-		CHtmlWriter writer;
-		writer.WriteLetterFromTemplate();
-	}
+
+	CString sLetterFileName(sSaveDir);
+	sLetterFileName += msSaveId;
+	sLetterFileName += L"letter_english.html";
+	CHtmlWriter writer;
+	writer.WriteLetterFromTemplate(sLetterFileName);
+
 
 	CRight::ResetSaveDirAndName();
 }

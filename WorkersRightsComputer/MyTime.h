@@ -40,6 +40,7 @@ public:
 	CMyTime NextDay(void);
 	CTimeSpan Subtract(CMyTime &other);
 	CString ToString(void);
+	CString ToHebrewString(void);
 	bool mbInitialized;
 	CString GetShortString();
 	int GetNDaysUntil(CMyTime &lastDay);

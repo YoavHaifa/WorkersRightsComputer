@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+﻿#include "StdAfx.h"
 #include "Person.h"
 #include "LogoWriter.h"
 #include "HtmlWriter.h"
@@ -66,24 +66,33 @@ void CPerson::StartLetter(CHtmlWriter &html)
 	s += msPrivateName;
 	s += " ";
 	s += msFamilyName;
-	html.WriteLine(s);
+	CString sh(L"לכבוד: ");
+	sh += msPrivateName;
+	sh += " ";
+	sh += msFamilyName;
+	html.WriteLineEH(s, sh);
+
 	if (!msPassport.IsEmpty() && msPassport != L"0")
 	{
-		s = L"Passport: ";
-		s += msPassport;
-		html.WriteLine(s);
+		if (mbIsPassport)
+		{
+			s = L"Passport: ";
+			sh = L"פספורט: ";
+		}
+		else
+		{
+			s = L"Id: ";
+			sh = L"ת.ז.: ";
+		}
+		html.WriteLineEH(s,sh,msPassport);
 	}
 	if (!msTelephone.IsEmpty() && msTelephone != L"0")
 	{
-		s = L"Tel: ";
-		s += msTelephone;
-		html.WriteLine(s);
+		html.WriteLineEH(L"Tel: ", L"טל: ", msTelephone);
 	}
 	if (!msEmail.IsEmpty() && msEmail != L"0")
 	{
-		s = L"Email: ";
-		s += msEmail;
-		html.WriteLine(s);
+		html.WriteLineEH(L"Email: ", L"דואל: ", msEmail);
 	}
 }
 void CPerson::SetDlg(CMyDialogEx *pDlg, int iFirstName, int iFamilyName, int iId, int iTel, int iAdd, int iEmail, int iRole)
