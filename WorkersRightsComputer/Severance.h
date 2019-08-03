@@ -10,6 +10,7 @@ public:
 	virtual bool Compute(void) override;
 
 	virtual CString GetDecriptionForLetter(void)override;
+	virtual CString GetDecriptionForLetterHebrew(void)override;
 
 	CButtonRef * mpbEntitledToSeveranceFund;
 	CButtonRef * mpbAllowSeveranceForShorterPeriod;

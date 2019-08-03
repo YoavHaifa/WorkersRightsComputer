@@ -10,6 +10,7 @@ CVacation::CVacation(void)
 	: CRight(L"Vacation", L"חופש")
 	, mPayPerDay(0)
 {
+	miPrintOrder = 2;
 }
 bool CVacation::SetCheckRef(CButtonRef *pButton)
 {
@@ -130,8 +131,11 @@ bool CVacation::ComputePerPeriod(void)
 
 	mDuePay = (int)(mnDueDays * mPayPerDay + 0.5);
 	msDesc += ToString(mnDueDays);
+	msDescHebrew  += ToString(mnDueDays);
 	msDesc += L" days * ";
+	msDescHebrew += L" ימים * ";
 	msDesc += ToString(mPayPerDay);
+	msDescHebrew += ToString(mPayPerDay);
 	return true;
 }
 bool CVacation::Compute(void)
@@ -149,7 +153,8 @@ bool CVacation::Compute(void)
 	mbUseShortRule = false;
 	mnYearsForVacation = 0;
 	mnMonthsForVacation = 0;
-	msDesc =L"";
+	msDesc = L"";
+	msDescHebrew = L"";
 
 	if (!gWorkPeriod.IsValid())
 	{
@@ -201,12 +206,19 @@ bool CVacation::Compute(void)
 		LogLine(L"per cent", SHORT_RULE_PER_CENT);
 		msDue += L"(Short period last year) ";
 		msDesc += L"Short Period: ";
+		msDescHebrew += L"תקופה קצרה: ";
 		msDesc += ToString(gWorkPeriod.mnWorkingDays);
+		msDescHebrew += ToString(gWorkPeriod.mnWorkingDays);
 		msDesc += L" days * ";
+		msDescHebrew += L" ימים * ";
 		msDesc += ToString(mPayPerDay);
+		msDescHebrew += ToString(mPayPerDay);
 		msDesc += L" * ";
+		msDescHebrew += L" * ";
 		msDesc += ToString(SHORT_RULE_PER_CENT);
+		msDescHebrew += ToString(SHORT_RULE_PER_CENT);
 		msDesc += L"%";
+		msDescHebrew += L"%";
 	}
 	else
 	{
@@ -262,6 +274,10 @@ void CVacation::PrepareString(void)
 CString CVacation::GetDecriptionForLetter(void)
 {
 	return msDesc;
+}
+CString CVacation::GetDecriptionForLetterHebrew(void)
+{
+	return msDescHebrew;
 }
 void CVacation::CountBackMonth(void)
 {

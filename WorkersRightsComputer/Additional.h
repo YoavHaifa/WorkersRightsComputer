@@ -1,8 +1,7 @@
 #pragma once
 #include "right.h"
 
-class CAdditional :
-public CRight
+class CAdditional : public CRight
 {
 public:
 	CAdditional(void);

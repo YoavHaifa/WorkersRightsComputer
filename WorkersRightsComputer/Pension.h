@@ -4,8 +4,7 @@
 #include "PensionReport.h"
 
 
-class CPension :
-public CRight
+class CPension : public CRight
 {
 public:
 	CPension(void);
@@ -13,6 +12,7 @@ public:
 	virtual	bool SetCheckRef(CButtonRef *pButton) override;
 	virtual bool Compute(void) override;
 	virtual CString GetDecriptionForLetter(void)override;
+	virtual CString GetDecriptionForLetterHebrew(void)override;
 
 	bool DoCompute(void);
 	void AddMonth(int year, int month, int nDays /* if 0 - full */);

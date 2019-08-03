@@ -44,7 +44,6 @@ public:
 
 	void Init(void);
 	void WriteLineToHtmlTable(class CHtmlWriter &html);
-	static void WriteItemToHtmlTable(class CHtmlWriter &html, CString &sItem);
 
 	bool ComputeEnvelop(void);
 	virtual bool Compute(void) = 0;
@@ -53,6 +52,7 @@ public:
 
 	virtual CString GetRightNameForLetter(void);
 	virtual CString GetDecriptionForLetter(void);
+	virtual CString GetDecriptionForLetterHebrew(void);
 
 	
 	void LogLine(const wchar_t *zText);
@@ -77,6 +77,7 @@ public:
 	CString msDue;
 	CString msDebug;
 	CString mLabel;
+	int miPrintOrder;
 	//static CString mStatusLabel;
 
 	FILE *mpfWrite;

@@ -6,6 +6,7 @@
 CNotice::CNotice(void)
 	: CRight(L"Notice", L"הודעה מוקדמת")
 {
+	miPrintOrder = 5;
 	mbDemandFullMonthAnyway = false;
 }
 CNotice::~CNotice(void)
@@ -173,6 +174,15 @@ CString CNotice::GetDecriptionForLetter(void)
 	s += ToString(mDueWorkDayToPay);
 	s += L" days * ";
 	s += ToString(mPayPerDay);
-	
+
+	return s;
+}
+CString CNotice::GetDecriptionForLetterHebrew(void)
+{
+	CString s;
+	s += ToString(mDueWorkDayToPay);
+	s += L" ימים * ";
+	s += ToString(mPayPerDay);
+
 	return s;
 }

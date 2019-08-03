@@ -11,6 +11,7 @@ CRight::CRight(const wchar_t *zName, const wchar_t *zHebrewName)
 	: msName(zName)
 	, msNameHebrew(zHebrewName)
 	, mbSkipIfZero(false)
+	, miPrintOrder(-1)
 	, mDebug(3)
 {
 	if (!umsSaveDir)
@@ -264,6 +265,10 @@ CString CRight::GetDecriptionForLetter(void)
 {
 	return CString(" ");
 }
+CString CRight::GetDecriptionForLetterHebrew(void)
+{
+	return CString(" ");
+}
 void CRight::WriteLine(const wchar_t *zLine)
 {
 	if (zLine)
@@ -350,24 +355,18 @@ bool CRight::GetIntFromEditBox(CEdit *pEdit, const wchar_t *zName, int &value)
 
 	return TryConvertInt(sText, zName, value);
 }
-void CRight::WriteItemToHtmlTable(class CHtmlWriter &html, CString &sItem)
-{
-	CString s("<td>");
-	s += sItem;
-	s += "</td>";
-	html.WriteL(s);
-}
-void CRight::WriteLineToHtmlTable(class CHtmlWriter &html)
+void CRight::WriteLineToHtmlTable(CHtmlWriter &html)
 {
 	html.WriteL(L"<tr>");
-	WriteItemToHtmlTable(html, msName);
+	html.WriteItemToHtmlTable(msName, msNameHebrew);
 
 	CString sDesc = GetDecriptionForLetter();
-	WriteItemToHtmlTable(html, sDesc);
+	CString sDescHebrew = GetDecriptionForLetterHebrew();
+	html.WriteItemToHtmlTable(sDesc, sDescHebrew);
 
 	CString sPay = ToString(mDuePay);
-	WriteItemToHtmlTable(html, sPay);
+	html.WriteItemToHtmlTable(sPay, sPay);
 
-	WriteItemToHtmlTable(html, msNameHebrew);
+	html.WriteItemToHtmlTable(msNameHebrew, msName);
 	html.WriteL(L"</tr>");
 }

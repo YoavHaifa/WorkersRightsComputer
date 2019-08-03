@@ -9,6 +9,7 @@ CSeverance::CSeverance(void)
 	, mpbAllowSeveranceForShorterPeriod(NULL)
 	, mpbEntitledToSeveranceFund(NULL)
 {
+	miPrintOrder = 1;
 }
 bool CSeverance::SetCheckRef(CButtonRef *pButton)
 {
@@ -68,6 +69,14 @@ CString CSeverance::GetDecriptionForLetter(void)
 	CString s = ToString(mnYears, 3);
 	s += L" years * ";
 	s += ToString(mPayPerYear);
-	
+
+	return s;
+}
+CString CSeverance::GetDecriptionForLetterHebrew(void)
+{
+	CString s = ToString(mnYears, 3);
+	s += L" שנים * ";
+	s += ToString(mPayPerYear);
+
 	return s;
 }

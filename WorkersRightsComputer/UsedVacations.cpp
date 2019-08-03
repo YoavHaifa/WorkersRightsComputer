@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "UsedVacations.h"
 #include "Right.h"
 #include "Utils.h"
@@ -255,18 +255,28 @@ void CUsedVacations::WriteToLetter(CHtmlWriter& html)
 		return;
 
 	html.StartParagraph();
-	wchar_t zBuf[128];
-	swprintf_s(zBuf, 128, L"This computation takes into account the following %d vacations:", nVacations);
-	html.WriteLine(zBuf);
+	html.WriteLEH(L"This computation takes into account the following ", L"חישוב זה מביא בחשבון ");
+	html.WriteInt(nVacations);
+	html.WriteLineEH(L" vacations:", L" חופשות לפי הפרוט הבא:");
 	POSITION pos = mVacationsUsed.GetHeadPosition();
 	while (pos)
 	{
 		CVacationUsed *pVac = mVacationsUsed.GetNext(pos);
-		CString s(L"Vacation: ");
-		s += pVac->mFirstDay.ToString();
-		s += " - ";
-		s += pVac->mLastDay.ToString();
-		html.WriteLine(s);
+		html.WriteEH(L"Vacation: ", L"חופשה: ");
+		html.WriteEH(pVac->mFirstDay.ToString(), pVac->mFirstDay.ToHebrewString());
+		html.Write(L" - ");
+		html.WriteEH(pVac->mLastDay.ToString(), pVac->mLastDay.ToHebrewString());
+
+		//fprintf(pf, "Work Days %2d / %2d - Paid %2d Unpaid %2d\n",
+		//	mnWorkDays, mnDays, mnPaid, mnUnPaid);
+		html.WriteEH(L", work days ", L", ימי עבודה ");
+		html.WriteInt(pVac->mnWorkDays);
+		html.WriteEH(L", paid ", L", בתשלום ");
+		html.WriteInt(pVac->mnPaid);
+		html.WriteEH(L", unpaid ", L", ללא תשלום ");
+		html.WriteInt(pVac->mnUnPaid);
+
+		html.WriteLine(L"");
 	}
 	html.EndParagraph();
 }

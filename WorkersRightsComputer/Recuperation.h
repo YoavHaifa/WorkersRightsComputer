@@ -20,6 +20,7 @@ public:
 
 	virtual bool Compute(void) override;
 	virtual CString GetDecriptionForLetter(void)override;
+	virtual CString GetDecriptionForLetterHebrew(void)override;
 
 	CSeniority *mpSeniority;
 	CYearlyRates *mpRates;

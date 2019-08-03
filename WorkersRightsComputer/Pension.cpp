@@ -11,6 +11,7 @@ CPension *gpPension = NULL;
 CPension::CPension(void)
 	: CRight(L"Pension", L"פנסיה")
 {
+	miPrintOrder = 0;
 	mpPensionRates = new CMonthlyRates(L"Pension", 2008);
 	mpSeveranceRates = new CYearlyRates(L"Severance", 2008);
 	gpPension = this;
@@ -261,19 +262,35 @@ CString CPension::GetDecriptionForLetter(void)
 	
 	return s;
 }
+CString CPension::GetDecriptionForLetterHebrew(void)
+{
+	CString s;
+	if (mSeveranceDue > 0)
+	{
+		s += L"פיצויים ";
+		s += ToString(mSeveranceDue);
+		s += L" + פנסיה ";
+		s += ToString(mPensionDue);
+	}
+	else
+	{
+		s += L"פנסיה בלבד";
+	}
+
+	return s;
+}
 void CPension::WriteToLetter(class CHtmlWriter& html)
 {
 	if (mReport.IsEmpty())
 		return;
 
 	html.StartParagraph();
-	html.WriteLine(L"Computation of due pension by month:");
+	html.WriteLineEH(L"Computation of due pension by month:", 
+		L"חישוב זכאות לפנסיה לפי חודשים:");
 
-	CString sDate = L"First day for pension: ";
-	sDate += mStartDateForPension.ToString();
-	html.WriteLine(sDate);
-	html.WriteLine(L"");
+	html.WriteEH(L"First day for pension: ", L"חישוב הפנסיה החל מתאריך: ");
+	html.WriteLineEH(mStartDateForPension.ToString(), mStartDateForPension.ToHebrewString());
+
 	mReport.WriteToLetter(html);
-
 	html.EndParagraph();
 }

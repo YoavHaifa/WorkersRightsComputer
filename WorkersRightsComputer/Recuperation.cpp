@@ -7,6 +7,7 @@ CRecuperation::CRecuperation(void)
 	: CRight(L"Recuperation", L"דמי הבראה")
 	, mpbDemandPreviousYears(NULL)
 {
+	miPrintOrder = 3;
 	Init();
 	mpSeniority = new CSeniority(L"Recuperation");
 	mpRates = new CYearlyRates(L"Recuperation", 1950);
@@ -133,6 +134,14 @@ CString CRecuperation::GetDecriptionForLetter(void)
 	CString s = ToString(mDueDays);
 	s += L" days * ";
 	s += ToString(mRate);
-	
+
+	return s;
+}
+CString CRecuperation::GetDecriptionForLetterHebrew(void)
+{
+	CString s = ToString(mDueDays);
+	s += L" ימים * ";
+	s += ToString(mRate);
+
 	return s;
 }

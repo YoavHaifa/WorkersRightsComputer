@@ -172,22 +172,19 @@ bool CAllRights::ComputeInternal()
 
 	return bOK;
 }
-void CAllRights::WriteLetterToHtml(CHtmlWriter &html, bool bUsingTemplate)
+void CAllRights::WriteLetterToHtml(CHtmlWriter &html)
 {
-	if (!bUsingTemplate)
+	for (int iPrint = 0; iPrint < 10; iPrint++)
 	{
-		gWorkPeriod.WriteToLetter(html);
-		html.WriteLine(L"Please find below the list of payments due from your employer");
-		html.WriteLine(L"In Short:");
-	}
-
-	POSITION pos = mRights.GetHeadPosition();
-	while (pos)
-	{
-		CRight *pRight = mRights.GetNext(pos);
-		if (pRight->mDuePay > 0)
+		POSITION pos = mRights.GetHeadPosition();
+		while (pos)
 		{
-			pRight->WriteLineToHtmlTable(html);
+			CRight *pRight = mRights.GetNext(pos);
+			if (pRight->miPrintOrder == iPrint && pRight->mDuePay > 0)
+			{
+				pRight->WriteLineToHtmlTable(html);
+				break;
+			}
 		}
 	}
 	WriteTotalLineToHtmlTable(html);
@@ -196,17 +193,15 @@ void CAllRights::WriteTotalLineToHtmlTable(CHtmlWriter &html)
 {
 	html.WriteL(L"<tr>");
 	
-	CString s(L"Total Due");
-	CRight::WriteItemToHtmlTable(html, s);
+	html.WriteItemToHtmlTable(CString(L"Total Due"), CString(L"סך הכל"));
 
-	s = L"";
-	CRight::WriteItemToHtmlTable(html, s);
+	CString sEmpty(L"");
+	html.WriteItemToHtmlTable(sEmpty, sEmpty);
 
-	s = CRight::ToString(mSumDue);
-	CRight::WriteItemToHtmlTable(html, s);
+	CString sSum(CRight::ToString(mSumDue));
+	html.WriteItemToHtmlTable(sSum, sSum);
 
-	s = L"סך הכל";
-	CRight::WriteItemToHtmlTable(html, s);
+	html.WriteItemToHtmlTable(CString(L"סך הכל"), CString("Total Due"));
 
 	html.WriteL(L"</tr>");
 }

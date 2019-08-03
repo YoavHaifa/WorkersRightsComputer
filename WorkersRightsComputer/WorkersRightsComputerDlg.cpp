@@ -1,4 +1,4 @@
-
+﻿
 // WorkersRightsComputerDlg.cpp : implementation file
 //
 
@@ -605,13 +605,8 @@ void CWorkersRightsComputerDlg::OnTestLoadtxt()
 }
 void CWorkersRightsComputerDlg::WriteEditorToLetter(CHtmlWriter& html)
 {
-	CString s(L"Prepared by: ");
 	CString sEditor(GetText(IDC_EDIT_FILLED_BY));
-	if (!sEditor.IsEmpty() && sEditor != L"0")
-	{
-		s += sEditor;
-	}
-	html.WritePara(s);
+	html.WriteLineEH(L"Prepared by: ", L"הוכן על ידי: ", sEditor);
 }
 
 

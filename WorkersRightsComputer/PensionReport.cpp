@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "PensionReport.h"
 #include "HtmlWriter.h"
 #include "Pension.h"
@@ -129,7 +129,7 @@ void CPensionReport::WriteToLetter(CHtmlWriter& html)
 	}
 	// Sum Line
 	html.StartTabLine();
-	html.Write2Tab("Sum");
+	html.Write2TabEH(L"Sum", L"סך הכל");
 	html.Write2Tab(" ");
 	html.Write2Tab(" ");
 	html.Write2Tab(" ");

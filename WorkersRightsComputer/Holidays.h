@@ -30,6 +30,7 @@ public:
 	virtual	bool SetEditRef(class CEditRef *pRef) override;
 	virtual bool Compute(void) override;
 	virtual CString GetDecriptionForLetter(void)override;
+	virtual CString GetDecriptionForLetterHebrew(void)override;
 
 	bool InitFromFile(const wchar_t *zfName);
 	bool InitFromFileInternals(FILE *pfRead, FILE *pfLog);

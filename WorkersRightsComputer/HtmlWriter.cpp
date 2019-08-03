@@ -109,7 +109,7 @@ void CHtmlWriter::ReplaceTemplateVariable(void)
 	else if (sToken == L"workPeriod")
 		PrintEH(gWorkPeriod.GetPeriodForLetter(), gWorkPeriod.GetPeriodForLetterHebrew());
 	else if (sToken == L"table")
-		WriteTable(true);
+		WriteTable();
 	else if (sToken == L"pension")
 		gpPension->WriteToLetter(*this);
 	else if (sToken == L"vacations")
@@ -124,7 +124,7 @@ void CHtmlWriter::ReplaceTemplateVariable(void)
 	{
 		CMyTime now;
 		now.SetNow();
-		WriteL(now.ToString());
+		WriteLEH(now.ToString(), now.ToHebrewString());
 	}
 
 	else
@@ -149,6 +149,12 @@ void CHtmlWriter::PrintEH(const CString& s, const CString& sh)
 	if (mbHeb)
 		fwprintf(mpfHebrewWrite, L"%s", (const wchar_t*)sh);
 }
+void CHtmlWriter::WriteInt(int value)
+{
+	wchar_t zBuf[128];
+	swprintf_s(zBuf, 128, L"%d", value);
+	Write(zBuf);
+}
 void CHtmlWriter::Write(const wchar_t *zText)
 {
 	if (mbEng)
@@ -156,12 +162,26 @@ void CHtmlWriter::Write(const wchar_t *zText)
 	if (mbHeb)
 		fwprintf(mpfHebrewWrite, L"%s", zText);
 }
+void CHtmlWriter::WriteEH(const wchar_t* zText, const wchar_t* zHebrewText)
+{
+	if (mbEng)
+		fwprintf(mpfWrite, L"%s", zText);
+	if (mbHeb)
+		fwprintf(mpfHebrewWrite, L"%s", zHebrewText);
+}
 void CHtmlWriter::WriteL(const wchar_t* zText)
 {
 	if (mbEng)
 		fwprintf(mpfWrite, L"%s\n", zText);
 	if (mbHeb)
 		fwprintf(mpfHebrewWrite, L"%s\n", zText);
+}
+void CHtmlWriter::WriteLTH_EH(const wchar_t* zText, const wchar_t* zHebrewText)
+{
+	if (mbEng)
+		fwprintf(mpfWrite, L"<th>%s</th>\n", zText);
+	if (mbHeb)
+		fwprintf(mpfHebrewWrite, L"<th>%s</th>\n", zHebrewText);
 }
 void CHtmlWriter::WriteLEH(const wchar_t* zText, const wchar_t* zHebrewText)
 {
@@ -236,18 +256,18 @@ void CHtmlWriter::WriteHeadline(const wchar_t *zText, int iH)
 		fwprintf(mpfHebrewWrite, L"%s</h%d>\n", zText, iH);
 	}
 }
-void CHtmlWriter::WriteTable(bool bUsingTemplate)
+void CHtmlWriter::WriteTable()
 {
 	WriteL(L"<table style=\"width:50%\" border=1>");
 
 	WriteL(L"<tr>");
-	WriteL(L"<th>Topic</th>");
-	WriteL(L"<th>Computation</th>");
-	WriteL(L"<th>Due</th>");
-	WriteL(L"<th>בעניין</th>");
+	WriteLTH_EH(L"Topic", L"בעניין");
+	WriteLTH_EH(L"Computation", L"חישוב");
+	WriteLTH_EH(L"Due", L"לתשלום");
+	WriteLTH_EH(L"בעניין", L"Topic");
 	WriteL(L"</tr>");
 
-	gAllRights.WriteLetterToHtml(*this, bUsingTemplate);
+	gAllRights.WriteLetterToHtml(*this);
 
 	WriteL(L"</table>");
 }
@@ -272,18 +292,18 @@ void CHtmlWriter::StartPensionTable(void)
 	WriteL(L"<table style=\"width:50%\" border=1>");
 
 	WriteL(L"<tr>");
-	WriteL(L"<th>From</th>");
-	WriteL(L"<th>Till</th>");
-	WriteL(L"<th>Salary</th>");
-	WriteL(L"<th>Months</th>");
-	WriteL(L"<th>Total</th>");
-	WriteL(L"<th>Pension</th>");
-	WriteL(L"<th>Due</th>");
+	WriteLTH_EH(L"From", L"מ-");
+	WriteLTH_EH(L"Till", L"עד");
+	WriteLTH_EH(L"Salary", L"משכורת");
+	WriteLTH_EH(L"Months", L"חודשים");
+	WriteLTH_EH(L"Total", L"סך הכל");
+	WriteLTH_EH(L"Pension", L"פנסיה");
+	WriteLTH_EH(L"Due", L"מגיע");
 	if (gpPension->mbSeverance)
 	{
-		WriteL(L"<th>Severance</th>");
-		WriteL(L"<th>Due</th>");
-		WriteL(L"<th>All</th>");
+		WriteLTH_EH(L"Severance", L"פיצויים");
+		WriteLTH_EH(L"Due", L"מגיע");
+		WriteLTH_EH(L"All", L"סך הכל");
 	}
 	WriteL(L"</tr>");
 }
@@ -298,12 +318,18 @@ void CHtmlWriter::Write2Tab(CString &sItem)
 	s += "</td>";
 	WriteL(s);
 }
-void CHtmlWriter::Write2Tab(const char *zText)
+void CHtmlWriter::Write2Tab(const char* zText)
 {
 	CString s("<td>");
 	s += zText;
 	s += "</td>";
 	WriteL(s);
+}
+void CHtmlWriter::Write2TabEH(const wchar_t* zText, const wchar_t* zHebrewText)
+{
+	Write(L"<td>");
+	WriteEH(zText, zHebrewText);
+	WriteLine(L"</td>");
 }
 void CHtmlWriter::Write2Tab(double value)
 {
@@ -328,4 +354,14 @@ bool CHtmlWriter::OpenHebrewLetter()
 	msfHebrewName.Replace(L"english", L"hebrew");
 	mpfHebrewWrite = MyFOpenWithErrorBox(msfHebrewName, L"w, ccs=UNICODE", L"HTML Unicode");
 	return true;
+}
+void CHtmlWriter::WriteItemToHtmlTable(CString sItem, CString sItemHebrew)
+{
+	CString s("<td>");
+	s += sItem;
+	s += "</td>";
+	CString sh("<td>");
+	sh += sItemHebrew;
+	sh += "</td>";
+	WriteLEH(s, sh);
 }

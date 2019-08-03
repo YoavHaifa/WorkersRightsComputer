@@ -22,6 +22,7 @@ CHolidays::CHolidays(void)
 	, mpPrevYearsFromBox(NULL)
 	, mpPrevNYearsBox(NULL)
 {
+	miPrintOrder = 4;
 	mnWorkedLastYear = -1;
 	mnPaidLastYear = -1;
 
@@ -423,5 +424,23 @@ CString CHolidays::GetDecriptionForLetter(void)
 	}
 	
 	return s;
+}
+CString CHolidays::GetDecriptionForLetterHebrew(void)
+{
+	CString s = ToString(mnDaysToPay);
+	s += L" ימים * ";
+	if (mMinPayPerDay == mMaxPayPerDay)
+	{
+		s += ToString(mMinPayPerDay);
+	}
+	else
+	{
+		s += L"[";
+		s += ToString(mMinPayPerDay);
+		s += L"-";
+		s += ToString(mMaxPayPerDay);
+		s += L"]";
+	}
 
+	return s;
 }
