@@ -10,7 +10,7 @@ public:
 	CString GetPassport(void);
 	CString GetTel(void);
 
-	void StartLetter(class CLogoWriter &lw);
+	//void StartLetter(class CLogoWriter &lw);
 	void StartLetter(class CHtmlWriter &html);
 	void SetDlg(class CMyDialogEx *pDlg, int iFirstName, int iFamilyName, int iId, int iTel, int iAdd, int iEmail, int iRole = 0);
 	int UpdateFromDlg();

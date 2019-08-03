@@ -33,9 +33,6 @@
     <ClInclude Include="Person.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="LogoWriter.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Right.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -58,9 +55,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="AllRights.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Hebrew.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="FilesList.h">
@@ -167,9 +161,6 @@
     <ClCompile Include="Person.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="LogoWriter.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Right.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -192,9 +183,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="AllRights.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Hebrew.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="FilesList.cpp">

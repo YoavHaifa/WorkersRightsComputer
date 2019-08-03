@@ -11,6 +11,7 @@ CPerson::CPerson(void)
 	: mbIsPassport(true)
 {
 }
+/*
 void CPerson::StartLetter(CLogoWriter &logo)
 {
 	logo.WriteLine(L"To");
@@ -35,7 +36,7 @@ void CPerson::StartLetter(CLogoWriter &logo)
 		s += msTelephone;
 		logo.WriteLine(s);
 	}
-}
+} */
 CString CPerson::GetFirstName(void)
 {
 	return mpDlg->GetText(miFirstName);

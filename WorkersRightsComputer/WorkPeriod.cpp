@@ -402,6 +402,7 @@ int CWorkPeriod::CountWorkDaysToEndOfMonthFrom(CMyTime &firstDate)
 	}
 	return n;
 }
+/*
 void CWorkPeriod::WriteToLetter(CLogoWriter &lw)
 {
 	CString s = L"Work Period: ";
@@ -409,7 +410,7 @@ void CWorkPeriod::WriteToLetter(CLogoWriter &lw)
 	s += " - ";
 	s += mLast.ToString();
 	lw.WriteLine(s);
-}
+} */
 void CWorkPeriod::WriteToLetter(class CHtmlWriter &html)
 {
 	CString s = L"Work Period: ";

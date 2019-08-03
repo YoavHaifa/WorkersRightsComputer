@@ -160,7 +160,6 @@ BEGIN_MESSAGE_MAP(CWorkersRightsComputerDlg, CDialogEx)
 	ON_COMMAND(ID_TEST_CREATEDIR, &CWorkersRightsComputerDlg::OnTestCreatedir)
 	ON_COMMAND(ID_FILE_LOADOLDCASE, &CWorkersRightsComputerDlg::OnFileLoadoldcase)
 	ON_COMMAND(ID_TEST_VERIFYBATCH, &CWorkersRightsComputerDlg::OnTestVerifybatch)
-	ON_COMMAND(ID_TEST_READHEBREW, &CWorkersRightsComputerDlg::OnTestReadhebrew)
 	ON_COMMAND(ID_TEST_WRITEHTML, &CWorkersRightsComputerDlg::OnTestWritehtml)
 	ON_BN_CLICKED(IDC_EMPLOYER, &CWorkersRightsComputerDlg::OnBnClickedEmployer)
 	ON_BN_CLICKED(IDC_COMMENTS, &CWorkersRightsComputerDlg::OnBnClickedComments)
@@ -492,11 +491,6 @@ void CWorkersRightsComputerDlg::OnTestVerifybatch()
 		CString sfName(dlg.mSelectedFileName);
 		CVerify::VerifyBatch(sfName);
 	}
-}
-void CWorkersRightsComputerDlg::OnTestReadhebrew()
-{
-	gHebrew.TestWrite();
-	//gHebrew.TestRead();
 }
 void CWorkersRightsComputerDlg::OnTestWritehtml()
 {

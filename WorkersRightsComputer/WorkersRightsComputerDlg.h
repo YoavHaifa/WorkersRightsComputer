@@ -90,7 +90,6 @@ public:
 	CEdit mEditPrevNYears;
 	static DWORD WINAPI StaticThreadFunc(LPVOID);
 	afx_msg void OnTestVerifybatch();
-	afx_msg void OnTestReadhebrew();
 	afx_msg void OnTestWritehtml();
 	afx_msg void OnBnClickedEmployer();
 	afx_msg void OnBnClickedComments();

@@ -25,7 +25,7 @@ public:
 	void ComputeLastYearsStart(void);
 	void ComputeWorkDays(void);
 	void Reset(void);
-	void WriteToLetter(CLogoWriter &lw);
+	// void WriteToLetter(CLogoWriter &lw);
 	void WriteToLetter(class CHtmlWriter &html);
 	CString GetPeriodForLetter(void);
 	CString GetPeriodForLetterHebrew(void);

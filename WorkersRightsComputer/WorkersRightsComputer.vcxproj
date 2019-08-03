@@ -192,7 +192,6 @@
     <ClInclude Include="FamilyPartDlg.h" />
     <ClInclude Include="FileName.h" />
     <ClInclude Include="FilesList.h" />
-    <ClInclude Include="Hebrew.h" />
     <ClInclude Include="HtmlWriter.h" />
     <ClInclude Include="MonthInfo.h" />
     <ClInclude Include="MonthlyRates.h" />
@@ -215,7 +214,6 @@
     <ClInclude Include="Verify.h" />
     <ClInclude Include="WorkPeriodDlg.h" />
     <ClInclude Include="Holidays.h" />
-    <ClInclude Include="LogoWriter.h" />
     <ClInclude Include="MinWage.h" />
     <ClInclude Include="Person.h" />
     <ClInclude Include="Resource.h" />
@@ -240,7 +238,6 @@
     <ClCompile Include="FamilyPartDlg.cpp" />
     <ClCompile Include="FileName.cpp" />
     <ClCompile Include="FilesList.cpp" />
-    <ClCompile Include="Hebrew.cpp" />
     <ClCompile Include="HtmlWriter.cpp" />
     <ClCompile Include="MonthInfo.cpp" />
     <ClCompile Include="MonthlyRates.cpp" />
@@ -263,7 +260,6 @@
     <ClCompile Include="Verify.cpp" />
     <ClCompile Include="WorkPeriodDlg.cpp" />
     <ClCompile Include="Holidays.cpp" />
-    <ClCompile Include="LogoWriter.cpp" />
     <ClCompile Include="MinWage.cpp" />
     <ClCompile Include="Person.cpp" />
     <ClCompile Include="Right.cpp" />
