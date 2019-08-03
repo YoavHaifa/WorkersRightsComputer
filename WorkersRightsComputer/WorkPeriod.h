@@ -54,8 +54,8 @@ public:
 	CMyTime mLast;
 	CMyTime mNotice;
 	CMyTime mLastYearStart;
-	CMyTime mLastSalaryUntil;
-	bool mbNotIncludingLastSalary;
+	//CMyTime mLastSalaryUntil;
+	//bool mbNotIncludingLastSalary;
 
 	//System::TimeSpan mSpan;
 	CString mSpanString;

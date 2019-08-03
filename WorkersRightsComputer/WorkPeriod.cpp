@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+﻿#include "StdAfx.h"
 #include "WorkPeriod.h"
 #include "Holidays.h"
 #include "Utils.h"
@@ -420,11 +420,15 @@ void CWorkPeriod::WriteToLetter(class CHtmlWriter &html)
 }
 void CWorkPeriod::WriteLastSalary(class CHtmlWriter& html)
 {
-	if (!mbNotIncludingLastSalary)
-		return;
-	CString s = L"This computation does not include last salary until ";
-	s += mLastSalaryUntil.ToString();
-	html.WritePara(s);
+	//if (!mbNotIncludingLastSalary)
+	//	return;
+	html.StartParagraph();
+	html.WriteEH(L"This computation does not include last salary until ", 
+		L"חישוב זה אינו כולל שכר אחרון עד לתאריך ");
+	html.WriteLineEH(gWorkPeriod.mLast.ToString(), gWorkPeriod.mLast.ToHebrewString());
+	//s += mLastSalaryUntil.ToString();
+	//html.WritePara(s);
+	html.EndParagraph();
 }
 CString CWorkPeriod::GetPeriodForLetter(void)
 {
@@ -471,8 +475,8 @@ void CWorkPeriod::SaveToXml(CXMLDump &xmlDump)
 		xmlDump.Write(L"HoursPerWeek", mHoursPerWeek);
 	}
 
-	xmlDump.Write(L"bNotIncludingLastSalary", mbNotIncludingLastSalary);
-	xmlDump.Write(L"last_salary_until", mLastSalaryUntil);
+	//xmlDump.Write(L"bNotIncludingLastSalary", mbNotIncludingLastSalary);
+	//xmlDump.Write(L"last_salary_until", mLastSalaryUntil);
 
 	gUsedVacations.SaveToXml(xmlDump);
 	gFamilyPart.SaveToXml(xmlDump);
@@ -512,8 +516,8 @@ void CWorkPeriod::LoadFromXml(class CXMLParseNode* pRoot)
 		pMain->GetValue(L"HoursPerWeek", mHoursPerWeek);
 	}
 
-	pMain->GetValue(L"bNotIncludingLastSalary", mbNotIncludingLastSalary);
-	pMain->GetValue(L"last_salary_until", mLastSalaryUntil);
+	//pMain->GetValue(L"bNotIncludingLastSalary", mbNotIncludingLastSalary);
+	//pMain->GetValue(L"last_salary_until", mLastSalaryUntil);
 
 	Compute();
 

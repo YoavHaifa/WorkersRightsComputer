@@ -333,13 +333,13 @@ void CWorkPeriodDlg::UpdateDataFromDialog(void)
 		gWorkPeriod.SetHourlyWage(_wtof(sWageText), _wtof(snHoursText));
 	}
 
-	if (IsChecked(IDC_CHECK_NOT_INCLUDING))
-		gWorkPeriod.mbNotIncludingLastSalary = true;
-	else
-		gWorkPeriod.mbNotIncludingLastSalary = false;
+	//if (IsChecked(IDC_CHECK_NOT_INCLUDING))
+	//	gWorkPeriod.mbNotIncludingLastSalary = true;
+	//else
+	//	gWorkPeriod.mbNotIncludingLastSalary = false;
 
-	flags = mLastSalaryDate.GetTime(time);
-	gWorkPeriod.mLastSalaryUntil.SetDate(time);
+	//flags = mLastSalaryDate.GetTime(time);
+	//gWorkPeriod.mLastSalaryUntil.SetDate(time);
 }
 void CWorkPeriodDlg::OnBnClickedOk()
 {

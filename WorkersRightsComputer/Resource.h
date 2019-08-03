@@ -102,7 +102,6 @@
 #define IDC_BUTTON_FAMILY_PART_CLEAR    1085
 #define IDC_STATIC_ASK                  1086
 #define IDC_BUTTON_FAMILY_PART_CLEAR2   1087
-#define IDC_CHECK_NOT_INCLUDING         1087
 #define ID_FILE_EXIT                    32771
 #define ID_COMPUTE_ALL                  32772
 #define ID_FILE_LOAD                    32773

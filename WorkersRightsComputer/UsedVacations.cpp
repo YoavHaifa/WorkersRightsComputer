@@ -258,6 +258,9 @@ void CUsedVacations::WriteToLetter(CHtmlWriter& html)
 	html.WriteLEH(L"This computation takes into account the following ", L"חישוב זה מביא בחשבון ");
 	html.WriteInt(nVacations);
 	html.WriteLineEH(L" vacations:", L" חופשות לפי הפרוט הבא:");
+
+	int nPaid = 0;
+	int nUnPaid = 0;
 	POSITION pos = mVacationsUsed.GetHeadPosition();
 	while (pos)
 	{
@@ -275,8 +278,20 @@ void CUsedVacations::WriteToLetter(CHtmlWriter& html)
 		html.WriteInt(pVac->mnPaid);
 		html.WriteEH(L", unpaid ", L", ללא תשלום ");
 		html.WriteInt(pVac->mnUnPaid);
+		nPaid += pVac->mnPaid;
+		nUnPaid += pVac->mnUnPaid;
 
 		html.WriteLine(L"");
 	}
+	html.EndParagraph();
+
+	// Sum of vacations
+	html.StartParagraph();
+	html.WriteEH(L"According to the law, days of paid vacation are included while computing social rights like severance and pension. In this computation ", 
+		L"לפי חוק חופשה שנתית, ימי חופשה בתשלום באים בחשבון לצורך חישוב זכויות סוציאליות כגון פיצויי פיטורים והפרשות לפנסיה.  בחישוב זה הוכללו ");
+	html.WriteInt(nPaid);
+	html.WriteEH(L" days of paid vacation were included and ", L" ימי חופשה בתשלום וקוזזו ");
+	html.WriteInt(nUnPaid);
+	html.WriteLineEH(L" days of unpaid vacation were offset.", L" ימי חופשה ללא תשלום. ");
 	html.EndParagraph();
 }
