@@ -72,19 +72,15 @@
 #define IDC_EDIT_EMP_TEL                1055
 #define IDC_EDIT_EMP_ID                 1056
 #define IDC_EDIT_EMP_ADDRESS            1057
-#define IDC_EDIT_EMP_NAME2              1058
-#define IDC_EDIT_EMP_TEL2               1059
-#define IDC_EDIT_EMP_ID2                1060
-#define IDC_EDIT_EMP_ADDRESS2           1061
 #define IDC_EDIT_EMP_ROLE               1062
 #define IDC_EDIT_ADDITIONAL_DESC        1063
+#define IDC_EDIT_EMP_COMMENT            1063
 #define IDC_EDIT_SUMMARY                1064
 #define IDC_RADIO_PRIVATE               1065
 #define IDC_RADIO_COMPANY               1066
 #define IDC_RADIO_OSEK                  1067
 #define IDC_EDIT4                       1068
 #define IDC_EDIT6                       1069
-#define IDC_EDIT_EMP_ROLE2              1070
 #define IDC_EDIT_FILLED_BY              1071
 #define IDC_DATETIMEPICKER_VAC_START    1072
 #define IDC_DATETIMEPICKER_VAC_END      1073
@@ -102,6 +98,13 @@
 #define IDC_BUTTON_FAMILY_PART_CLEAR    1085
 #define IDC_STATIC_ASK                  1086
 #define IDC_BUTTON_FAMILY_PART_CLEAR2   1087
+#define IDC_BUTTON_ADD_EMPLOYER         1088
+#define IDC_BUTTON_ADD_CONTACT          1089
+#define IDC_BUTTON_CLEAR_CONTACTS       1090
+#define IDC_BUTTON_CLEAR_CONTACT        1091
+#define IDC_EDIT_CONTACTS               1092
+#define IDC_BUTTON_CLEAR_CONTACT2       1093
+#define IDC_BUTTON_EDIT_CONTACT         1093
 #define ID_FILE_EXIT                    32771
 #define ID_COMPUTE_ALL                  32772
 #define ID_FILE_LOAD                    32773
@@ -120,7 +123,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        141
 #define _APS_NEXT_COMMAND_VALUE         32782
-#define _APS_NEXT_CONTROL_VALUE         1088
+#define _APS_NEXT_CONTROL_VALUE         1093
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

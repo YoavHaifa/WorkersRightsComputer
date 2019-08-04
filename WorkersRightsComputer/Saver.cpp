@@ -10,6 +10,7 @@
 #include "XmlParse.h"
 #include "HtmlWriter.h"
 #include "Config.h"
+#include "Person.h"
 
 
 CSaver::CSaver()
@@ -29,6 +30,7 @@ void CSaver::ResetAllInputs(void)
 	if (gpDlg)
 		gpDlg->ResetAllInputs();
 	gWorkPeriod.Reset();
+	CPerson::ClearContacts();
 }
 void CSaver::Save(const wchar_t *zfName)
 {
@@ -69,6 +71,8 @@ void CSaver::SaveToXml(void)
 	gpDlg->SaveToXml(xmlDump);
 
 	gWorkPeriod.SaveToXml(xmlDump);
+
+	CPerson::SaveContactsToXml(xmlDump);
 
 	xmlDump.Close();
 }
@@ -210,6 +214,7 @@ void CSaver::LoadFromXmlFile()
 
 	gpDlg->LoadFromXml(pRoot);
 	gWorkPeriod.LoadFromXml(pRoot);
+	CPerson::LoadContactsFromXml(pRoot);
 
 	gpDlg->mbDisableComputations = false;
 	gpDlg->OnInputChange();

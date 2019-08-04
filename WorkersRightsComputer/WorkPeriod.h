@@ -54,18 +54,10 @@ public:
 	CMyTime mLast;
 	CMyTime mNotice;
 	CMyTime mLastYearStart;
-	//CMyTime mLastSalaryUntil;
-	//bool mbNotIncludingLastSalary;
 
-	//System::TimeSpan mSpan;
 	CString mSpanString;
 	CString msLastYearStart;
 
-	// CEdit &mSpanTextBox;
-	// DateTimePicker ^ mNoticeDateTimePicker;
-
-	//System::Windows::Forms::Label ^ mWorkingDaysLabel;
-	//System::Windows::Forms::Label ^ mLastYearStartLabel;
 
 	static const int N_WEEK_DAYS = 7;
 	double maWorkingDays[N_WEEK_DAYS];
