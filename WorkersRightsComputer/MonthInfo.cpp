@@ -70,6 +70,13 @@ bool CMonthInfo::IsPartial(void)
 {
 	return (mFraction < 1);
 }
+double CMonthInfo::GetCompanyRatio()
+{
+	if (mHoursPerWeekPaidByCompany > 0)
+		return mHoursPerWeekPaidByCompany / mHoursPerWeek;
+
+	return mRatioPaidByCompany;
+}
 void CMonthInfo::SetUnpaid(int nAnpaidDaysToAdd)
 {
 	if (nAnpaidDaysToAdd < 1)

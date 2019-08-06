@@ -10,6 +10,7 @@ public:
 	void InitFirst();
 	void InitNext(CMonthInfo &prev);
 	bool IsPartial(void);
+	double GetCompanyRatio(void);
 
 	int mi;
 	bool mbLast;
@@ -19,6 +20,7 @@ public:
 	int mnDaysWorked;
 	int mHoursPerWeek;
 	double mHoursPerWeekPaidByCompany;
+	double mRatioPaidByCompany;
 	double mFraction;
 	void SetUnpaid(int nAnpaidDaysToAdd);
 	void SetDaysPerWeek(void);

@@ -35,6 +35,7 @@ public:
 	double mSeverancePerYear;
 	double mPensionDue;
 	double mSeveranceDue;
+	double mDueFromFamily;
 	bool mbSeverance;
 	CPensionReport mReport;
 

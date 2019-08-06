@@ -27,4 +27,7 @@ public:
 	CDateTimeCtrl mStartPeriod;
 	afx_msg void OnBnClickedButtonAddPeriod();
 	afx_msg void OnBnClickedButtonFamilyPartClear();
+	afx_msg void OnBnClickedButtonAddPeriodPercent();
+	afx_msg void OnBnClickedButtonFamilyPartClearLast();
+	void ClearForEdit();
 };

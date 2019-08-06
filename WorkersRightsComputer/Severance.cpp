@@ -2,6 +2,7 @@
 #include "Severance.h"
 #include "WorkPeriod.h"
 #include "MinWage.h"
+#include "FamilyPart.h"
 
 
 CSeverance::CSeverance(void)
@@ -62,6 +63,13 @@ bool CSeverance::Compute(void)
 	msDue += ToString(mPayPerYear);
 	msDue += L" ==> ";
 	msDue += ToString(mDuePay);
+	if (gFamilyPart.mbAskOnlyForFamilyPart)
+	{
+		mDuePay = mDuePay * gFamilyPart.mRatio;
+		msDue += L" =FamilyPart=> ";
+		msDue += ToString(mDuePay);
+
+	}
 	return true;
 }
 CString CSeverance::GetDecriptionForLetter(void)

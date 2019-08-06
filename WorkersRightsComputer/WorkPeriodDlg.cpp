@@ -53,7 +53,7 @@ void CWorkPeriodDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_CHECK_SATURDAY, mCheckSaturday);
 	DDX_Control(pDX, IDC_RADIO_MONTHLY, mRadioMonthly);
 	DDX_Control(pDX, IDC_RADIO_HOURLY, mRadioHourly);
-	DDX_Control(pDX, IDC_DATETIMEPICKER_NOTICE2, mLastSalaryDate);
+	//DDX_Control(pDX, IDC_DATETIMEPICKER_NOTICE2, mLastSalaryDate);
 }
 
 
@@ -434,6 +434,7 @@ void CWorkPeriodDlg::OnBnClickedOk3()
 }
 void CWorkPeriodDlg::OnBnClickedButtonFamilyPart()
 {
+	UpdateDataFromDialog();
 	CFamilyPartDlg dlg;
 	dlg.DoModal();
 

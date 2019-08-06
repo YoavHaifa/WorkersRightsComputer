@@ -5,6 +5,7 @@
 #include "Utils.h"
 #include "MonthInfo.h"
 #include "HtmlWriter.h"
+#include "FamilyPart.h"
 
 CPension *gpPension = NULL;
 
@@ -47,6 +48,7 @@ bool CPension::Compute(void)
 	mDuePay = 0;
 	mSeveranceDue = 0;
 	mPensionDue = 0;
+	mDueFromFamily = 0;
 	mPensionPerYear = 0;
 	mSeverancePerYear = 0;
 
@@ -95,6 +97,7 @@ bool CPension::Compute(void)
 void CPension::AddMonth(int year, int month, int nDays /* if 0 - full */)
 {
 	double part = 1;
+	double familyPart = 0;
 	if (umbOldStyle)
 	{
 		if (nDays > 0)
@@ -108,12 +111,16 @@ void CPension::AddMonth(int year, int month, int nDays /* if 0 - full */)
 	{
 		CMonthInfo *pInfo = gWorkPeriod.GetMonthInfoFor(year, month);
 		part = pInfo->mFraction;
+		if (gFamilyPart.mbAskOnlyForFamilyPart)
+			familyPart = 1 - pInfo->GetCompanyRatio();
 	}
 
 	double monthlyPay = gMinWage.ComputeMonthlyPay(year, month);
 
 	double penRate = mpPensionRates->RatePerMonth(year, month);
 	double pensionDue = monthlyPay * penRate * part;
+	if (gFamilyPart.mbAskOnlyForFamilyPart)
+		pensionDue *= familyPart;
 	mPensionDue += pensionDue;
 	mPensionPerYear += pensionDue;
 
@@ -129,11 +136,14 @@ void CPension::AddMonth(int year, int month, int nDays /* if 0 - full */)
 	sLine += L" ";
 	sLine += ToString(pensionDue);
 
+	double severanceDue = 0;
 	double sevRate = 0;
 	if (mpbEntitledToSeveranceFund->IsChecked())
 	{
 		sevRate = mpSeveranceRates->RatePerYear(year);
-		double severanceDue = monthlyPay * sevRate * part;
+		severanceDue = monthlyPay * sevRate * part;
+		if (gFamilyPart.mbAskOnlyForFamilyPart)
+			severanceDue *= familyPart;
 		mSeveranceDue += severanceDue;
 		mSeverancePerYear += severanceDue;
 		double all = severanceDue + pensionDue;
@@ -148,7 +158,9 @@ void CPension::AddMonth(int year, int month, int nDays /* if 0 - full */)
 	LogLine(sLine);
 	if (month == 12)
 		OnYearEnd();
-	mReport.AddMonth(year, month, monthlyPay, part, penRate, sevRate);
+	if (gFamilyPart.mbAskOnlyForFamilyPart)
+		mDueFromFamily += (pensionDue + severanceDue);
+	mReport.AddMonth(year, month, monthlyPay, part, penRate, sevRate, familyPart);
 }
 bool CPension::DoCompute()
 {
@@ -248,6 +260,9 @@ void CPension::OnYearEnd(void)
 CString CPension::GetDecriptionForLetter(void)
 {
 	CString s;
+	if (gFamilyPart.mbAskOnlyForFamilyPart)
+		s += "Family Part, ";
+
 	if (mSeveranceDue > 0)
 	{
 		s += L"Severance ";
@@ -265,6 +280,9 @@ CString CPension::GetDecriptionForLetter(void)
 CString CPension::GetDecriptionForLetterHebrew(void)
 {
 	CString s;
+	if (gFamilyPart.mbAskOnlyForFamilyPart)
+		s += L"חלק המשפחה, ";
+
 	if (mSeveranceDue > 0)
 	{
 		s += L"פיצויים ";

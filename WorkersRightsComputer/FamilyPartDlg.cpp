@@ -33,16 +33,15 @@ void CFamilyPartDlg::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(CFamilyPartDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_ADD_PERIOD, &CFamilyPartDlg::OnBnClickedButtonAddPeriod)
 	ON_BN_CLICKED(IDC_BUTTON_FAMILY_PART_CLEAR, &CFamilyPartDlg::OnBnClickedButtonFamilyPartClear)
+	ON_BN_CLICKED(IDC_BUTTON_ADD_PERIOD_PERCENT, &CFamilyPartDlg::OnBnClickedButtonAddPeriodPercent)
+	ON_BN_CLICKED(IDC_BUTTON_FAMILY_PART_CLEAR_LAST, &CFamilyPartDlg::OnBnClickedButtonFamilyPartClearLast)
 END_MESSAGE_MAP()
 
 BOOL CFamilyPartDlg::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
-
-	SetText(IDC_EDIT_HOURS_BY_COMPANY, L"-");
-
-
+	ClearForEdit();
 	UpdateText();
 	return TRUE;  // return TRUE  unless you set the focus to a contro
 }
@@ -57,7 +56,7 @@ void CFamilyPartDlg::UpdateText()
 		{
 			mStartPeriod.SetTime(&gWorkPeriod.mFirst.mTime);
 		}
-		SetText(IDC_EDIT_HOURS_BY_COMPANY, L"-");
+		ClearForEdit();
 	}
 
 	CString s = gFamilyPart.GetFullText();
@@ -92,10 +91,49 @@ void CFamilyPartDlg::OnBnClickedButtonAddPeriod()
 		return;
 	}
 	UpdateText();
-	SetText(IDC_EDIT_HOURS_BY_COMPANY, L"-");
+	ClearForEdit();
+}
+void CFamilyPartDlg::OnBnClickedButtonAddPeriodPercent()
+{
+	CString s(GetText(IDC_EDIT_PERCENT_BY_COMPANY));
+	if (!isdigit(s[0]))
+	{
+		MessageBox(L"Please define number of hours per week", L"Input Error");
+		return;
+	}
+	double perCent = _wtof(s);
+	if (perCent < 0 || perCent > 100)
+	{
+		MessageBox(L"Illegal value for percent", L"Input Error");
+		return;
+	}
+
+	CTime timeTime;
+	DWORD dwResult = mStartPeriod.GetTime(timeTime);
+	if (dwResult == GDT_VALID)
+	{
+		gFamilyPart.AddPeriodPC(timeTime, perCent);
+	}
+	else
+	{
+		MessageBox(L"Illegal date for period start", L"Input Error");
+		return;
+	}
+	UpdateText();
+	ClearForEdit();
 }
 void CFamilyPartDlg::OnBnClickedButtonFamilyPartClear()
 {
 	gFamilyPart.Clear();
 	UpdateText();
+}
+void CFamilyPartDlg::OnBnClickedButtonFamilyPartClearLast()
+{
+	gFamilyPart.ClearLast();
+	UpdateText();
+}
+void CFamilyPartDlg::ClearForEdit()
+{
+	SetText(IDC_EDIT_HOURS_BY_COMPANY, L"");
+	SetText(IDC_EDIT_PERCENT_BY_COMPANY, L"");
 }

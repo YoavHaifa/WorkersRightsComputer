@@ -1,6 +1,7 @@
 ﻿#include "StdAfx.h"
 #include "Notice.h"
 #include "WorkPeriod.h"
+#include "FamilyPart.h"
 
 
 CNotice::CNotice(void)
@@ -166,6 +167,14 @@ bool CNotice::Compute(void)
 	mDuePay = mDueWorkDayToPay * mPayPerDay;
 	msDue += ToString(mDuePay);
 	mbValid = true;
+
+	if (gFamilyPart.mbAskOnlyForFamilyPart)
+	{
+		mDuePay = mDuePay * gFamilyPart.mRatio;
+		msDue += L" =FamilyPart=> ";
+		msDue += ToString(mDuePay);
+	}
+
 	return true;
 }
 CString CNotice::GetDecriptionForLetter(void)

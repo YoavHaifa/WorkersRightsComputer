@@ -74,6 +74,8 @@ void CSaver::SaveToXml(void)
 
 	CPerson::SaveContactsToXml(xmlDump);
 
+	xmlDump.Write(L"software_version", gConfig.msVersion);
+
 	xmlDump.Close();
 }
 void CSaver::SaveToTxtFile(void)

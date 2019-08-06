@@ -205,6 +205,8 @@ bool CWorkPeriod::Compute(void)
 	gUsedVacations.Compute();
 	ComputeFullYears();
 
+	gFamilyPart.Compute();
+
 	gWorkPeriod.Log(L"Computed");
 	return true;
 }
@@ -867,6 +869,11 @@ bool CWorkPeriod::IncludesMonthButNotFirst(int year, int month)
 }
 void CWorkPeriod::SetWeekDaysPaidByCompany(class CCompanyPartPeriod *pFrom, class CCompanyPartPeriod *pUntil)
 {
+	if (!maMonths[0].mbInitialized)
+	{
+		CUtils::MessBox(L"<SetWeekDaysPaidByCompany> Months array not initialized", L"SW Error");
+		return;
+	}
 	for (int i = 0; i < MAX_MONTHS; i++)
 	{
 		if (maMonths[i].IsMonthBefore(pFrom->mFrom))
@@ -874,6 +881,7 @@ void CWorkPeriod::SetWeekDaysPaidByCompany(class CCompanyPartPeriod *pFrom, clas
 		if (pUntil && !maMonths[i].IsMonthBefore(pUntil->mFrom))
 			return;
 		maMonths[i].mHoursPerWeekPaidByCompany = pFrom->mCompanyHoursPerWeek;
+		maMonths[i].mRatioPaidByCompany = pFrom->mCompanyPart;
 		if (maMonths[i].mbLast)
 			return;
 	}
@@ -885,7 +893,7 @@ double CWorkPeriod::ComputeFamilyPart(void)
 
 	for (int i = 0; i < MAX_MONTHS; i++)
 	{
-		double companyRatio = maMonths[i].mHoursPerWeekPaidByCompany / maMonths[i].mHoursPerWeek;
+		double companyRatio = maMonths[i].GetCompanyRatio(); // mHoursPerWeekPaidByCompany / maMonths[i].mHoursPerWeek;
 		sumFractions += maMonths[i].mFraction;
 		sumCompanyRatio += companyRatio * maMonths[i].mFraction;
 		if (maMonths[i].mbLast)
