@@ -53,8 +53,13 @@ bool CRecuperation::Compute(void)
 		return false;
 	}
 
-	double lastYearFraction = gWorkPeriod.GetLastYearAsFraction();
+	double lastYearFraction = gWorkPeriod.GetLastYearAsFractionMinusUnpaidvacation();
+	LogLine(L"Last Year Fraction", lastYearFraction);
+
 	int intDaysPerYear = mpSeniority->ma[gWorkPeriod.mnFullWorkYears + 1];
+	mDueDays = lastYearFraction * intDaysPerYear;
+	LogLine(L"N Due Days for last year", mDueDays);
+
 	int rateYear = gWorkPeriod.mLast.mYear;
 	if(gWorkPeriod.mLast.mMonth < MONTH_OF_NEW_RATE)
 		rateYear--;
@@ -71,8 +76,6 @@ bool CRecuperation::Compute(void)
 		mnYearsBack = gWorkPeriod.mnFullWorkYears;
 		LogLine(L"N Years Back can't be more than worked", mnYearsBack);
 	}
-	mDueDays = lastYearFraction * intDaysPerYear;
-	LogLine(L"N Due Days for last year", mDueDays);
 
 	if (mpbDemandPreviousYears->IsChecked() && mnYearsBack > 0)
 	{

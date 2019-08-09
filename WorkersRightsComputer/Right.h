@@ -55,7 +55,8 @@ public:
 	virtual CString GetDecriptionForLetterHebrew(void);
 
 	
-	void LogLine(const wchar_t *zText);
+	void LogLine(const wchar_t* zText);
+	void LogLine(const wchar_t* zText, CString s);
 	void LogLine(const wchar_t *zText, int value);
 	void LogLine(const wchar_t *zText, int ivalue, const wchar_t *zText2, double dvalue);
 	void LogLine(const wchar_t *zText, double value);

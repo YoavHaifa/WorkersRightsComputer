@@ -224,6 +224,33 @@ void CUsedVacations::UpdateNextYearStart(CMyTime &yearStart, CMyTime &nextYearSt
 		}
 	}
 }
+int CUsedVacations::CountDaysOfUnpaidVacation(CMyTime& first, CMyTime& last)
+{
+	int nDays = 0;
+
+	POSITION pos = mVacationsUsed.GetHeadPosition();
+	while (pos)
+	{
+		CVacationUsed *pVac = mVacationsUsed.GetNext(pos);
+		if (pVac->mnUnPaid > 0)
+		{
+			nDays += pVac->CountDaysOfUnpaidVacation(first, last);
+		}
+	}
+	return nDays;
+}
+void CUsedVacations::AddToWorkYear(CWorkYear& workYear)
+{
+	POSITION pos = mVacationsUsed.GetHeadPosition();
+	while (pos)
+	{
+		CVacationUsed *pVac = mVacationsUsed.GetNext(pos);
+		if (pVac->mnUnPaid > 0)
+		{
+			pVac->AddToWorkYear(workYear);
+		}
+	}
+}
 void CUsedVacations::Log()
 {
 	FILE *pfLog = CUtils::OpenLogFile(L"UsedVacations");

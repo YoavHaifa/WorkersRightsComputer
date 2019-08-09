@@ -15,6 +15,7 @@ public:
 	int mi;
 	bool mbLast;
 	int mSeniorityMonths;
+	int mnAllDays;
 	int mnAllWorkingDays;
 	int mnDaysUnpaidVacation;
 	int mnDaysWorked;

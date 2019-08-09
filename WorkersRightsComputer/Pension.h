@@ -27,7 +27,7 @@ public:
 	static const int YEAR_TO_START = 2008;
 
 	CMyTime mStartDateForPension;
-	CButtonRef * mpbEntitledToSeveranceFund;
+	CButtonRef * mpbEntitledOnlyToSeveranceFund;
 	CButtonRef * mpbHadActivePensionBefore;
 	bool mbCollectiveAgreementWithDifferentRates;
 

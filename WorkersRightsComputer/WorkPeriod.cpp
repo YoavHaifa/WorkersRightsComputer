@@ -8,6 +8,7 @@
 #include "FamilyPart.h"
 #include "XMLDump.h"
 #include "XMLParse.h"
+#include "WorkYears.h"
 
 CWorkPeriod gWorkPeriod;
 
@@ -48,7 +49,8 @@ void CWorkPeriod::Reset(void)
 
 	SetMinWage();
 	gUsedVacations.ClearAllVacations();
-	ClearFullYears();
+	gWorkYears.Clear();
+	//ClearFullYears();
 }
 void CWorkPeriod::SetMinWage(void)
 {
@@ -203,7 +205,8 @@ bool CWorkPeriod::Compute(void)
 	PrepareSpanString();
 
 	gUsedVacations.Compute();
-	ComputeFullYears();
+	gWorkYears.Compute();
+	//ComputeFullYears();
 
 	gFamilyPart.Compute();
 
@@ -329,11 +332,17 @@ void CWorkPeriod::ComputeForSeverance(void)
 	double fraction = (float)days / 365;
 	mYearsForSeverance += fraction;
 }
-double CWorkPeriod::GetLastYearAsFraction(void)
+double CWorkPeriod::GetLastYearAsFractionMinusUnpaidvacation(void)
 {
 	CMyTime dayAfter(mLast.NextDay());
 	CTimeSpan span = dayAfter.Subtract(mLastYearStart);
 	int days = (int)span.GetDays();
+
+	int nDaysOfUnpaidVacation = gUsedVacations.CountDaysOfUnpaidVacation(mLastYearStart, mLast);
+	if (days < nDaysOfUnpaidVacation)
+		CUtils::MessBox(L"<LastYear> nDaysOfUnpaidVacation > whole period", L"SW Error");
+	else
+		days -= nDaysOfUnpaidVacation;
 
 	double fraction = (float)days / 365;
 	return fraction;
@@ -692,6 +701,19 @@ int CWorkPeriod::CountWorkingDays(CMyTime &first, CMyTime &last)
 	}
 	return n;
 }
+/*
+int CWorkPeriod::CountAllDaysWithoutUnpaidVacation(CMyTime& first, CMyTime& last)
+{
+	int n = 0;
+	CMyTime check = first;
+	while (check <= last)
+	{
+		if (!check.IsUnpaidVacation())
+			n++;
+		check.AddDay();
+	}
+	return n;
+} */
 void CWorkPeriod::CountNWorkingDaysFrom(CMyTime &first, int nToSkip, CMyTime &dateAfter)
 {
 	int n = 0;
@@ -703,6 +725,17 @@ void CWorkPeriod::CountNWorkingDaysFrom(CMyTime &first, int nToSkip, CMyTime &da
 		check.AddDay();
 	}
 	dateAfter = check;
+}
+int CWorkPeriod::CountAllDaysPerMonth(int year, int month)
+{
+	int n = 0;
+	CMyTime date(year, month, 1);
+	while (date.mMonth == month)
+	{
+		n++;
+		date.AddDay();
+	}
+	return n;
 }
 int CWorkPeriod::CountWorkingDaysPerMonth(int year, int month)
 {
@@ -800,6 +833,7 @@ void CWorkPeriod::Log(const wchar_t *zAt)
 	fwprintf(pfLog, L"Notice Day %s\n", (const wchar_t *)s);
 
 	fprintf(pfLog, "\n");
+	/*
 	if (!mFullYearsStart.IsEmpty())
 	{
 		fprintf(pfLog, "Start of full years\n");
@@ -812,18 +846,23 @@ void CWorkPeriod::Log(const wchar_t *zAt)
 			fwprintf(pfLog, L"%2d: %s\n", ++count, (const wchar_t *)s);
 		}
 		fprintf(pfLog, "\n");
-	}
+	} */
 
 	for (int i = 0; i < MAX_MONTHS; i++)
 	{
 		if (maMonths[i].mFraction < 1)
-			fwprintf(pfLog, L"%3d: %d/%02d - %0.2f\n", maMonths[i].mi, maMonths[i].mYear, maMonths[i].mMonth, maMonths[i].mFraction);
+			fwprintf(pfLog, L"%3d: %d/%02d - %0.2f\n", maMonths[i].mi, 
+				maMonths[i].mYear, maMonths[i].mMonth, maMonths[i].mFraction);
 		if (maMonths[i].mbLast)
 			break;
 	}
 
 	fclose(pfLog);
+
+	gUsedVacations.Log();
+	gWorkYears.Log();
 }
+/*
 void CWorkPeriod::ClearFullYears(void)
 {
 	while (!mFullYearsStart.IsEmpty())
@@ -831,7 +870,8 @@ void CWorkPeriod::ClearFullYears(void)
 		delete mFullYearsStart.GetTail();
 		mFullYearsStart.RemoveTail();
 	}
-}
+} */
+/*
 void CWorkPeriod::ComputeFullYears(void)
 {
 	ClearFullYears();
@@ -858,7 +898,7 @@ void CWorkPeriod::ComputeFullYears(void)
 		mLastYearStart = mFirst;
 		mnFullWorkYears = 0;
 	}
-}
+} */
 bool CWorkPeriod::IncludesMonthButNotFirst(int year, int month)
 {
 	if (!mFirst.IsMonthBefore(year, month))

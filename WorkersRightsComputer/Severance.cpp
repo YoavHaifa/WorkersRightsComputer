@@ -8,7 +8,7 @@
 CSeverance::CSeverance(void)
 	: CRight(L"Severance", L"פיצויי פיטורים")
 	, mpbAllowSeveranceForShorterPeriod(NULL)
-	, mpbEntitledToSeveranceFund(NULL)
+	, mpbEntitledOnlyToSeveranceFund(NULL)
 {
 	miPrintOrder = 1;
 }
@@ -21,14 +21,14 @@ bool CSeverance::SetCheckRef(CButtonRef *pButton)
 	}
 	if (pButton->msName == L"EntitledOnly2Sev")
 	{
-		mpbEntitledToSeveranceFund = pButton;
+		mpbEntitledOnlyToSeveranceFund = pButton;
 		return true;
 	}
 	return false;
 }
 bool CSeverance::Compute(void)
 {
-	if (mpbEntitledToSeveranceFund->IsChecked())
+	if (mpbEntitledOnlyToSeveranceFund->IsChecked())
 	{
 		mDuePay = 0;
 		msDue += L"Entitle ONLY to Severance Fund - None here";

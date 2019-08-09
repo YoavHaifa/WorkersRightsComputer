@@ -94,6 +94,11 @@ void CMyTime::WriteInLine(FILE* pf)
 	else
 		fwprintf(pf, L"0");
 }
+void CMyTime::Log(FILE* pf)
+{
+	CString s(ToString());
+	fwprintf(pf, L"%s ", (const wchar_t *)s);
+}
 void CMyTime::Reset(void)
 {
 	mbInitialized = false;

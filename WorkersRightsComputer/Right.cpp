@@ -95,6 +95,13 @@ void CRight::LogLine(const wchar_t *zText)
 {
 	WriteLine(zText);
 }
+void CRight::LogLine(const wchar_t* zText, CString s)
+{
+	CString str(zText);
+	str += " ";
+	str += s;
+	WriteLine(str);
+}
 void CRight::LogLine(const wchar_t *zText, int value)
 {
 	CString s(zText);

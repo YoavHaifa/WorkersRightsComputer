@@ -17,6 +17,7 @@ public:
 	void Read(FILE *pf);
 	void Write(FILE* pf);
 	void WriteInLine(FILE* pf);
+	void Log(FILE* pf);
 	void Reset(void);
 	bool operator > (CMyTime &other);
 	bool operator < (CMyTime &other);

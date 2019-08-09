@@ -186,6 +186,7 @@
     <ClInclude Include="Additional.h" />
     <ClInclude Include="AllRights.h" />
     <ClInclude Include="Config.h" />
+    <ClInclude Include="WorkYear.h" />
     <ClInclude Include="MyAskDlg.h" />
     <ClInclude Include="EmployerDlg.h" />
     <ClInclude Include="FamilyPart.h" />
@@ -224,6 +225,7 @@
     <ClInclude Include="WorkersRightsComputer.h" />
     <ClInclude Include="WorkersRightsComputerDlg.h" />
     <ClInclude Include="WorkPeriod.h" />
+    <ClInclude Include="WorkYears.h" />
     <ClInclude Include="XMLDump.h" />
     <ClInclude Include="XMLParse.h" />
     <ClInclude Include="YearlyRates.h" />
@@ -232,6 +234,7 @@
     <ClCompile Include="Additional.cpp" />
     <ClCompile Include="AllRights.cpp" />
     <ClCompile Include="Config.cpp" />
+    <ClCompile Include="WorkYear.cpp" />
     <ClCompile Include="MyAskDlg.cpp" />
     <ClCompile Include="EmployerDlg.cpp" />
     <ClCompile Include="FamilyPart.cpp" />
@@ -273,6 +276,7 @@
     <ClCompile Include="WorkersRightsComputer.cpp" />
     <ClCompile Include="WorkersRightsComputerDlg.cpp" />
     <ClCompile Include="WorkPeriod.cpp" />
+    <ClCompile Include="WorkYears.cpp" />
     <ClCompile Include="XMLDump.cpp" />
     <ClCompile Include="XMLParse.cpp" />
     <ClCompile Include="YearlyRates.cpp" />
