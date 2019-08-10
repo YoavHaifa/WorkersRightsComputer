@@ -270,6 +270,8 @@ void CHtmlWriter::WriteTable()
 	gAllRights.WriteLetterToHtml(*this);
 
 	WriteL(L"</table>");
+	WriteL(L"<br><br><br><br>");
+
 }
 void CHtmlWriter::StartParagraph(void)
 {
