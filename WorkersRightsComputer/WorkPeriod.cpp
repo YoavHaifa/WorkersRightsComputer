@@ -127,15 +127,10 @@ void CWorkPeriod::SetNotice(CTime date)
 }*/
 bool CWorkPeriod::Compute(void)
 {
-	if (mnWorkDaysPerWeek < 0.1)
-		CountWorkingDays();
+	CountWorkingDays();
 
 	// Init for invalid work span
-	mnCalendarYears = 0;
-	mnMonths = 0;
-	mnDays = 0;
 	mnMonthsDetailed = 0;
-	mYearsForSeverance = 0;
 	mSpanString = "";
 	// TEMP _ CORRECT!
 	//mLastYearStartLabel->Text = "???";
@@ -160,78 +155,16 @@ bool CWorkPeriod::Compute(void)
 		return false;
 	}
 
-	// Compute start of last work year and number of full years
-	mLastYearStart = mFirst;
-	while (mLastYearStart.mYear < mLast.mYear)
-	{
-		mLastYearStart.AddYears(1);
-		mnCalendarYears++;
-	}
-	if (mLastYearStart > mLast)
-	{
-		mLastYearStart.AddYears(-1);
-		mnCalendarYears--;
-	}
-
-	// Compute number of full month
-	int deltaMonths = mLast.mMonth - mFirst.mMonth;
-	if (mLastYearStart.mYear < mLast.mYear)
-		deltaMonths += 12;
-
-	if (deltaMonths > 1)
-	{
-		mnMonths = deltaMonths - 1;
-		deltaMonths = 1;
-	}
-	if (deltaMonths > 0)
-	{
-		if (mLast.mDay >= mFirst.mDay - 1)
-		{
-			mnMonths++;
-			deltaMonths = 0;
-		}
-	}
-
-	// Compute number of days
-	int deltaDays = mLast.mDay - mFirst.mDay + 1 + 30 * deltaMonths;
-	mnDays = deltaDays;
-	ComputeWorkDays();
-
 	InitDetailsForEachMonth();
-
-	ComputeLastYearsStart();
-	ComputeForSeverance();
-
-	PrepareSpanString();
 
 	gUsedVacations.Compute();
 	gWorkYears.Compute();
-	//ComputeFullYears();
+	mSpanString = gWorkYears.PrepareSpanString();
 
 	gFamilyPart.Compute();
 
 	gWorkPeriod.Log(L"Computed");
 	return true;
-}
-void CWorkPeriod::PrepareSpanString(void)
-{
-	mSpanString = "";
-	if (mnFullWorkYears > 0)
-	{
-		mSpanString = CRight::ToString(mnFullWorkYears);
-		mSpanString += " years ";
-	}
-	mSpanString += CRight::ToString(mnMonths);
-	mSpanString += " months ";
-	mSpanString += CRight::ToString(mnDays);
-	mSpanString += " days";
-
-	if (mnFullWorkYears < 1)
-	{
-		mSpanString += " (";
-		mSpanString += CRight::ToString(mnWorkingDays);
-		mSpanString += " work-days)";
-	}
 }
 bool CWorkPeriod::IsBeforeDate(CMyTime &date, int year, int month, int day)
 {
@@ -261,102 +194,30 @@ bool CWorkPeriod::IsAfterDate(CMyTime &date, int year, int month, int day)
 
 	return day > date.mDay;
 }
-bool CWorkPeriod::LastYearDoContains(int year, int month, int day)
-{
-	if (!IsValid())
-		return false;
-
-	if (IsBeforeDate(mLastYearStart, year, month, day))
-		return false;
-
-	if (IsAfterDate(mLast, year, month, day))
-		return false;
-
-	return true;
-}
 bool CWorkPeriod::LastYearContains(CHoliday & holiday)
 {
+	if (holiday.mYear > 2050)
+	{
+		static bool bOnce = false;
+		if (!bOnce)
+		{
+			bOnce = true;
+			CUtils::MessBox(L"holiday.mYear > 2050", L"Input error");
+		}
+		return false;
+	}
 	holiday.mbInLastYear = false;
 	if (!IsValid())
 		return false;
 
-	if (holiday.mbAllYears)
-	{
-		if (LastYearDoContains(mLast.mYear, holiday.mMonth, holiday.mDay))
-		{
-			holiday.mYear = mLast.mYear;
-			holiday.mbInLastYear = true;
-		}
-		else if (LastYearDoContains(mLastYearStart.mYear, holiday.mMonth, holiday.mDay))
-		{
-			holiday.mYear = mLastYearStart.mYear;
-			holiday.mbInLastYear = true;
-		}
-	}
-	else
-	{
-		if(LastYearDoContains(holiday.mYear, holiday.mMonth, holiday.mDay))
-			holiday.mbInLastYear = true;
-	}
+	if (gWorkYears.LastYearDoContains(holiday))
+		holiday.mbInLastYear = true;
 
 	return holiday.mbInLastYear;
-}
-
-void CWorkPeriod::ComputeLastYearsStart(void)
-{
-	msLastYearStart = L"Since ";
-	msLastYearStart = msLastYearStart + CRight::ToString(mFirst.mDay);
-	msLastYearStart = msLastYearStart + L".";
-	msLastYearStart = msLastYearStart + CRight::ToString(mFirst.mMonth);
-	msLastYearStart = msLastYearStart + L".";
-	msLastYearStart = msLastYearStart + CRight::ToString(mLastYearStart.mYear);
-	// TEMP
-	// mLastYearStartLabel->Text = msLastYearStart;
-}
-void CWorkPeriod::ComputeWorkDays(void)
-{
-	//TimeSpan span = mLast.Subtract(mFirst);
-	CTimeSpan span = mLast.mTime - mFirst.mTime;
-	int days = (int)span.GetDays();
-
-	mnWorkingDays = (int)(days * mnWorkDaysPerWeek / 7);
-}
-void CWorkPeriod::ComputeForSeverance(void)
-{
-	mYearsForSeverance = mnFullWorkYears;
-
-	CMyTime dayAfter (mLast.NextDay());
-	CTimeSpan span = dayAfter.mTime - mLastYearStart.mTime;
-	int days = (int)span.GetDays();
-
-	double fraction = (float)days / 365;
-	mYearsForSeverance += fraction;
-}
-double CWorkPeriod::GetLastYearAsFractionMinusUnpaidvacation(void)
-{
-	CMyTime dayAfter(mLast.NextDay());
-	CTimeSpan span = dayAfter.Subtract(mLastYearStart);
-	int days = (int)span.GetDays();
-
-	int nDaysOfUnpaidVacation = gUsedVacations.CountDaysOfUnpaidVacation(mLastYearStart, mLast);
-	if (days < nDaysOfUnpaidVacation)
-		CUtils::MessBox(L"<LastYear> nDaysOfUnpaidVacation > whole period", L"SW Error");
-	else
-		days -= nDaysOfUnpaidVacation;
-
-	double fraction = (float)days / 365;
-	return fraction;
 }
 void CWorkPeriod::SetWorkingDay(int iDay, double fraction)
 {
 	maWorkingDays[iDay] = fraction;
-	CountWorkingDays();
-
-	CString s = CRight::ToString(mnWorkDaysPerWeek);
-	//String ^ s = mnWorkDaysPerWeek.ToString("F0");
-	s += L" Work Days";
-	// TEMP
-	// mWorkingDaysLabel->Text = s;
 	Compute();
 }
 void CWorkPeriod::CountWorkingDays(void)
@@ -371,23 +232,6 @@ void CWorkPeriod::CountWorkingDays(void)
 		mnDaysInMonthForDailySalary = 21.6666;
 	else
 		mnDaysInMonthForDailySalary = 25;
-}
-bool CWorkPeriod::WorkedAtLeastNMonths(int nMonths)
-{
-	int nYears = 0;
-	while (nMonths > 12)
-	{
-		nYears++;
-		nMonths -= 12;
-	}
-	if (mnFullWorkYears > nYears)
-		return true;
-	if (mnFullWorkYears < nYears)
-		return false;
-
-	if (mnMonths >= nMonths)
-		return true;
-	return false;
 }
 int CWorkPeriod::CountDaysToEndOfMonth(CMyTime &date)
 {

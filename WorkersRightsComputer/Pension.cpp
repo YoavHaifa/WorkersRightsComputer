@@ -6,6 +6,7 @@
 #include "MonthInfo.h"
 #include "HtmlWriter.h"
 #include "FamilyPart.h"
+#include "WorkYears.h"
 
 CPension *gpPension = NULL;
 
@@ -170,7 +171,7 @@ bool CPension::DoCompute()
 
 	if (mpbHadActivePensionBefore->IsChecked())
 	{
-		if (!gWorkPeriod.WorkedAtLeastNMonths(N_MONTHS_BEFORE_PAY_CONTINUITY))
+		if (!gWorkYears.WorkedAtLeastNMonths(N_MONTHS_BEFORE_PAY_CONTINUITY))
 		{
 			msDue += L"Period Too Short";
 			msDebug += L"Too short even for continuity pay";

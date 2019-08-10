@@ -2,6 +2,7 @@
 #include "Vacation.h"
 #include "Utils.h"
 #include "VacationTable.h"
+#include "WorkYears.h"
 
 const double CVacation::MIN_FRACTION_FOR_ROUND_UP = 0.9;
 
@@ -37,13 +38,13 @@ bool CVacation::ComputePerPeriod(void)
 	int nMonthInSeniorityYear = 12;
 	double daysFraction = 0;
 
-	if (gWorkPeriod.mnMonths < N_MONTH_FOR_FULL_YEARLY_VACATION)
+	if (gWorkYears.mnMonthsInLastYear < N_MONTH_FOR_FULL_YEARLY_VACATION)
 	{
-		restMonths += gWorkPeriod.mnMonths;
+		restMonths += gWorkYears.mnMonthsInLastYear;
 		seniority ++;
-		nMonthInSeniorityYear = gWorkPeriod.mnMonths;
+		nMonthInSeniorityYear = gWorkYears.mnMonthsInLastYear;
 
-		daysFraction = (double)gWorkPeriod.mnDays / 30;
+		daysFraction = (double)gWorkYears.mnDaysInLastYear / 30;
 		if (daysFraction > 1)
 			daysFraction = 1;
 	}
@@ -99,12 +100,12 @@ bool CVacation::ComputePerPeriod(void)
 
 	// Compute Months
 	/*
-	if (gWorkPeriod.mnMonths < N_MONTH_FOR_FULL_YEARLY_VACATION)
+	if (gWorkYears.mnMonthsInLastYear < N_MONTH_FOR_FULL_YEARLY_VACATION)
 	{
 		int daysPerLastMonth = GetNDaysPerMonth(gWorkPeriod.mnYears + 1, gWorkPeriod.mnWorkDaysPerWeek, mCurYear, mCurMonth);
 		LogLine(L"n days for full last year", daysPerLastMonth);
-		mnMonthsForVacation = gWorkPeriod.mnMonths;
-		double fraction = (double)gWorkPeriod.mnDays / 30;
+		mnMonthsForVacation = gWorkYears.mnMonthsInLastYear;
+		double fraction = (double)gWorkYears.mnDaysInLastYear / 30;
 		if (fraction > 1)
 			fraction = 1;
 		mnMonthsForVacation += fraction;
@@ -161,7 +162,7 @@ bool CVacation::Compute(void)
 		msDue += L"Define Work Period...";
 		return false;
 	}
-	LogLine(L"previous work years", gWorkPeriod.mnFullWorkYears);
+	LogLine(L"previous work years", gWorkYears.mnPrevYears);
 
 	// Check for request to previous years
 	mnYearsOfUnpaidVacation = 0;
@@ -171,9 +172,9 @@ bool CVacation::Compute(void)
 	{
 		mnYearsOfUnpaidVacation = _wtof(sText);
 		LogLine(L"Demand N Prev Years to Pay Vacation", mnYearsOfUnpaidVacation);
-		if (mnYearsOfUnpaidVacation > gWorkPeriod.mnFullWorkYears)
+		if (mnYearsOfUnpaidVacation > gWorkYears.mnPrevYears)
 		{
-			mnYearsOfUnpaidVacation = gWorkPeriod.mnFullWorkYears;
+			mnYearsOfUnpaidVacation = gWorkYears.mnPrevYears;
 			mpPrevYearsBox->SetWindowTextW(ToString(mnYearsOfUnpaidVacation));
 			LogLine(L"N Prev Years to Pay cut to n worked", mnYearsOfUnpaidVacation);
 		}
@@ -194,21 +195,21 @@ bool CVacation::Compute(void)
 		return false;
 	}
 
-	if (gWorkPeriod.mnWorkingDays < MIN_DAYS_FOR_SHORT_RULE)
+	if (gWorkYears.mnWorkingDays < MIN_DAYS_FOR_SHORT_RULE)
 	{
 		mbUseShortRule = true;
-		mDuePay = gWorkPeriod.mnWorkingDays * mPayPerDay * SHORT_RULE_PER_CENT / 100;
+		mDuePay = gWorkYears.mnWorkingDays * mPayPerDay * SHORT_RULE_PER_CENT / 100;
 		msDebug += L" Special rule, less than ";
 		msDebug += ToString(MIN_DAYS_FOR_SHORT_RULE);
 		msDebug += L" days";
-		LogLine(L"Short period: n working days", gWorkPeriod.mnWorkingDays);
+		LogLine(L"Short period: n working days", gWorkYears.mnWorkingDays);
 		LogLine(L"pay per day", mPayPerDay);
 		LogLine(L"per cent", SHORT_RULE_PER_CENT);
 		msDue += L"(Short period last year) ";
 		msDesc += L"Short Period: ";
 		msDescHebrew += L"תקופה קצרה: ";
-		msDesc += ToString(gWorkPeriod.mnWorkingDays);
-		msDescHebrew += ToString(gWorkPeriod.mnWorkingDays);
+		msDesc += ToString(gWorkYears.mnWorkingDays);
+		msDescHebrew += ToString(gWorkYears.mnWorkingDays);
 		msDesc += L" days * ";
 		msDescHebrew += L" ימים * ";
 		msDesc += ToString(mPayPerDay);
@@ -222,10 +223,10 @@ bool CVacation::Compute(void)
 	}
 	else
 	{
-		mnSeniority = gWorkPeriod.mnFullWorkYears;
+		mnSeniority = gWorkYears.mnPrevYears;
 		mnYearsForVacation = mnYearsOfUnpaidVacation;
 		LogLine(L"N Previous Years for vacation", mnYearsForVacation);
-		if (gWorkPeriod.mnMonths >= N_MONTH_FOR_FULL_YEARLY_VACATION)
+		if (gWorkYears.mnMonthsInLastYear >= N_MONTH_FOR_FULL_YEARLY_VACATION)
 		{
 			mnYearsForVacation++;
 			mnSeniority++;

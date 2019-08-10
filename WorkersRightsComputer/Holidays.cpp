@@ -3,6 +3,7 @@
 #include "WorkPeriod.h"
 #include "MinWage.h"
 #include "Utils.h"
+#include "WorkYears.h"
 #include "WorkersRightsComputerDlg.h"
 
 void CHoliday::Log(FILE *pf)
@@ -139,20 +140,51 @@ bool CHolidays::InitFromFileInternals(FILE *pfRead, FILE *pfLog)
 		{
 			int year = 0;
 			if (!TryConvertInt(sLine, L"year", year))
+			{
+				CUtils::MessBox(L"Failed to read year as number", L"Input Error");
 				return false;
+
+			}
+			if (year < 1980 || year > 2050)
+			{
+				wchar_t zBuf[256];
+				swprintf_s(zBuf, 256, L"<Reading holidays from file> Bad value for year: %d", year);
+				CUtils::MessBox(zBuf, L"Input Error");
+				return false;
+			}
 			map[i]->mYear = year;
 		}
 
 		// Read Month
 		int month = 0;
 		if (!TryReadInt(pfRead, L"month", month))
+		{
+			CUtils::MessBox(L"Failed to read month as number", L"Input Error");
 			return false;
+		}
+		if (month < 1 || month > 12)
+		{
+			wchar_t zBuf[256];
+			swprintf_s(zBuf, 256, L"<Reading holidays from file> Bad value for month: %d", month);
+			CUtils::MessBox(zBuf, L"Input Error");
+			return false;
+		}
 		map[i]->mMonth = month;
 
 		// Read Day
 		int day = 0;
 		if (!TryReadInt(pfRead, L"day", day))
+		{
+			CUtils::MessBox(L"Failed to read day as number", L"Input Error");
 			return false;
+		}
+		if (day < 1 || day > 31)
+		{
+			wchar_t zBuf[256];
+			swprintf_s(zBuf, 256, L"<Reading holidays from file> Bad value for day: %d", day);
+			CUtils::MessBox(zBuf, L"Input Error");
+			return false;
+		}
 		map[i]->mDay = day;
 
 		mn++;
@@ -173,14 +205,13 @@ void CHolidays::PrintLog()
 
 	for (int i = 0; i < mn; i++)
 	{
-		fwprintf(pfLog, L"%40s - ", (const wchar_t *)map[i]->msName);
+		fwprintf(pfLog, L"%2d: %40s - ", i, (const wchar_t *)map[i]->msName);
 		if (map[i]->mbAllYears)
 			fwprintf(pfLog, L"*        ");
 		else
-			fwprintf(pfLog, L"year %4d\n", map[i]->mYear);
+			fwprintf(pfLog, L"year %4d", map[i]->mYear);
 
 		fwprintf(pfLog, L" - month %d, day %d\n", map[i]->mMonth, map[i]->mDay);
-		fwprintf(pfLog, L"\n");
 	}
 	fclose(pfLog);
 }
@@ -330,7 +361,7 @@ void CHolidays::ComputePayPrevYears(void)
 		return;
 	}
 
-	CMyTime payDate = gWorkPeriod.mLastYearStart;
+	CMyTime payDate = gWorkYears.GetLastYearStart();
 	payDate.SubDay();
 	double rest = nYears;
 	while (rest > 0)
@@ -377,13 +408,18 @@ void CHolidays::RememberPayParDay(double value)
 }
 bool CHolidays::Compute(void)
 {
-	msSelection = gpDlg->GetHolidaysSet();
-	if (!InitFromFile(msSelection))
-		return false;
-
 	mnDaysToPay = 0;
 	mMinPayPerDay = 0;
 	mMaxPayPerDay = 0;
+
+	msSelection = gpDlg->GetHolidaysSet();
+	if (msSelection.IsEmpty())
+	{
+		msDue = L"Holidays not defined";
+		return false;
+	}
+	if (!InitFromFile(msSelection))
+		return false;
 
 	mnInLastYear = NInLastYear();
 	// TEMP - This edit box role is not clear -

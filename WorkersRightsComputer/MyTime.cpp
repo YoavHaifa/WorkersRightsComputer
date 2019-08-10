@@ -1,7 +1,22 @@
 #include "stdafx.h"
 #include "MyTime.h"
 #include "WorkPeriod.h"
+#include "Utils.h"
 
+unsigned int SafeGetDaysTime(CTime start, CTime end)
+{
+	// Discard hours, minutes, seconds, and daylight savings time
+	CTime startDay(start.GetYear(), start.GetMonth(), start.GetDay(), 0, 0, 0, 0);
+	CTime endDay(end.GetYear(), end.GetMonth(), end.GetDay(), 0, 0, 0, 0);
+
+	// Get number of days apart
+	CTimeSpan span = endDay - startDay;
+	return (unsigned int)span.GetDays();
+}
+unsigned int SafeGetDays(CMyTime &start, CMyTime &end)
+{
+	return SafeGetDaysTime(start.mTime, end.mTime);
+}
 
 CMyTime::CMyTime()
 	: mYear(0)
@@ -99,6 +114,14 @@ void CMyTime::Log(FILE* pf)
 	CString s(ToString());
 	fwprintf(pf, L"%s ", (const wchar_t *)s);
 }
+void CMyTime::LogLine(FILE* pf, const wchar_t* zText)
+{
+	CString s(ToString());
+	if (mHour != 0)
+		fwprintf(pf, L"%s %s (hour %d)\n", zText, (const wchar_t *)s, mHour);
+	else
+		fwprintf(pf, L"%s %s\n", zText, (const wchar_t *)s);
+}
 void CMyTime::Reset(void)
 {
 	mbInitialized = false;
@@ -150,14 +173,14 @@ void CMyTime::AddDay(void)
 {
 	int lastDay = mDay;
 	int lastHour = mTime.GetHour();
-	CTimeSpan span(1, 0, 0, 0);
-	Set(mTime + span);
+	CTimeSpan span1Day(1, 0, 0, 0);
+	Set(mTime + span1Day);
 
 	// Correct for changes due to daylight saving...
 	if (mDay == lastDay)
 	{
-		CTimeSpan span1Day(0, 1, 0, 0);
-		Set(mTime + span1Day);
+		CTimeSpan span1hour(0, 1, 0, 0);
+		Set(mTime + span1hour);
 	}
 	else
 	{
@@ -174,6 +197,12 @@ CMyTime CMyTime::NextDay(void)
 	CMyTime next = *this;
 	next.AddDay();
 	return next;
+}
+CMyTime CMyTime::PrevDay(void)
+{
+	CMyTime prev = *this;
+	prev.SubDay();
+	return prev;
 }
 void CMyTime::SubDay(void)
 {
@@ -253,10 +282,47 @@ CString CMyTime::GetShortString()
 	CString s = mTime.Format(_T("%B %d, %Y"));
 	return s;
 }
+int CMyTime::GetNMonthsBefore(CMyTime& dayAfter, int* pnExtraDays)
+{
+	CMyTime countDays(*this);
+	int nMonths = 0;
+	int nDays = 0;
+
+	while (countDays < dayAfter)
+	{
+		countDays.AddDay();
+		if (countDays.mDay == mDay)
+		{
+			nMonths++;
+			nDays = 0;
+		}
+		else
+			nDays++;
+	}
+	if (pnExtraDays)
+		*pnExtraDays = nDays;
+	return nMonths;
+}
 int CMyTime::GetNDaysUntil(CMyTime &lastDay)
 {
-	CTimeSpan span = lastDay.mTime - mTime;
-	return (int)span.GetDays() + 1;
+	return SafeGetDays(*this, lastDay) + 1;
+	//CTimeSpan span = lastDay.mTime - mTime;
+	//return (int)span.GetDays() + 1;
+}
+int CMyTime::GetNDaysBefore(CMyTime& dayAfter)
+{
+	return SafeGetDays(*this, dayAfter);
+	/*
+	CTimeSpan span = dayAfter.mTime - mTime;
+	int nHours = (int)span.GetHours();
+	int nDays = (int)span.GetDays();
+	if (nHours != nDays * 24)
+	{
+		static int nDiff = 0;
+		nDiff++;
+	//	CUtils::MessBox(L"nHours != nDays * 24", L"SW Error???");
+	}
+	return nDays; */
 }
 bool CMyTime::IsWorkingDay()
 {

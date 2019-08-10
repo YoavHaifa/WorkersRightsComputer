@@ -1,6 +1,7 @@
 ﻿#include "StdAfx.h"
 #include "Recuperation.h"
 #include "WorkPeriod.h"
+#include "WorkYears.h"
 
 
 CRecuperation::CRecuperation(void)
@@ -45,7 +46,7 @@ bool CRecuperation::Compute(void)
 		return false;
 	}
 
-	if (gWorkPeriod.mnFullWorkYears < MIN_YEARS_TO_START)
+	if (gWorkYears.mnFullWorkYears < MIN_YEARS_TO_START)
 	{
 		mbValid = false;
 		msDue += L"0";
@@ -53,10 +54,10 @@ bool CRecuperation::Compute(void)
 		return false;
 	}
 
-	double lastYearFraction = gWorkPeriod.GetLastYearAsFractionMinusUnpaidvacation();
+	double lastYearFraction = gWorkYears.GetLastYearAsFraction();
 	LogLine(L"Last Year Fraction", lastYearFraction);
 
-	int intDaysPerYear = mpSeniority->ma[gWorkPeriod.mnFullWorkYears + 1];
+	int intDaysPerYear = mpSeniority->ma[gWorkYears.mn];
 	mDueDays = lastYearFraction * intDaysPerYear;
 	LogLine(L"N Due Days for last year", mDueDays);
 
@@ -71,15 +72,15 @@ bool CRecuperation::Compute(void)
 	if (sText.GetLength() > 0)
 		mnYearsBack = _wtof(sText);
 	LogLine(L"N Years Back", mnYearsBack);
-	if (mnYearsBack > gWorkPeriod.mnFullWorkYears)
+	if (mnYearsBack > gWorkYears.mnPrevYears)
 	{
-		mnYearsBack = gWorkPeriod.mnFullWorkYears;
+		mnYearsBack = gWorkYears.mnPrevYears;
 		LogLine(L"N Years Back can't be more than worked", mnYearsBack);
 	}
 
 	if (mpbDemandPreviousYears->IsChecked() && mnYearsBack > 0)
 	{
-		int seniority = gWorkPeriod.mnFullWorkYears;
+		int seniority = gWorkYears.mnPrevYears;
 		double rest = mnYearsBack;
 		while (rest > 0)
 		{

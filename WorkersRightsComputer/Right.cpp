@@ -172,15 +172,16 @@ void CRight::LogLine(const wchar_t *zText, int ivalue, const wchar_t *zText2, do
 	s += ToString(dvalue);
 	WriteLine(s);
 }
-void CRight::LogLine(const wchar_t *zText, CTimeSpan span)
+void CRight::LogLineSpan(const wchar_t *zText, CMyTime& start, CMyTime& end)
 {
+	int nDays = start.GetNDaysBefore(end);
 	CString s(zText);
 	s += L" TIME SPAN days ";
-	s += ToString(span.GetDays());
-	s += L" houres ";
-	s += ToString(span.GetHours());
-	s += L" minutes ";
-	s += ToString(span.GetMinutes());
+	s += ToString(nDays);
+	//s += L" houres ";
+	//s += ToString(span.GetHours());
+	//s += L" minutes ";
+	//s += ToString(span.GetMinutes());
 	WriteLine(s);
 }
 bool CRight::TryReadInt(FILE *pfRead, const wchar_t *zText, int &value)

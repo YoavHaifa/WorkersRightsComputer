@@ -1,6 +1,7 @@
 ﻿#include "StdAfx.h"
 #include "Notice.h"
 #include "WorkPeriod.h"
+#include "WorkYears.h"
 #include "FamilyPart.h"
 
 
@@ -27,8 +28,9 @@ bool CNotice::Compute(void)
 
 	LogLine(L"Last day at work", gWorkPeriod.mLast.mTime);
 	LogLine(L"Notice", gWorkPeriod.mNotice.mTime);
-	CTimeSpan spanAfterNotice = gWorkPeriod.mLast.mTime - gWorkPeriod.mNotice.mTime;
-	LogLine(L"Last - Notice ", spanAfterNotice);
+	//CTimeSpan spanAfterNotice = gWorkPeriod.mLast.mTime - gWorkPeriod.mNotice.mTime;
+	//LogLineSpan(L"Last - Notice ", spanAfterNotice);
+	LogLineSpan(L"Last - Notice ", gWorkPeriod.mNotice, gWorkPeriod.mLast);
 
 	// Compute to how many days the worker is entitled 
 	// and what is the last day to which he is entitled to be paid
@@ -36,13 +38,13 @@ bool CNotice::Compute(void)
 	mLastDayOfNotice = gWorkPeriod.mNotice;
 	bool bHalfDayDue = false;
 
-	if (gWorkPeriod.mnFullWorkYears >= 1 || mbDemandFullMonthAnyway)
+	if (gWorkYears.mnFullWorkYears >= 1 || mbDemandFullMonthAnyway)
 	{
 		mbDemandFullMonth = true;
 		mLastDayOfNotice = gWorkPeriod.mNotice;
 		mLastDayOfNotice.AddMonth();
 		msDue += L"Month ";
-		if (gWorkPeriod.mnFullWorkYears >= 1)
+		if (gWorkYears.mnFullWorkYears >= 1)
 			LogLine(L"At least one full year worked");
 		else
 			LogLine(L"Demand full month for less than one full year worked");
@@ -50,14 +52,14 @@ bool CNotice::Compute(void)
 	else
 	{
 		mbDemandFullMonth = false;
-		if (gWorkPeriod.mnMonths < 7)
+		if (gWorkYears.mnMonthsInLastYear < 7)
 		{
-			mDueNoticeDays = gWorkPeriod.mnMonths;
+			mDueNoticeDays = gWorkYears.mnMonthsInLastYear;
 			LogLine(L"Less than 7 months, demand day per month", mDueNoticeDays);
 		}
 		else
 		{
-			int extraMonths = gWorkPeriod.mnMonths - 6;
+			int extraMonths = gWorkYears.mnMonthsInLastYear - 6;
 			mDueNoticeDays = 6 + extraMonths * 2.5;
 			LogLine(L"More than half year, demand days", mDueNoticeDays);
 		}
@@ -83,8 +85,9 @@ bool CNotice::Compute(void)
 	LogLine(L"Check", checkDate.mTime);
 	while (checkDate.mTime <= gWorkPeriod.mLast.mTime)
 	{
-		CTimeSpan span = gWorkPeriod.mLast.mTime - checkDate.mTime;
-		LogLine(L"In loop", span);
+		//CTimeSpan span = gWorkPeriod.mLast.mTime - checkDate.mTime;
+		//LogLine(L"In loop", span);
+		LogLineSpan(L"In loop", checkDate, gWorkPeriod.mLast);
 		int dayOf = checkDate.mDayOfWeek - 1;
 		if (gWorkPeriod.maWorkingDays[dayOf] > 0)
 		{
@@ -96,8 +99,9 @@ bool CNotice::Compute(void)
 	}
 	LogLine(L"Check Time", (__int64)checkDate.mTime.GetTime());
 	LogLine(L"Last Time", (__int64)gWorkPeriod.mLast.mTime.GetTime());
-	CTimeSpan spanAfterLast = checkDate.mTime - gWorkPeriod.mLast.mTime;
-	LogLine(L"Out of loop", spanAfterLast);
+	//CTimeSpan spanAfterLast = checkDate.mTime - gWorkPeriod.mLast.mTime;
+	//LogLine(L"Out of loop", spanAfterLast);
+	LogLineSpan(L"Out of loop", gWorkPeriod.mLast, checkDate);
 
 	LogLine(L"n days paid after notice", mnDaysPaidAfterNotice);
 	LogLine(L"");

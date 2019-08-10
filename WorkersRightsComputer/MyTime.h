@@ -18,6 +18,7 @@ public:
 	void Write(FILE* pf);
 	void WriteInLine(FILE* pf);
 	void Log(FILE* pf);
+	void LogLine(FILE* pf, const wchar_t*zText);
 	void Reset(void);
 	bool operator > (CMyTime &other);
 	bool operator < (CMyTime &other);
@@ -39,12 +40,15 @@ public:
 	void SubDay(void);
 	void AddDay(void);
 	CMyTime NextDay(void);
+	CMyTime PrevDay(void);
 	CTimeSpan Subtract(CMyTime &other);
 	CString ToString(void);
 	CString ToHebrewString(void);
 	bool mbInitialized;
 	CString GetShortString();
-	int GetNDaysUntil(CMyTime &lastDay);
+	int GetNMonthsBefore(CMyTime& dayAfter, int *pnExtraDays = NULL);
+	int GetNDaysUntil(CMyTime& lastDay);
+	int GetNDaysBefore(CMyTime& dayAfter);
 	bool IsWorkingDay();
 	double AdvanceToNextMonth(void);
 	bool IsOnPrevMonthsTo(CMyTime &time);

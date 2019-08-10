@@ -18,9 +18,6 @@ public:
 	void SetHourlyWage(double wagePerHour, double nHoursPerWeek);
 
 	bool LastYearContains(class CHoliday &holiday);
-	bool LastYearDoContains(int year, int month, int day);
-	void ComputeLastYearsStart(void);
-	void ComputeWorkDays(void);
 	void Reset(void);
 	// void WriteToLetter(CLogoWriter &lw);
 	void WriteToLetter(class CHtmlWriter &html);
@@ -53,30 +50,21 @@ public:
 	CMyTime mLastYearStart;
 
 	CString mSpanString;
-	CString msLastYearStart;
-
 
 	static const int N_WEEK_DAYS = 7;
 	double maWorkingDays[N_WEEK_DAYS];
 	void SetWorkingDay(int iDay, double fraction);
 	void CountWorkingDays(void);
 
-	int mnCalendarYears;
-	int mnFullWorkYears;
-	int mnMonths;
+	//int mnFullWorkYears;
+	//int mnMonthsInLastYear;
 	int mnMonthsDetailed;
-	int mnDays;
+	//int mnDaysInLastYear;
 	bool mbNegative;
-	int mnWorkingDays;
 	double mnWorkDaysPerWeek;
-	double mYearsForSeverance;
 	double mnDaysInMonthForDailySalary;
 	double mnWorkingHoursInFullMonth;
 
-	void ComputeForSeverance(void);
-	void PrepareSpanString(void);
-	double GetLastYearAsFractionMinusUnpaidvacation(void);
-	bool WorkedAtLeastNMonths(int nMonths);
 	int CountDaysToEndOfMonth(CMyTime &date);
 	int CountWorkDaysToEndOfMonthFrom(CMyTime &firstDate);
 	void Save(FILE *pfSave);

@@ -258,7 +258,7 @@ void CHtmlWriter::WriteHeadline(const wchar_t *zText, int iH)
 }
 void CHtmlWriter::WriteTable()
 {
-	WriteL(L"<table style=\"width:50%\" border=1>");
+	WriteL(L"<table style=\"width:100%\" border=1>");
 
 	WriteL(L"<tr>");
 	WriteLTH_EH(L"Topic", L"בעניין");

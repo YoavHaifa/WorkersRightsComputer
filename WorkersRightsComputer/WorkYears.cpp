@@ -3,6 +3,7 @@
 #include "WorkYear.h"
 #include "WorkPeriod.h"
 #include "Utils.h"
+#include "Right.h"
 
 CWorkYears gWorkYears;
 
@@ -17,6 +18,9 @@ void CWorkYears::Clear(void)
 void CWorkYears::Compute(void)
 {
 	mn = 0;
+	mnFullWorkYears = 0;
+	mnPrevYears = 0;
+	mYearsForSeverance = 0;
 	if (!gWorkPeriod.IsValid())
 		return;
 
@@ -27,6 +31,53 @@ void CWorkYears::Compute(void)
 		maYears[mn].InitNext(maYears[mn - 1]);
 		mn++;
 	}
+
+	if (maYears[mn - 1].mFraction == 1)
+	{
+		mnFullWorkYears = mn;
+		mYearsForSeverance = mn;
+	}
+	else
+	{
+		mnFullWorkYears = mn - 1;
+		mYearsForSeverance = mnFullWorkYears + maYears[mn - 1].mFraction;
+	}
+	mnPrevYears = mn - 1;
+
+	mnMonthsInLastYear = maYears[mn - 1].GetNFullMonths(&mnDaysInLastYear);
+	ComputeWorkDays(); // WARNING: This procedure dont take into account vacations (as yet)!
+}
+CMyTime& CWorkYears::GetLastYearStart(void)
+{
+	return maYears[mn - 1].mLastDay;
+}
+double CWorkYears::GetLastYearAsFraction(void)
+{
+	return maYears[mn - 1].mFraction;
+}
+CString CWorkYears::PrepareSpanString(void)
+{
+	CString sSpanString(L"");
+	if (mnFullWorkYears > 0)
+	{
+		sSpanString = CRight::ToString(mnFullWorkYears);
+		sSpanString += " years ";
+	}
+	if (mn == mnFullWorkYears)
+		return sSpanString;
+
+	sSpanString += CRight::ToString(mnMonthsInLastYear);
+	sSpanString += " months ";
+	sSpanString += CRight::ToString(mnDaysInLastYear);
+	sSpanString += " days";
+
+	if (mnFullWorkYears < 1)
+	{
+		sSpanString += " (";
+		sSpanString += CRight::ToString(mnWorkingDays);
+		sSpanString += " work-days)";
+	}
+	return sSpanString;
 }
 
 void CWorkYears::Log()
@@ -47,4 +98,31 @@ void CWorkYears::Log()
 		}
 	}
 	fclose(pfLog);
+}
+void CWorkYears::ComputeWorkDays(void) // WARNING: This procedure dont take into account vacations (as yet)!
+{
+	int days = gWorkPeriod.mFirst.GetNDaysUntil(gWorkPeriod.mLast);
+
+	mnWorkingDays = (int)(days * gWorkPeriod.mnWorkDaysPerWeek / 7);
+}
+bool CWorkYears::WorkedAtLeastNMonths(int nMonths)
+{
+	int nFullYears = 0;
+	while (nMonths >= 12)
+	{
+		nFullYears++;
+		nMonths -= 12;
+	}
+	if (mnFullWorkYears > nFullYears)
+		return true;
+	if (mnFullWorkYears < nFullYears)
+		return false;
+
+	if (mnMonthsInLastYear >= nMonths)
+		return true;
+	return false;
+}
+bool CWorkYears::LastYearDoContains(class CHoliday& holiday)
+{
+	return maYears[mn-1].Contains(holiday);
 }

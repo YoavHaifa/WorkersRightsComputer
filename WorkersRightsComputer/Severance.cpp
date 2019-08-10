@@ -1,6 +1,7 @@
 ﻿#include "StdAfx.h"
 #include "Severance.h"
 #include "WorkPeriod.h"
+#include "WorkYears.h"
 #include "MinWage.h"
 #include "FamilyPart.h"
 
@@ -35,7 +36,7 @@ bool CSeverance::Compute(void)
 		return false;
 	}
 
-	mnYears = gWorkPeriod.mYearsForSeverance;
+	mnYears = gWorkYears.mYearsForSeverance;
 	mPayPerYear = gMinWage.ComputeMonthlyPay(gWorkPeriod.mLast.mYear, gWorkPeriod.mLast.mMonth);
 	if (mnYears < MIN_PERIOD)
 	{
