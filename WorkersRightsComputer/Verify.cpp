@@ -6,6 +6,7 @@
 #include "WorkPeriod.h"
 #include "AllRights.h"
 #include "FilesList.h"
+#include "Pension.h"
 
 
 void CVerify::VerifyBatch(const wchar_t *zfName)
@@ -66,6 +67,8 @@ CVerify::~CVerify()
 bool CVerify::Verify()
 {
 	CRight::umbOldStyle = true;
+	gpPension->CorrectForOldStype();
+
 	if (!ReadOldFile())
 		return false;
 

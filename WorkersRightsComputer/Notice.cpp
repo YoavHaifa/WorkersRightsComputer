@@ -26,8 +26,8 @@ bool CNotice::Compute(void)
 		return false;
 	}
 
-	LogLine(L"Last day at work", gWorkPeriod.mLast.mTime);
-	LogLine(L"Notice", gWorkPeriod.mNotice.mTime);
+	LogLine(L"Last day at work", gWorkPeriod.mLast);
+	LogLine(L"Notice", gWorkPeriod.mNotice);
 	//CTimeSpan spanAfterNotice = gWorkPeriod.mLast.mTime - gWorkPeriod.mNotice.mTime;
 	//LogLineSpan(L"Last - Notice ", spanAfterNotice);
 	LogLineSpan(L"Last - Notice ", gWorkPeriod.mNotice, gWorkPeriod.mLast);
@@ -41,7 +41,6 @@ bool CNotice::Compute(void)
 	if (gWorkYears.mnFullWorkYears >= 1 || mbDemandFullMonthAnyway)
 	{
 		mbDemandFullMonth = true;
-		mLastDayOfNotice = gWorkPeriod.mNotice;
 		mLastDayOfNotice.AddMonth();
 		msDue += L"Month ";
 		if (gWorkYears.mnFullWorkYears >= 1)
@@ -82,8 +81,8 @@ bool CNotice::Compute(void)
 	mDueWorkDayToPay = 0;
 	mnDaysPaidAfterNotice = 0;
 	CMyTime checkDate (gWorkPeriod.mNotice.NextDay());
-	LogLine(L"Check", checkDate.mTime);
-	while (checkDate.mTime <= gWorkPeriod.mLast.mTime)
+	LogLine(L"Check", checkDate);
+	while (checkDate <= gWorkPeriod.mLast)
 	{
 		//CTimeSpan span = gWorkPeriod.mLast.mTime - checkDate.mTime;
 		//LogLine(L"In loop", span);
@@ -95,10 +94,10 @@ bool CNotice::Compute(void)
 			LogLine(L"Worked", checkDate.mTime, L"Paid", mnDaysPaidAfterNotice);
 		}
 		checkDate.AddDay();
-		LogLine(L"Check", checkDate.mTime);
+		LogLine(L"Check", checkDate);
 	}
-	LogLine(L"Check Time", (__int64)checkDate.mTime.GetTime());
-	LogLine(L"Last Time", (__int64)gWorkPeriod.mLast.mTime.GetTime());
+	LogLine(L"Check Time", checkDate);
+	LogLine(L"Last Time", gWorkPeriod.mLast);
 	//CTimeSpan spanAfterLast = checkDate.mTime - gWorkPeriod.mLast.mTime;
 	//LogLine(L"Out of loop", spanAfterLast);
 	LogLineSpan(L"Out of loop", gWorkPeriod.mLast, checkDate);
@@ -113,7 +112,7 @@ bool CNotice::Compute(void)
 	}
 
 	int nDaysChecked = 0;
-	while (checkDate.mTime <= mLastDayOfNotice.mTime)
+	while (checkDate <= mLastDayOfNotice)
 	{
 		int dayOf = checkDate.mDayOfWeek - 1;
 		if (gWorkPeriod.maWorkingDays[dayOf] > 0)

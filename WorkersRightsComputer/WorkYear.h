@@ -20,7 +20,7 @@ public:
 	void InitFirst(void);
 	void InitNext(CWorkYear &prev);
 	void InitInternals(void);
-	int GetNFullMonths(int* pnExtraDays);
+	int GetNFullMonths(int* pnExtraDays, double* pExtraDaysFraction);
 	bool Contains(class CHoliday& holiday);
 	bool Contains(CMyTime &time);
 

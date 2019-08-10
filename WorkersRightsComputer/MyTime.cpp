@@ -144,14 +144,14 @@ void CMyTime::AddMonth(void)
 		mMonth++;
 	Set(mYear, mMonth, mDay);
 }
-void CMyTime::AddMonths(int n)
+void CMyTime::AddMonths(int nMonthsToAdd)
 {
-	if (n >= 12)
+	if (nMonthsToAdd >= 12)
 	{
-		mYear += n / 12;
-		n = n % 12;
+		mYear += nMonthsToAdd / 12;
+		nMonthsToAdd = nMonthsToAdd % 12;
 	}
-	mMonth += n;
+	mMonth += nMonthsToAdd;
 	while (mMonth > 12)
 	{
 		mYear++;
@@ -287,6 +287,7 @@ int CMyTime::GetNMonthsBefore(CMyTime& dayAfter, int* pnExtraDays)
 	CMyTime countDays(*this);
 	int nMonths = 0;
 	int nDays = 0;
+	int prevday = countDays.mDay;
 
 	while (countDays < dayAfter)
 	{
@@ -296,8 +297,15 @@ int CMyTime::GetNMonthsBefore(CMyTime& dayAfter, int* pnExtraDays)
 			nMonths++;
 			nDays = 0;
 		}
+		else if (countDays.mDay < prevday && prevday < mDay) // Shorter month ended
+		{
+			nMonths++;
+			nDays = 0;
+		}
 		else
 			nDays++;
+
+		prevday = countDays.mDay;
 	}
 	if (pnExtraDays)
 		*pnExtraDays = nDays;

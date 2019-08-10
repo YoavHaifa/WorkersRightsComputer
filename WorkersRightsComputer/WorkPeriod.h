@@ -56,10 +56,7 @@ public:
 	void SetWorkingDay(int iDay, double fraction);
 	void CountWorkingDays(void);
 
-	//int mnFullWorkYears;
-	//int mnMonthsInLastYear;
 	int mnMonthsDetailed;
-	//int mnDaysInLastYear;
 	bool mbNegative;
 	double mnWorkDaysPerWeek;
 	double mnDaysInMonthForDailySalary;

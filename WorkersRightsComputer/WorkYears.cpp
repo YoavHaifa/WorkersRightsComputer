@@ -44,7 +44,7 @@ void CWorkYears::Compute(void)
 	}
 	mnPrevYears = mn - 1;
 
-	mnMonthsInLastYear = maYears[mn - 1].GetNFullMonths(&mnDaysInLastYear);
+	mnMonthsInLastYear = maYears[mn - 1].GetNFullMonths(&mnDaysInLastYear, &mDaysInLastYearAsFraction);
 	ComputeWorkDays(); // WARNING: This procedure dont take into account vacations (as yet)!
 }
 CMyTime& CWorkYears::GetLastYearStart(void)

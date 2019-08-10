@@ -43,10 +43,7 @@ bool CVacation::ComputePerPeriod(void)
 		restMonths += gWorkYears.mnMonthsInLastYear;
 		seniority ++;
 		nMonthInSeniorityYear = gWorkYears.mnMonthsInLastYear;
-
-		daysFraction = (double)gWorkYears.mnDaysInLastYear / 30;
-		if (daysFraction > 1)
-			daysFraction = 1;
+		daysFraction = gWorkYears.mDaysInLastYearAsFraction;
 	}
 		
 	mCurYear = gWorkPeriod.mLast.mYear;
@@ -97,23 +94,6 @@ bool CVacation::ComputePerPeriod(void)
 			LogLine(L"seniority", seniority);
 		}
 	}
-
-	// Compute Months
-	/*
-	if (gWorkYears.mnMonthsInLastYear < N_MONTH_FOR_FULL_YEARLY_VACATION)
-	{
-		int daysPerLastMonth = GetNDaysPerMonth(gWorkPeriod.mnYears + 1, gWorkPeriod.mnWorkDaysPerWeek, mCurYear, mCurMonth);
-		LogLine(L"n days for full last year", daysPerLastMonth);
-		mnMonthsForVacation = gWorkYears.mnMonthsInLastYear;
-		double fraction = (double)gWorkYears.mnDaysInLastYear / 30;
-		if (fraction > 1)
-			fraction = 1;
-		mnMonthsForVacation += fraction;
-
-		double vacFrac = mnMonthsForVacation * daysPerLastYear / 12;
-		LogLine(L"days for last part year with fraction", vacFrac);
-		mnDueDays += vacFrac;
-	} */
 
 	// Round Up or Down
 	LogLine(L"n due days due with fraction", mnDueDays);

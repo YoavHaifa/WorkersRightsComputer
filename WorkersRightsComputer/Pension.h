@@ -40,6 +40,7 @@ public:
 	CPensionReport mReport;
 
 	void WriteToLetter(class CHtmlWriter& html);
+	void CorrectForOldStype(void);
 };
 
 extern CPension *gpPension;

@@ -101,11 +101,19 @@ void CWorkYear::InitInternals(void)
 		}
 	}
 }
-int CWorkYear::GetNFullMonths(int *pnExtraDays)
+int CWorkYear::GetNFullMonths(int *pnExtraDays, double* pExtraDaysFraction)
 {
 	CMyTime first(mFirstDay);
 	first.AddDays(mnUnpaidVacationDays);
-	return first.GetNMonthsBefore(mDayAfter, pnExtraDays);
+	int nMonths = first.GetNMonthsBefore(mDayAfter, pnExtraDays);
+	double nDaysInFullMonth = 30;
+	if (mDayAfter.mMonth == 3)
+	{
+		if (*pnExtraDays >= mDayAfter.mDay)
+			nDaysInFullMonth = 28;
+	}
+	*pExtraDaysFraction = (double)* pnExtraDays / nDaysInFullMonth;
+	return nMonths;
 }
 bool CWorkYear::Contains(CHoliday& holiday)
 {

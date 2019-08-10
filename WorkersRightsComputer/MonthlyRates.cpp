@@ -125,3 +125,14 @@ bool CMonthlyRates::InitFromFile(void)
 	mbValid = true;
 	return true;
 }
+void CMonthlyRates::CorrectForOldStype(void)
+{
+	if (!mbValid)
+		return;
+
+	for (int i = 0; i < MAX_RATES; i++)
+	{
+		if (ma[i] == 0.0333)
+			ma[i] = 0.033;
+	}
+}

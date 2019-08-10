@@ -316,3 +316,7 @@ void CPension::WriteToLetter(class CHtmlWriter& html)
 	mReport.WriteToLetter(html);
 	html.EndParagraph();
 }
+void CPension::CorrectForOldStype(void)
+{
+	mpPensionRates->CorrectForOldStype();
+}

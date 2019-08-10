@@ -139,6 +139,22 @@ void CRight::LogLine(const wchar_t *zText, CTime value)
 	s += ToString(value);
 	WriteLine(s);
 }
+void CRight::LogLine(const wchar_t* zText, CMyTime myTime)
+{
+	CString s(zText);
+	s += " ";
+	s += myTime.ToString();
+	WriteLine(s);
+}
+void CRight::LogLine(const wchar_t* zText, CMyTime myTime, const wchar_t* zText2)
+{
+	CString s(zText);
+	s += " ";
+	s += myTime.ToString();
+	s += " ";
+	s += zText2;
+	WriteLine(s);
+}
 void CRight::LogLine(const wchar_t *zText, CTime value, const wchar_t *zText2)
 {
 	CString s(zText);

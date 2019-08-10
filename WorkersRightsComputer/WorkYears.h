@@ -19,6 +19,7 @@ public:
 	int mn;
 	int mnMonthsInLastYear;
 	int mnDaysInLastYear;
+	double mDaysInLastYearAsFraction;
 	int mnFullWorkYears;
 	int mnPrevYears;
 	int mnWorkingDays; // Only relevant to compute vacation for short period

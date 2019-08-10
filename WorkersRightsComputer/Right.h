@@ -63,7 +63,9 @@ public:
 	void LogLine(const wchar_t *zText, __int64 value);
 	void LogLineSpan(const wchar_t *zText, CMyTime &start, CMyTime &end);
 	void LogLine(const wchar_t *zText, CTime value);
-	void LogLine(const wchar_t *zText, CTime value, const wchar_t *zText2);
+	void LogLine(const wchar_t* zText, CMyTime value);
+	void LogLine(const wchar_t* zText, CMyTime value, const wchar_t* zText2);
+	void LogLine(const wchar_t* zText, CTime value, const wchar_t* zText2);
 	void LogLine(const wchar_t *zText, CTime value, const wchar_t *zText2, int value2);
 	void LogLine(const wchar_t *zText, CTime value, const wchar_t *zText2, double value2);
 
