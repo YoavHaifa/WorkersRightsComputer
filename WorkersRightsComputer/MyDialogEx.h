@@ -35,7 +35,7 @@ public:
 	bool Enable(int id, bool bEnable);
 
 private:
-	void OnUserCrash(CString &sText);
+	//void OnUserCrash(CString &sText);
 	bool mbWriteToPipe;
 	int mnWriteToPipeFailed;
 	int mnWriteToPipeSucceeded;

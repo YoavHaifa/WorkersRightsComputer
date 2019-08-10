@@ -291,12 +291,12 @@ CString CPension::GetDecriptionForLetterHebrew(void)
 	{
 		s += L"פיצויים ";
 		s += ToString(mSeveranceDue);
-		s += L" + פנסיה ";
+		s += L" + תגמולים ";
 		s += ToString(mPensionDue);
 	}
 	else
 	{
-		s += L"פנסיה בלבד";
+		s += L"תגמולים בלבד";
 	}
 
 	return s;

@@ -14,6 +14,7 @@
 #include "LogoWriter.h"
 #include "HtmlWriter.h"
 #include "Person.h"
+#include "XMLDump.h"
 
 CAllRights gAllRights;
 
@@ -221,5 +222,16 @@ void CAllRights::Save(FILE *pfWrite)
 	{
 		CRight *pRight = mRights.GetNext(pos);
 		pRight->Save(pfWrite);
+	}
+}
+void CAllRights::SaveToXml(CXMLDump& xmlDump)
+{
+	CXMLDumpScope scope(L"AllRightsAsComputed", xmlDump);
+
+	POSITION pos = mRights.GetHeadPosition();
+	while (pos)
+	{
+		CRight* pRight = mRights.GetNext(pos);
+		pRight->SaveToXml(xmlDump);
 	}
 }

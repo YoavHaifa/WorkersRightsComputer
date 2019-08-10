@@ -68,6 +68,7 @@ public:
 	void LogLine(const wchar_t *zText, CTime value, const wchar_t *zText2, double value2);
 
 	void Save(FILE *pfWrite);
+	void SaveToXml(class CXMLDump& xmlDump);
 
 	static bool umbOldStyle;
 	CString msName;

@@ -2,6 +2,7 @@
 #include "Right.h"
 #include "Utils.h"
 #include "HtmlWriter.h"
+#include "XMLDump.h"
 
 CString CRight::umsSaveDir = L"..\\release\\Log\\";
 CString CRight::umsName = L"__";
@@ -45,6 +46,14 @@ void CRight::Save(FILE *pfWrite)
 	WriteLine(pfWrite, msDue);
 	WriteLine(pfWrite, msDebug);
 	WriteLine(pfWrite, L"*");
+}
+void CRight::SaveToXml(CXMLDump& xmlDump)
+{
+	CXMLDumpScope scope(msName, xmlDump);
+
+	xmlDump.Write(L"Due", mDuePay);
+	xmlDump.Write(L"sDue", msDue);
+	xmlDump.Write(L"Debug", msDebug);
 }
 CString CRight::GetSaveFileName(const wchar_t *zfName, const wchar_t *zExtension)
 {
