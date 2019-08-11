@@ -15,7 +15,7 @@ public:
 	virtual CString GetDecriptionForLetterHebrew(void)override;
 
 	bool DoCompute(void);
-	void AddMonth(int year, int month, int nDays /* if 0 - full */);
+	void AddMonth(int year, int month, int nDays /* if 0 - full */, bool bFirst = false);
 	void OnYearEnd(void);
 
 	class CMonthlyRates *mpPensionRates;
@@ -25,6 +25,7 @@ public:
 	static const int N_MONTHS_BEFORE_PAY_FROM_2009 = 6;
 	static const int N_MONTHS_BEFORE_PAY_CONTINUITY = 3;
 	static const int YEAR_TO_START = 2008;
+	static const int YEAR_TO_START_CHECKING_VACATIONS = 2010;
 
 	CMyTime mStartDateForPension;
 	CButtonRef * mpbEntitledOnlyToSeveranceFund;
@@ -39,6 +40,7 @@ public:
 	bool mbSeverance;
 	CPensionReport mReport;
 
+	bool UpdateStartDateForPension(void);
 	void WriteToLetter(class CHtmlWriter& html);
 	void CorrectForOldStype(void);
 };

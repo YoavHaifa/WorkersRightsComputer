@@ -114,15 +114,15 @@ int CVacationUsed::CountDaysOfUnpaidVacation(CMyTime& first, CMyTime& last)
 	CTimeSpan span = dayAfter.Subtract(firstToCount);
 	return (int)span.GetDays();
 }
-void CVacationUsed::AddToWorkYear(CWorkYear& workYear)
+void CVacationUsed::AddToWorkSpan(CWorkSpan& workSpan)
 {
 	if (mnUnPaid < 1)
 		return;
 
-	if (mFirstDayUnpaid > workYear.mDayAfter)
+	if (mFirstDayUnpaid > workSpan.mDayAfter)
 		return;
-	if (mFirstDayUnpaid < workYear.mFirstDay)
+	if (mFirstDayUnpaid < workSpan.mFirstDay)
 		return;
 
-	workYear.AddUnpaidVacation(*this);
+	workSpan.AddUnpaidVacation(*this);
 }

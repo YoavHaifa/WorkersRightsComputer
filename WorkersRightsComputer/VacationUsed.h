@@ -22,6 +22,6 @@ public:
 	void SetPartiallyPaid(int nPaidDays);
 
 	int CountDaysOfUnpaidVacation(CMyTime& first, CMyTime& last);
-	void AddToWorkYear(class CWorkYear& workYear);
+	void AddToWorkSpan(class CWorkSpan& workSpan);
 };
 

@@ -7,6 +7,7 @@
 #include "HtmlWriter.h"
 #include "FamilyPart.h"
 #include "WorkYears.h"
+#include "UsedVacations.h"
 
 CPension *gpPension = NULL;
 
@@ -97,11 +98,12 @@ bool CPension::Compute(void)
 
 	return bOK;
 }
-void CPension::AddMonth(int year, int month, int nDays /* if 0 - full */)
+void CPension::AddMonth(int year, int month, int nDays /* if 0 - full */, bool bFirst)
 {
 	double part = 1;
 	double familyPart = 0;
-	if (umbOldStyle)
+	CMonthInfo* pInfo = gWorkPeriod.GetMonthInfoFor(year, month);
+	if (umbOldStyle || bFirst)
 	{
 		if (nDays > 0)
 		{
@@ -109,10 +111,11 @@ void CPension::AddMonth(int year, int month, int nDays /* if 0 - full */)
 			if (part > 1)
 				part = 1;
 		}
+		if (bFirst)
+			part = min(part, pInfo->mFraction);
 	}
 	if (part == 1)
 	{
-		CMonthInfo *pInfo = gWorkPeriod.GetMonthInfoFor(year, month);
 		part = pInfo->mFraction;
 		if (gFamilyPart.mbAskOnlyForFamilyPart)
 			familyPart = 1 - pInfo->GetCompanyRatio();
@@ -206,6 +209,9 @@ bool CPension::DoCompute()
 		mStartDateForPension.Set(YEAR_TO_START, 1,  1);
 		msDebug += L" Period before 2008 skipped";
 	}
+	if (mStartDateForPension.mYear >= YEAR_TO_START_CHECKING_VACATIONS)
+		UpdateStartDateForPension();
+
 	CString sDate = L"First day for pension ";
 	sDate += mStartDateForPension.ToString();
 	LogLine(sDate);
@@ -220,7 +226,7 @@ bool CPension::DoCompute()
 		nDaysInFirstMonth = gWorkPeriod.mLast.mDay - mStartDateForPension.mDay + 1;
 		bFirstIsLast = true;
 	}
-	AddMonth(mStartDateForPension.mYear, mStartDateForPension.mMonth, nDaysInFirstMonth);
+	AddMonth(mStartDateForPension.mYear, mStartDateForPension.mMonth, nDaysInFirstMonth, true);
 
 	if (!bFirstIsLast)
 	{
@@ -315,6 +321,20 @@ void CPension::WriteToLetter(class CHtmlWriter& html)
 
 	mReport.WriteToLetter(html);
 	html.EndParagraph();
+}
+bool CPension::UpdateStartDateForPension()
+{
+	if (mStartDateForPension <= gWorkPeriod.mFirst)
+		return false;
+
+	CWorkSpan workBeforePension(gWorkPeriod.mFirst, mStartDateForPension);
+	if (workBeforePension.mDayAfter > mStartDateForPension)
+	{
+		mStartDateForPension = workBeforePension.mDayAfter;
+		LogLine(L"Start day for pension updated due to vacations", mStartDateForPension);
+		return true;
+	}
+	return false;
 }
 void CPension::CorrectForOldStype(void)
 {

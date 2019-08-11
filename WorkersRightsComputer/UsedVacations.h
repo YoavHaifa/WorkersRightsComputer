@@ -26,7 +26,7 @@ public:
 	void WriteToLetter(class CHtmlWriter& html);
 
 	int CountDaysOfUnpaidVacation(CMyTime& first, CMyTime& last);
-	void AddToWorkYear(class CWorkYear &workYear);
+	void AddToWorkSpan(class CWorkSpan &workSpan);
 };
 
 extern CUsedVacations gUsedVacations;

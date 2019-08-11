@@ -186,6 +186,7 @@
     <ClInclude Include="Additional.h" />
     <ClInclude Include="AllRights.h" />
     <ClInclude Include="Config.h" />
+    <ClInclude Include="WorkSpan.h" />
     <ClInclude Include="WorkYear.h" />
     <ClInclude Include="MyAskDlg.h" />
     <ClInclude Include="EmployerDlg.h" />
@@ -234,6 +235,7 @@
     <ClCompile Include="Additional.cpp" />
     <ClCompile Include="AllRights.cpp" />
     <ClCompile Include="Config.cpp" />
+    <ClCompile Include="WorkSpan.cpp" />
     <ClCompile Include="WorkYear.cpp" />
     <ClCompile Include="MyAskDlg.cpp" />
     <ClCompile Include="EmployerDlg.cpp" />

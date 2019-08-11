@@ -8,6 +8,7 @@
 #include "XMLDump.h"
 #include "HtmlWriter.h"
 #include "XMLParse.h"
+#include "WorkSpan.h"
 
 CUsedVacations gUsedVacations;
 
@@ -239,7 +240,7 @@ int CUsedVacations::CountDaysOfUnpaidVacation(CMyTime& first, CMyTime& last)
 	}
 	return nDays;
 }
-void CUsedVacations::AddToWorkYear(CWorkYear& workYear)
+void CUsedVacations::AddToWorkSpan(CWorkSpan& workSpan)
 {
 	POSITION pos = mVacationsUsed.GetHeadPosition();
 	while (pos)
@@ -247,7 +248,7 @@ void CUsedVacations::AddToWorkYear(CWorkYear& workYear)
 		CVacationUsed *pVac = mVacationsUsed.GetNext(pos);
 		if (pVac->mnUnPaid > 0)
 		{
-			pVac->AddToWorkYear(workYear);
+			pVac->AddToWorkSpan(workSpan);
 		}
 	}
 }
