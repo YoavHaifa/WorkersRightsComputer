@@ -91,22 +91,26 @@ bool CRight::ComputeEnvelop(void)
 
 	CString sLine = L"Computing ";
 	sLine += msName;
-	fwprintf(mpfWrite, L"%s\n\n", (const wchar_t *)sLine);
+	if (mpfWrite)
+		fwprintf(mpfWrite, L"%s\n\n", (const wchar_t *)sLine);
 
 	bool bOK = Compute();
-	fwprintf(mpfWrite, L"\n");
-	fwprintf(mpfWrite, L"%s\n", (const wchar_t *)msDue);
-	fwprintf(mpfWrite, L"%s\n", (const wchar_t *)msDebug);
-
-	if (!bOK)
+	if (mpfWrite)
 	{
-		WriteLine(L"");
-		sLine = msName;
-		sLine += L" not computed!";
-		WriteLine (sLine);
+		fwprintf(mpfWrite, L"\n");
+		fwprintf(mpfWrite, L"%s\n", (const wchar_t*)msDue);
+		fwprintf(mpfWrite, L"%s\n", (const wchar_t*)msDebug);
+
+		if (!bOK)
+		{
+			WriteLine(L"");
+			sLine = msName;
+			sLine += L" not computed!";
+			WriteLine(sLine);
+		}
+		fclose(mpfWrite);
+		mpfWrite = NULL;
 	}
-	fclose(mpfWrite);
-	mpfWrite = NULL;
 
 	return bOK;
 }
@@ -314,6 +318,8 @@ CString CRight::GetDecriptionForLetterHebrew(void)
 }
 void CRight::WriteLine(const wchar_t *zLine)
 {
+	if (!mpfWrite)
+		return;
 	if (zLine)
 		fwprintf(mpfWrite, L"%s\n", zLine);
 	else

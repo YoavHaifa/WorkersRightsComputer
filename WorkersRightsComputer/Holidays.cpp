@@ -96,7 +96,7 @@ bool CHolidays::InitFromFile(const wchar_t *zfName)
 	//mStatusLabel = sfName;
 	msfName = sfName;
 
-	FILE *pfLog = CUtils::OpenLogFile(L"ReadHolidays");
+	FILE *pfLog = CUtils::TryOpenLogFile(L"ReadHolidays");
 	if (pfLog)
 		fwprintf(pfLog, L"Reading File: %s\n\n", (const wchar_t *)sfName);
 
@@ -198,7 +198,7 @@ bool CHolidays::InitFromFileInternals(FILE *pfRead, FILE *pfLog)
 
 void CHolidays::PrintLog()
 {
-	FILE *pfLog = CUtils::OpenLogFile(L"HolidaysDefinition");
+	FILE *pfLog = CUtils::TryOpenLogFile(L"HolidaysDefinition");
 	if (!pfLog)
 		return;
 	fwprintf(pfLog, L"Input File: %s\n\n", (const wchar_t *)msfName);
@@ -242,13 +242,17 @@ void CHolidays::AddToDebug(int i, bool bPrice)
 int CHolidays::NInLastYear(void)
 {
 	msDebug = L"Holidays:";
-	FILE *pfWrite = CUtils::OpenLogFile(L"HolidaysInLastYear");
-	fwprintf(pfWrite, L"Input File: %s\n\n", (const wchar_t *)msfName);
-	fwprintf(pfWrite, L"%d holidays defined\n", mn);
+	FILE *pfWrite = CUtils::TryOpenLogFile(L"HolidaysInLastYear");
+	if (pfWrite)
+	{
+		fwprintf(pfWrite, L"Input File: %s\n\n", (const wchar_t *)msfName);
+		fwprintf(pfWrite, L"%d holidays defined\n", mn);
+	}
 
 	if (mn < 1)
 	{
-		fclose(pfWrite);
+		if (pfWrite)
+			fclose(pfWrite);
 		return 0;
 	}
 
@@ -258,7 +262,8 @@ int CHolidays::NInLastYear(void)
 		if (gWorkPeriod.LastYearContains(*map[i]))
 		{
 			n++;
-			map[i]->Log(pfWrite);
+			if (pfWrite)
+				map[i]->Log(pfWrite);
 			AddToDebug(i,false);
 		}
 	}
@@ -266,10 +271,14 @@ int CHolidays::NInLastYear(void)
 	if ( n > MAX_HOLIDAYS_PER_YEAR )
 	{
 		n = MAX_HOLIDAYS_PER_YEAR;
-		fprintf(pfWrite, "Max Holidays Per Year: %d\n", n);
+		if (pfWrite)
+			fprintf(pfWrite, "Max Holidays Per Year: %d\n", n);
 	}
-	fprintf(pfWrite, "Return %d", n);
-	fclose(pfWrite);
+	if (pfWrite)
+	{
+		fprintf(pfWrite, "Return %d", n);
+		fclose(pfWrite);
+	}
 	return n;
 }
 

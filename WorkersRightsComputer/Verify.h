@@ -24,6 +24,13 @@ public:
 	CVerify(const wchar_t *zfName, bool bSilent = false);
 	~CVerify();
 
+	static CString umsfName;
+	static bool umbBreakonDiff;
+	static FILE* umpfReport;
+	static int umiBatch;
+	static bool umbDisplayDiff;
+
+	static DWORD WINAPI StaticVerifyBatch(LPVOID);
 	static void VerifyBatch(const wchar_t *zfName);
 
 	CString msfName;

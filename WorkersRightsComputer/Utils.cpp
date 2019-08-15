@@ -79,7 +79,7 @@ FILE * CUtils::TryOpenStreamReader(const wchar_t *zfName, const wchar_t *zDesc, 
 		ReportFileOpenError(zfName, zDesc, true);
 	return pf;
 }
-FILE * CUtils::TryOpenStreamWriter(const wchar_t *zfName, const wchar_t *zDesc, bool bAppend)
+FILE * CUtils::TryOpenStreamWriter(const wchar_t *zfName, const wchar_t *zDesc, bool bAppend, bool bReportError)
 {
 	FILE *pf;
 	if (bAppend)
@@ -87,7 +87,7 @@ FILE * CUtils::TryOpenStreamWriter(const wchar_t *zfName, const wchar_t *zDesc, 
 	else
 		_wfopen_s(&pf, zfName, L"w");
 
-	if (!pf)
+	if (!pf && bReportError)
 		ReportFileOpenError(zfName, zDesc, false);
 	return pf;
 }
@@ -125,7 +125,7 @@ FILE * CUtils::OpenOutputFile(const wchar_t *zName, const wchar_t *zExtension)
 	sfName += zExtension;
 	return TryOpenStreamWriter(sfName,L"Save");
 }
-FILE * CUtils::OpenLogFile(const wchar_t *zName, bool bAppend)
+FILE* CUtils::OpenLogFile(const wchar_t* zName, bool bAppend)
 {
 	CString sfName = GetBaseDir();
 	sfName += "Log";
@@ -136,13 +136,24 @@ FILE * CUtils::OpenLogFile(const wchar_t *zName, bool bAppend)
 	sfName += L".log";
 	return TryOpenStreamWriter(sfName, L"log", bAppend);
 }
+FILE* CUtils::TryOpenLogFile(const wchar_t* zName, bool bAppend)
+{
+	CString sfName = GetBaseDir();
+	sfName += "Log";
+	if (!VerifyDirectory(sfName))
+		return NULL;
+	sfName += "\\";
+	sfName += zName;
+	sfName += L".log";
+	return TryOpenStreamWriter(sfName, L"log", bAppend, false /*bReportError*/);
+}
 FILE * CUtils::OpenSpecialLogFile(const wchar_t *zName)
 {
 	CString sfName = CRight::GetSaveDir();
 	sfName += CRight::umsName;
 	sfName += zName;
 	sfName += L".log";
-	return TryOpenStreamWriter(sfName, L"log");
+	return TryOpenStreamWriter(sfName, L"log", false, false);
 }
 /*
 FILE * CUtils::OpenSaveFileRead(const wchar_t *zName)
@@ -166,7 +177,7 @@ void CUtils::ReportFileOpenError(const wchar_t *zfName, const wchar_t *zDesc, bo
 	s += zDesc;
 	s += L": ";
 	s += zfName;
-	MessageBox(NULL, s, L"Instalaltion Error", MB_OK);
+	MessageBox(NULL, s, L"Installation Error", MB_OK);
 
 	wchar_t zBuf[256];
 	GetCurrentDirectory(sizeof(zBuf), zBuf);

@@ -665,7 +665,7 @@ void CWorkPeriod::Log(const wchar_t *zAt)
 {
 	CString sfName(L"WorkPeriod_");
 	sfName += zAt;
-	FILE *pfLog = CUtils::OpenLogFile(sfName);
+	FILE *pfLog = CUtils::TryOpenLogFile(sfName);
 	if (!pfLog)
 		return;
 

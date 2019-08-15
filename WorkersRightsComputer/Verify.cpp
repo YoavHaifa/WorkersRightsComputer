@@ -8,23 +8,34 @@
 #include "FilesList.h"
 #include "Pension.h"
 
+CString CVerify::umsfName;
+bool CVerify::umbBreakonDiff = false;
+FILE* CVerify::umpfReport = NULL;
+int CVerify::umiBatch = 0;
+bool CVerify::umbDisplayDiff = false;
 
 void CVerify::VerifyBatch(const wchar_t *zfName)
 {
-	CString sPath = CFileName::GetPath(zfName);
+	umsfName = zfName;
+	CUtils::CreateThread(StaticVerifyBatch, NULL);
+}
+DWORD WINAPI CVerify::StaticVerifyBatch(LPVOID)
+{
+	CString sPath = CFileName::GetPath(umsfName);
 	sPath = CFileName::GetPath(sPath);
 
 	CString sLogFileName(sPath + L"VerifyBatch.log");
 	FILE *pfLog = MyFOpenWithErrorBox(sLogFileName, L"w", L"Log");
 	if (!pfLog)
-		return;
+		return 0;
 
-	//sPattern += L"*\\Save.txt";
+	CString sReportFileName(sPath + L"VerifyBatchReport.csv");
+	umpfReport = MyFOpenWithErrorBox(sReportFileName, L"w", L"Log");
 
 	CFilesList list;
 	CUtils::ListFilesInDirRecursive(sPath, L"*.txt", list);
-	//CUtils::ListFiles(sPattern, list, true);
 
+	umiBatch = 0;
 	POSITION pos = list.GetHeadPosition();
 	while (pos)
 	{
@@ -32,15 +43,31 @@ void CVerify::VerifyBatch(const wchar_t *zfName)
 		CString sPrivate = CFileName::GetPrivate((const wchar_t *)*psfName);
 		if (sPrivate == L"Save.txt")
 		{
+			umiBatch++;
+			if (umpfReport)
+				fprintf(umpfReport, "%d, ", umiBatch);
 			CVerify verify((const wchar_t *)*psfName, true);
 			bool bSame = verify.Verify();
 			verify.WriteSummary(pfLog);
-			if (!bSame)
+
+			if (umpfReport)
+			{
+				CString sCurPath = CFileName::GetPath((const wchar_t *)*psfName);
+				CString sLast = CFileName::GetPrivate(sCurPath);
+				fwprintf(umpfReport, L"%s\n", (const wchar_t *)sLast);
+			}
+			if (!bSame && umbBreakonDiff)
 				break;
 		}
 	}
 	fclose(pfLog);
+	if (umpfReport)
+	{
+		fclose(umpfReport);
+		umpfReport = NULL;
+	}
 	CUtils::OpenTextFile(sLogFileName);
+	return 0;
 }
 
 CVerify::CVerify(const wchar_t *zfName, bool bSilent)
@@ -194,6 +221,8 @@ bool CVerify::ReadOldFile()
 
 	CheckIfNoticeSet();
 	gpDlg->mbDisableComputations = false;
+	if (pfRead)
+		fclose(pfRead);
 	return true;
 }
 void CVerify::ReadTime(FILE *pfRead, int i)
@@ -317,6 +346,9 @@ bool CVerify::VerifyResults()
 	mnDiff = 0;
 	mnMissing = 0;
 
+	double oldSum = 0;
+	double newSum = 0;
+
 	POSITION pos = gAllRights.mRights.GetHeadPosition();
 	while (pos)
 	{
@@ -325,6 +357,7 @@ bool CVerify::VerifyResults()
 		s += pRight->msName;
 		s += L" ";
 		s += CRight::ToString(pRight->mDuePay);
+		newSum += pRight->mDuePay;
 		mnCompared++;
 
 		bool bFound = false;
@@ -334,17 +367,27 @@ bool CVerify::VerifyResults()
 			CRightResult *pResult = mResults.GetNext(posRes);
 			if (pResult->msName == pRight->msName)
 			{
+				oldSum += pResult->mDue;
 				bFound = true;
+				if (umpfReport)
+					fwprintf(umpfReport, L"%s, ", (const wchar_t *)pResult->msName);
 				if ((pRight->mDuePay >= (pResult->mDue - 0.2)) && (pRight->mDuePay <= (pResult->mDue + 0.2)))
 				{
 					s += L" Same";
 					mnSame++;
+					if (umpfReport)
+						fprintf(umpfReport, "0, ");
 				}
 				else
 				{
 					s += L" Diff, old =  ";
 					s += CRight::ToString(pResult->mDue);
 					mnDiff++;
+					if (umpfReport)
+					{
+						double diff = pRight->mDuePay - pResult->mDue;
+						fprintf(umpfReport, "%d, ", (int)diff);
+					}
 				}
 				break;
 			}
@@ -353,10 +396,24 @@ bool CVerify::VerifyResults()
 		{
 			s += L" No saved result found";
 			mnMissing++;
+			if (umpfReport)
+				fprintf(umpfReport, "miss, ");
 		}
 	}
-	if (!mbSilentMode || mnSame != mnCompared)
-		CUtils::MessBox(s, L"Verify Results");
+	if (!umpfReport || umbDisplayDiff)
+	{
+		if (!mbSilentMode || mnSame != mnCompared )
+			CUtils::MessBox(s, L"Verify Results");
+	}
+	if (umpfReport)
+	{
+		double diff = newSum - oldSum;
+		fprintf(umpfReport, "%.2f, ", diff);
+		if (mnSame == mnCompared)
+			fprintf(umpfReport, "same, ");
+		else
+			fprintf(umpfReport, "diff, ");
+	}
 	return mnSame == mnCompared;
 }
 void CVerify::CheckIfNoticeSet()
@@ -377,6 +434,7 @@ void CVerify::CheckIfNoticeSet()
 		}
 		sLine = CUtils::TryReadLine(pfRead);
 	}
+	fclose(pfRead);
 }
 void CVerify::ReadHolidaysDefinitions()
 {
@@ -400,7 +458,7 @@ CHolidaysDef::CHolidaysDef(const wchar_t *zfName)
 	if (!pf)
 		return;
 
-	FILE *pfLog = CUtils::OpenLogFile(L"CHolidaysDef_read");
+	FILE *pfLog = CUtils::TryOpenLogFile(L"CHolidaysDef_read");
 	if (pfLog)
 		fwprintf(pfLog, L"%s\n", zfName);
 
@@ -423,6 +481,7 @@ CHolidaysDef::CHolidaysDef(const wchar_t *zfName)
 	}
 	if (pfLog)
 		fclose(pfLog);
+	fclose(pf);
 }
 bool CHolidaysDef::Includes(CList<CString *, CString *> &usedHolidays, FILE *pfLog)
 {
@@ -556,8 +615,6 @@ bool CVerify::ReadCurrentHolidaysNames(void)
 		fwprintf(mpfLog, L"\n");
 	return true;
 }
-
-
 void CVerify::WriteSummary(FILE *pf)
 {
 	fwprintf(pf, L"%80s", (const wchar_t *)msfName);
