@@ -43,5 +43,7 @@ public:
 	bool mbEng;
 	bool mbHeb;
 	void WriteItemToHtmlTable(CString sItem, CString sItemHebrew);
+
+	static CString umsHtmlDir;
 };
 

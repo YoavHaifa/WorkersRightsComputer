@@ -4,7 +4,7 @@
 #include "HtmlWriter.h"
 #include "XMLDump.h"
 
-CString CRight::umsSaveDir = L"..\\release\\Log\\";
+CString CRight::umsSaveDir = L"";
 CString CRight::umsName = L"__";
 bool CRight::umbOldStyle = false;
 
@@ -23,6 +23,12 @@ CRight::CRight(const wchar_t *zName, const wchar_t *zHebrewName)
 CRight::~CRight(void)
 {
 }
+CString CRight::GetSaveDir(void)
+{
+	if (umsSaveDir.IsEmpty())
+		ResetSaveDirAndName();
+	return umsSaveDir;
+}
 void CRight::SetSaveDirAndName(const wchar_t *zSaveDir, const wchar_t *zName)
 {
 	umsSaveDir = zSaveDir;
@@ -30,7 +36,11 @@ void CRight::SetSaveDirAndName(const wchar_t *zSaveDir, const wchar_t *zName)
 }
 void CRight::ResetSaveDirAndName(void)
 {
-	umsSaveDir = L"..\\release\\Log\\";
+	umsSaveDir = CUtils::GetBaseDir();
+	umsSaveDir += "Log";
+	CUtils::VerifyDirectory(umsSaveDir);
+	umsSaveDir += "\\";
+	// umsSaveDir = L"..\\release\\Log\\";
 	umsName = L"__";
 }
 void CRight::Init(void)

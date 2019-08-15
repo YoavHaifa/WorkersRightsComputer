@@ -10,6 +10,7 @@
 #include "WorkersRightsComputerDlg.h"
 #include "Pension.h"
 
+CString CHtmlWriter::umsHtmlDir;
 
 CHtmlWriter::CHtmlWriter()
 	: mpfWrite(NULL)
@@ -18,6 +19,8 @@ CHtmlWriter::CHtmlWriter()
 	, mbEng(true)
 	, mbHeb(true)
 {
+	if (umsHtmlDir.IsEmpty())
+		umsHtmlDir = CUtils::GetBaseDir() + L"HTML\\";
 }
 CHtmlWriter::~CHtmlWriter()
 {
@@ -32,7 +35,7 @@ bool CHtmlWriter::CopyLogo(const wchar_t* zfName)
 {
 	CFileName fName(zfName);
 	CString sPath = fName.Path();
-	CString sLogoSrc(L"..\\HTML\\Logo.jpg");
+	CString sLogoSrc(umsHtmlDir + L"Logo.jpg");
 	CString sLogoTarget = sPath + L"Logo.jpg";
 	CopyFile(sLogoSrc, sLogoTarget, FALSE);
 	return true;
@@ -41,7 +44,7 @@ int CHtmlWriter::WriteLetterFromTemplate(const wchar_t* zfName)
 {
 	CopyLogo(zfName);
 
-	mpfRead = MyFOpenWithErrorBox(L"..\\HTML\\letterTemplate.html", L"r, ccs=UNICODE", L"letter template");
+	mpfRead = MyFOpenWithErrorBox(umsHtmlDir + L"letterTemplate.html", L"r, ccs=UNICODE", L"letter template");
 
 	msfName = zfName;
 	mpfWrite = MyFOpenWithErrorBox(msfName, L"w, ccs=UNICODE", L"HTML Unicode");

@@ -55,11 +55,16 @@ bool CMonthlyRates::PrintLog(void)
 }
 bool CMonthlyRates::InitFromFile(void)
 {
+	/*
 	CString sfName = L"..\\release\\Input\\Rates";
 	sfName += msName;
 	sfName += L".txt";
 
-	FILE *pfRead = MyFOpenWithErrorBox(sfName, L"r", L"input rates");
+	FILE *pfRead = MyFOpenWithErrorBox(sfName, L"r", L"input rates"); */
+	CString sfName = L"Rates";
+	sfName += msName;
+	FILE* pfRead = CUtils::OpenInputFile(sfName);
+
 	if (!pfRead)
 		return false;
 

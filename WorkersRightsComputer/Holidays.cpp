@@ -77,7 +77,8 @@ bool CHolidays::InitFromFile(const wchar_t *zfName)
 		return false;
 
 	mbValid = false;
-	CString sfName = L"..\\release\\Input\\Holidays\\";
+	CString sfName = CUtils::GetBaseDir();
+	sfName += L"Input\\Holidays\\";
 	sfName = sfName + zfName;
 	sfName = sfName + L"Holidays.txt";
 

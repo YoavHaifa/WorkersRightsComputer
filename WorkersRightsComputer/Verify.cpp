@@ -381,7 +381,7 @@ void CVerify::CheckIfNoticeSet()
 void CVerify::ReadHolidaysDefinitions()
 {
 	CFilesList list;
-	CUtils::ListFilesInDir(L"..\\release\\input\\holidays", L"txt", list);
+	CUtils::ListFilesInDir(CUtils::GetBaseDir() + L"input\\holidays", L"txt", list);
 	POSITION pos = list.GetHeadPosition();
 	while (pos)
 	{
@@ -573,6 +573,16 @@ void CVerify::WriteSummary(FILE *pf)
 
 	fwprintf(pf, L"\n");
 	fflush(pf);
+
+	CString s(msfName + L" ");
+	if (mnCompared == mnSame)
+		s += "All Same";
+	else if (mnDiff > 0)
+		s += "Differ";
+	else if (mnMissing > 0)
+		s += " Missing";
+
+	gpDlg->DisplaySummary(s);
 }
 
 

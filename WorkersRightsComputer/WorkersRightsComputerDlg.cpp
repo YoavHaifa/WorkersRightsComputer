@@ -333,8 +333,9 @@ void CWorkersRightsComputerDlg::ResetAllInputs(void)
 }
 void CWorkersRightsComputerDlg::InitHolidaysCombo()
 {
+	CString msDir(CUtils::GetBaseDir() + L"input\\holidays");
 	CFilesList list;
-	CUtils::ListFilesInDir(L"..\\release\\input\\holidays", L"txt", list);
+	CUtils::ListFilesInDir(msDir, L"txt", list);
 	POSITION pos = list.GetHeadPosition();
 	while (pos)
 	{

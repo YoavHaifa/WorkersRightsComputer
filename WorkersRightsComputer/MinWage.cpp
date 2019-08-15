@@ -23,6 +23,7 @@ bool CMinWage::InitFromFile(void)
 	if (bFailed)
 		return false;
 
+	/*
 	CString sfName = L".\\Input\\MinWage.txt";
 	if (!CUtils::FileExists(sfName))
 	{
@@ -37,9 +38,10 @@ bool CMinWage::InitFromFile(void)
 			nErr++;
 			return false;
 		}
-	}
+	} */
 
-	FILE *pfRead = CUtils::TryOpenStreamReader(sfName,L"Minimum Wage Inmput");
+	FILE* pfRead = CUtils::OpenInputFile(L"MinWage");
+	//FILE* pfRead = CUtils::TryOpenStreamReader(sfName, L"Minimum Wage Inmput");
 
 	mn = CUtils::ReadInt(pfRead);
 

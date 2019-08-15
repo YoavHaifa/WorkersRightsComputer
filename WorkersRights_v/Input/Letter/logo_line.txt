@@ -1,0 +1,9 @@
+
+<w:p>
+<w:pPr><w:bidi w:val="off"/><w:rPr><w:rStyle w:val="Emphasis"/><wx:font wx:val="Arial"/><w:i w:val="off"/><w:i-cs w:val="off"/><w:rtl/></w:rPr></w:pPr>
+<w:r>
+<w:rPr><w:rStyle w:val="Emphasis"/><w:i w:val="off"/><w:i-cs w:val="off"/></w:rPr>
+<w:t>__text__</w:t>
+</w:r>
+</w:p>
+

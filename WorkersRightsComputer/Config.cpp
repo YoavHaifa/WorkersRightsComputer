@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Config.h"
 #include "XmlParse.h"
+#include "Utils.h"
 
 CConfig gConfig;
 
@@ -9,7 +10,9 @@ CConfig::CConfig(void)
 }
 void CConfig::InitFromXml()
 {
-	CXMLParse xmlParse(L"..\\release\\Config.xml");
+	CString sfName = CUtils::GetBaseDir();
+	sfName += L"Config.xml";
+	CXMLParse xmlParse(sfName);
 	CXMLParseNode* pRoot = xmlParse.GetRoot();
 	if (!pRoot)
 		return;

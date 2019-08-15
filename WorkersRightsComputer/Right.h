@@ -87,7 +87,6 @@ public:
 	FILE *mpfWrite;
 	int mDebug;
 
-	static CString umsSaveDir;	
 	static CString umsName;
 
 	static void SetSaveDirAndName(const wchar_t *zSaveDir, const wchar_t *zName);
@@ -108,5 +107,10 @@ public:
 	static CString ToString(double value, int nDigits);
 	static CString ToString(CTime value);
 	static bool GetIntFromEditBox(CEdit *pEdit, const wchar_t *zName, int &value);
+
+	static CString GetSaveDir(void);
+
+private:
+	static CString umsSaveDir;
 };
 

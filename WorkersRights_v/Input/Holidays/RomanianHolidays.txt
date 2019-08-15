@@ -1,0 +1,373 @@
+2nd Day of Christmas
+2019
+12
+26
+Christmas Day
+2019
+12
+25
+National Day
+2019
+12
+1
+Feast of Saint Andrew
+2019
+11
+30
+Assumption Day
+2019
+8
+15
+Orthodox Pentecost holiday
+2019
+6
+17
+Orthodox Pentecost
+2019
+6
+16
+Labor Day
+2019
+5
+1
+Orthodox Easter Monday
+2019
+4
+29
+Orthodox Easter Day
+2019
+4
+28
+New Year's Holiday
+2019
+1
+2
+New Year's Day
+2019
+1
+1
+2nd Day of Christmas
+2018
+12
+26
+Christmas Day
+2018
+12
+25
+National Day
+2018
+12
+1
+Feast of Saint Andrew
+2018
+11
+30
+Assumption Day
+2018
+8
+15
+Orthodox Whit Monday
+2018
+5
+28
+Orthodox Pentecost
+2018
+5
+27
+Labor Day
+2018
+5
+1
+Orthodox Easter Monday
+2018
+4
+9
+Orthodox Easter Sunday
+2018
+4
+8
+New Year's Holiday
+2018
+1
+2
+New Year's Day
+2018
+1
+1
+Second Day Of Christmas
+2017
+12
+26
+Christmas
+2017
+12
+25
+National Holiday Romania
+2017
+12
+01
+Saint Andrew's Day
+2017
+11
+30
+Assumpption Day
+2017
+08
+15
+Orthdox Pentacost
+2017
+06
+05
+Orthdox Pentacost
+2017
+06
+07
+Labor Day
+2017
+05
+01
+Orthdox Easter Monday
+2017
+04
+17
+Orthdox Easter
+2017
+04
+16
+New Year's Day
+2017
+01
+01
+Second Day Of Christmas
+2016
+12
+26
+Christmas
+2016
+12
+25
+National Holiday Romania
+2016
+12
+01
+Saint Andrew's Day
+2016
+11
+30
+Assumpption Day
+2016
+08
+15
+Orthdox Pentacost
+2016
+06
+20
+Orthdox Pentacost
+2016
+06
+19
+Orthdox Easter Monday
+2016
+05
+02
+Labor Day
+2016
+05
+01
+Orthdox Easter
+2016
+05
+01
+New Year's Day
+2016
+01
+02
+New Year's Day
+2015
+01
+01
+Second Day Of Christmas
+2015
+12
+26
+Christmas
+2015
+12
+25
+National Holiday Romania
+2015
+12
+01
+Saint Andrew's Day
+2015
+11
+30
+Assumpption Day
+2015
+08
+15
+Orthdox Pentacost
+2015
+06
+01
+Orthdox Pentacost
+2015
+05
+31
+Labor Day
+2015
+05
+01
+Orthdox Easter Monday
+2015
+04
+13
+Orthdox Easter
+2015
+04
+12
+New Year's Day
+2015
+01
+02
+New Year's Day
+2015
+01
+01
+Second Day of Christmas
+2014
+12
+26
+Christmas
+2014
+12
+25
+National Holiday Romania
+2014
+12
+01
+Saint Andrew's Day
+2014
+11
+30
+Assumption Day
+2014
+08
+15
+Labour Day
+2014
+05
+1
+Orthodox Easter Monday
+2014
+04
+21
+Orthodox Easter
+2014
+04
+20
+Orthodox Whit Monday
+2014
+04
+9
+Orthodox Whitsun
+2014
+04
+8
+New Year's Day
+2014
+01
+2
+New Year's Day
+2014
+01
+1
+Second Day of Christmas
+2013
+12
+26
+Christmas
+2013
+12
+25
+National Holiday Romania
+2013
+12
+01
+Assumption Day
+2013
+08
+16
+Orthodox Whit Monday
+2013
+05
+20
+Orthodox Whitsun
+2013
+05
+19
+Orthodox Easter Monday
+2013
+05
+6
+Orthodox Easter
+2013
+05
+5
+Labour Day
+2013
+05
+1
+Epiphany
+2013
+01
+06
+New Year's Day
+2013
+01
+1
+Second Day of Christmas
+2012
+12
+26
+Christmas
+2012
+12
+25
+National Holiday Romania
+2012
+12
+01
+Assumption Day
+2012
+08
+15
+Orthodox Whit Monday
+2012
+06
+4
+Orthodox Whitsun
+2012
+06
+03
+Labour Day
+2012
+05
+1
+Orthodox Easter Monday
+2012
+04
+16
+Orthodox Easter
+2012
+05
+15
+New Year's Day
+2012
+01
+1
+New Year's Day
+2012
+01
+1
+end

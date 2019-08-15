@@ -38,7 +38,11 @@ void CSaver::Save(const wchar_t *zfName)
 		msfName = zfName;
 	else
 	{
-		msfName = L"..\\release\\Save\\Last.xml";
+		msfName = CUtils::GetBaseDir();
+		msfName += "Save";
+		if (!CUtils::VerifyDirectory(msfName))
+			return;
+		msfName += L"\\Last.xml";
 		gUsedVacations.Log();
 	}
 
@@ -52,7 +56,10 @@ void CSaver::Restore(const wchar_t* zfName)
 	if (zfName)
 		msfName = zfName;
 	else
-		msfName = L"..\\release\\Save\\Last.xml";
+	{
+		msfName = CUtils::GetBaseDir();
+		msfName += L"Save\\Last.xml";
+	}
 
 	CFileName fName(msfName);
 	if (fName.IsOfType(L"xml"))
