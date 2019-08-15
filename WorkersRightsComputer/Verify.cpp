@@ -55,6 +55,7 @@ DWORD WINAPI CVerify::StaticVerifyBatch(LPVOID)
 				CString sCurPath = CFileName::GetPath((const wchar_t *)*psfName);
 				CString sLast = CFileName::GetPrivate(sCurPath);
 				fwprintf(umpfReport, L"%s\n", (const wchar_t *)sLast);
+				fflush(umpfReport);
 			}
 			if (!bSame && umbBreakonDiff)
 				break;
@@ -118,8 +119,9 @@ bool CVerify::ReadOldFile()
 	int nChecked = 0;
 
 	// Read Text Boxes
+	bool bEndFound = false;
 	CString sKey = CUtils::ReadLine(pfRead);
-	while (!sKey.IsEmpty() && sKey != L"end")
+	while (!sKey.IsEmpty() && sKey != L"end" && !bEndFound)
 	{
 		// Look for known boxes old names
 		POSITION pos = gpDlg->mEditBoxes.GetHeadPosition();
@@ -129,7 +131,7 @@ bool CVerify::ReadOldFile()
 			if (pRef->msOldName == sKey)
 			{
 				nEditsRead++;
-				CString sValue = CUtils::ReadLine(pfRead);
+				CString sValue = CUtils::ReadNextLine(pfRead);
 				pRef->mEdit.SetWindowTextW(sValue);
 				if (pRef->msOldName == L"textBox1")
 					msFirstName = sValue;
@@ -138,9 +140,12 @@ bool CVerify::ReadOldFile()
 				if (mpfLog)
 					fwprintf(mpfLog, L"<Read> Set %s %s to %s\n", (const wchar_t *)pRef->msName, 
 					(const wchar_t *)pRef->msOldName, (const wchar_t *)sValue);
+				if (sValue == L"end")
+					bEndFound = true;
 			}
 		}
-		sKey = CUtils::ReadLine(pfRead);
+		if (!bEndFound)
+			sKey = CUtils::ReadLine(pfRead);
 	}
 
 	// Read Work Period
@@ -492,12 +497,23 @@ bool CHolidaysDef::Includes(CList<CString *, CString *> &usedHolidays, FILE *pfL
 	while (pos)
 	{
 		CString *psUsedName = usedHolidays.GetNext(pos);
+		int lenUsed = psUsedName->GetLength();
 
 		bool bFound = false;
 		POSITION myPos = mNames.GetHeadPosition();
 		while (myPos)
 		{
 			CString *psName = mNames.GetNext(myPos);
+			if (psName->GetLength() > lenUsed)
+			{
+				if (psName->Left(lenUsed) == *psUsedName)
+				{
+					bFound = true;
+					if (pfLog)
+						fwprintf(pfLog, L"<CHolidaysDef::Includes> found: %s\n", (const wchar_t *)*psUsedName);
+					break;
+				}
+			}
 			if (*psName == *psUsedName)
 			{
 				bFound = true;

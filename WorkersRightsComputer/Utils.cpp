@@ -188,7 +188,7 @@ bool CUtils::FileExists(const wchar_t *zfName)
 	DWORD rc = GetFileAttributes(zfName);
 	return rc != INVALID_FILE_ATTRIBUTES;
 }
-CString CUtils::ReadLine(FILE *pfRead)
+CString CUtils::ReadLine(FILE* pfRead)
 {
 	wchar_t zBuf[2048];
 	if (fgetws(zBuf, sizeof(zBuf), pfRead) == NULL)
@@ -200,6 +200,20 @@ CString CUtils::ReadLine(FILE *pfRead)
 	s.Remove('\n');
 	if (s.IsEmpty())
 		return ReadLine(pfRead);
+	return s;
+}
+CString CUtils::ReadNextLine(FILE* pfRead)
+{
+	wchar_t zBuf[2048];
+	if (fgetws(zBuf, sizeof(zBuf), pfRead) == NULL)
+	{
+		MessageBox(NULL, L"CUtils::ReadLine failed - file end", L"Input Error", MB_OK);
+		return CString(L"");
+	}
+	CString s(zBuf);
+	s.Remove('\n');
+	if (s.IsEmpty())
+		return CString("0");
 	return s;
 }
 CString CUtils::TryReadLine(FILE *pfRead)

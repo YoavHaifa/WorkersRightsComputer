@@ -35,7 +35,8 @@ public:
 	static void ReportFileOpenError(const wchar_t *zfName, const wchar_t *zDesc, bool bRead);
 
 	static bool FileExists(const wchar_t *zfName);
-	static CString ReadLine(FILE *pf);
+	static CString ReadLine(FILE* pf);
+	static CString ReadNextLine(FILE* pf);
 	static CString TryReadLine(FILE *pf);
 	static int ReadInt(FILE *pfRead);
 	static double ReadFloat(FILE *pfRead);
