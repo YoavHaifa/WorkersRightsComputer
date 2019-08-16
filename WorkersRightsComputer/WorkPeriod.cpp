@@ -29,6 +29,7 @@ CWorkPeriod::CWorkPeriod(void)
 	, mMonthlyWage(0)
 	, mHourlyWage(0)
 	, mHoursPerWeek(0)
+	, mbSkipNotice(false)
 {
 	Reset();
 
@@ -50,7 +51,8 @@ void CWorkPeriod::Reset(void)
 	SetMinWage();
 	gUsedVacations.ClearAllVacations();
 	gWorkYears.Clear();
-	//ClearFullYears();
+
+	mbSkipNotice = false;
 }
 void CWorkPeriod::SetMinWage(void)
 {
@@ -307,6 +309,7 @@ void CWorkPeriod::SaveToXml(CXMLDump &xmlDump)
 	xmlDump.Write(L"first", mFirst);
 	xmlDump.Write(L"last", mLast);
 	xmlDump.Write(L"notice", mNotice);
+	xmlDump.Write(L"b_skip_notice", mbSkipNotice);
 
 	{
 		CXMLDumpScope scope(L"Days", xmlDump);
@@ -331,9 +334,6 @@ void CWorkPeriod::SaveToXml(CXMLDump &xmlDump)
 		xmlDump.Write(L"HoursPerWeek", mHoursPerWeek);
 	}
 
-	//xmlDump.Write(L"bNotIncludingLastSalary", mbNotIncludingLastSalary);
-	//xmlDump.Write(L"last_salary_until", mLastSalaryUntil);
-
 	gUsedVacations.SaveToXml(xmlDump);
 	gFamilyPart.SaveToXml(xmlDump);
 }
@@ -346,6 +346,7 @@ void CWorkPeriod::LoadFromXml(class CXMLParseNode* pRoot)
 	pMain->GetValue(L"first", mFirst);
 	pMain->GetValue(L"last", mLast);
 	pMain->GetValue(L"notice", mNotice);
+	pMain->GetValue(L"b_skip_notice", mbSkipNotice);
 
 	{
 		CXMLParseNode* pDays = pMain->GetFirst(L"Days");
@@ -388,6 +389,8 @@ void CWorkPeriod::Save(FILE *pfSave)
 	mFirst.Write(pfSave);
 	mLast.Write(pfSave);
 	mNotice.Write(pfSave);
+	//if (mbSkipNotice)
+	//	fprintf(pfSave, "Skip Notice!\n");
 	fwprintf(pfSave, L"Days\n");
 	for (int iDay = 0; iDay < 7; iDay++)
 	{
@@ -677,20 +680,6 @@ void CWorkPeriod::Log(const wchar_t *zAt)
 	fwprintf(pfLog, L"Notice Day %s\n", (const wchar_t *)s);
 
 	fprintf(pfLog, "\n");
-	/*
-	if (!mFullYearsStart.IsEmpty())
-	{
-		fprintf(pfLog, "Start of full years\n");
-		int count = 0;
-		POSITION pos = mFullYearsStart.GetHeadPosition();
-		while (pos)
-		{
-			CMyTime *pDate = mFullYearsStart.GetNext(pos);
-			s = pDate->ToString();
-			fwprintf(pfLog, L"%2d: %s\n", ++count, (const wchar_t *)s);
-		}
-		fprintf(pfLog, "\n");
-	} */
 
 	for (int i = 0; i < MAX_MONTHS; i++)
 	{
@@ -706,43 +695,6 @@ void CWorkPeriod::Log(const wchar_t *zAt)
 	gUsedVacations.Log();
 	gWorkYears.Log();
 }
-/*
-void CWorkPeriod::ClearFullYears(void)
-{
-	while (!mFullYearsStart.IsEmpty())
-	{
-		delete mFullYearsStart.GetTail();
-		mFullYearsStart.RemoveTail();
-	}
-} */
-/*
-void CWorkPeriod::ComputeFullYears(void)
-{
-	ClearFullYears();
-
-	//if (gUsedVacations.IsEmpty())
-	//	return;
-
-	CMyTime yearStart = mFirst;
-	while (yearStart <= mLast)
-	{
-		mFullYearsStart.AddTail(new CMyTime(yearStart));
-		CMyTime nextYearStart(yearStart.mYear + 1, yearStart.mMonth, yearStart.mDay);
-
-		gUsedVacations.UpdateNextYearStart(yearStart, nextYearStart);
-		yearStart = nextYearStart;
-	}
-	if (!mFullYearsStart.IsEmpty())
-	{
-		mLastYearStart = *mFullYearsStart.GetTail();
-		mnFullWorkYears = mFullYearsStart.GetSize() - 1;
-	}
-	else
-	{
-		mLastYearStart = mFirst;
-		mnFullWorkYears = 0;
-	}
-} */
 bool CWorkPeriod::IncludesMonthButNotFirst(int year, int month)
 {
 	if (!mFirst.IsMonthBefore(year, month))

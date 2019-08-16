@@ -49,7 +49,18 @@ void CWorkYears::Compute(void)
 }
 CMyTime& CWorkYears::GetLastYearStart(void)
 {
-	return maYears[mn - 1].mLastDay;
+	return maYears[mn - 1].mFirstDay;
+}
+CMyTime& CWorkYears::GetPrevYearEnd(int iPrev)
+{
+	int iYear = mn - 1 - iPrev;
+	if (iYear < 0)
+	{
+		CUtils::MessBox(L"<CWorkYears::GetPrevYearEnd> go back too much", L"SW Error");
+		iYear = 0;
+	}
+
+	return maYears[iYear].mLastDay;
 }
 double CWorkYears::GetLastYearAsFraction(void)
 {
@@ -96,6 +107,12 @@ void CWorkYears::Log()
 		{
 			maYears[i].Log(pfLog);
 		}
+		fprintf(pfLog, "mnMonthsInLastYear    %d\n", mnMonthsInLastYear);
+		fprintf(pfLog, "mnDaysInLastYear      %d\n", mnDaysInLastYear);
+		fprintf(pfLog, "mDaysInLastAsFraction %.2f\n", mDaysInLastYearAsFraction);
+		fprintf(pfLog, "mnFullWorkYears       %d\n", mnFullWorkYears);
+		fprintf(pfLog, "mnWorkingDays         %d\n", mnWorkingDays);
+		fprintf(pfLog, "mYearsForSeverance    %.3f\n", mYearsForSeverance);
 	}
 	fclose(pfLog);
 }

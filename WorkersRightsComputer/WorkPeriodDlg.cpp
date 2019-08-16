@@ -77,6 +77,7 @@ BEGIN_MESSAGE_MAP(CWorkPeriodDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_CHECK_SATURDAY, &CWorkPeriodDlg::OnBnClickedCheckSaturday)
 	ON_BN_CLICKED(IDOK3, &CWorkPeriodDlg::OnBnClickedOk3)
 	ON_BN_CLICKED(IDC_BUTTON_FAMILY_PART, &CWorkPeriodDlg::OnBnClickedButtonFamilyPart)
+	ON_BN_CLICKED(IDC_CHECK_NO_NOTICE, &CWorkPeriodDlg::OnBnClickedCheckNoNotice)
 END_MESSAGE_MAP()
 
 BOOL CWorkPeriodDlg::OnInitDialog()
@@ -101,6 +102,7 @@ BOOL CWorkPeriodDlg::OnInitDialog()
 		mbNoticeSet = true;
 		mNoticeDate.SetTime(&gWorkPeriod.mNotice.mTime);
 	}
+	SetCheck(IDC_CHECK_NO_NOTICE, gWorkPeriod.mbSkipNotice);
 
 	for (int iDay = 0; iDay < 7; iDay++)
 	{
@@ -183,7 +185,11 @@ int CWorkPeriodDlg::UpdateText()
 			sAll += "\r\n";
 		}
 	}
-	if (mbNoticeSet)
+	if (gWorkPeriod.mbSkipNotice)
+	{
+		sAll += "Do not demand notice.\r\n";
+	}
+	else if (mbNoticeSet)
 	{
 		DWORD dwResult = mNoticeDate.GetTime(timeTime);
 		if (dwResult == GDT_VALID)
@@ -438,5 +444,10 @@ void CWorkPeriodDlg::OnBnClickedButtonFamilyPart()
 	CFamilyPartDlg dlg;
 	dlg.DoModal();
 
+	UpdateText();
+}
+void CWorkPeriodDlg::OnBnClickedCheckNoNotice()
+{
+	gWorkPeriod.mbSkipNotice = IsChecked(IDC_CHECK_NO_NOTICE);
 	UpdateText();
 }

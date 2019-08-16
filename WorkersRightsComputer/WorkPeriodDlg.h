@@ -70,4 +70,5 @@ public:
 	afx_msg void OnBnClickedOk3();
 	afx_msg void OnBnClickedButtonFamilyPart();
 	//CDateTimeCtrl mLastSalaryDate;
+	afx_msg void OnBnClickedCheckNoNotice();
 };

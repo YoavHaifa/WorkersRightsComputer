@@ -238,6 +238,7 @@ void CHolidays::AddToDebug(int i, bool bPrice)
 
 	msDebug += L" ";
 	msDebug += s;
+	msDebug += "\n";
 }
 int CHolidays::NInLastYear(void)
 {
@@ -310,7 +311,7 @@ void CHolidays::ComputePayLastYear(void)
 		return;
 	}
 
-	msDebug = "Holiday Pay";
+	msDebug = "Holidays Pay:\n";
 	int nSummed = 0;
 	while (nSummed < nToSum)
 	{
@@ -371,15 +372,15 @@ void CHolidays::ComputePayPrevYears(void)
 		return;
 	}
 
-	CMyTime payDate = gWorkYears.GetLastYearStart();
-	payDate.SubDay();
+	int iPrev = 1;
 	double rest = nYears;
 	while (rest > 0)
 	{
+		CMyTime payDate = gWorkYears.GetPrevYearEnd(iPrev++);
 		double payPerDay = gMinWage.ComputeHolidayPrice(payDate.mYear, payDate.mMonth);
 		double payPerYear = payPerDay * nDaysPerYear;
 		RememberPayParDay(payPerDay);
-		LogLine(L"pay per day", payPerDay);
+		LogLine(L"pay per day in prev year", payPerDay);
 		if (rest >= 1)
 		{
 			mnDaysToPay += nDaysPerYear;
@@ -393,7 +394,6 @@ void CHolidays::ComputePayPrevYears(void)
 		}
 		LogLine(L"pay per year", payPerYear);
 		mDuePay += payPerYear;
-		payDate.AddYears(-1);
 	}
 
 	// msw->WriteLine("");

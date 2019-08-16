@@ -125,7 +125,14 @@ void CWorkYear::Log(FILE* pfLog)
 	mFirstDay.Log(pfLog);
 	fprintf(pfLog, "- ");
 	mLastDay.Log(pfLog);
+
+	if (mFraction < 1)
+		fprintf(pfLog, ", Fraction %.3f", mFraction);
+
 	if (mnUnpaidVacationDays > 0)
-		fprintf(pfLog, "Unpaid Vacation %d Days", mnUnpaidVacationDays);
+		fprintf(pfLog, ", Unpaid Vacation %d/%d Days", mnUnpaidVacationDays, mnAllCalendarDays);
+	else
+		fprintf(pfLog, ", %d Days", mnAllCalendarDays);
+
 	fprintf(pfLog, "\n");
 }

@@ -61,6 +61,7 @@ public:
 	double mnWorkDaysPerWeek;
 	double mnDaysInMonthForDailySalary;
 	double mnWorkingHoursInFullMonth;
+	bool mbSkipNotice;
 
 	int CountDaysToEndOfMonth(CMyTime &date);
 	int CountWorkDaysToEndOfMonthFrom(CMyTime &firstDate);

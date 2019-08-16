@@ -30,6 +30,8 @@
 #define IDC_CHECK_FRIDAY                1010
 #define IDC_CHECK_SATURDAY              1011
 #define IDC_DATETIMEPICKER_NOTICE2      1012
+#define IDC_CHECK_SATURDAY2             1012
+#define IDC_CHECK_NO_NOTICE             1012
 #define IDC_EDIT_MONTH_SALARY           1014
 #define IDC_RADIO_MIN_WAGE              1015
 #define IDC_RADIO_MONTHLY               1016

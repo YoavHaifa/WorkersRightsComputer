@@ -11,6 +11,7 @@ public:
 	void Log();
 
 	CMyTime& GetLastYearStart(void);
+	CMyTime& GetPrevYearEnd(int iPrev);
 	double GetLastYearAsFraction(void);
 	CString PrepareSpanString(void);
 	bool WorkedAtLeastNMonths(int nMonths);

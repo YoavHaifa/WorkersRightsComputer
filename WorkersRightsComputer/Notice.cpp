@@ -19,6 +19,12 @@ bool CNotice::Compute(void)
 	mDuePay = 0;
 	mbValid = false;
 
+	if (gWorkPeriod.mbSkipNotice)
+	{
+		LogLine(L"Do not demand notice!");
+		msDue += L"Notice was not demanded.";
+		return false;
+	}
 	if (!gWorkPeriod.mNotice.mbInitialized)
 	{
 		LogLine(L"Notice Date not set!");
