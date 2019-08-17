@@ -111,6 +111,7 @@ bool CHolidays::InitFromFile(const wchar_t *zfName)
 
 		fclose(pfLog);
 	}
+	fclose(pfRead);
 	return bOK;
 }
 bool CHolidays::InitFromFileInternals(FILE *pfRead, FILE *pfLog)

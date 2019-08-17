@@ -135,14 +135,16 @@ void CMyTime::AddYears(int n)
 }
 void CMyTime::AddMonth(void)
 {
-	if (mMonth >= 12)
+	int wantedDay = mDay;
+	int wantedMonth = mMonth + 1;
+	if (wantedMonth > 12)
 	{
 		mYear++;
-		mMonth = 1;
+		wantedMonth = 1;
 	}
-	else
-		mMonth++;
-	Set(mYear, mMonth, mDay);
+	Set(mYear, wantedMonth, wantedDay);
+	while (mMonth != wantedMonth)
+		Set(mYear, wantedMonth, --wantedDay);
 }
 void CMyTime::AddMonths(int nMonthsToAdd)
 {
