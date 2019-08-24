@@ -130,10 +130,8 @@ bool CNotice::Compute(void)
 			mDuePay = payPerMonth * fraction;
 		}
 		else */
-		{
-			msDue += L"Full Month";
-			mDuePay = payPerMonth;
-		}
+		msDue += L"Full Month";
+		mDuePay = payPerMonth;
 	}
 	else
 	{
@@ -210,18 +208,30 @@ bool CNotice::Compute(void)
 CString CNotice::GetDecriptionForLetter(void)
 {
 	CString s;
-	s += ToString(mDueWorkDayToPay);
-	s += L" days * ";
-	s += ToString(mPayPerDay);
-
+	if (mbDemandFullMonth && (mnDaysPaidAfterNotice == 0))
+	{
+		s = L"Full month";
+	}
+	else
+	{
+		s += ToString(mDueWorkDayToPay);
+		s += L" days * ";
+		s += ToString(mPayPerDay);
+	}
 	return s;
 }
 CString CNotice::GetDecriptionForLetterHebrew(void)
 {
 	CString s;
-	s += ToString(mDueWorkDayToPay);
-	s += L" ימים * ";
-	s += ToString(mPayPerDay);
-
+	if (mbDemandFullMonth && (mnDaysPaidAfterNotice == 0))
+	{
+		s = L"חודש מלא";
+	}
+	else
+	{
+		s += ToString(mDueWorkDayToPay);
+		s += L" ימים * ";
+		s += ToString(mPayPerDay);
+	}
 	return s;
 }

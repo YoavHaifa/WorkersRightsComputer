@@ -103,6 +103,8 @@ public:
 	afx_msg void OnTestLoadxml();
 	void WriteEditorToLetter(class CHtmlWriter& html);
 	afx_msg void OnTestLoadtxt();
+	// Allows user to set special rate per holidays
+	CEdit mEditPayPerEachHolyDay;
 };
 
 extern CWorkersRightsComputerDlg *gpDlg;

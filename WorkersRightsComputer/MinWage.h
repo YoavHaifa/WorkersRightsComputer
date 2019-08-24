@@ -22,7 +22,6 @@ public:
 
 	bool InitFromFile(void);
 	void PrintLog(void);
-	bool ComputeHolidayPrice(class CHoliday &holiday);
 	double ComputeHolidayPriceBaseWage(int year, int month);
 	double ComputeHolidayPrice(int year, int month);
 	double PayPerMonthAtWorkEnd(void);

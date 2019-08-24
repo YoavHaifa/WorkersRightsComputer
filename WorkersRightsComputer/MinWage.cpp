@@ -103,11 +103,6 @@ double CMinWage::ComputeHolidayPriceBaseWage(int year, int month)
 
 	return map[mn-1]->mWage;
 }
-bool CMinWage::ComputeHolidayPrice(CHoliday & holiday)
-{
-	holiday.mPrice =  ComputeHolidayPrice(holiday.mYear, holiday.mMonth);
-	return true;
-}
 double CMinWage::PayPerMonthAtWorkEnd(void)
 {
 	if (mn < 1)

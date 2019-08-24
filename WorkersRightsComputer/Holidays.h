@@ -49,7 +49,8 @@ public:
 	CEdit *mpNDaysWorkedPrevYearsBox;
 	CEdit *mpNDaysPaidPrevYearsBox;
 	CEdit *mpPrevYearsFromBox;
-	CEdit *mpPrevNYearsBox;
+	CEdit* mpPrevNYearsBox;
+	CEdit* mpPayRatePerHolidayBox;
 
 	int mn;
 	CString msfName;
@@ -61,7 +62,9 @@ public:
 	double mnDaysToPay;
 	double mMinPayPerDay;
 	double mMaxPayPerDay;
+	double mRateSetByUser;
 	void RememberPayParDay(double value);
+	bool ComputeHolidayPrice(class CHoliday& holiday);
 
 	void ComputePayLastYear(void);
 	void ComputePayPrevYears(void);

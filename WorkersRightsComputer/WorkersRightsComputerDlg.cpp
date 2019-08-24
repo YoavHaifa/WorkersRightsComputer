@@ -96,6 +96,9 @@ CWorkersRightsComputerDlg::CWorkersRightsComputerDlg(CWnd* pParent /*=nullptr*/)
 	mEditBoxes.AddTail(new CEditRef(L"VacationPrevYears", mEditVacationPrevYears, L"textBox11"));
 	mEditBoxes.AddTail(new CEditRef(L"RecuperationPrevYears", mEditRecuperationPrevYears, L"textBox13"));
 
+	mEditBoxes.AddTail(new CEditRef(L"PayRatePerHoliday", mEditPayPerEachHolyDay));
+
+
 	mButtons.AddTail(new CButtonRef(L"AllowSevLess", mAllowSevLess, L"checkBox1"));
 	mButtons.AddTail(new CButtonRef(L"DemandVac4Prev", mDemandVac4Prev, L"checkBox2"));
 	mButtons.AddTail(new CButtonRef(L"DemandRec4Prev", mDemandRec4Prev, L"checkBox3"));
@@ -136,6 +139,7 @@ void CWorkersRightsComputerDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT_FILLED_BY, mFilledBy);
 	DDX_Control(pDX, IDC_EDIT_ADDRESS, mAddress);
 	DDX_Control(pDX, IDC_EDIT_EMAIL, mEmail);
+	DDX_Control(pDX, IDC_EDIT_PAY_PER_HOLY_DAY, mEditPayPerEachHolyDay);
 }
 
 BEGIN_MESSAGE_MAP(CWorkersRightsComputerDlg, CDialogEx)

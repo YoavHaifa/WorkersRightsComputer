@@ -22,6 +22,8 @@ CHolidays::CHolidays(void)
 	, mpNDaysPaidPrevYearsBox(NULL)
 	, mpPrevYearsFromBox(NULL)
 	, mpPrevNYearsBox(NULL)
+	, mpPayRatePerHolidayBox(NULL)
+	, mRateSetByUser(0)
 {
 	miPrintOrder = 4;
 	mnWorkedLastYear = -1;
@@ -65,6 +67,11 @@ bool CHolidays::SetEditRef(class CEditRef *pRef)
 	if (pRef->msName == "PrevNYear")
 	{
 		mpPrevNYearsBox = &pRef->mEdit;
+		return true;
+	}
+	if (pRef->msName == "PayRatePerHoliday")
+	{
+		mpPayRatePerHolidayBox = &pRef->mEdit;
 		return true;
 	}
 
@@ -296,7 +303,7 @@ void CHolidays::ComputePayLastYear(void)
 		map[i]->mbInLastYearPaySum = false;
 		if (map[i]->mbInLastYear)
 		{
-			gMinWage.ComputeHolidayPrice(*map[i]);
+			ComputeHolidayPrice(*map[i]);
 		}
 	}
 
@@ -378,7 +385,11 @@ void CHolidays::ComputePayPrevYears(void)
 	while (rest > 0)
 	{
 		CMyTime payDate = gWorkYears.GetPrevYearEnd(iPrev++);
-		double payPerDay = gMinWage.ComputeHolidayPrice(payDate.mYear, payDate.mMonth);
+		double payPerDay;
+		if (mRateSetByUser > 0)
+			payPerDay = mRateSetByUser;
+		else
+			payPerDay = gMinWage.ComputeHolidayPrice(payDate.mYear, payDate.mMonth);
 		double payPerYear = payPerDay * nDaysPerYear;
 		RememberPayParDay(payPerDay);
 		LogLine(L"pay per day in prev year", payPerDay);
@@ -431,6 +442,12 @@ bool CHolidays::Compute(void)
 	}
 	if (!InitFromFile(msSelection))
 		return false;
+
+	mRateSetByUser = SafeGetDoubleFromTextBox(*mpPayRatePerHolidayBox);
+	if (mRateSetByUser < 0)
+		mRateSetByUser = 0;
+	if (mRateSetByUser > 0)
+		LogLine(L"Pay rate per holiday set by user", mRateSetByUser);
 
 	mnInLastYear = NInLastYear();
 	// TEMP - This edit box role is not clear -
@@ -490,4 +507,12 @@ CString CHolidays::GetDecriptionForLetterHebrew(void)
 	}
 
 	return s;
+}
+bool CHolidays::ComputeHolidayPrice(CHoliday& holiday)
+{
+	if (mRateSetByUser > 0)
+		holiday.mPrice = mRateSetByUser;
+	else
+		holiday.mPrice = gMinWage.ComputeHolidayPrice(holiday.mYear, holiday.mMonth);
+	return true;
 }
