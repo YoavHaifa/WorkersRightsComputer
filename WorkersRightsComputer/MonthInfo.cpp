@@ -80,6 +80,10 @@ double CMonthInfo::GetCompanyRatio()
 
 	return mRatioPaidByCompany;
 }
+double CMonthInfo::GetFamilyPart(void)
+{
+	return 1 - GetCompanyRatio();
+}
 void CMonthInfo::SetUnpaid(int nAnpaidDaysToAdd)
 {
 	if (nAnpaidDaysToAdd < 1)

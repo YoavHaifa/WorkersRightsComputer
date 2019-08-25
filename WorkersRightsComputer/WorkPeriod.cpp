@@ -51,6 +51,7 @@ void CWorkPeriod::Reset(void)
 	SetMinWage();
 	gUsedVacations.ClearAllVacations();
 	gWorkYears.Clear();
+	gFamilyPart.Clear();
 
 	mbSkipNotice = false;
 }

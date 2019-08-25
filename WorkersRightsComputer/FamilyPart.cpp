@@ -220,6 +220,7 @@ void CFamilyPart::SaveToXml(CXMLDump &xmlDump)
 }
 void CFamilyPart::LoadFromXml(class CXMLParseNode* pRoot)
 {
+	Clear();
 	CXMLParseNode* pMain = pRoot->GetFirst(L"FamilyPart");
 	if (!pMain)
 		return;
@@ -269,6 +270,7 @@ void CFamilyPart::Save(FILE *pfSave)
 }
 void CFamilyPart::Restore(FILE *pfRead)
 {
+	Clear();
 	CString s = CUtils::ReadLine(pfRead);
 	while (s == "Period")
 	{

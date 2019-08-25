@@ -11,6 +11,7 @@ public:
 	void InitNext(CMonthInfo &prev);
 	bool IsPartial(void);
 	double GetCompanyRatio(void);
+	double GetFamilyPart(void);
 
 	int mi;
 	bool mbLast;

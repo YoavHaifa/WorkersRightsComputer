@@ -101,7 +101,6 @@ bool CPension::Compute(void)
 void CPension::AddMonth(int year, int month, int nDays /* if 0 - full */, bool bFirst)
 {
 	double part = 1;
-	double familyPart = 0;
 	CMonthInfo* pInfo = gWorkPeriod.GetMonthInfoFor(year, month);
 	if (umbOldStyle || bFirst)
 	{
@@ -117,16 +116,19 @@ void CPension::AddMonth(int year, int month, int nDays /* if 0 - full */, bool b
 	if (part == 1)
 	{
 		part = pInfo->mFraction;
-		if (gFamilyPart.mbAskOnlyForFamilyPart)
-			familyPart = 1 - pInfo->GetCompanyRatio();
 	}
 
 	double monthlyPay = gMinWage.ComputeMonthlyPay(year, month);
 
 	double penRate = mpPensionRates->RatePerMonth(year, month);
 	double pensionDue = monthlyPay * penRate * part;
+
+	double familyPart = 0;
 	if (gFamilyPart.mbAskOnlyForFamilyPart)
+	{
+		familyPart = pInfo->GetFamilyPart();
 		pensionDue *= familyPart;
+	}
 	mPensionDue += pensionDue;
 	mPensionPerYear += pensionDue;
 
