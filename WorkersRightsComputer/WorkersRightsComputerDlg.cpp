@@ -365,6 +365,12 @@ void CWorkersRightsComputerDlg::InitHolidaysCombo()
 }
 void CWorkersRightsComputerDlg::OnBnClickedCheckSeveranceLessThanYear()
 {
+	if (!gWorkPeriod.IsValid())
+	{
+		SetCheck(IDC_CHECK_SEVERANCE_LESS_THAN_YEAR, false);
+		CUtils::MessBox(L"Please define working period first", L"Notice");
+		return;
+	}
 	if (IsChecked(IDC_CHECK_SEVERANCE_LESS_THAN_YEAR))
 	{
 		if (!gWorkYears.mbAllowPartYearSeverance)

@@ -197,6 +197,9 @@ void CSaver::WriteLetter()
 	msfName += L"save.xml";
 	SaveToXml();
 
+	if (!gWorkPeriod.IsValid())
+		return;
+
 	CString sLogDir = sSaveDir + "Log";
 	CUtils::VerifyDirectory(sLogDir);
 	sLogDir += "\\";
