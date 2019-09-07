@@ -13,6 +13,7 @@
 #include "FamilyPartDlg.h"
 #include "FamilyPart.h"
 #include "Utils.h"
+#include "Config.h"
 
 
 // CWorkPeriodDlg dialog
@@ -438,6 +439,9 @@ void CWorkPeriodDlg::OnBnClickedOk3()
 		CUtils::MessBox(L"Work period not fully defined", L"Notice");
 		return;
 	}
+
+	if (gUsedVacations.IsEmpty())
+		gUsedVacations.mbAdd14DaysUnpaidVacation4Severance = gConfig.mb14DaysUnpaidVacation4SeveranceDefault;
 
 	CVacationsDlg dlg;
 	dlg.DoModal();

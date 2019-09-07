@@ -10,6 +10,7 @@
 #include "XMLParse.h"
 #include "WorkSpan.h"
 #include "WorkYears.h"
+#include "Config.h"
 
 CUsedVacations gUsedVacations;
 bool CUsedVacations::umbPrintUnpaid = false;
@@ -86,7 +87,7 @@ void CUsedVacations::ClearAllVacations(void)
 	while (mVacationsUsed.GetSize() > 0)
 		ClearLastVacation();
 
-	mbAdd14DaysUnpaidVacation4Severance = false;
+	mbAdd14DaysUnpaidVacation4Severance = gConfig.mb14DaysUnpaidVacation4SeveranceDefault;
 }
 CString CUsedVacations::GetVacationsShortText(void)
 {

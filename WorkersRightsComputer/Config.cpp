@@ -6,6 +6,7 @@
 CConfig gConfig;
 
 CConfig::CConfig(void)
+	: mb14DaysUnpaidVacation4SeveranceDefault(false)
 {
 }
 void CConfig::InitFromXml()
@@ -19,4 +20,5 @@ void CConfig::InitFromXml()
 
 	pRoot->GetValue(L"version", msVersion);
 	pRoot->GetValue(L"save_dir", msSaveRoot);
+	pRoot->GetValue(L"b_14_days_severance", mb14DaysUnpaidVacation4SeveranceDefault);
 }
