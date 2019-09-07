@@ -41,8 +41,9 @@ bool CSeverance::Compute(void)
 	mPayPerYear = gMinWage.ComputeMonthlyPay(gWorkPeriod.mLast.mYear, gWorkPeriod.mLast.mMonth);
 	if (mnYears < MIN_PERIOD)
 	{
-		double partYearThreshold = (double)N_MIN_MONTHS_FOR_SPECIAL_CASE / 12 - 0.002;
-		if (mpbAllowSeveranceForShorterPeriod->IsChecked() && mnYears >= partYearThreshold)
+		//double partYearThreshold = (double)N_MIN_MONTHS_FOR_SPECIAL_CASE / 12 - 0.002;
+		//if (mpbAllowSeveranceForShorterPeriod->IsChecked() && mnYears >= partYearThreshold)
+		if (mpbAllowSeveranceForShorterPeriod->IsChecked() && gWorkYears.mbAllowPartYearSeverance)
 		{
 			mDuePay = mPayPerYear;
 			msDue += L"Full pay for one year ==> ";

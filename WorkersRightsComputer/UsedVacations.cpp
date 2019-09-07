@@ -9,8 +9,10 @@
 #include "HtmlWriter.h"
 #include "XMLParse.h"
 #include "WorkSpan.h"
+#include "WorkYears.h"
 
 CUsedVacations gUsedVacations;
+bool CUsedVacations::umbPrintUnpaid = false;
 
 CUsedVacations::CUsedVacations()
 	: mbAdd14DaysUnpaidVacation4Severance(false)
@@ -315,11 +317,28 @@ void CUsedVacations::WriteToLetter(CHtmlWriter& html)
 
 	// Sum of vacations
 	html.StartParagraph();
-	html.WriteEH(L"According to the law, days of paid vacation are included while computing social rights like severance and pension. In this computation ", 
-		L"לפי חוק חופשה שנתית, ימי חופשה בתשלום באים בחשבון לצורך חישוב זכויות סוציאליות כגון פיצויי פיטורים והפרשות לפנסיה.  בחישוב זה הוכללו ");
+	html.WriteLineEH(L"According to the law, days of paid vacation are included while computing social rights like severance and pension.",
+		L"לפי חוק חופשה שנתית, ימי חופשה בתשלום באים בחשבון לצורך חישוב זכויות סוציאליות כגון פיצויי פיטורים והפרשות לפנסיה. ");
+	html.WriteEH(L"In this computation ", L"בחישוב זה הוכללו ");
 	html.WriteInt(nPaid);
-	html.WriteEH(L" days of paid vacation were included and ", L" ימי חופשה בתשלום וקוזזו ");
-	html.WriteInt(nUnPaid);
-	html.WriteLineEH(L" days of unpaid vacation were offset.", L" ימי חופשה ללא תשלום. ");
+	html.WriteLineEH(L" days of paid vacation were included.", L" ימי חופשה בתשלום.");
+	if (umbPrintUnpaid)
+	{
+		html.WriteEH(L"In this computation ", L"בחישוב זה קוזזו ");
+		html.WriteInt(nUnPaid);
+		html.WriteLineEH(L" days of unpaid vacation were offset.", L" ימי חופשה ללא תשלום. ");
+	}
+	html.EndParagraph();
+	if (gWorkYears.mnDaysForSeveranceAddedForUnpaidVacations)
+		WriteToLetterExtraSeverance(html);
+}
+void CUsedVacations::WriteToLetterExtraSeverance(class CHtmlWriter& html)
+{
+	html.StartParagraph();
+	html.WriteLineEH(L"According to the law, 14 days of unpaid vacation per year are entitled for severance payment.",
+		L"לפי סעיף 10(3) לתקנות פיצויי פיטורים, 14 יום ראשונים של חופשה ללא תשלום בכל שנת עבודה באים בחשבון לצורך חישוב פיצויי הפיטורים.");
+	html.WriteEH(L"In this computation ", L"בחישוב זה הוכללו ");
+	html.WriteInt(gWorkYears.mnDaysForSeveranceAddedForUnpaidVacations);
+	html.WriteLineEH(L" such days were included.", L" ימים כאלו.");
 	html.EndParagraph();
 }

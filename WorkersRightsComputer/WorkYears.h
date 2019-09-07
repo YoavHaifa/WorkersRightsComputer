@@ -26,6 +26,8 @@ public:
 	int mnWorkingDays; // Only relevant to compute vacation for short period
 	double mYearsForSeverance;
 	int mnDaysForSeveranceAddedForUnpaidVacations;
+	bool mbAllowPartYearSeverance;
+	static const int N_MIN_MONTHS_FOR_SPECIAL_CASE = 10;
 
 private:
 	static const int MAX_YEARS = 50;

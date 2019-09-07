@@ -22,6 +22,7 @@
 #include "XmlParse.h"
 #include "HtmlWriter.h"
 #include "Config.h"
+#include "WorkYears.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -298,7 +299,18 @@ void CWorkersRightsComputerDlg::OnBnClickedWorkPeriod()
 {
 	CWorkPeriodDlg dlg;
 	if (dlg.DoModal() == IDOK)
+	{
+		if (!gWorkYears.mbAllowPartYearSeverance)
+		{
+			SetCheck(IDC_CHECK_SEVERANCE_LESS_THAN_YEAR, false);
+		}
+		if (gWorkYears.mYearsForSeverance < 1)
+		{
+			if (!IsChecked(IDC_CHECK_SEVERANCE_LESS_THAN_YEAR))
+				SetCheck(IDC_CHECK_ONLY_SEVERANCE, true);
+		}
 		OnInputChange();
+	}
 }
 
 
@@ -353,6 +365,21 @@ void CWorkersRightsComputerDlg::InitHolidaysCombo()
 }
 void CWorkersRightsComputerDlg::OnBnClickedCheckSeveranceLessThanYear()
 {
+	if (IsChecked(IDC_CHECK_SEVERANCE_LESS_THAN_YEAR))
+	{
+		if (!gWorkYears.mbAllowPartYearSeverance)
+		{
+			SetCheck(IDC_CHECK_SEVERANCE_LESS_THAN_YEAR, false);
+			CUtils::MessBox(L"Period too short for full severance on less than a year", L"Notice");
+		}
+	}
+	if (IsChecked(IDC_CHECK_SEVERANCE_LESS_THAN_YEAR))
+		SetCheck(IDC_CHECK_ONLY_SEVERANCE, false);
+	else
+	{
+		if (gWorkYears.mYearsForSeverance < 1)
+			SetCheck(IDC_CHECK_ONLY_SEVERANCE, true);
+	}
 	OnInputChange();
 }
 void CWorkersRightsComputerDlg::OnBnClickedCheckVacationYears()
@@ -365,6 +392,7 @@ void CWorkersRightsComputerDlg::OnBnClickedCheckRecuperationYears()
 }
 void CWorkersRightsComputerDlg::OnBnClickedCheckOnlySeverance()
 {
+	SetCheck(IDC_CHECK_SEVERANCE_LESS_THAN_YEAR, false);
 	OnInputChange();
 }
 void CWorkersRightsComputerDlg::OnBnClickedCheckActivePension()

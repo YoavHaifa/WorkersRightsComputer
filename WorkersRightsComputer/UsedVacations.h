@@ -24,10 +24,13 @@ public:
 	bool mbAdd14DaysUnpaidVacation4Severance;
 	void UpdateNextYearStart(class CMyTime &yearStart, class CMyTime &nextYearStart);
 	void WriteToLetter(class CHtmlWriter& html);
+	void WriteToLetterExtraSeverance(class CHtmlWriter& html);
 
 	int CountDaysOfUnpaidVacation(CMyTime& first, CMyTime& last);
 	void AddToWorkSpan(class CWorkSpan &workSpan);
 	double GetSeveranceYearsForUnpaidVacation();
+
+	static bool umbPrintUnpaid;
 };
 
 extern CUsedVacations gUsedVacations;

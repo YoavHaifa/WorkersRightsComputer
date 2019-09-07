@@ -11,6 +11,7 @@ CWorkYears gWorkYears;
 CWorkYears::CWorkYears(void)
 	: mn(0)
 	, mnDaysForSeveranceAddedForUnpaidVacations(0)
+	, mbAllowPartYearSeverance(false)
 {
 }
 void CWorkYears::Clear(void)
@@ -24,6 +25,7 @@ void CWorkYears::Compute(void)
 	mnPrevYears = 0;
 	mYearsForSeverance = 0;
 	mnDaysForSeveranceAddedForUnpaidVacations = 0;
+	mbAllowPartYearSeverance = false;
 	if (!gWorkPeriod.IsValid())
 		return;
 
@@ -55,6 +57,9 @@ void CWorkYears::Compute(void)
 		}
 		mYearsForSeverance += (double)mnDaysForSeveranceAddedForUnpaidVacations / 365.0;
 	}
+
+	double partYearThreshold = (double)N_MIN_MONTHS_FOR_SPECIAL_CASE / 12 - 0.002;
+	mbAllowPartYearSeverance = mYearsForSeverance >= partYearThreshold;
 
 	mnMonthsInLastYear = maYears[mn - 1].GetNFullMonths(&mnDaysInLastYear, &mDaysInLastYearAsFraction);
 	ComputeWorkDays(); // WARNING: This procedure dont take into account vacations (as yet)!
