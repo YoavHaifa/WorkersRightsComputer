@@ -102,4 +102,5 @@ void CVacationsDlg::OnBnClickedButtonVacClear()
 void CVacationsDlg::OnBnClickedCheck14daysVac4sevrance()
 {
 	gUsedVacations.mbAdd14DaysUnpaidVacation4Severance = IsChecked(IDC_CHECK_14DAYS_VAC4SEVRANCE);
+	UpdateText();
 }

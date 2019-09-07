@@ -12,6 +12,7 @@
 #include "UsedVacations.h"
 #include "FamilyPartDlg.h"
 #include "FamilyPart.h"
+#include "Utils.h"
 
 
 // CWorkPeriodDlg dialog
@@ -432,6 +433,11 @@ void CWorkPeriodDlg::OnBnClickedCheckSaturday()
 void CWorkPeriodDlg::OnBnClickedOk3()
 {
 	UpdateDataFromDialog();
+	if (!gWorkPeriod.IsValid())
+	{
+		CUtils::MessBox(L"Work period not fully defined", L"Notice");
+		return;
+	}
 
 	CVacationsDlg dlg;
 	dlg.DoModal();

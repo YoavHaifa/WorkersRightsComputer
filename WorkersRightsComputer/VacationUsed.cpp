@@ -14,6 +14,7 @@ CVacationUsed::CVacationUsed(CMyTime firstDay, CMyTime lastDay)
 	, mnPaid(0)
 	, mnUnPaid(0)
 	, mnUnpaidCalendarDays(0)
+	, mnUnpaidUsedForSeverance(0)
 {
 	mnDays = firstDay.GetNDaysUntil(mLastDay);
 }

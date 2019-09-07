@@ -25,6 +25,7 @@ public:
 	int mnPrevYears;
 	int mnWorkingDays; // Only relevant to compute vacation for short period
 	double mYearsForSeverance;
+	int mnDaysForSeveranceAddedForUnpaidVacations;
 
 private:
 	static const int MAX_YEARS = 50;

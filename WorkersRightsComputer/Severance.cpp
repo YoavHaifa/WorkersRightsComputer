@@ -4,6 +4,7 @@
 #include "WorkYears.h"
 #include "MinWage.h"
 #include "FamilyPart.h"
+#include "UsedVacations.h"
 
 
 CSeverance::CSeverance(void)
@@ -71,6 +72,15 @@ bool CSeverance::Compute(void)
 		msDue += ToString(mDuePay);
 
 	}
+
+	if (gUsedVacations.mbAdd14DaysUnpaidVacation4Severance)
+	{
+		msDebug += L" Including ";
+		msDebug += ToString(gWorkYears.mnDaysForSeveranceAddedForUnpaidVacations);
+		msDebug += L" days of unpaid vacation";
+	}
+	else
+		msDebug += L" 14 days of unpaid vacation were not requested";
 	return true;
 }
 CString CSeverance::GetDecriptionForLetter(void)

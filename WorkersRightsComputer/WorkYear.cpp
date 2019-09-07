@@ -6,6 +6,8 @@
 
 CWorkYear::CWorkYear(void)
 	: mSeniority(0)
+	, mnUnpaidVacationCalendarDaysForSeverance(0)
+	, mpPrev(NULL)
 	, mDebug(0)
 {
 	if (mDebug)
@@ -23,11 +25,13 @@ CWorkYear::~CWorkYear(void)
 }
 void CWorkYear::InitFirst(void)
 {
+	mpPrev = NULL;
 	mSeniority = 1;
 	InitInternals(gWorkPeriod.mFirst);
 }
 void CWorkYear::InitNext(CWorkYear& prev)
 {
+	mpPrev = &prev;
 	mSeniority = prev.mSeniority + 1;
 	InitInternals(prev.mDayAfter);
 }
@@ -40,6 +44,7 @@ void CWorkYear::InitInternals(CMyTime& firstDay)
 	Init(firstDay, dayAfter);
 
 	mFraction = 1;
+	mnUnpaidVacationCalendarDaysForSeverance = 0;
 	if (mpfLog)
 	{
 		mLastDay.LogLine(mpfLog, L"last day %s");
@@ -117,6 +122,31 @@ bool CWorkYear::Contains(CMyTime& time)
 		return false;
 	return true;
 }
+int CWorkYear::GetUnpaidVacationCalendarDaysForSeverance(void)
+{
+	mnUnpaidVacationCalendarDaysForSeverance = 0;
+	int unpaidCalendarDays = mnAllCalendarDays - mnPaidCalendarDays;
+	if (unpaidCalendarDays > 0)
+	{
+		int nToAdd = min(unpaidCalendarDays, MAX_14_UNPAID_VACATION_DAYS_FOR_SEVERANCE);
+
+		double fractionThreshold = MIN_MONTHS_FOR_UNPAID_VACATION_DAYS_FOR_SEVERANCE / 12.0;
+		if (mFraction > fractionThreshold)
+			mnUnpaidVacationCalendarDaysForSeverance = nToAdd;
+		else if (mpPrev)
+		{
+			if (mpPrev->mnUnpaidVacationCalendarDaysForSeverance)
+			{
+				int leftToAdd = MAX_14_UNPAID_VACATION_DAYS_FOR_SEVERANCE - mpPrev->mnUnpaidVacationCalendarDaysForSeverance;
+				int mayAdd = (int)(leftToAdd + mFraction * MAX_14_UNPAID_VACATION_DAYS_FOR_SEVERANCE);
+				mnUnpaidVacationCalendarDaysForSeverance = min(nToAdd, mayAdd);
+			}
+			else
+				mnUnpaidVacationCalendarDaysForSeverance = nToAdd;
+		}
+	}
+	return mnUnpaidVacationCalendarDaysForSeverance;
+}
 void CWorkYear::Log(FILE* pfLog)
 {
 	if (!pfLog)
@@ -134,5 +164,7 @@ void CWorkYear::Log(FILE* pfLog)
 	else
 		fprintf(pfLog, ", %d Days", mnAllCalendarDays);
 
+	if (mnUnpaidVacationCalendarDaysForSeverance > 0)
+		fprintf(pfLog, ", Severance extra %d Days", mnUnpaidVacationCalendarDaysForSeverance);
 	fprintf(pfLog, "\n");
 }

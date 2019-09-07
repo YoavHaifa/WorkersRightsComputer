@@ -27,6 +27,7 @@ public:
 
 	int CountDaysOfUnpaidVacation(CMyTime& first, CMyTime& last);
 	void AddToWorkSpan(class CWorkSpan &workSpan);
+	double GetSeveranceYearsForUnpaidVacation();
 };
 
 extern CUsedVacations gUsedVacations;

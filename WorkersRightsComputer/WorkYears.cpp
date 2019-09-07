@@ -4,11 +4,13 @@
 #include "WorkPeriod.h"
 #include "Utils.h"
 #include "Right.h"
+#include "UsedVacations.h"
 
 CWorkYears gWorkYears;
 
 CWorkYears::CWorkYears(void)
 	: mn(0)
+	, mnDaysForSeveranceAddedForUnpaidVacations(0)
 {
 }
 void CWorkYears::Clear(void)
@@ -21,6 +23,7 @@ void CWorkYears::Compute(void)
 	mnFullWorkYears = 0;
 	mnPrevYears = 0;
 	mYearsForSeverance = 0;
+	mnDaysForSeveranceAddedForUnpaidVacations = 0;
 	if (!gWorkPeriod.IsValid())
 		return;
 
@@ -43,6 +46,15 @@ void CWorkYears::Compute(void)
 		mYearsForSeverance = mnFullWorkYears + maYears[mn - 1].mFraction;
 	}
 	mnPrevYears = mn - 1;
+
+	if (gUsedVacations.mbAdd14DaysUnpaidVacation4Severance)
+	{
+		for (int i = 0; i < mn; i++)
+		{
+			mnDaysForSeveranceAddedForUnpaidVacations += maYears[i].GetUnpaidVacationCalendarDaysForSeverance();
+		}
+		mYearsForSeverance += (double)mnDaysForSeveranceAddedForUnpaidVacations / 365.0;
+	}
 
 	mnMonthsInLastYear = maYears[mn - 1].GetNFullMonths(&mnDaysInLastYear, &mDaysInLastYearAsFraction);
 	ComputeWorkDays(); // WARNING: This procedure dont take into account vacations (as yet)!
