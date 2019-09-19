@@ -45,10 +45,13 @@ bool CSeverance::Compute(void)
 		//if (mpbAllowSeveranceForShorterPeriod->IsChecked() && mnYears >= partYearThreshold)
 		if (mpbAllowSeveranceForShorterPeriod->IsChecked() && gWorkYears.mbAllowPartYearSeverance)
 		{
-			mDuePay = mPayPerYear;
-			msDue += L"Full pay for one year ==> ";
+			mDuePay = mPayPerYear * mnYears;
+			msDue += L"Pay for ";
+			msDue += ToString(mnYears);
+			msDue += L" year * ";
 			msDue += ToString(mPayPerYear);
-			return true;
+			msDue += L" ==> ";
+			msDue += ToString(mDuePay);
 		}
 		else
 		{
@@ -57,24 +60,26 @@ bool CSeverance::Compute(void)
 			return false;
 		}
 	}
+	else
+	{
+		mDuePay = (int)(mnYears * mPayPerYear + 0.5);
 
-	mDuePay = (int)(mnYears * mPayPerYear + 0.5);
+		msDue += L"Pay for ";
+		msDue += ToString(mnYears ,3);
+		msDue += L" years * ";
+		msDue += ToString(mPayPerYear);
+		msDue += L" ==> ";
+		msDue += ToString(mDuePay);
+	}
 
-	msDue += L"Pay for ";
-	msDue += ToString(mnYears ,3);
-	msDue += L" years * ";
-	msDue += ToString(mPayPerYear);
-	msDue += L" ==> ";
-	msDue += ToString(mDuePay);
 	if (gFamilyPart.mbAskOnlyForFamilyPart)
 	{
 		mDuePay = mDuePay * gFamilyPart.mRatio;
 		msDue += L" =FamilyPart=> ";
 		msDue += ToString(mDuePay);
-
 	}
 
-	if (gUsedVacations.mbAdd14DaysUnpaidVacation4Severance)
+	if (gWorkYears.mnDaysForSeveranceAddedForUnpaidVacations && gUsedVacations.mbAdd14DaysUnpaidVacation4Severance)
 	{
 		msDebug += L" Including ";
 		msDebug += ToString(gWorkYears.mnDaysForSeveranceAddedForUnpaidVacations);
@@ -82,6 +87,7 @@ bool CSeverance::Compute(void)
 	}
 	else
 		msDebug += L" 14 days of unpaid vacation were not requested";
+
 	return true;
 }
 CString CSeverance::GetDecriptionForLetter(void)

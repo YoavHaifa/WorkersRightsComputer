@@ -1,5 +1,5 @@
 <config>
-	<version> v0.8.7 </version>
+	<version> v0.8.8 </version>
 	<save_dir> C:\Users\yoavb\OneDrive\Desktop\WR Save </save_dir>
-	<b_14_days_severance> false </b_14_days_severance>
+	<b_14_days_severance> true </b_14_days_severance>
 </config>
