@@ -6,6 +6,7 @@ CAdditional::CAdditional(void)
 	, mpDescBox(NULL)
 	, mpDueBox(NULL)
 {
+	miPrintOrder = 6;
 	mbSkipIfZero = true;
 }
 CAdditional::~CAdditional(void)

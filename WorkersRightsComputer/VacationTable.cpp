@@ -11,8 +11,8 @@ CVacationTable::CVacationTable()
 	: mnVacationsComputed(0)
 	, mpfLog(0)
 {
-	InitFromFile();
-	PrintLog();
+	if (InitFromFile())
+		PrintLog();
 }
 
 
@@ -22,9 +22,11 @@ CVacationTable::~CVacationTable()
 bool CVacationTable::InitFromFile(void)
 {
 	// CString sDir = Directory::GetCurrentDirectory();
-	CString sfName = L"..\\release\\Input\\Vacation.txt";
+	FILE* pfRead = CUtils::OpenInputFile(L"Vacation");
 
-	FILE *pfRead = MyFOpenWithErrorBox(sfName, L"r", L"Vacation Data");
+	//CString sfName = L"..\\release\\Input\\Vacation.txt";
+
+	//FILE *pfRead = MyFOpenWithErrorBox(sfName, L"r", L"Vacation Data");
 	if (!pfRead)
 		return false;
 

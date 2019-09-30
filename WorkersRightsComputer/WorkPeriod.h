@@ -3,10 +3,7 @@
 #include "MyTime.h"
 #include "MonthInfo.h"
 
-/*
-class CMonthInfo
-{
-};*/
+
 
 class CWorkPeriod
 {
@@ -21,12 +18,11 @@ public:
 	void SetHourlyWage(double wagePerHour, double nHoursPerWeek);
 
 	bool LastYearContains(class CHoliday &holiday);
-	bool LastYearDoContains(int year, int month, int day);
-	void ComputeLastYearsStart(void);
-	void ComputeWorkDays(void);
 	void Reset(void);
-	void WriteToLetter(CLogoWriter &lw);
+	// void WriteToLetter(CLogoWriter &lw);
 	void WriteToLetter(class CHtmlWriter &html);
+	CString GetPeriodForLetter(void);
+	CString GetPeriodForLetterHebrew(void);
 
 	bool IsValid(void)
 	{
@@ -53,42 +49,26 @@ public:
 	CMyTime mNotice;
 	CMyTime mLastYearStart;
 
-	//System::TimeSpan mSpan;
 	CString mSpanString;
-	CString msLastYearStart;
-
-	// CEdit &mSpanTextBox;
-	// DateTimePicker ^ mNoticeDateTimePicker;
-
-	//System::Windows::Forms::Label ^ mWorkingDaysLabel;
-	//System::Windows::Forms::Label ^ mLastYearStartLabel;
 
 	static const int N_WEEK_DAYS = 7;
 	double maWorkingDays[N_WEEK_DAYS];
 	void SetWorkingDay(int iDay, double fraction);
+	void CountWorkingDays(void);
 
-	static const int MAX_MONTHS = 600;
-	CMonthInfo maMonths[MAX_MONTHS];
-
-	int mnCalendarYears;
-	int mnFullWorkYears;
-	int mnMonths;
 	int mnMonthsDetailed;
-	int mnDays;
 	bool mbNegative;
-	int mnWorkingDays;
 	double mnWorkDaysPerWeek;
-	double mYearsForSeverance;
 	double mnDaysInMonthForDailySalary;
 	double mnWorkingHoursInFullMonth;
+	bool mbSkipNotice;
 
-	void ComputeForSeverance(void);
-	void PrepareSpanString(void);
-	double GetLastYearAsFraction(void);
-	bool WorkedAtLeastNMonths(int nMonths);
 	int CountDaysToEndOfMonth(CMyTime &date);
 	int CountWorkDaysToEndOfMonthFrom(CMyTime &firstDate);
 	void Save(FILE *pfSave);
+	void SaveToXml(class CXMLDump &xmlDump);
+	void LoadFromXml(class CXMLParseNode* pRoot);
+
 	void Restore(FILE *pfRead);
 	bool mbMinWage;
 	bool mbMonthlyWage;
@@ -98,8 +78,10 @@ public:
 	CString GetTextSummary();
 	CString GetShortSummary();
 	CString GetDaysText();
-	int CountWorkingDays(CMyTime &first, CMyTime &last);
+	int CountWorkingDays(CMyTime& first, CMyTime& last);
+	//int CountAllDaysWithoutUnpaidVacation(CMyTime& first, CMyTime& last);
 	void CountNWorkingDaysFrom(CMyTime &first, int nToSkip, CMyTime &dateAfter);
+	int CountAllDaysPerMonth(int year, int month);
 	int CountWorkingDaysPerMonth(int year, int month);
 	int CountDaysWorkedPerMonth(int year, int month);
 	void InitDetailsForEachMonth();
@@ -108,13 +90,15 @@ public:
 	void Debug(const wchar_t *zAt);
 	void Log(const wchar_t *zAt);
 
-	CList<CMyTime *, CMyTime *> mFullYearsStart;
-	void ClearFullYears(void);
-	void ComputeFullYears(void);
 	bool IncludesMonthButNotFirst(int year, int month);
 
 	void SetWeekDaysPaidByCompany(class CCompanyPartPeriod *pFrom, class CCompanyPartPeriod *pUntil);
 	double ComputeFamilyPart(void);
+	void WriteLastSalary(class CHtmlWriter& html);
+
+private:
+	static const int MAX_MONTHS = 600;
+	CMonthInfo maMonths[MAX_MONTHS];
 };
 
 extern CWorkPeriod gWorkPeriod;

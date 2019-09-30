@@ -191,11 +191,12 @@ bool CMyDialogEx::GetItemText(int id, CString &sText)
 		ubOnce = true;
 		CMyRegistry::GetAppReg("enable_crash_by_text", ubAllowUserToInitiateCrashByText);
 	} */
+	/*
 	if (ubAllowUserToInitiateCrashByText)
 	{
 		if (sText.Left(7) == L"crashme")
 			OnUserCrash(sText);
-	}
+	} */
 	return true;
 }
 CString CMyDialogEx::GetTextOptional(int id)
@@ -228,6 +229,7 @@ bool CMyDialogEx::Enable(int id, bool bEnable)
 	pWnd->EnableWindow(bEnable);
 	return true;
 }
+/*
 static int five = 5;
 void CMyDialogEx::OnUserCrash(CString &sText)
 {
@@ -257,7 +259,7 @@ void CMyDialogEx::OnUserCrash(CString &sText)
 
 	int *pi = 0;
 	*pi = 0;
-}
+} */
 bool CMyDialogEx::VerifyAndGetInput(int id, int minValue, int maxValue, int & oValue, const wchar_t * zName)
 {
 	CString sText(_T(""));

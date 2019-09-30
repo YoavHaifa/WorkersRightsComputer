@@ -7,6 +7,7 @@
 CMonthInfo::CMonthInfo()
 	: mi(-1)
 	, mSeniorityMonths(-1)
+	, mnAllDays(0)
 	, mnAllWorkingDays(0)
 	, mnDaysUnpaidVacation(0)
 	, mnDaysWorked(0)
@@ -23,6 +24,7 @@ void CMonthInfo::InitFirst()
 
 	mi = 0;
 	mSeniorityMonths = 0;
+	mnAllDays = gWorkPeriod.CountAllDaysPerMonth(mYear,mMonth);
 	mnAllWorkingDays = gWorkPeriod.CountWorkingDaysPerMonth(mYear,mMonth);
 	mnDaysWorked = gWorkPeriod.CountDaysWorkedPerMonth(mYear,mMonth);
 	mFraction = (double)mnDaysWorked / mnAllWorkingDays;
@@ -41,6 +43,7 @@ void CMonthInfo::InitNext(CMonthInfo &prev)
 	else
 		mSeniorityMonths = prev.mSeniorityMonths + 1;
 
+	mnAllDays = gWorkPeriod.CountAllDaysPerMonth(mYear, mMonth);
 	if (MonthContains(gWorkPeriod.mLast))
 	{
 		mnAllWorkingDays = gWorkPeriod.CountWorkingDaysPerMonth(mYear,mMonth);
@@ -69,6 +72,17 @@ void CMonthInfo::SetDaysPerWeek(void)
 bool CMonthInfo::IsPartial(void)
 {
 	return (mFraction < 1);
+}
+double CMonthInfo::GetCompanyRatio()
+{
+	if (mHoursPerWeekPaidByCompany > 0)
+		return mHoursPerWeekPaidByCompany / mHoursPerWeek;
+
+	return mRatioPaidByCompany;
+}
+double CMonthInfo::GetFamilyPart(void)
+{
+	return 1 - GetCompanyRatio();
 }
 void CMonthInfo::SetUnpaid(int nAnpaidDaysToAdd)
 {

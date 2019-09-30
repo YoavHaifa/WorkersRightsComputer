@@ -44,7 +44,6 @@ public:
 
 	void Init(void);
 	void WriteLineToHtmlTable(class CHtmlWriter &html);
-	static void WriteItemToHtmlTable(class CHtmlWriter &html, CString &sItem);
 
 	bool ComputeEnvelop(void);
 	virtual bool Compute(void) = 0;
@@ -53,20 +52,25 @@ public:
 
 	virtual CString GetRightNameForLetter(void);
 	virtual CString GetDecriptionForLetter(void);
+	virtual CString GetDecriptionForLetterHebrew(void);
 
 	
-	void LogLine(const wchar_t *zText);
+	void LogLine(const wchar_t* zText);
+	void LogLine(const wchar_t* zText, CString s);
 	void LogLine(const wchar_t *zText, int value);
 	void LogLine(const wchar_t *zText, int ivalue, const wchar_t *zText2, double dvalue);
 	void LogLine(const wchar_t *zText, double value);
 	void LogLine(const wchar_t *zText, __int64 value);
-	void LogLine(const wchar_t *zText, CTimeSpan value);
+	void LogLineSpan(const wchar_t *zText, CMyTime &start, CMyTime &end);
 	void LogLine(const wchar_t *zText, CTime value);
-	void LogLine(const wchar_t *zText, CTime value, const wchar_t *zText2);
+	void LogLine(const wchar_t* zText, CMyTime value);
+	void LogLine(const wchar_t* zText, CMyTime value, const wchar_t* zText2);
+	void LogLine(const wchar_t* zText, CTime value, const wchar_t* zText2);
 	void LogLine(const wchar_t *zText, CTime value, const wchar_t *zText2, int value2);
 	void LogLine(const wchar_t *zText, CTime value, const wchar_t *zText2, double value2);
 
 	void Save(FILE *pfWrite);
+	void SaveToXml(class CXMLDump& xmlDump);
 
 	static bool umbOldStyle;
 	CString msName;
@@ -77,17 +81,18 @@ public:
 	CString msDue;
 	CString msDebug;
 	CString mLabel;
+	int miPrintOrder;
 	//static CString mStatusLabel;
 
 	FILE *mpfWrite;
 	int mDebug;
 
-	static CString umsSaveDir;	
 	static CString umsName;
 
 	static void SetSaveDirAndName(const wchar_t *zSaveDir, const wchar_t *zName);
 	static void ResetSaveDirAndName(void);
 	static FILE * OpenFile(const wchar_t *zfName, const wchar_t *zExtension);
+	static CString GetSaveFileName(const wchar_t *zfName, const wchar_t *zExtension);
 	bool TryReadInt(FILE *pfRead, const wchar_t *zText, int &value);
 	static bool TryConvertInt(const wchar_t *zSource, const wchar_t *zText, int &value);
 	int SafeGetIntFromTextBox(CEdit &box);
@@ -102,5 +107,10 @@ public:
 	static CString ToString(double value, int nDigits);
 	static CString ToString(CTime value);
 	static bool GetIntFromEditBox(CEdit *pEdit, const wchar_t *zName, int &value);
+
+	static CString GetSaveDir(void);
+
+private:
+	static CString umsSaveDir;
 };
 

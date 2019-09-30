@@ -55,11 +55,16 @@ bool CMonthlyRates::PrintLog(void)
 }
 bool CMonthlyRates::InitFromFile(void)
 {
+	/*
 	CString sfName = L"..\\release\\Input\\Rates";
 	sfName += msName;
 	sfName += L".txt";
 
-	FILE *pfRead = MyFOpenWithErrorBox(sfName, L"r", L"input rates");
+	FILE *pfRead = MyFOpenWithErrorBox(sfName, L"r", L"input rates"); */
+	CString sfName = L"Rates";
+	sfName += msName;
+	FILE* pfRead = CUtils::OpenInputFile(sfName);
+
 	if (!pfRead)
 		return false;
 
@@ -124,4 +129,15 @@ bool CMonthlyRates::InitFromFile(void)
 	//}
 	mbValid = true;
 	return true;
+}
+void CMonthlyRates::CorrectForOldStype(void)
+{
+	if (!mbValid)
+		return;
+
+	for (int i = 0; i < MAX_RATES; i++)
+	{
+		if (ma[i] == 0.0333)
+			ma[i] = 0.033;
+	}
 }

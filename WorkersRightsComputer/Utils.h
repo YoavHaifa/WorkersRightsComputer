@@ -1,6 +1,8 @@
 #pragma once
 #include "FileName.h"
 
+
+
 inline FILE * MyFOpen(const wchar_t *zfName, const wchar_t *zMode)
 {
 	FILE *pf = NULL;
@@ -13,20 +15,28 @@ class CUtils
 public:
 	CUtils(void);
 
-	static FILE * TryOpenStreamReader(const wchar_t *zfName, const wchar_t *zDesc, bool bReportError = true);
-	static FILE * TryOpenStreamWriter(const wchar_t *zfName, const wchar_t *zDesc, bool bAppend = false);
+	static bool umbInstallationError; 
+	static CString GetBaseDir(void);
+	static void ReportInstallationError(void);
+	static FILE* OpenInputFile(const wchar_t* zName);
+	//static FILE* OpenLogFile(const char* zName);
 
-	static FILE * OpenLetterInput(const wchar_t *zName, const wchar_t *zExtension);
-	static FILE * OpenInputFile(const wchar_t *zName, const wchar_t *zExtension);
+	static FILE * TryOpenStreamReader(const wchar_t *zfName, const wchar_t *zDesc, bool bReportError = true);
+	static FILE * TryOpenStreamWriter(const wchar_t *zfName, const wchar_t *zDesc, bool bAppend = false, bool bReportError = true);
+
+	// static FILE * OpenLetterInput(const wchar_t *zName, const wchar_t *zExtension);
+	//static FILE * OpenInputFile(const wchar_t *zName, const wchar_t *zExtension);
 	static FILE * OpenOutputFile(const wchar_t *zName, const wchar_t *zExtension);
-	static FILE * OpenLogFile(const wchar_t *zName, bool bAppend = false);
+	static FILE* OpenLogFile(const wchar_t* zName, bool bAppend = false);
+	static FILE* TryOpenLogFile(const wchar_t* zName, bool bAppend = false);
 	static FILE * OpenSpecialLogFile(const wchar_t *zName);
-	static FILE * OpenSaveFileRead(const wchar_t *zName);
+	// static FILE * OpenSaveFileRead(const wchar_t *zName);
 
 	static void ReportFileOpenError(const wchar_t *zfName, const wchar_t *zDesc, bool bRead);
 
 	static bool FileExists(const wchar_t *zfName);
-	static CString ReadLine(FILE *pf);
+	static CString ReadLine(FILE* pf);
+	static CString ReadNextLine(FILE* pf);
 	static CString TryReadLine(FILE *pf);
 	static int ReadInt(FILE *pfRead);
 	static double ReadFloat(FILE *pfRead);
@@ -73,8 +83,8 @@ inline FILE * MyFOpenWithErrorBox(const wchar_t *zfName, const wchar_t *zMode, c
 
 			//wchar_t zErr[128];
 			//_wcserror_s(zErr, sizeof(zErr), err);
-			wchar_t zMsg[128];
-			swprintf_s(zMsg, sizeof(zMsg), L"Error %d\n\r File exist\n\r ", err);
+			wchar_t zMsg[256];
+			swprintf_s(zMsg, 256, L"Error %d\n\r File exist\n\r ", err);
 			s += zMsg;
 		}
 

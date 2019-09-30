@@ -4,6 +4,7 @@
 #include "WorkPeriod.h"
 #include "VacationTable.h"
 #include "MonthInfo.h"
+#include "WorkYear.h"
 
 
 CVacationUsed::CVacationUsed(CMyTime firstDay, CMyTime lastDay)
@@ -13,6 +14,7 @@ CVacationUsed::CVacationUsed(CMyTime firstDay, CMyTime lastDay)
 	, mnPaid(0)
 	, mnUnPaid(0)
 	, mnUnpaidCalendarDays(0)
+	, mnUnpaidUsedForSeverance(0)
 {
 	mnDays = firstDay.GetNDaysUntil(mLastDay);
 }
@@ -93,4 +95,35 @@ void CVacationUsed::SetPartiallyPaid(int nPaidDays)
 	gWorkPeriod.CountNWorkingDaysFrom(mFirstDay, mnPaid, mFirstDayUnpaid);
 	CTimeSpan span = mLastDay.mTime - mFirstDayUnpaid.mTime;
 	mnUnpaidCalendarDays = (int)span.GetDays() + 1;
+}
+int CVacationUsed::CountDaysOfUnpaidVacation(CMyTime& first, CMyTime& last)
+{
+	if (first > mLastDay)
+		return 0;
+	if (last < mFirstDayUnpaid)
+		return 0;
+
+	CMyTime dayAfter = last;
+	if (last > mLastDay)
+		dayAfter = mLastDay;
+	dayAfter.AddDay();
+
+	CMyTime firstToCount = first;
+	if (mFirstDayUnpaid > first)
+		firstToCount = mFirstDayUnpaid;
+
+	CTimeSpan span = dayAfter.Subtract(firstToCount);
+	return (int)span.GetDays();
+}
+void CVacationUsed::AddToWorkSpan(CWorkSpan& workSpan)
+{
+	if (mnUnPaid < 1)
+		return;
+
+	if (mFirstDayUnpaid > workSpan.mDayAfter)
+		return;
+	if (mFirstDayUnpaid < workSpan.mFirstDay)
+		return;
+
+	workSpan.AddUnpaidVacation(*this);
 }

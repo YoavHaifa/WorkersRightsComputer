@@ -1,7 +1,8 @@
 #include "StdAfx.h"
-#include ".\xmlparse.h"
+#include "XmlParse.h"
 #include "Utils.h"
 #include "FileName.h"
+#include "MyTime.h"
 //#include "XMLDump.h"
 
 FILE *CXMLParseNode::umpfDebug = NULL;
@@ -374,17 +375,29 @@ bool CXMLParseNode::GetValue(long & value)
     }
     return false;
 }
-bool CXMLParseNode::GetValue(float & value)
+bool CXMLParseNode::GetValue(float& value)
 {
-    if (msValue.IsEmpty())
-        return false;
-    wchar_t first = msValue[0];
-    if (isdigit(first) || first == '-')
-    {
-        value = (float)_wtof(msValue);
-        return true;
-    }
-    return false;
+	if (msValue.IsEmpty())
+		return false;
+	wchar_t first = msValue[0];
+	if (isdigit(first) || first == '-')
+	{
+		value = (float)_wtof(msValue);
+		return true;
+	}
+	return false;
+}
+bool CXMLParseNode::GetValue(double& value)
+{
+	if (msValue.IsEmpty())
+		return false;
+	wchar_t first = msValue[0];
+	if (isdigit(first) || first == '-')
+	{
+		value = _wtof(msValue);
+		return true;
+	}
+	return false;
 }
 bool CXMLParseNode::GetValue(CString & sValue)
 {
@@ -392,6 +405,28 @@ bool CXMLParseNode::GetValue(CString & sValue)
         return false;
     sValue = msValue;
     return true;
+}
+bool CXMLParseNode::GetValue(CMyTime& time)
+{
+	CString sTime;
+	if (!GetValue(L"time", sTime))
+	{
+		time.Reset();
+        return false;
+	}
+
+	if (sTime.IsEmpty())
+	{
+		time.Reset();
+        return false;
+	}
+
+	__int64 t = _wtoi64(sTime);
+	if (t == 0)
+		time.Reset();
+	else
+		time.Set(t);
+	return true;
 }
 bool CXMLParseNode::ValueIs(const wchar_t *zValue)
 {
@@ -509,19 +544,33 @@ CXMLParse::CXMLParse(const wchar_t *zDir, const wchar_t *zName, const wchar_t *z
 	fName.AddMetaTypeAndType(zRoot, L"xml");
 	OpenFile(fName);
 }
-CXMLParse::CXMLParse(const wchar_t *zfName, int offset)
-: msName(zfName)
-, mpf(NULL)
-, mpMemoryToParse(NULL)
-, mMemoryLen(0)
-, mMemoryLenUsed(0)
-, mpRoot(NULL)
-, msNextToken(L"")
-, mbNextCharReady(false)
-, mNextChar (0)
-, meNextType (XML_UNDEF)
+CXMLParse::CXMLParse(const wchar_t* zfName, int offset)
+	: msName(zfName)
+	, mpf(NULL)
+	, mpMemoryToParse(NULL)
+	, mMemoryLen(0)
+	, mMemoryLenUsed(0)
+	, mpRoot(NULL)
+	, msNextToken(L"")
+	, mbNextCharReady(false)
+	, mNextChar(0)
+	, meNextType(XML_UNDEF)
 {
 	OpenFile(zfName, offset);
+}
+CXMLParse::CXMLParse(const wchar_t* zfName, bool bUnicode)
+	: msName(zfName)
+	, mpf(NULL)
+	, mpMemoryToParse(NULL)
+	, mMemoryLen(0)
+	, mMemoryLenUsed(0)
+	, mpRoot(NULL)
+	, msNextToken(L"")
+	, mbNextCharReady(false)
+	, mNextChar(0)
+	, meNextType(XML_UNDEF)
+{
+	OpenFile(zfName, 0, bUnicode);
 }
 CXMLParse::CXMLParse(const wchar_t *zName, const wchar_t *pMemory, int len)
 : msName(zName)
@@ -549,13 +598,17 @@ CXMLParse::~CXMLParse(void)
     if (mpRoot)
         delete mpRoot;
 }
-bool CXMLParse::OpenFile(const wchar_t *zfName, int offset)
+bool CXMLParse::OpenFile(const wchar_t *zfName, int offset, bool bUnicode)
 {
+	mnCharsRead = 0;
 	msName = zfName;
     if (mpRoot)
         delete mpRoot;
 	mpRoot = NULL;
-	mpf = MyFOpen (msName, L"r");
+	if (bUnicode)
+		mpf = MyFOpenWithErrorBox(msName, L"r, ccs=UNICODE", L"for restoring");
+	else
+		mpf = MyFOpen (msName, L"r");
     if (!mpf)
         return false;
 
@@ -648,13 +701,14 @@ bool CXMLParse::ReadNextChar(void)
 		}
 		else
 		{
-			int ch = fgetc(mpf);
-			if (ch == EOF)
+			int ch = fgetwc(mpf);
+			if (ch == WEOF)
 				return false;
 			mNextChar = (wchar_t)ch;
 		}
         mbNextCharReady = true;
     }
+	mnCharsRead++;
     return true;
 }
 bool CXMLParse::ReadNextNonBlankChar(void)

@@ -4,10 +4,73 @@
 #include "FilesList.h"
 
 bool CUtils::umbCreateConsoleWindow = false;
+bool CUtils::umbInstallationError = false;
 
 CUtils::CUtils(void)
 {
 }
+void CUtils::ReportInstallationError(void)
+{
+	wchar_t zBuf[256];
+	GetCurrentDirectory(255, zBuf);
+	CUtils::MessBox(zBuf, L"Installation Error");
+	umbInstallationError = true;
+	exit(1);
+}
+CString CUtils::GetBaseDir(void)
+{
+	static CString usBaseDir(L"");
+	if (usBaseDir.IsEmpty())
+	{
+		wchar_t zBuf[256];
+		GetCurrentDirectory(255, zBuf);
+		usBaseDir = zBuf;
+		usBaseDir.Replace(L"WorkersRightsComputer\\WorkersRightsComputer", L"WorkersRightsComputer\\WorkersRights_v\\");
+		if (usBaseDir.Right(5) == L"Debug")
+			usBaseDir = usBaseDir.Left(usBaseDir.GetLength() - 5);
+		if (usBaseDir.Right(7) == L"Release")
+			usBaseDir = usBaseDir.Left(usBaseDir.GetLength() - 7);
+	}
+	return usBaseDir;
+}
+FILE* CUtils::OpenInputFile(const wchar_t* zName)
+{
+	if (umbInstallationError)
+		return NULL;
+
+	static CString sInputPath;
+	if (sInputPath.IsEmpty())
+	{
+		sInputPath = GetBaseDir();
+		sInputPath += "input\\";
+	}
+	CString sfName = sInputPath + zName;
+	sfName += ".txt";
+	FILE* pf = MyFOpenWithErrorBox(sfName, L"r", L"Input");
+	if (!pf)
+		ReportInstallationError();
+	return pf;
+}
+/*
+FILE* CUtils::OpenLogFile(const char* zName)
+{
+	if (umbInstallationError)
+		return NULL;
+
+	static CString sLogPath;
+	if (sLogPath.IsEmpty())
+	{
+		sLogPath = GetBaseDir();
+		sLogPath += "Log\\";
+	}
+	CString sfName = sLogPath + zName;
+	sfName += ".log";
+	FILE* pf = MyFOpenWithErrorBox(sfName, L"r", L"Log");
+	if (!pf)
+		ReportInstallationError();
+	return pf;
+} */
+
 FILE * CUtils::TryOpenStreamReader(const wchar_t *zfName, const wchar_t *zDesc, bool bReportError)
 {
 	FILE *pf;
@@ -16,7 +79,7 @@ FILE * CUtils::TryOpenStreamReader(const wchar_t *zfName, const wchar_t *zDesc, 
 		ReportFileOpenError(zfName, zDesc, true);
 	return pf;
 }
-FILE * CUtils::TryOpenStreamWriter(const wchar_t *zfName, const wchar_t *zDesc, bool bAppend)
+FILE * CUtils::TryOpenStreamWriter(const wchar_t *zfName, const wchar_t *zDesc, bool bAppend, bool bReportError)
 {
 	FILE *pf;
 	if (bAppend)
@@ -24,10 +87,11 @@ FILE * CUtils::TryOpenStreamWriter(const wchar_t *zfName, const wchar_t *zDesc, 
 	else
 		_wfopen_s(&pf, zfName, L"w");
 
-	if (!pf)
+	if (!pf && bReportError)
 		ReportFileOpenError(zfName, zDesc, false);
 	return pf;
 }
+/*
 FILE * CUtils::OpenInputFile(const wchar_t *zName, const wchar_t *zExtension)
 {
 	CString sfName(L".\\Input\\");
@@ -43,7 +107,8 @@ FILE * CUtils::OpenInputFile(const wchar_t *zName, const wchar_t *zExtension)
 	sfName += L".";
 	sfName += zExtension;
 	return TryOpenStreamReader(sfName,L"Input");
-}
+} */
+/*
 FILE * CUtils::OpenLetterInput(const wchar_t *zName, const wchar_t *zExtension)
 {
 	CString sfName = L"..\\release\\Input\\Letter\\";
@@ -51,37 +116,53 @@ FILE * CUtils::OpenLetterInput(const wchar_t *zName, const wchar_t *zExtension)
 	sfName += L".";
 	sfName += zExtension;
 	return TryOpenStreamReader(sfName,L"Input");
-}
+} */
 FILE * CUtils::OpenOutputFile(const wchar_t *zName, const wchar_t *zExtension)
 {
-	CString sfName(CRight::umsSaveDir ? CRight::umsSaveDir : L".\\Log\\");
+	CString sfName(CRight::GetSaveDir());
 	sfName += zName;
 	sfName += L".";
 	sfName += zExtension;
 	return TryOpenStreamWriter(sfName,L"Save");
 }
-FILE * CUtils::OpenLogFile(const wchar_t *zName, bool bAppend)
+FILE* CUtils::OpenLogFile(const wchar_t* zName, bool bAppend)
 {
-	CString sfName = L"..\\release\\Log\\";
+	CString sfName = GetBaseDir();
+	sfName += "Log";
+	if (!VerifyDirectory(sfName))
+		return NULL;
+	sfName += "\\";
 	sfName += zName;
 	sfName += L".log";
 	return TryOpenStreamWriter(sfName, L"log", bAppend);
 }
+FILE* CUtils::TryOpenLogFile(const wchar_t* zName, bool bAppend)
+{
+	CString sfName = GetBaseDir();
+	sfName += "Log";
+	if (!VerifyDirectory(sfName))
+		return NULL;
+	sfName += "\\";
+	sfName += zName;
+	sfName += L".log";
+	return TryOpenStreamWriter(sfName, L"log", bAppend, false /*bReportError*/);
+}
 FILE * CUtils::OpenSpecialLogFile(const wchar_t *zName)
 {
-	CString sfName = CRight::umsSaveDir;
+	CString sfName = CRight::GetSaveDir();
 	sfName += CRight::umsName;
 	sfName += zName;
 	sfName += L".log";
-	return TryOpenStreamWriter(sfName, L"log");
+	return TryOpenStreamWriter(sfName, L"log", false, false);
 }
+/*
 FILE * CUtils::OpenSaveFileRead(const wchar_t *zName)
 {
 	CString sfName = L"..\\release\\Save\\";
 	sfName += zName;
 	sfName += L".txt";
 	return TryOpenStreamReader(sfName, L"read saved");
-}
+} */
 void CUtils::ReportFileOpenError(const wchar_t *zfName, const wchar_t *zDesc, bool bRead)
 {
 	static int nErr = 0;
@@ -96,7 +177,7 @@ void CUtils::ReportFileOpenError(const wchar_t *zfName, const wchar_t *zDesc, bo
 	s += zDesc;
 	s += L": ";
 	s += zfName;
-	MessageBox(NULL, s, L"Instalaltion Error", MB_OK);
+	MessageBox(NULL, s, L"Installation Error", MB_OK);
 
 	wchar_t zBuf[256];
 	GetCurrentDirectory(sizeof(zBuf), zBuf);
@@ -107,7 +188,7 @@ bool CUtils::FileExists(const wchar_t *zfName)
 	DWORD rc = GetFileAttributes(zfName);
 	return rc != INVALID_FILE_ATTRIBUTES;
 }
-CString CUtils::ReadLine(FILE *pfRead)
+CString CUtils::ReadLine(FILE* pfRead)
 {
 	wchar_t zBuf[2048];
 	if (fgetws(zBuf, sizeof(zBuf), pfRead) == NULL)
@@ -119,6 +200,20 @@ CString CUtils::ReadLine(FILE *pfRead)
 	s.Remove('\n');
 	if (s.IsEmpty())
 		return ReadLine(pfRead);
+	return s;
+}
+CString CUtils::ReadNextLine(FILE* pfRead)
+{
+	wchar_t zBuf[2048];
+	if (fgetws(zBuf, sizeof(zBuf), pfRead) == NULL)
+	{
+		MessageBox(NULL, L"CUtils::ReadLine failed - file end", L"Input Error", MB_OK);
+		return CString(L"");
+	}
+	CString s(zBuf);
+	s.Remove('\n');
+	if (s.IsEmpty())
+		return CString("0");
 	return s;
 }
 CString CUtils::TryReadLine(FILE *pfRead)

@@ -11,6 +11,9 @@
 #include "VacationsDlg.h"
 #include "UsedVacations.h"
 #include "FamilyPartDlg.h"
+#include "FamilyPart.h"
+#include "Utils.h"
+#include "Config.h"
 
 
 // CWorkPeriodDlg dialog
@@ -18,7 +21,7 @@
 IMPLEMENT_DYNAMIC(CWorkPeriodDlg, CDialogEx)
 
 CWorkPeriodDlg::CWorkPeriodDlg(CWnd* pParent /*=nullptr*/)
-	: CDialogEx(IDD_DIALOG_WORK_PERIOD, pParent)
+	: CMyDialogEx(IDD_DIALOG_WORK_PERIOD, pParent)
 	, mWageMode(IDC_RADIO_MIN_WAGE)
 {
 	mapCheckDays[0] = &mCheckSunday;
@@ -52,6 +55,7 @@ void CWorkPeriodDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_CHECK_SATURDAY, mCheckSaturday);
 	DDX_Control(pDX, IDC_RADIO_MONTHLY, mRadioMonthly);
 	DDX_Control(pDX, IDC_RADIO_HOURLY, mRadioHourly);
+	//DDX_Control(pDX, IDC_DATETIMEPICKER_NOTICE2, mLastSalaryDate);
 }
 
 
@@ -75,6 +79,7 @@ BEGIN_MESSAGE_MAP(CWorkPeriodDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_CHECK_SATURDAY, &CWorkPeriodDlg::OnBnClickedCheckSaturday)
 	ON_BN_CLICKED(IDOK3, &CWorkPeriodDlg::OnBnClickedOk3)
 	ON_BN_CLICKED(IDC_BUTTON_FAMILY_PART, &CWorkPeriodDlg::OnBnClickedButtonFamilyPart)
+	ON_BN_CLICKED(IDC_CHECK_NO_NOTICE, &CWorkPeriodDlg::OnBnClickedCheckNoNotice)
 END_MESSAGE_MAP()
 
 BOOL CWorkPeriodDlg::OnInitDialog()
@@ -99,6 +104,7 @@ BOOL CWorkPeriodDlg::OnInitDialog()
 		mbNoticeSet = true;
 		mNoticeDate.SetTime(&gWorkPeriod.mNotice.mTime);
 	}
+	SetCheck(IDC_CHECK_NO_NOTICE, gWorkPeriod.mbSkipNotice);
 
 	for (int iDay = 0; iDay < 7; iDay++)
 	{
@@ -181,7 +187,11 @@ int CWorkPeriodDlg::UpdateText()
 			sAll += "\r\n";
 		}
 	}
-	if (mbNoticeSet)
+	if (gWorkPeriod.mbSkipNotice)
+	{
+		sAll += "Do not demand notice.\r\n";
+	}
+	else if (mbNoticeSet)
 	{
 		DWORD dwResult = mNoticeDate.GetTime(timeTime);
 		if (dwResult == GDT_VALID)
@@ -200,6 +210,12 @@ int CWorkPeriodDlg::UpdateText()
 
 	sAll += GetWageText();
 	sAll += "\r\n";
+
+	if (gFamilyPart.mbAskOnlyForFamilyPart)
+	{
+		sAll += gFamilyPart.GetShortText();
+		sAll += "\r\n";
+	}
 
 	mShow.SetWindowText(sAll);
 	//CWnd wnd = GetDialogEl
@@ -324,6 +340,14 @@ void CWorkPeriodDlg::UpdateDataFromDialog(void)
 		mHoursPerWeek.GetWindowTextW(snHoursText);
 		gWorkPeriod.SetHourlyWage(_wtof(sWageText), _wtof(snHoursText));
 	}
+
+	//if (IsChecked(IDC_CHECK_NOT_INCLUDING))
+	//	gWorkPeriod.mbNotIncludingLastSalary = true;
+	//else
+	//	gWorkPeriod.mbNotIncludingLastSalary = false;
+
+	//flags = mLastSalaryDate.GetTime(time);
+	//gWorkPeriod.mLastSalaryUntil.SetDate(time);
 }
 void CWorkPeriodDlg::OnBnClickedOk()
 {
@@ -410,6 +434,14 @@ void CWorkPeriodDlg::OnBnClickedCheckSaturday()
 void CWorkPeriodDlg::OnBnClickedOk3()
 {
 	UpdateDataFromDialog();
+	if (!gWorkPeriod.IsValid())
+	{
+		CUtils::MessBox(L"Work period not fully defined", L"Notice");
+		return;
+	}
+
+	if (gUsedVacations.IsEmpty())
+		gUsedVacations.mbAdd14DaysUnpaidVacation4Severance = gConfig.mb14DaysUnpaidVacation4SeveranceDefault;
 
 	CVacationsDlg dlg;
 	dlg.DoModal();
@@ -418,6 +450,14 @@ void CWorkPeriodDlg::OnBnClickedOk3()
 }
 void CWorkPeriodDlg::OnBnClickedButtonFamilyPart()
 {
+	UpdateDataFromDialog();
 	CFamilyPartDlg dlg;
 	dlg.DoModal();
+
+	UpdateText();
+}
+void CWorkPeriodDlg::OnBnClickedCheckNoNotice()
+{
+	gWorkPeriod.mbSkipNotice = IsChecked(IDC_CHECK_NO_NOTICE);
+	UpdateText();
 }

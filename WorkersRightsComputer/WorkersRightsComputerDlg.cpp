@@ -1,4 +1,4 @@
-
+﻿
 // WorkersRightsComputerDlg.cpp : implementation file
 //
 
@@ -17,6 +17,12 @@
 #include "EmployerDlg.h"
 #include "Person.h"
 #include "Saver.h"
+#include "MyAskDlg.h"
+#include "XmlDump.h"
+#include "XmlParse.h"
+#include "HtmlWriter.h"
+#include "Config.h"
+#include "WorkYears.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -91,6 +97,9 @@ CWorkersRightsComputerDlg::CWorkersRightsComputerDlg(CWnd* pParent /*=nullptr*/)
 	mEditBoxes.AddTail(new CEditRef(L"VacationPrevYears", mEditVacationPrevYears, L"textBox11"));
 	mEditBoxes.AddTail(new CEditRef(L"RecuperationPrevYears", mEditRecuperationPrevYears, L"textBox13"));
 
+	mEditBoxes.AddTail(new CEditRef(L"PayRatePerHoliday", mEditPayPerEachHolyDay));
+
+
 	mButtons.AddTail(new CButtonRef(L"AllowSevLess", mAllowSevLess, L"checkBox1"));
 	mButtons.AddTail(new CButtonRef(L"DemandVac4Prev", mDemandVac4Prev, L"checkBox2"));
 	mButtons.AddTail(new CButtonRef(L"DemandRec4Prev", mDemandRec4Prev, L"checkBox3"));
@@ -131,6 +140,7 @@ void CWorkersRightsComputerDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT_FILLED_BY, mFilledBy);
 	DDX_Control(pDX, IDC_EDIT_ADDRESS, mAddress);
 	DDX_Control(pDX, IDC_EDIT_EMAIL, mEmail);
+	DDX_Control(pDX, IDC_EDIT_PAY_PER_HOLY_DAY, mEditPayPerEachHolyDay);
 }
 
 BEGIN_MESSAGE_MAP(CWorkersRightsComputerDlg, CDialogEx)
@@ -155,10 +165,11 @@ BEGIN_MESSAGE_MAP(CWorkersRightsComputerDlg, CDialogEx)
 	ON_COMMAND(ID_TEST_CREATEDIR, &CWorkersRightsComputerDlg::OnTestCreatedir)
 	ON_COMMAND(ID_FILE_LOADOLDCASE, &CWorkersRightsComputerDlg::OnFileLoadoldcase)
 	ON_COMMAND(ID_TEST_VERIFYBATCH, &CWorkersRightsComputerDlg::OnTestVerifybatch)
-	ON_COMMAND(ID_TEST_READHEBREW, &CWorkersRightsComputerDlg::OnTestReadhebrew)
 	ON_COMMAND(ID_TEST_WRITEHTML, &CWorkersRightsComputerDlg::OnTestWritehtml)
 	ON_BN_CLICKED(IDC_EMPLOYER, &CWorkersRightsComputerDlg::OnBnClickedEmployer)
 	ON_BN_CLICKED(IDC_COMMENTS, &CWorkersRightsComputerDlg::OnBnClickedComments)
+	ON_COMMAND(ID_TEST_LOADXML, &CWorkersRightsComputerDlg::OnTestLoadxml)
+	ON_COMMAND(ID_TEST_LOADTXT, &CWorkersRightsComputerDlg::OnTestLoadtxt)
 END_MESSAGE_MAP()
 
 
@@ -199,6 +210,9 @@ BOOL CWorkersRightsComputerDlg::OnInitDialog()
 	InitHolidaysCombo();
 	InitializeAllRights();
 	mRadioPassport.SetCheck(1);
+	gConfig.InitFromXml();
+	CString sTitle(L"Workers Rights Computer - Experimental Beta Version ");
+	SetTitle(sTitle + gConfig.msVersion);
 
 	CUtils::CreateThread(&StaticThreadFunc, NULL);
 
@@ -258,7 +272,22 @@ HCURSOR CWorkersRightsComputerDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
+void CWorkersRightsComputerDlg::OnOK()
+{
+	CMyAskDlg dlg(L"Verify OK", L"Do you want save and to exit?");
+	if (dlg.Ask())
+	{
+		OnBnClickedButtonSave();
+		CDialogEx::OnOK();
+	}
+}
 
+void CWorkersRightsComputerDlg::OnCancel()
+{
+	CMyAskDlg dlg(L"Verify Cancel", L"Do you want to exit without saving?");
+	if (dlg.Ask())
+		CDialogEx::OnCancel();
+}
 
 void CWorkersRightsComputerDlg::OnFileExit()
 {
@@ -270,7 +299,18 @@ void CWorkersRightsComputerDlg::OnBnClickedWorkPeriod()
 {
 	CWorkPeriodDlg dlg;
 	if (dlg.DoModal() == IDOK)
+	{
+		if (!gWorkYears.mbAllowPartYearSeverance)
+		{
+			SetCheck(IDC_CHECK_SEVERANCE_LESS_THAN_YEAR, false);
+		}
+		if (gWorkYears.mYearsForSeverance < 1)
+		{
+			if (!IsChecked(IDC_CHECK_SEVERANCE_LESS_THAN_YEAR))
+				SetCheck(IDC_CHECK_ONLY_SEVERANCE, true);
+		}
 		OnInputChange();
+	}
 }
 
 
@@ -286,28 +326,32 @@ void CWorkersRightsComputerDlg::OnBnClickedButtonLoad()
 }
 void CWorkersRightsComputerDlg::OnBnClickedButtonReset()
 {
+	CSaver::ResetAllInputs();
+	OnInputChange();
+}
+void CWorkersRightsComputerDlg::ResetAllInputs(void)
+{
 	POSITION pos = mEditBoxes.GetHeadPosition();
 	while (pos)
 	{
-		CEditRef *pEdit = mEditBoxes.GetNext(pos);
+		CEditRef* pEdit = mEditBoxes.GetNext(pos);
 		pEdit->mEdit.SetWindowTextW(L"0");
 	}
 
 	pos = mButtons.GetHeadPosition();
 	while (pos)
 	{
-		CButtonRef *pButton = mButtons.GetNext(pos);
+		CButtonRef* pButton = mButtons.GetNext(pos);
 		pButton->mButton.SetCheck(BST_UNCHECKED);
 	}
 	mComboHolidays.SetWindowTextW(L"Select set of Holidays");
-	gWorkPeriod.Reset();
 
-	OnInputChange();
 }
 void CWorkersRightsComputerDlg::InitHolidaysCombo()
 {
+	CString msDir(CUtils::GetBaseDir() + L"input\\holidays");
 	CFilesList list;
-	CUtils::ListFilesInDir(L"..\\release\\input\\holidays", L"txt", list);
+	CUtils::ListFilesInDir(msDir, L"txt", list);
 	POSITION pos = list.GetHeadPosition();
 	while (pos)
 	{
@@ -321,6 +365,27 @@ void CWorkersRightsComputerDlg::InitHolidaysCombo()
 }
 void CWorkersRightsComputerDlg::OnBnClickedCheckSeveranceLessThanYear()
 {
+	if (!gWorkPeriod.IsValid())
+	{
+		SetCheck(IDC_CHECK_SEVERANCE_LESS_THAN_YEAR, false);
+		CUtils::MessBox(L"Please define working period first", L"Notice");
+		return;
+	}
+	if (IsChecked(IDC_CHECK_SEVERANCE_LESS_THAN_YEAR))
+	{
+		if (!gWorkYears.mbAllowPartYearSeverance)
+		{
+			SetCheck(IDC_CHECK_SEVERANCE_LESS_THAN_YEAR, false);
+			CUtils::MessBox(L"Period too short for full severance on less than a year", L"Notice");
+		}
+	}
+	if (IsChecked(IDC_CHECK_SEVERANCE_LESS_THAN_YEAR))
+		SetCheck(IDC_CHECK_ONLY_SEVERANCE, false);
+	else
+	{
+		if (gWorkYears.mYearsForSeverance < 1)
+			SetCheck(IDC_CHECK_ONLY_SEVERANCE, true);
+	}
 	OnInputChange();
 }
 void CWorkersRightsComputerDlg::OnBnClickedCheckVacationYears()
@@ -333,6 +398,7 @@ void CWorkersRightsComputerDlg::OnBnClickedCheckRecuperationYears()
 }
 void CWorkersRightsComputerDlg::OnBnClickedCheckOnlySeverance()
 {
+	SetCheck(IDC_CHECK_SEVERANCE_LESS_THAN_YEAR, false);
 	OnInputChange();
 }
 void CWorkersRightsComputerDlg::OnBnClickedCheckActivePension()
@@ -465,15 +531,14 @@ void CWorkersRightsComputerDlg::OnTestVerifybatch()
 		CVerify::VerifyBatch(sfName);
 	}
 }
-void CWorkersRightsComputerDlg::OnTestReadhebrew()
-{
-	gHebrew.TestWrite();
-	//gHebrew.TestRead();
-}
 void CWorkersRightsComputerDlg::OnTestWritehtml()
 {
-	CHtmlWriter writer;
-	writer.Try();
+	CMyFileDialog dlg(CMyFileDialog::FD_SAVE, L"Save Letter");
+	if (dlg.DoModal())
+	{
+		CHtmlWriter writer;
+		writer.WriteLetterFromTemplate(dlg.GetPathName());
+	}
 }
 void CWorkersRightsComputerDlg::OnBnClickedEmployer()
 {
@@ -484,3 +549,97 @@ void CWorkersRightsComputerDlg::OnBnClickedComments()
 {
 	// TODO: Add your control notification handler code here
 }
+void CWorkersRightsComputerDlg::SaveToXml(CXMLDump &xmlDump)
+{
+	CXMLDumpScope mainScope(L"MainDialog", xmlDump);
+
+	{
+		CXMLDumpScope scope(L"EditBoxes", xmlDump);
+		POSITION pos = mEditBoxes.GetHeadPosition();
+		while (pos)
+		{
+			CString sText;
+			CEditRef *pRef = mEditBoxes.GetNext(pos);
+			pRef->mEdit.GetWindowText(sText);
+			if (sText.IsEmpty())
+				sText = L"0";
+			xmlDump.Write((const wchar_t *)pRef->msName, (const wchar_t *)sText);
+		}
+	}
+	// Holidays
+	CString sText;
+	mComboHolidays.GetWindowText(sText);
+	if (sText.IsEmpty())
+		sText = L"-";
+	xmlDump.Write(L"Holidays", (const wchar_t *)sText);
+
+	{
+		CXMLDumpScope scope(L"Buttons", xmlDump);
+		POSITION pos = mButtons.GetHeadPosition();
+		while (pos)
+		{
+			CButtonRef *pRef = mButtons.GetNext(pos);
+			if (pRef->mButton.GetCheck() == BST_CHECKED)
+				xmlDump.Write((const wchar_t *)pRef->msName, L"checked");
+			else
+				xmlDump.Write((const wchar_t *)pRef->msName, L"not_checked");
+		}
+	}
+}
+void CWorkersRightsComputerDlg::LoadFromXml(CXMLParseNode* pRoot)
+{
+	CXMLParseNode *pMain = pRoot->GetFirst(L"MainDialog");
+	if (!pMain)
+		return;
+
+	CXMLParseNode *pEdit = pMain->GetFirst(L"EditBoxes");
+	if (!pEdit)
+		return;
+	CString sText;
+	POSITION pos = mEditBoxes.GetHeadPosition();
+	while (pos)
+	{
+		CEditRef* pRef = mEditBoxes.GetNext(pos);
+		if (pEdit->GetValue((const wchar_t*)pRef->msName, sText))
+			pRef->mEdit.SetWindowText(sText);
+	}
+
+	if (pMain->GetValue(L"Holidays", sText))
+		mComboHolidays.SetWindowTextW(sText);
+
+	CXMLParseNode* pButtons = pMain->GetFirst(L"Buttons");
+	if (!pButtons)
+		return;
+	pos = mButtons.GetHeadPosition();
+	while (pos)
+	{
+		CButtonRef* pRef = mButtons.GetNext(pos);
+		if (pButtons->GetValue((const wchar_t*)pRef->msName, sText))
+			pRef->mButton.SetCheck(sText == L"checked" ? BST_CHECKED : 0);
+	}
+}
+void CWorkersRightsComputerDlg::OnTestLoadxml()
+{
+	CMyFileDialog dlg(CMyFileDialog::FD_OPEN, L"Select XML File");
+	if (dlg.DoModal())
+	{
+		CSaver saver;
+		saver.Restore(dlg.GetPathName());
+	}
+}
+void CWorkersRightsComputerDlg::OnTestLoadtxt()
+{
+	CMyFileDialog dlg(CMyFileDialog::FD_OPEN, L"Select TXT File");
+	if (dlg.DoModal())
+	{
+		CSaver saver;
+		saver.Restore(dlg.GetPathName());
+	}
+}
+void CWorkersRightsComputerDlg::WriteEditorToLetter(CHtmlWriter& html)
+{
+	CString sEditor(GetText(IDC_EDIT_FILLED_BY));
+	html.WriteLineEH(L"Prepared by: ", L"הוכן על ידי: ", sEditor);
+}
+
+

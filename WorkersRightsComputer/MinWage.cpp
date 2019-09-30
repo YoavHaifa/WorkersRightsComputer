@@ -23,6 +23,7 @@ bool CMinWage::InitFromFile(void)
 	if (bFailed)
 		return false;
 
+	/*
 	CString sfName = L".\\Input\\MinWage.txt";
 	if (!CUtils::FileExists(sfName))
 	{
@@ -37,9 +38,10 @@ bool CMinWage::InitFromFile(void)
 			nErr++;
 			return false;
 		}
-	}
+	} */
 
-	FILE *pfRead = CUtils::TryOpenStreamReader(sfName,L"Minimum Wage Inmput");
+	FILE* pfRead = CUtils::OpenInputFile(L"MinWage");
+	//FILE* pfRead = CUtils::TryOpenStreamReader(sfName, L"Minimum Wage Inmput");
 
 	mn = CUtils::ReadInt(pfRead);
 
@@ -100,11 +102,6 @@ double CMinWage::ComputeHolidayPriceBaseWage(int year, int month)
 	}
 
 	return map[mn-1]->mWage;
-}
-bool CMinWage::ComputeHolidayPrice(CHoliday & holiday)
-{
-	holiday.mPrice =  ComputeHolidayPrice(holiday.mYear, holiday.mMonth);
-	return true;
 }
 double CMinWage::PayPerMonthAtWorkEnd(void)
 {

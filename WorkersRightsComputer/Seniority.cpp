@@ -37,11 +37,15 @@ bool CSeniority::PrintLog(void)
 }
 bool CSeniority::InitFromFile(void)
 {
+	/*
 	CString sfName = L"..\\release\\Input\\Seniority";
 	sfName += msName;
 	sfName += L".txt";
 
-	FILE *pfRead = MyFOpenWithErrorBox(sfName, L"r", L"Input Defs");
+	FILE *pfRead = MyFOpenWithErrorBox(sfName, L"r", L"Input Defs"); */
+	CString sfName = L"Seniority";
+	sfName += msName;
+	FILE* pfRead = CUtils::OpenInputFile(sfName);
 	if (!pfRead)
 		return false;
 

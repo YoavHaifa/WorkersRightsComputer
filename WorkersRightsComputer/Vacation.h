@@ -30,11 +30,13 @@ public:
 	double mnYearsOfUnpaidVacation;
 	double mnDaysOfPaidVacation;
 	CString msDesc;
+	CString msDescHebrew;
 
 	//int GetNDaysPerYear(int seniority, double nDaysPerWeek);
 	virtual bool Compute(void) override;
 	bool ComputePerPeriod(void);
 	virtual CString GetDecriptionForLetter(void)override;
+	virtual CString GetDecriptionForLetterHebrew(void)override;
 	void PrepareString(void);
 
 	int mCurYear;

@@ -6,6 +6,11 @@
 #include "Resource.h"
 #include "AllRights.h"
 #include "UsedVacations.h"
+#include "XmlDump.h"
+#include "XmlParse.h"
+#include "HtmlWriter.h"
+#include "Config.h"
+#include "Person.h"
 
 
 CSaver::CSaver()
@@ -20,31 +25,68 @@ CSaver::~CSaver()
 	if (mpfRead)
 		fclose(mpfRead);
 }
+void CSaver::ResetAllInputs(void)
+{
+	if (gpDlg)
+		gpDlg->ResetAllInputs();
+	gWorkPeriod.Reset();
+	CPerson::ClearContacts();
+}
 void CSaver::Save(const wchar_t *zfName)
 {
 	if (zfName)
 		msfName = zfName;
 	else
 	{
-		msfName = L"..\\release\\Save\\Last.txt";
+		msfName = CUtils::GetBaseDir();
+		msfName += "Save";
+		if (!CUtils::VerifyDirectory(msfName))
+			return;
+		msfName += L"\\Last.xml";
 		gUsedVacations.Log();
 	}
 
-	SaveToFile();
+	SaveToXml();
 
 	WriteLetter();
 }
-void CSaver::Restore(const wchar_t *zfName)
+void CSaver::Restore(const wchar_t* zfName)
 {
+	ResetAllInputs();
 	if (zfName)
 		msfName = zfName;
 	else
-		msfName = L"..\\release\\Save\\Last.txt";
+	{
+		msfName = CUtils::GetBaseDir();
+		msfName += L"Save\\Last.xml";
+	}
 
-	LoadFromFile();
-
+	CFileName fName(msfName);
+	if (fName.IsOfType(L"xml"))
+		LoadFromXmlFile();
+	else
+		LoadFromTxtFile();
 }
-void CSaver::SaveToFile(void)
+void CSaver::SaveToXml(void)
+{
+	CFileName fName(msfName);
+	fName.ChangeType(L"xml");
+	CXMLDump xmlDump((const wchar_t *)fName, L"WorkersRights");
+	if (!xmlDump)
+		return;
+
+	gpDlg->SaveToXml(xmlDump);
+
+	gWorkPeriod.SaveToXml(xmlDump);
+
+	CPerson::SaveContactsToXml(xmlDump);
+
+	gAllRights.SaveToXml(xmlDump);
+	xmlDump.Write(L"software_version", gConfig.msVersion);
+
+	xmlDump.Close();
+}
+void CSaver::SaveToTxtFile(void)
 {
 	mpfWrite = MyFOpenWithErrorBox(msfName, L"w, ccs=UNICODE", L"for saving");
 	if (!mpfWrite)
@@ -134,30 +176,63 @@ void CSaver::SaveButton(FILE *pfSave, CButtonRef *pRef)
 void CSaver::WriteLetter()
 {
 	// Get Worker's name for save dir & files
-	CString sName(gpDlg->GetText(IDC_EDIT_FIRST_NAME));
-	sName += "_";
-	sName += gpDlg->GetText(IDC_EDIT_FAMILY_NAME);
-	sName += "_";
-	sName.Replace(L" ", L"_");
+	msSaveId = gpDlg->GetText(IDC_EDIT_FIRST_NAME);
+	msSaveId += "_";
+	msSaveId += gpDlg->GetText(IDC_EDIT_FAMILY_NAME);
+	msSaveId += "_";
+	msSaveId += gpDlg->GetText(IDC_EDIT_ID);
+	msSaveId.Replace(L" ", L"_");
 
 	// SAVE
 	// Set Target Directory
-	CString sSaveDir(L"C:\\WorkersRights\\Save\\");
-	sSaveDir += sName;
-	sSaveDir += gpDlg->GetText(IDC_EDIT_ID);
+	CString sSaveDir(gConfig.msSaveRoot);
+	sSaveDir += "\\";
+	sSaveDir += msSaveId;
 	CUtils::VerifyDirectory(sSaveDir);
 	sSaveDir += "\\";
 
+	msSaveId += "_";
 	msfName = sSaveDir;
-	msfName += L"Save.txt";
-	SaveToFile();
+	msfName += msSaveId;
+	msfName += L"save.xml";
+	SaveToXml();
 
-	CRight::SetSaveDirAndName(sSaveDir, sName);
+	if (!gWorkPeriod.IsValid())
+		return;
+
+	CString sLogDir = sSaveDir + "Log";
+	CUtils::VerifyDirectory(sLogDir);
+	sLogDir += "\\";
+
+	CRight::SetSaveDirAndName(sLogDir, msSaveId);
 	gpDlg->OnInputChange(); //  Recompute all and save all relevant logs to special dir
-	gAllRights.WriteLetter();
+
+	CString sLetterFileName(sSaveDir);
+	sLetterFileName += msSaveId;
+	sLetterFileName += L"letter_english.html";
+	CHtmlWriter writer;
+	writer.WriteLetterFromTemplate(sLetterFileName);
+
+
 	CRight::ResetSaveDirAndName();
 }
-void CSaver::LoadFromFile()
+void CSaver::LoadFromXmlFile()
+{
+	CXMLParse XMLParse(msfName, true);
+	CXMLParseNode* pRoot = XMLParse.GetRoot();
+	if (!pRoot)
+		return;
+
+	gpDlg->mbDisableComputations = true;
+
+	gpDlg->LoadFromXml(pRoot);
+	gWorkPeriod.LoadFromXml(pRoot);
+	CPerson::LoadContactsFromXml(pRoot);
+
+	gpDlg->mbDisableComputations = false;
+	gpDlg->OnInputChange();
+}
+void CSaver::LoadFromTxtFile()
 {
 	mpfRead = MyFOpenWithErrorBox(msfName, L"r, ccs=UNICODE", L"for restoring");
 	if (!mpfRead)

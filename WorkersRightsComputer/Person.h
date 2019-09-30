@@ -5,13 +5,16 @@ class CPerson
 public:
 	CPerson(void);
 
-	void StartLetter(class CLogoWriter &lw);
+	CString GetFirstName(void);
+	CString GetLastName(void);
+	CString GetPassport(void);
+	CString GetTel(void);
+
+	//void StartLetter(class CLogoWriter &lw);
 	void StartLetter(class CHtmlWriter &html);
 	void SetDlg(class CMyDialogEx *pDlg, int iFirstName, int iFamilyName, int iId, int iTel, int iAdd, int iEmail, int iRole = 0);
 	int UpdateFromDlg();
 	void UpdateDlg();
-	void SaveToFile();
-	void LoadFromFile();
 
 	CString msPrivateName;
 	CString msFamilyName;
@@ -20,6 +23,8 @@ public:
 	CString msAddress;
 	CString msEmail;
 	CString msRole;
+	CString msComment;
+	bool mbIsPassport; // Otherwise ID
 	class CMyDialogEx *mpDlg;
 	int miFirstName;
 	int miFamilyName;
@@ -28,8 +33,14 @@ public:
 	int miTel;
 	int miEmail;
 	int miRole;
+	bool mbEmployer;
+	CString GetDescription();
+	static void ClearContacts(void);
+	static void SaveContactsToXml(class CXMLDump& xmlDump);
+	void SaveToXml(class CXMLDump& xmlDump);
+	static void LoadContactsFromXml(class CXMLParseNode* pRoot);
+	void LoadFromXml(class CXMLParseNode* pRoot);
 };
 
 extern CPerson gWorker;
-extern CPerson gEmployer;
-extern CPerson gEmployer2;
+extern CList<CPerson*, CPerson*> gContacts;

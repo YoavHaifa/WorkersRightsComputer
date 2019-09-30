@@ -15,9 +15,9 @@ public:
 	bool SetCheckRef(CButtonRef *pButton);
 	bool SetEditRef(CEditRef *pRef);
 
-	void Save(FILE *pfWrite);
+	void Save(FILE* pfWrite);
+	void SaveToXml(class CXMLDump &xmlDump);
 
-	void WriteLetter(void);
 	void WriteLetterToHtml(class CHtmlWriter &html);
 	void WriteTotalLineToHtmlTable(class CHtmlWriter &html);
 

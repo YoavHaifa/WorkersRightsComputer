@@ -4,7 +4,7 @@
 class CCompanyPartPeriod
 {
 public:
-	CCompanyPartPeriod(CTime start, double nHours, bool bDummy = false)
+	CCompanyPartPeriod(CTime start, double nHours, double perCent, bool bDummy = false)
 		: mFrom(start)
 		, mCompanyHoursPerWeek(nHours)
 		, mbDummyForApril18(bDummy)
@@ -13,17 +13,20 @@ public:
 			mHoursPerWeek = 43;
 		else
 			mHoursPerWeek = 42;
-		mCompanyPart = mCompanyHoursPerWeek / mHoursPerWeek;
+
+		if (mCompanyHoursPerWeek > 0)
+			mCompanyPart = mCompanyHoursPerWeek / mHoursPerWeek;
+		else
+			mCompanyPart = perCent / 100;
+
 		if (mCompanyPart > 1)
 			mCompanyPart = 1;
 	}
-	void UpdateHours(double nHours)
+	void UpdateFrom(CCompanyPartPeriod &other)
 	{
-		mCompanyHoursPerWeek = nHours;
+		mCompanyHoursPerWeek = other.mCompanyHoursPerWeek;
+		mCompanyPart = other.mCompanyPart;
 		mbDummyForApril18 = false;
-		mCompanyPart = mCompanyHoursPerWeek / mHoursPerWeek;
-		if (mCompanyPart > 1)
-			mCompanyPart = 1;
 	}
 	CString GetLine(CCompanyPartPeriod *pPrev)
 	{
@@ -33,10 +36,18 @@ public:
 		if (mbDummyForApril18)
 		{
 			hours = pPrev->mCompanyHoursPerWeek;
-			part = hours / mHoursPerWeek;
+			if (hours)
+				part = hours / mHoursPerWeek;
+			else
+				part = pPrev->mCompanyPart;
 		}
-		sprintf_s(zBuf,sizeof(zBuf), 
-			"From %2d/%4d - %5.2f / %d --> %5.2f%%", mFrom.mMonth, mFrom.mYear, hours, mHoursPerWeek, part * 100);
+		if (hours > 0)
+			sprintf_s(zBuf,sizeof(zBuf), 
+				"From %2d/%4d - %5.2f / %d --> %5.2f%%", mFrom.mMonth, mFrom.mYear, hours, mHoursPerWeek, part * 100);
+		else 
+			sprintf_s(zBuf,sizeof(zBuf), 
+				"From %2d/%4d --> %5.2f%%", mFrom.mMonth, mFrom.mYear, part * 100);
+
 		if (mbDummyForApril18)
 		{
 			CString s("(");
@@ -60,7 +71,11 @@ public:
 	~CFamilyPart();
 
 	void Clear(void);
-	bool AddPeriod(CTime startTime, double hoursPerWeek);
+	void ClearLast(void);
+	bool CheckStartTime(class CMyTime &startTime);
+	bool AddPeriod(CMyTime& startTime, CCompanyPartPeriod *pNewPeriod);
+	bool AddPeriod(CTime startTime, double hoursPerWeekByCompany);
+	bool AddPeriodPC(CTime startTime, double perCentByCompany); // By Percent
 
 	bool mbAskOnlyForFamilyPart;
 	double mRatio;
@@ -68,9 +83,14 @@ public:
 
 	CList<CCompanyPartPeriod *, CCompanyPartPeriod *> mPeriods;
 	CString GetFullText();
+	CString GetShortText();
 	void Compute();
+	void SaveToXml(class CXMLDump &xmlDump);
+	void LoadFromXml(class CXMLParseNode* pRoot);
+
 	void Save(FILE *pfSave);
 	void Restore(FILE *pfRead);
+	void WriteToLetter(class CHtmlWriter &writer);
 };
 
 extern CFamilyPart gFamilyPart;

@@ -47,11 +47,15 @@ bool CYearlyRates::PrintLog(void)
 }
 bool CYearlyRates::InitFromFile(void)
 {
+	/*
 	CString sfName = L"..\\release\\Input\\Rates";
 	sfName += msName;
 	sfName += L".txt";
 
-	FILE *pfRead = MyFOpenWithErrorBox(sfName, L"r", L"rates input");
+	FILE *pfRead = MyFOpenWithErrorBox(sfName, L"r", L"rates input"); */
+	CString sfName = L"Rates";
+	sfName += msName;
+	FILE* pfRead = CUtils::OpenInputFile(sfName);
 	if (!pfRead)
 		return false;
 

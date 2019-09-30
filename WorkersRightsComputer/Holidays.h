@@ -30,6 +30,7 @@ public:
 	virtual	bool SetEditRef(class CEditRef *pRef) override;
 	virtual bool Compute(void) override;
 	virtual CString GetDecriptionForLetter(void)override;
+	virtual CString GetDecriptionForLetterHebrew(void)override;
 
 	bool InitFromFile(const wchar_t *zfName);
 	bool InitFromFileInternals(FILE *pfRead, FILE *pfLog);
@@ -48,7 +49,8 @@ public:
 	CEdit *mpNDaysWorkedPrevYearsBox;
 	CEdit *mpNDaysPaidPrevYearsBox;
 	CEdit *mpPrevYearsFromBox;
-	CEdit *mpPrevNYearsBox;
+	CEdit* mpPrevNYearsBox;
+	CEdit* mpPayRatePerHolidayBox;
 
 	int mn;
 	CString msfName;
@@ -60,7 +62,9 @@ public:
 	double mnDaysToPay;
 	double mMinPayPerDay;
 	double mMaxPayPerDay;
+	double mRateSetByUser;
 	void RememberPayParDay(double value);
+	bool ComputeHolidayPrice(class CHoliday& holiday);
 
 	void ComputePayLastYear(void);
 	void ComputePayPrevYears(void);

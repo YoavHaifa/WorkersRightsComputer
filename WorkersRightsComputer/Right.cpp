@@ -2,8 +2,9 @@
 #include "Right.h"
 #include "Utils.h"
 #include "HtmlWriter.h"
+#include "XMLDump.h"
 
-CString CRight::umsSaveDir = L"..\\release\\Log\\";
+CString CRight::umsSaveDir = L"";
 CString CRight::umsName = L"__";
 bool CRight::umbOldStyle = false;
 
@@ -11,6 +12,7 @@ CRight::CRight(const wchar_t *zName, const wchar_t *zHebrewName)
 	: msName(zName)
 	, msNameHebrew(zHebrewName)
 	, mbSkipIfZero(false)
+	, miPrintOrder(-1)
 	, mDebug(3)
 {
 	if (!umsSaveDir)
@@ -21,6 +23,12 @@ CRight::CRight(const wchar_t *zName, const wchar_t *zHebrewName)
 CRight::~CRight(void)
 {
 }
+CString CRight::GetSaveDir(void)
+{
+	if (umsSaveDir.IsEmpty())
+		ResetSaveDirAndName();
+	return umsSaveDir;
+}
 void CRight::SetSaveDirAndName(const wchar_t *zSaveDir, const wchar_t *zName)
 {
 	umsSaveDir = zSaveDir;
@@ -28,7 +36,11 @@ void CRight::SetSaveDirAndName(const wchar_t *zSaveDir, const wchar_t *zName)
 }
 void CRight::ResetSaveDirAndName(void)
 {
-	umsSaveDir = L"..\\release\\Log\\";
+	umsSaveDir = CUtils::GetBaseDir();
+	umsSaveDir += "Log";
+	CUtils::VerifyDirectory(umsSaveDir);
+	umsSaveDir += "\\";
+	// umsSaveDir = L"..\\release\\Log\\";
 	umsName = L"__";
 }
 void CRight::Init(void)
@@ -44,6 +56,23 @@ void CRight::Save(FILE *pfWrite)
 	WriteLine(pfWrite, msDue);
 	WriteLine(pfWrite, msDebug);
 	WriteLine(pfWrite, L"*");
+}
+void CRight::SaveToXml(CXMLDump& xmlDump)
+{
+	CXMLDumpScope scope(msName, xmlDump);
+
+	xmlDump.Write(L"Due", mDuePay);
+	xmlDump.Write(L"sDue", msDue);
+	xmlDump.Write(L"Debug", msDebug);
+}
+CString CRight::GetSaveFileName(const wchar_t *zfName, const wchar_t *zExtension)
+{
+	CString sfName = umsSaveDir;
+	sfName += umsName;
+	sfName += zfName;
+	sfName += ".";
+	sfName += zExtension;
+	return sfName;
 }
 FILE * CRight::OpenFile(const wchar_t *zfName, const wchar_t *zExtension)
 {
@@ -62,28 +91,39 @@ bool CRight::ComputeEnvelop(void)
 
 	CString sLine = L"Computing ";
 	sLine += msName;
-	fwprintf(mpfWrite, L"%s\n\n", (const wchar_t *)sLine);
+	if (mpfWrite)
+		fwprintf(mpfWrite, L"%s\n\n", (const wchar_t *)sLine);
 
 	bool bOK = Compute();
-	fwprintf(mpfWrite, L"\n");
-	fwprintf(mpfWrite, L"%s\n", (const wchar_t *)msDue);
-	fwprintf(mpfWrite, L"%s\n", (const wchar_t *)msDebug);
-
-	if (!bOK)
+	if (mpfWrite)
 	{
-		WriteLine(L"");
-		sLine = msName;
-		sLine += L" not computed!";
-		WriteLine (sLine);
+		fwprintf(mpfWrite, L"\n");
+		fwprintf(mpfWrite, L"%s\n", (const wchar_t*)msDue);
+		fwprintf(mpfWrite, L"%s\n", (const wchar_t*)msDebug);
+
+		if (!bOK)
+		{
+			WriteLine(L"");
+			sLine = msName;
+			sLine += L" not computed!";
+			WriteLine(sLine);
+		}
+		fclose(mpfWrite);
+		mpfWrite = NULL;
 	}
-	fclose(mpfWrite);
-	mpfWrite = NULL;
 
 	return bOK;
 }
 void CRight::LogLine(const wchar_t *zText)
 {
 	WriteLine(zText);
+}
+void CRight::LogLine(const wchar_t* zText, CString s)
+{
+	CString str(zText);
+	str += " ";
+	str += s;
+	WriteLine(str);
 }
 void CRight::LogLine(const wchar_t *zText, int value)
 {
@@ -111,6 +151,22 @@ void CRight::LogLine(const wchar_t *zText, CTime value)
 	CString s(zText);
 	s += " ";
 	s += ToString(value);
+	WriteLine(s);
+}
+void CRight::LogLine(const wchar_t* zText, CMyTime myTime)
+{
+	CString s(zText);
+	s += " ";
+	s += myTime.ToString();
+	WriteLine(s);
+}
+void CRight::LogLine(const wchar_t* zText, CMyTime myTime, const wchar_t* zText2)
+{
+	CString s(zText);
+	s += " ";
+	s += myTime.ToString();
+	s += " ";
+	s += zText2;
 	WriteLine(s);
 }
 void CRight::LogLine(const wchar_t *zText, CTime value, const wchar_t *zText2)
@@ -155,15 +211,16 @@ void CRight::LogLine(const wchar_t *zText, int ivalue, const wchar_t *zText2, do
 	s += ToString(dvalue);
 	WriteLine(s);
 }
-void CRight::LogLine(const wchar_t *zText, CTimeSpan span)
+void CRight::LogLineSpan(const wchar_t *zText, CMyTime& start, CMyTime& end)
 {
+	int nDays = start.GetNDaysBefore(end);
 	CString s(zText);
 	s += L" TIME SPAN days ";
-	s += ToString(span.GetDays());
-	s += L" houres ";
-	s += ToString(span.GetHours());
-	s += L" minutes ";
-	s += ToString(span.GetMinutes());
+	s += ToString(nDays);
+	//s += L" houres ";
+	//s += ToString(span.GetHours());
+	//s += L" minutes ";
+	//s += ToString(span.GetMinutes());
 	WriteLine(s);
 }
 bool CRight::TryReadInt(FILE *pfRead, const wchar_t *zText, int &value)
@@ -255,8 +312,14 @@ CString CRight::GetDecriptionForLetter(void)
 {
 	return CString(" ");
 }
+CString CRight::GetDecriptionForLetterHebrew(void)
+{
+	return CString(" ");
+}
 void CRight::WriteLine(const wchar_t *zLine)
 {
+	if (!mpfWrite)
+		return;
 	if (zLine)
 		fwprintf(mpfWrite, L"%s\n", zLine);
 	else
@@ -341,24 +404,18 @@ bool CRight::GetIntFromEditBox(CEdit *pEdit, const wchar_t *zName, int &value)
 
 	return TryConvertInt(sText, zName, value);
 }
-void CRight::WriteItemToHtmlTable(class CHtmlWriter &html, CString &sItem)
-{
-	CString s("<td>");
-	s += sItem;
-	s += "</td>";
-	html.WriteL(s);
-}
-void CRight::WriteLineToHtmlTable(class CHtmlWriter &html)
+void CRight::WriteLineToHtmlTable(CHtmlWriter &html)
 {
 	html.WriteL(L"<tr>");
-	WriteItemToHtmlTable(html, msName);
+	html.WriteItemToHtmlTable(msName, msNameHebrew);
 
 	CString sDesc = GetDecriptionForLetter();
-	WriteItemToHtmlTable(html, sDesc);
+	CString sDescHebrew = GetDecriptionForLetterHebrew();
+	html.WriteItemToHtmlTable(sDesc, sDescHebrew);
 
 	CString sPay = ToString(mDuePay);
-	WriteItemToHtmlTable(html, sPay);
+	html.WriteItemToHtmlTable(sPay, sPay);
 
-	WriteItemToHtmlTable(html, msNameHebrew);
+	html.WriteItemToHtmlTable(msNameHebrew, msName);
 	html.WriteL(L"</tr>");
 }

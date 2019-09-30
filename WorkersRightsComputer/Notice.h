@@ -10,6 +10,7 @@ public:
 	virtual ~CNotice(void);
 	virtual bool Compute(void) override;
 	virtual CString GetDecriptionForLetter(void)override;
+	virtual CString GetDecriptionForLetterHebrew(void)override;
 
 	bool mbDemandFullMonthAnyway;
 	bool mbDemandFullMonth;

@@ -38,8 +38,10 @@ public:
     bool GetHexaValue(unsigned long & value);
     bool GetValue(unsigned long & value);
     bool GetValue(long & value);
-    bool GetValue(float & value);
-    bool GetValue(CString & sValue);
+	bool GetValue(float& value);
+	bool GetValue(double& value);
+	bool GetValue(CString & sValue);
+	bool GetValue(class CMyTime& time);
 
     int GetValues(const wchar_t * zName, CList<CString*, CString*> &valuesList);
     bool ValueIs(const wchar_t *zValue);
@@ -86,11 +88,12 @@ public:
 
     CXMLParse(void);
     CXMLParse(const wchar_t *zDir, const wchar_t *zName, const wchar_t *zRoot);
-    CXMLParse(const wchar_t *zfName, int offset = 0);
-    CXMLParse(const wchar_t *zName, const wchar_t *pMemory, int len);
+	CXMLParse(const wchar_t* zfName, int offset = 0);
+	CXMLParse(const wchar_t* zfName, bool bUnicode);
+	CXMLParse(const wchar_t *zName, const wchar_t *pMemory, int len);
     ~CXMLParse(void);
 
-	bool OpenFile(const wchar_t *zfName, int offset = 0);
+	bool OpenFile(const wchar_t *zfName, int offset = 0, bool bUnicode = false);
 	void SetNew(const wchar_t *zfName);
 
 protected:
@@ -122,4 +125,5 @@ public:
     void Dump(void);
 	CString GetName(void){return msName;}
 	static bool GetValueByKey(const wchar_t *zfName, int key, float &oValue);
+	int mnCharsRead;
 };

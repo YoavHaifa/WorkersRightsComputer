@@ -8,6 +8,7 @@ public:
 	bool InitFromFile(void);
 	bool PrintLog(void);
 	double RatePerMonth(int year, int month);
+	void CorrectForOldStype(void);
 
 	CString msName;
 

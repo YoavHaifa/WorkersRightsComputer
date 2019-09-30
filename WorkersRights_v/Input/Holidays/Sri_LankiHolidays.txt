@@ -1,0 +1,337 @@
+Christmas Day
+2019
+12
+25
+Deepavali
+2019
+10
+27
+Eid al Adha Feast of Sacrifice
+2019
+8
+12
+Esala full moon poya
+2019
+6
+16
+Eid al Fitr End of Ramadan
+2019
+6
+5
+Labour Day
+2019
+5
+1
+Vesak Full Moon Poya Day
+2019
+5
+18
+Bak Full Moon Poya Day
+2019
+4
+19
+Sinhala and Tamil New Years Day Good friday
+2019
+4
+14
+Mahasivarathri Day
+2019
+3
+4
+National Day
+2019
+2
+4
+Tamil Thai Pongal Day
+2019
+1
+15
+Christmas Day
+2018
+12
+25
+Deepavali
+2018
+11
+6
+Eid al Adha Feast of Sacrifice
+2018
+8
+22
+Esala full moon poya
+2018
+7
+27
+Eid al Fitr End of Ramadan
+2018
+6
+15
+Labour Day
+2018
+5
+1
+Vesak Full Moon Poya Day
+2018
+4
+30
+Sinhala and Tamil New Years Day Good friday
+2018
+4
+14
+Bak Full Moon Poya Day
+2018
+3
+31
+Mahasivarathri Day
+2018
+2
+13
+National Day
+2018
+2
+4
+Tamil Thai Pongal Day
+2018
+1
+14
+Christmas Day
+2017
+12
+25
+Deepawali
+2017
+10
+18
+Hadji Festival Day
+2017
+09
+1
+Esala full moon poya
+2017
+07
+08
+Ramazan Festival Day
+2017
+06
+26
+Vesak(Buddha Day)
+2017
+05
+10
+May Day
+2017
+05
+01
+Sinhala and Tamil New Year Day
+2017
+04
+14
+Mahasivarathri Day
+2017
+02
+24
+National Day
+2017
+02
+04
+Tamil Thai Pongal Day
+2017
+01
+14
+New Year's Day
+2017
+01
+01
+Christmas Day
+2016
+12
+25
+Deepawali
+2016
+10
+29
+Hadji Festival Day
+2016
+09
+13
+Ramazan Festival Day
+2016
+07
+07
+Vesak(Buddha Day)
+2016
+05
+21
+May Day
+2016
+05
+01
+Sinhala and Tamil New Year Day
+2016
+04
+14
+Good Friday
+2016
+03
+25
+Mahasivarathri Day
+2016
+03
+07
+National Day
+2016
+02
+04
+Tamil Thai Pongal Day
+2016
+01
+15
+New Year's Day
+2016
+01
+01
+Christmas Day
+2015
+12
+25
+Deepawali
+2015
+10
+11
+Hadji Festival Day
+2015
+09
+23
+Ramazan Festival Day
+2015
+07
+18
+Vesak(Buddha Day)
+2015
+05
+03
+May Day
+2015
+05
+01
+Sinhala and Tamil New Year Day
+2015
+04
+13
+Good Friday
+2015
+04
+03
+Mahasivarathri Day
+2015
+02
+17
+National Day
+2015
+02
+04
+Tamil Thai Pongal Day
+2015
+01
+15
+New Year's Day
+2015
+01
+01
+Christmas day
+2014
+12
+25
+deepawali
+2014
+10
+22
+hadji festival day
+2014
+10
+5
+ramazan festival day
+2014
+07
+29
+vesak (buddha day)
+2013
+05
+14
+may day
+2014
+05
+1
+good friday
+2014
+04
+18
+sinhala & tamil new year day
+2014
+04
+14
+mahasivarathri day
+2014
+02
+28
+national day
+2014
+02
+4
+tamil thai pongal day
+2014
+01
+14
+new year's day
+2014
+01
+1
+Christmas day
+2013
+12
+25
+deepawali
+2013
+11
+2
+hadji festival day
+2013
+10
+16
+ramazan festival day
+2013
+08
+9
+may day
+2013
+05
+1
+vesak (buddha day)
+2013
+04
+28
+sinhala & tamil new year day
+2013
+04
+14
+good friday
+2013
+03
+29
+mahasivarathri day
+2013
+03
+10
+national day
+2013
+02
+4
+tamil thai pongal day
+2013
+01
+14
+new year's day
+2013
+01
+1
+end

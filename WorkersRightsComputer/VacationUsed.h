@@ -17,8 +17,12 @@ public:
 	int mnPaid;
 	int mnUnPaid;
 	int mnUnpaidCalendarDays;
+	int mnUnpaidUsedForSeverance;
 	void ShortLog(FILE *pf);
 	void LongLog(FILE *pf);
 	void SetPartiallyPaid(int nPaidDays);
+
+	int CountDaysOfUnpaidVacation(CMyTime& first, CMyTime& last);
+	void AddToWorkSpan(class CWorkSpan& workSpan);
 };
 

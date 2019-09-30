@@ -30,6 +30,9 @@ protected:
 	virtual BOOL OnInitDialog();
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	afx_msg void OnPaint();
+	virtual void OnOK();
+	virtual void OnCancel();
+
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
 public:
@@ -55,6 +58,7 @@ public:
 	CList<CEditRef *, CEditRef *> mEditBoxes;
 	CComboBox mComboHolidays;
 	afx_msg void OnBnClickedButtonReset();
+	void ResetAllInputs(void);
 
 	CButton mAllowSevLess;
 	CButton mDemandVac4Prev;
@@ -86,7 +90,6 @@ public:
 	CEdit mEditPrevNYears;
 	static DWORD WINAPI StaticThreadFunc(LPVOID);
 	afx_msg void OnTestVerifybatch();
-	afx_msg void OnTestReadhebrew();
 	afx_msg void OnTestWritehtml();
 	afx_msg void OnBnClickedEmployer();
 	afx_msg void OnBnClickedComments();
@@ -95,6 +98,13 @@ public:
 	CEdit mFilledBy;
 	CEdit mAddress;
 	CEdit mEmail;
+	void SaveToXml(class CXMLDump& xmlDump);
+	void LoadFromXml(class CXMLParseNode *pRoot);
+	afx_msg void OnTestLoadxml();
+	void WriteEditorToLetter(class CHtmlWriter& html);
+	afx_msg void OnTestLoadtxt();
+	// Allows user to set special rate per holidays
+	CEdit mEditPayPerEachHolyDay;
 };
 
 extern CWorkersRightsComputerDlg *gpDlg;
