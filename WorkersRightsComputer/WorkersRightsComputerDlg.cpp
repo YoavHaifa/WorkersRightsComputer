@@ -108,6 +108,9 @@ CWorkersRightsComputerDlg::CWorkersRightsComputerDlg(CWnd* pParent /*=nullptr*/)
 
 	mButtons.AddTail(new CButtonRef(L"RadioID", mRadiID, NULL, false));
 	mButtons.AddTail(new CButtonRef(L"RadioPass", mRadioPassport, NULL, false));
+
+	mButtons.AddTail(new CButtonRef(L"PaidLastYVacation", mVacationPaid4LastYear, NULL));
+	mButtons.AddTail(new CButtonRef(L"PaidLastYRecuperation", mRecuperationPaid4LastYear, NULL));
 }
 
 void CWorkersRightsComputerDlg::DoDataExchange(CDataExchange* pDX)
@@ -141,6 +144,8 @@ void CWorkersRightsComputerDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT_ADDRESS, mAddress);
 	DDX_Control(pDX, IDC_EDIT_EMAIL, mEmail);
 	DDX_Control(pDX, IDC_EDIT_PAY_PER_HOLY_DAY, mEditPayPerEachHolyDay);
+	DDX_Control(pDX, IDC_CHECK_PAID_VACATION, mVacationPaid4LastYear);
+	DDX_Control(pDX, IDC_CHECK_PAID_RECUP, mRecuperationPaid4LastYear);
 }
 
 BEGIN_MESSAGE_MAP(CWorkersRightsComputerDlg, CDialogEx)
@@ -170,6 +175,8 @@ BEGIN_MESSAGE_MAP(CWorkersRightsComputerDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_COMMENTS, &CWorkersRightsComputerDlg::OnBnClickedComments)
 	ON_COMMAND(ID_TEST_LOADXML, &CWorkersRightsComputerDlg::OnTestLoadxml)
 	ON_COMMAND(ID_TEST_LOADTXT, &CWorkersRightsComputerDlg::OnTestLoadtxt)
+	ON_BN_CLICKED(IDC_CHECK_PAID_VACATION, &CWorkersRightsComputerDlg::OnBnClickedCheckPaidVacation)
+	ON_BN_CLICKED(IDC_CHECK_PAID_RECUP, &CWorkersRightsComputerDlg::OnBnClickedCheckPaidRecup)
 END_MESSAGE_MAP()
 
 
@@ -641,5 +648,11 @@ void CWorkersRightsComputerDlg::WriteEditorToLetter(CHtmlWriter& html)
 	CString sEditor(GetText(IDC_EDIT_FILLED_BY));
 	html.WriteLineEH(L"Prepared by: ", L"הוכן על ידי: ", sEditor);
 }
-
-
+void CWorkersRightsComputerDlg::OnBnClickedCheckPaidVacation()
+{
+	OnInputChange();
+}
+void CWorkersRightsComputerDlg::OnBnClickedCheckPaidRecup()
+{
+	OnInputChange();
+}

@@ -22,6 +22,8 @@ public:
 	virtual CString GetDecriptionForLetter(void)override;
 	virtual CString GetDecriptionForLetterHebrew(void)override;
 
+	void ComputePrevYears(void);
+
 	CSeniority *mpSeniority;
 	CYearlyRates *mpRates;
 
@@ -31,7 +33,8 @@ public:
 	static const int MIN_YEARS_TO_START = 1;
 
 	CEdit *mpPrevYearsBox;
-	CButtonRef *mpbDemandPreviousYears;
+	CButtonRef* mpbDemandPreviousYears;
+	CButtonRef* mpbPaid4LastYear;
 	double mnYearsBack;
 	double mDueDays;
 	double mRate;

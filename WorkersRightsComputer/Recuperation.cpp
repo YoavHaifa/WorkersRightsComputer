@@ -7,6 +7,8 @@
 CRecuperation::CRecuperation(void)
 	: CRight(L"Recuperation", L"דמי הבראה")
 	, mpbDemandPreviousYears(NULL)
+	, mpbPaid4LastYear(NULL)
+
 {
 	miPrintOrder = 3;
 	Init();
@@ -20,6 +22,11 @@ bool CRecuperation::SetCheckRef(CButtonRef *pButton)
 		mpbDemandPreviousYears = pButton;
 		return true;
 	}
+	else if (pButton->msName == L"PaidLastYRecuperation")
+	{
+		mpbPaid4LastYear = pButton;
+		return true;
+	}
 	return false;
 }
 bool CRecuperation::SetEditRef(class CEditRef *pRef)
@@ -31,7 +38,32 @@ bool CRecuperation::SetEditRef(class CEditRef *pRef)
 	}
 	return false;
 }
+void CRecuperation::ComputePrevYears(void)
+{
+	int seniority = gWorkYears.mnPrevYears;
+	double rest = mnYearsBack;
+	while (rest > 0)
+	{
+		LogLine(L"Seniority", seniority);
+		double daysPerYear = mpSeniority->ma[seniority];
+		if (rest >= 1)
+		{
+			mDueDays += daysPerYear;
+			rest -= 1;
+			LogLine(L"Add for year", daysPerYear);
+		}
+		else
+		{
+			LogLine(L"part of year", rest);
+			LogLine(L"days per year", daysPerYear);
+			LogLine(L"Add days per part year", daysPerYear * rest);
+			mDueDays += daysPerYear * rest;
+			rest = 0;
+		}
 
+		seniority--;
+	}
+}
 bool CRecuperation::Compute(void)
 {
 	mDuePay = 0;
@@ -54,64 +86,52 @@ bool CRecuperation::Compute(void)
 		return false;
 	}
 
-	double lastYearFraction = gWorkYears.GetLastYearAsFraction();
-	LogLine(L"Last Year Fraction", lastYearFraction);
-
-	int intDaysPerYear = mpSeniority->ma[gWorkYears.mn];
-	mDueDays = lastYearFraction * intDaysPerYear;
-	LogLine(L"N Due Days for last year", mDueDays);
-
-	int rateYear = gWorkPeriod.mLast.mYear;
-	if(gWorkPeriod.mLast.mMonth < MONTH_OF_NEW_RATE)
-		rateYear--;
-	mRate = mpRates->RatePerYear(rateYear);
-
-	mnYearsBack = 0;
-	CString sText;
-	mpPrevYearsBox->GetWindowTextW(sText);
-	if (sText.GetLength() > 0)
-		mnYearsBack = _wtof(sText);
-	LogLine(L"N Years Back", mnYearsBack);
-	if (mnYearsBack > gWorkYears.mnPrevYears)
+	double lastYearFraction = 0;
+	if (mpbPaid4LastYear->IsChecked())
+		LogLine(L"Last Year Recuperation Paid");
+	else
 	{
-		mnYearsBack = gWorkYears.mnPrevYears;
-		LogLine(L"N Years Back can't be more than worked", mnYearsBack);
+		lastYearFraction = gWorkYears.GetLastYearAsFraction();
+		LogLine(L"Last Year Fraction", lastYearFraction);
+
+		int intDaysPerYear = mpSeniority->ma[gWorkYears.mn];
+		mDueDays = lastYearFraction * intDaysPerYear;
+		LogLine(L"N Due Days for last year", mDueDays);
+
+		int rateYear = gWorkPeriod.mLast.mYear;
+		if(gWorkPeriod.mLast.mMonth < MONTH_OF_NEW_RATE)
+			rateYear--;
+		mRate = mpRates->RatePerYear(rateYear);
+
+		mnYearsBack = 0;
+		CString sText;
+		mpPrevYearsBox->GetWindowTextW(sText);
+		if (sText.GetLength() > 0)
+			mnYearsBack = _wtof(sText);
+		LogLine(L"N Years Back", mnYearsBack);
+		if (mnYearsBack > gWorkYears.mnPrevYears)
+		{
+			mnYearsBack = gWorkYears.mnPrevYears;
+			LogLine(L"N Years Back can't be more than worked", mnYearsBack);
+		}
 	}
 
 	if (mpbDemandPreviousYears->IsChecked() && mnYearsBack > 0)
-	{
-		int seniority = gWorkYears.mnPrevYears;
-		double rest = mnYearsBack;
-		while (rest > 0)
-		{
-			LogLine(L"Seniority", seniority);
-			double daysPerYear = mpSeniority->ma[seniority];
-			if (rest >= 1)
-			{
-				mDueDays += daysPerYear;
-				rest -= 1;
-				LogLine(L"Add for year", daysPerYear);
-			}
-			else
-			{
-				LogLine(L"part of year", rest);
-				LogLine(L"days per year", daysPerYear);
-				LogLine(L"Add days per part year", daysPerYear * rest);
-				mDueDays += daysPerYear * rest;
-				rest = 0;
-			}
+		ComputePrevYears();
 
-			seniority--;
-		}
-	}
 	LogLine(L"N Due Days Final", mDueDays);
 	LogLine(L"Pay per day", mRate);
 
 	mDuePay = mDueDays * mRate;
 	mbValid = true;
 
-	msDebug += L" partYear ";
-	msDebug += ToString(lastYearFraction);
+	if (mpbPaid4LastYear->IsChecked())
+		msDebug += L"Last Year Recuperation Paid";
+	else
+	{
+		msDebug += L" partYear ";
+		msDebug += ToString(lastYearFraction);
+	}
 	if (mpbDemandPreviousYears->IsChecked() && mnYearsBack > 0)
 	{
 		msDebug += L" mnYearsBack ";

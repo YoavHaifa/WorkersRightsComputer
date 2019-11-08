@@ -105,6 +105,10 @@ public:
 	afx_msg void OnTestLoadtxt();
 	// Allows user to set special rate per holidays
 	CEdit mEditPayPerEachHolyDay;
+	CButton mVacationPaid4LastYear;
+	CButton mRecuperationPaid4LastYear;
+	afx_msg void OnBnClickedCheckPaidVacation();
+	afx_msg void OnBnClickedCheckPaidRecup();
 };
 
 extern CWorkersRightsComputerDlg *gpDlg;
