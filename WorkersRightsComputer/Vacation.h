@@ -25,8 +25,10 @@ public:
 	int mnSeniority;
 
 	bool mbUseShortRule;
+	bool mbLastYearPaid;
 	double mnDueDays;
-	CButtonRef * mpbDemandForPreviousYears;
+	CButtonRef* mpbDemandForPreviousYears;
+	CButtonRef* mpbPaid4LastYear;
 	double mnYearsOfUnpaidVacation;
 	double mnDaysOfPaidVacation;
 	CString msDesc;
@@ -42,5 +44,8 @@ public:
 	int mCurYear;
 	int mCurMonth;
 	void CountBackMonth(void);
+
+	void ComputePrevYears(void);
+	void ComputeLastYearByShortRule(void);
 };
 

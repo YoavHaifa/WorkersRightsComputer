@@ -113,6 +113,9 @@
 #define IDC_BUTTON_EDIT_CONTACT         1093
 #define IDC_EDIT1                       1093
 #define IDC_EDIT_PAY_PER_HOLY_DAY       1093
+#define IDC_CHECK_PAID_VACATION         1094
+#define IDC_CHECK2                      1095
+#define IDC_CHECK_PAID_RECUP            1095
 #define ID_FILE_EXIT                    32771
 #define ID_COMPUTE_ALL                  32772
 #define ID_FILE_LOAD                    32773
@@ -131,7 +134,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        141
 #define _APS_NEXT_COMMAND_VALUE         32782
-#define _APS_NEXT_CONTROL_VALUE         1094
+#define _APS_NEXT_CONTROL_VALUE         1096
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
