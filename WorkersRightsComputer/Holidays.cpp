@@ -131,7 +131,7 @@ bool CHolidays::InitFromFileInternals(FILE *pfRead, FILE *pfLog)
 		CString sLine = CUtils::ReadLine(pfRead);
 		if (pfLog)
 			fwprintf(pfLog, L"%s\n", (const wchar_t *)sLine);
-		if (sLine == L"end")
+		if (sLine.Left(3) == L"end")
 			break;
 
 		map[i] = new CHoliday(sLine);

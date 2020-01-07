@@ -37,7 +37,22 @@ CWorkPeriod::CWorkPeriod(void)
 	mnWorkDaysPerWeek = 0;
 
 	mnDaysInMonthForDailySalary = 25;
-	mnWorkingHoursInFullMonth = 186;
+}
+int CWorkPeriod::GetWorkingHoursInFullMonth(int year, int month)
+{
+	if (year < 2018)
+		return 186;
+	if (year == 2018 && month < 4)
+		return 186;
+	return 182;
+}
+int CWorkPeriod::GetWorkingHoursInFullWeek(int year, int month)
+{
+	if (year < 2018)
+		return 43;
+	if (year == 2018 && month < 4)
+		return 43;
+	return 42;
 }
 void CWorkPeriod::Reset(void)
 {

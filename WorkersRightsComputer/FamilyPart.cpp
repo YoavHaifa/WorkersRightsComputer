@@ -293,11 +293,14 @@ void CFamilyPart::WriteToLetter(CHtmlWriter &writer)
 	{
 		writer.WriteLEH(L"This computation only relates to the part that is due from the employing family. ",
 			L"חישוב זה מתייחס רק לחלק התשלום המגיע מהמשפחה המעסיקה.");
-
+		writer.StartBold();
 		writer.WriteLEH(L"Family Part is ", L"חלקה של המשפחה הוא ");
 		wchar_t zBuf[128];
 		swprintf_s(zBuf, 128, L"%5.2f%%", mRatio * 100);
-		writer.WriteLine(zBuf);
+		writer.WriteL(zBuf);
+		writer.EndBold();
+		writer.WriteLineEH(L" from the payment for severance, pension and advance notice.", 
+			L"מהתשלום עבור פיצויי פיטורים, תגמולי מעסיק והודעה מוקדמת. ");
 	}
 	else
 	{

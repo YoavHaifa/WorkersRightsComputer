@@ -284,6 +284,14 @@ void CHtmlWriter::EndParagraph(void)
 {
 	WriteL(L"</p>");
 }
+void CHtmlWriter::StartBold(void)
+{
+	WriteL(L"<b>");
+}
+void CHtmlWriter::EndBold(void)
+{
+	WriteL(L"</b>");
+}
 void CHtmlWriter::StartTabLine(void)
 {
 	WriteL(L"<tr>");

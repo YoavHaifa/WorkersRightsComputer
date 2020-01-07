@@ -140,7 +140,7 @@ bool CVerify::ReadOldFile()
 				if (mpfLog)
 					fwprintf(mpfLog, L"<Read> Set %s %s to %s\n", (const wchar_t *)pRef->msName, 
 					(const wchar_t *)pRef->msOldName, (const wchar_t *)sValue);
-				if (sValue == L"end")
+				if (sValue.Left(3) == L"end")
 					bEndFound = true;
 			}
 		}

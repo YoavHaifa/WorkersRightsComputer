@@ -25,6 +25,6 @@ public:
 	double mRatioPaidByCompany;
 	double mFraction;
 	void SetUnpaid(int nAnpaidDaysToAdd);
-	void SetDaysPerWeek(void);
+	//void SetDaysPerWeek(void);
 };
 

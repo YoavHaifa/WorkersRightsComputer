@@ -1,5 +1,6 @@
 #pragma once
 #include "MyTime.h"
+#include "WorkPeriod.h"
 
 class CCompanyPartPeriod
 {
@@ -9,10 +10,11 @@ public:
 		, mCompanyHoursPerWeek(nHours)
 		, mbDummyForApril18(bDummy)
 	{
-		if (mFrom.mYear < 2018 || (mFrom.mYear == 2018 && mFrom.mMonth < 4))
-			mHoursPerWeek = 43;
-		else
-			mHoursPerWeek = 42;
+		mHoursPerWeek = gWorkPeriod.GetWorkingHoursInFullWeek(mFrom.mYear, mFrom.mMonth);
+		//if (mFrom.mYear < 2018 || (mFrom.mYear == 2018 && mFrom.mMonth < 4))
+		//	mHoursPerWeek = 43;
+		//else
+		//	mHoursPerWeek = 42;
 
 		if (mCompanyHoursPerWeek > 0)
 			mCompanyPart = mCompanyHoursPerWeek / mHoursPerWeek;

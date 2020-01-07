@@ -78,7 +78,7 @@ bool CMonthlyRates::InitFromFile(void)
 	//double iLastValue = 0;
 	CString sLine;
 	sLine = CUtils::ReadLine(pfRead);
-	while (sLine != L"end")
+	while (sLine.Left(3) != L"end")
 	{
 		int year = _wtoi(sLine);
 		year -= mFirstYear;
@@ -89,7 +89,7 @@ bool CMonthlyRates::InitFromFile(void)
 		}
 
 		sLine = CUtils::ReadLine(pfRead);
-		if (sLine == L"end")
+		if (sLine.Left(3) == L"end")
 			break;
 		int month = _wtoi(sLine);
 		month -= 1;
@@ -100,7 +100,7 @@ bool CMonthlyRates::InitFromFile(void)
 		}
 
 		sLine = CUtils::ReadLine(pfRead);
-		if (sLine == L"end")
+		if (sLine.Left(3) == L"end")
 			break;
 		double value = _wtof(sLine);
 		
