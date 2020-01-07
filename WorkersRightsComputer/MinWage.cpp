@@ -83,7 +83,7 @@ double CMinWage::ComputeHolidayPrice(int year, int month)
 	double extraHour = 0;
 	if (year > 2016 || (year == 2016 && month > 6))
 	{
-		extraHour = baseWage / gWorkPeriod.mnWorkingHoursInFullMonth;
+		extraHour = baseWage / gWorkPeriod.GetWorkingHoursInFullMonth(year, month);
 	}
 	return (baseWage / gWorkPeriod.mnDaysInMonthForDailySalary + extraHour) * 1.5;
 }

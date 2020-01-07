@@ -68,7 +68,7 @@ bool CYearlyRates::InitFromFile(void)
 	int iLastYear = 0;
 	double iLastValue = 0;
 	CString sLine = CUtils::ReadLine(pfRead);
-	while (sLine != L"end")
+	while (sLine.Left(3) != L"end")
 	{
 		int year = _wtoi(sLine);
 		year -= mFirstYear;
@@ -79,7 +79,7 @@ bool CYearlyRates::InitFromFile(void)
 		}
 
 		sLine = CUtils::ReadLine(pfRead);
-		if (sLine == L"end")
+		if (sLine.Left(3) == L"end")
 			break;
 		double value = _wtof(sLine);
 		

@@ -290,7 +290,7 @@ void CSaver::LoadFromTxtFile()
 			gWorkPeriod.Restore(mpfRead);
 			break;
 		}
-		if (sText1 == L"end")
+		if (sText1.Left(3) == L"end")
 			break;
 		sText2 = CUtils::ReadLine(mpfRead);
 	}

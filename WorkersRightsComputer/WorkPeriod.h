@@ -60,7 +60,8 @@ public:
 	bool mbNegative;
 	double mnWorkDaysPerWeek;
 	double mnDaysInMonthForDailySalary;
-	double mnWorkingHoursInFullMonth;
+	int GetWorkingHoursInFullMonth(int year, int month);
+	int GetWorkingHoursInFullWeek(int year, int month);
 	bool mbSkipNotice;
 
 	int CountDaysToEndOfMonth(CMyTime &date);

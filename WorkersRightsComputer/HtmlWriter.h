@@ -29,6 +29,9 @@ public:
 	void PrintEH(const CString& s, const CString& sh);
 	void StartParagraph(void);
 	void EndParagraph(void);
+	void StartBold(void);
+	void EndBold(void);
+
 	void StartTabLine(void);
 	void EndTabLine(void);
 	void StartPensionTable(void);

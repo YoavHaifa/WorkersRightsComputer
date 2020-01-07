@@ -20,7 +20,8 @@ CMonthInfo::~CMonthInfo()
 void CMonthInfo::InitFirst()
 {
 	Set(gWorkPeriod.mFirst.mTime);
-	SetDaysPerWeek();
+	mHoursPerWeek = gWorkPeriod.GetWorkingHoursInFullWeek(mYear, mMonth);
+	//SetDaysPerWeek();
 
 	mi = 0;
 	mSeniorityMonths = 0;
@@ -35,7 +36,8 @@ void CMonthInfo::InitNext(CMonthInfo &prev)
 {
 	Set(prev.mYear, prev.mMonth, 1);
 	AddMonth();
-	SetDaysPerWeek();
+	mHoursPerWeek = gWorkPeriod.GetWorkingHoursInFullWeek(mYear, mMonth);
+	//SetDaysPerWeek();
 
 	mi = prev.mi + 1;
 	if (mi == 1 && prev.IsPartial())
@@ -60,15 +62,17 @@ void CMonthInfo::InitNext(CMonthInfo &prev)
 	}
 	mnDaysUnpaidVacation = 0;
 }
+/*
 void CMonthInfo::SetDaysPerWeek(void)
 {
+	mHoursPerWeek = gWorkPeriod.GetWorkingHoursInFullWeek(mYear, mMonth);
 	if (mYear < 2018)
 		mHoursPerWeek = 43;
 	else if (mYear == 2018 && mMonth < 4)
 		mHoursPerWeek = 43;
 	else
 		mHoursPerWeek = 42;
-}
+} */
 bool CMonthInfo::IsPartial(void)
 {
 	return (mFraction < 1);

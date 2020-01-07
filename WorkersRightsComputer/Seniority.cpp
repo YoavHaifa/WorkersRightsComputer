@@ -59,11 +59,11 @@ bool CSeniority::InitFromFile(void)
 	int iLastValue = 0;
 	CString sLine;
 	sLine = CUtils::ReadLine(pfRead);
-	while (sLine != L"end")
+	while (sLine.Left(3) != L"end")
 	{
 		int year = _wtoi(sLine);
 		sLine = CUtils::ReadLine(pfRead);
-		if (sLine == L"end")
+		if (sLine.Left(3) == L"end")
 			break;
 		int value = _wtoi(sLine);
 		
