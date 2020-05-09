@@ -114,7 +114,6 @@
 #define IDC_EDIT1                       1093
 #define IDC_EDIT_PAY_PER_HOLY_DAY       1093
 #define IDC_CHECK_PAID_VACATION         1094
-#define IDC_CHECK2                      1095
 #define IDC_CHECK_PAID_RECUP            1095
 #define ID_FILE_EXIT                    32771
 #define ID_COMPUTE_ALL                  32772
@@ -127,13 +126,14 @@
 #define ID_TEST_WRITEHTML               32779
 #define ID_TEST_LOADXML                 32780
 #define ID_TEST_LOADTXT                 32781
+#define ID_TEST_VERIFYBATCHNEW          32782
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        141
-#define _APS_NEXT_COMMAND_VALUE         32782
+#define _APS_NEXT_COMMAND_VALUE         32783
 #define _APS_NEXT_CONTROL_VALUE         1096
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

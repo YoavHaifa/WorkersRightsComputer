@@ -7,17 +7,24 @@
 #include "AllRights.h"
 #include "FilesList.h"
 #include "Pension.h"
+#include "Saver.h"
+#include "XMLParse.h"
 
 CString CVerify::umsfName;
 bool CVerify::umbBreakonDiff = false;
 FILE* CVerify::umpfReport = NULL;
 int CVerify::umiBatch = 0;
 bool CVerify::umbDisplayDiff = false;
+bool CVerify::umbOld = false;
 
-void CVerify::VerifyBatch(const wchar_t *zfName)
+void CVerify::VerifyBatch(const wchar_t *zfName, bool bOld)
 {
 	umsfName = zfName;
-	CUtils::CreateThread(StaticVerifyBatch, NULL);
+	umbOld = bOld;
+	if (umbOld)
+		CUtils::CreateThread(StaticVerifyBatchOld, NULL);
+	else
+		CUtils::CreateThread(StaticVerifyBatch, NULL);
 }
 DWORD WINAPI CVerify::StaticVerifyBatch(LPVOID)
 {
@@ -25,11 +32,64 @@ DWORD WINAPI CVerify::StaticVerifyBatch(LPVOID)
 	sPath = CFileName::GetPath(sPath);
 
 	CString sLogFileName(sPath + L"VerifyBatch.log");
-	FILE *pfLog = MyFOpenWithErrorBox(sLogFileName, L"w", L"Log");
+	FILE* pfLog = MyFOpenWithErrorBox(sLogFileName, L"w", L"Log");
 	if (!pfLog)
 		return 0;
 
 	CString sReportFileName(sPath + L"VerifyBatchReport.csv");
+	umpfReport = MyFOpenWithErrorBox(sReportFileName, L"w", L"Log");
+
+	CFilesList list;
+	CUtils::ListFilesInDirRecursive(sPath, L"*_save.xml", list);
+
+	umiBatch = 0;
+	POSITION pos = list.GetHeadPosition();
+	while (pos)
+	{
+		CString* psfName = list.GetNext(pos);
+		CString sPrivate = CFileName::GetPrivate((const wchar_t*)*psfName);
+		if (sPrivate.Right(9) == L"_save.xml")
+		{
+			umiBatch++;
+			if (umpfReport)
+				fprintf(umpfReport, "%d, ", umiBatch);
+		}
+
+		CVerify verify((const wchar_t*)*psfName, true);
+		bool bSame = verify.Verify();
+		verify.WriteSummary(pfLog);
+
+		if (umpfReport)
+		{
+			CString sCurPath = CFileName::GetPath((const wchar_t*)*psfName);
+			CString sLast = CFileName::GetPrivate(sCurPath);
+			fwprintf(umpfReport, L"%s\n", (const wchar_t*)sLast);
+			fflush(umpfReport);
+		}
+		if (!bSame && umbBreakonDiff)
+			break;
+	}
+
+	fclose(pfLog);
+	if (umpfReport)
+	{
+		fclose(umpfReport);
+		umpfReport = NULL;
+	}
+	CUtils::OpenTextFile(sLogFileName);
+	return 0;
+}
+DWORD WINAPI CVerify::StaticVerifyBatchOld(LPVOID)
+{
+	CString sPath = CFileName::GetPath(umsfName);
+	sPath = CFileName::GetPath(sPath);
+
+	CString sLogFileName(sPath + L"VerifyBatchOld.log");
+	FILE *pfLog = MyFOpenWithErrorBox(sLogFileName, L"w", L"Log");
+	if (!pfLog)
+		return 0;
+
+	CString sReportFileName(sPath + L"VerifyBatchReportOld.csv");
 	umpfReport = MyFOpenWithErrorBox(sReportFileName, L"w", L"Log");
 
 	CFilesList list;
@@ -47,7 +107,7 @@ DWORD WINAPI CVerify::StaticVerifyBatch(LPVOID)
 			if (umpfReport)
 				fprintf(umpfReport, "%d, ", umiBatch);
 			CVerify verify((const wchar_t *)*psfName, true);
-			bool bSame = verify.Verify();
+			bool bSame = verify.VerifyOld();
 			verify.WriteSummary(pfLog);
 
 			if (umpfReport)
@@ -81,6 +141,7 @@ CVerify::CVerify(const wchar_t *zfName, bool bSilent)
 	, mnMissing(0)
 	, mDebug(3)
 	, mpfLog(NULL)
+	, mpSavedXml(NULL)
 {
 	mpfLog = CUtils::OpenLogFile(L"Verify");
 	if (mpfLog)
@@ -91,8 +152,22 @@ CVerify::~CVerify()
 	Clear();
 	if (mpfLog)
 		fclose(mpfLog);
+	if (mpSavedXml)
+		delete mpSavedXml;
 }
 bool CVerify::Verify()
+{
+	CRight::umbOldStyle = false;
+
+	if (!ReadSavedXml())
+		return false;
+
+	gpDlg->OnInputChange();
+
+	mbAllSame = VerifyResults();
+	return mbAllSame;
+}
+bool CVerify::VerifyOld()
 {
 	CRight::umbOldStyle = true;
 	gpPension->CorrectForOldStype();
@@ -101,9 +176,27 @@ bool CVerify::Verify()
 		return false;
 
 	gpDlg->OnInputChange();
-	mbAllSame = VerifyResults();
+	mbAllSame = VerifyResultsOld();
 	CRight::umbOldStyle = false;
 	return mbAllSame;
+}
+bool CVerify::ReadSavedXml()
+{
+	if (mpSavedXml)
+		delete mpSavedXml;
+
+	gpDlg->OnBnClickedButtonReset();
+	gpDlg->mbDisableComputations = true;
+	CSaver saver;
+	saver.Restore(msfName);
+
+	gpDlg->mbDisableComputations = false;
+	mpSavedXml = new CXMLParse(msfName, true /*bUnicode*/);
+	mpSavedXmlRoot = mpSavedXml->GetRoot();
+	if (!mpSavedXmlRoot)
+		return false;
+	mpSavedResults = mpSavedXmlRoot->GetFirst(L"AllRightsAsComputed");
+	return mpSavedResults != NULL;
 }
 bool CVerify::ReadOldFile()
 {
@@ -346,6 +439,83 @@ void CVerify::Clear()
 bool CVerify::VerifyResults()
 {
 	CString s(L"<VerifyResults>");
+	mnCompared = 0;
+	mnSame = 0;
+	mnDiff = 0;
+	mnMissing = 0;
+
+	double oldSum = 0;
+	double newSum = 0;
+
+	POSITION pos = gAllRights.mRights.GetHeadPosition();
+	while (pos)
+	{
+		CRight* pRight = gAllRights.mRights.GetNext(pos);
+		s += L"\r\n";
+		s += pRight->msName;
+		s += L" ";
+		s += CRight::ToString(pRight->mDuePay);
+		newSum += pRight->mDuePay;
+		mnCompared++;
+
+		bool bFound = false;
+		CXMLParseNode *pRightNode = mpSavedResults->GetFirst(pRight->msName);
+		if (pRightNode)
+		{
+			double savedDue = 0;
+			if (pRightNode->GetValue(L"Due", savedDue))
+			{
+				bFound = true;
+				if (umpfReport)
+					fwprintf(umpfReport, L"%s, ", (const wchar_t*)pRight->msName);
+				if ((pRight->mDuePay >= (savedDue - 0.2)) && (pRight->mDuePay <= (savedDue + 0.2)))
+				{
+					s += L" Same";
+					mnSame++;
+					if (umpfReport)
+						fprintf(umpfReport, "0, ");
+				}
+				else
+				{
+					s += L" Diff, old =  ";
+					s += CRight::ToString(savedDue);
+					mnDiff++;
+					if (umpfReport)
+					{
+						double diff = pRight->mDuePay - savedDue;
+						fprintf(umpfReport, "%d, ", (int)diff);
+					}
+				}
+			}
+		}
+		if (!bFound)
+		{
+			s += L" No saved result found";
+			mnMissing++;
+			if (umpfReport)
+				fprintf(umpfReport, "miss, ");
+		}
+
+	}
+	if (!umpfReport || umbDisplayDiff)
+	{
+		if (!mbSilentMode || mnSame != mnCompared)
+			CUtils::MessBox(s, L"Verify Results");
+	}
+	if (umpfReport)
+	{
+		double diff = newSum - oldSum;
+		fprintf(umpfReport, "%.2f, ", diff);
+		if (mnSame == mnCompared)
+			fprintf(umpfReport, "same, ");
+		else
+			fprintf(umpfReport, "diff, ");
+	}
+	return mnSame == mnCompared;
+}
+bool CVerify::VerifyResultsOld()
+{
+	CString s(L"<VerifyResultsOld>");
 	mnCompared = 0;
 	mnSame = 0;
 	mnDiff = 0;

@@ -29,12 +29,16 @@ public:
 	static FILE* umpfReport;
 	static int umiBatch;
 	static bool umbDisplayDiff;
+	static bool umbOld;
 
+	static DWORD WINAPI StaticVerifyBatchOld(LPVOID);
 	static DWORD WINAPI StaticVerifyBatch(LPVOID);
-	static void VerifyBatch(const wchar_t *zfName);
+	static void VerifyBatch(const wchar_t *zfName, bool bOld = false);
 
 	CString msfName;
 	bool Verify();
+	bool VerifyOld();
+	bool ReadSavedXml();
 	bool ReadOldFile();
 	void ReadTime(FILE *pfRead, int i);
 	CList<CRightResult *, CRightResult *> mResults;
@@ -46,6 +50,7 @@ public:
 	int ReadResults(FILE *pfRead);
 	void Clear();
 	bool VerifyResults();
+	bool VerifyResultsOld();
 	void ReadHolidaysDefinitions();
 	CString SelectHolidays();
 	CString GetLogFileNameFor(const wchar_t *zRight);
@@ -61,5 +66,9 @@ public:
 	int mnMissing;
 	bool mbSilentMode;
 	void CheckIfNoticeSet();
+
+	class CXMLParse* mpSavedXml;
+	class CXMLParseNode* mpSavedXmlRoot;
+	class CXMLParseNode* mpSavedResults;
 };
 

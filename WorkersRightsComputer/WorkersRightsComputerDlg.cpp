@@ -177,6 +177,7 @@ BEGIN_MESSAGE_MAP(CWorkersRightsComputerDlg, CDialogEx)
 	ON_COMMAND(ID_TEST_LOADTXT, &CWorkersRightsComputerDlg::OnTestLoadtxt)
 	ON_BN_CLICKED(IDC_CHECK_PAID_VACATION, &CWorkersRightsComputerDlg::OnBnClickedCheckPaidVacation)
 	ON_BN_CLICKED(IDC_CHECK_PAID_RECUP, &CWorkersRightsComputerDlg::OnBnClickedCheckPaidRecup)
+	ON_COMMAND(ID_TEST_VERIFYBATCHNEW, &CWorkersRightsComputerDlg::OnTestVerifybatchnew)
 END_MESSAGE_MAP()
 
 
@@ -503,7 +504,7 @@ void CWorkersRightsComputerDlg::OnFileLoadoldcase()
 	{
 		CString sfName(dlg.mSelectedFileName);
 		CVerify verify(sfName);
-		verify.Verify();
+		verify.VerifyOld();
 	}
 }
 void CWorkersRightsComputerDlg::OnInputChange()
@@ -532,6 +533,17 @@ void CWorkersRightsComputerDlg::OnTestVerifybatch()
 	CString sDir(L"C:\\WorkersRights\\New_examples\\Beena MOl_Thomas_M7281984");
 	CMyFileDialog dlg(CMyFileDialog::FD_OPEN, L"saved file", sDir);
 	dlg.SetDefaultExtention(L"txt");
+	if (dlg.DoModal())
+	{
+		CString sfName(dlg.mSelectedFileName);
+		CVerify::VerifyBatch(sfName);
+	}
+}
+void CWorkersRightsComputerDlg::OnTestVerifybatchnew()
+{
+	CString sDir(L"F:\\WorkersRights\\Verify");
+	CMyFileDialog dlg(CMyFileDialog::FD_OPEN, L"saved file", sDir);
+	dlg.SetDefaultExtention(L"xml");
 	if (dlg.DoModal())
 	{
 		CString sfName(dlg.mSelectedFileName);
