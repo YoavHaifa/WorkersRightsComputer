@@ -21,6 +21,7 @@ public:
 	int GetNFullMonths(int* pnExtraDays, double* pExtraDaysFraction);
 	bool Contains(class CHoliday& holiday);
 	bool Contains(CMyTime &time);
+	int GetEndYear();
 
 	int GetUnpaidVacationCalendarDaysForSeverance(void);
 

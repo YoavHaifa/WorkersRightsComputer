@@ -160,3 +160,7 @@ bool CWorkYears::LastYearDoContains(class CHoliday& holiday)
 {
 	return maYears[mn-1].Contains(holiday);
 }
+int CWorkYears::GetLastWorkYear()
+{
+	return maYears[mn - 1].GetEndYear();
+}

@@ -123,7 +123,9 @@ bool CHolidays::InitFromFile(const wchar_t *zfName)
 }
 bool CHolidays::InitFromFileInternals(FILE *pfRead, FILE *pfLog)
 {
+	int lastWorkYear = gWorkYears.GetLastWorkYear();
 	mn = 0;
+	int nInLastYear = 0;
 
 	for (int i = 0; i < MAX_HOLIDAYS_DEFINED; i++)
 	{
@@ -162,6 +164,8 @@ bool CHolidays::InitFromFileInternals(FILE *pfRead, FILE *pfLog)
 				return false;
 			}
 			map[i]->mYear = year;
+			if (year == lastWorkYear)
+				nInLastYear++;
 		}
 
 		// Read Month
@@ -197,6 +201,23 @@ bool CHolidays::InitFromFileInternals(FILE *pfRead, FILE *pfLog)
 		map[i]->mDay = day;
 
 		mn++;
+	}
+
+	if (nInLastYear < 9)
+	{
+		if (nInLastYear < 1)
+		{
+			wchar_t zBuf[256];
+			swprintf_s(zBuf, 256, L"<Reading holidays from file> No holidays defined for last year: %d", lastWorkYear);
+			CUtils::MessBox(zBuf, L"Warning");
+		}
+		else
+		{
+			wchar_t zBuf[256];
+			swprintf_s(zBuf, 256, L"<Reading holidays from file> There are only %d holidays defined for last year: %d", 
+				nInLastYear, lastWorkYear);
+			CUtils::MessBox(zBuf, L"Warning");
+		}
 	}
 
 	mbValid = true;

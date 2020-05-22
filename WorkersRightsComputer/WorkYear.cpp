@@ -122,6 +122,10 @@ bool CWorkYear::Contains(CMyTime& time)
 		return false;
 	return true;
 }
+int CWorkYear::GetEndYear()
+{
+	return mLastDay.mYear;
+}
 int CWorkYear::GetUnpaidVacationCalendarDaysForSeverance(void)
 {
 	mnUnpaidVacationCalendarDaysForSeverance = 0;
