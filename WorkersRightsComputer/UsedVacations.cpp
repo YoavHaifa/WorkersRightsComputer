@@ -281,7 +281,7 @@ void CUsedVacations::Log()
 }
 void CUsedVacations::WriteToLetter(CHtmlWriter& html)
 {
-	int nVacations = mVacationsUsed.GetSize();
+	int nVacations = (int)mVacationsUsed.GetSize();
 	if (nVacations < 1)
 		return;
 
