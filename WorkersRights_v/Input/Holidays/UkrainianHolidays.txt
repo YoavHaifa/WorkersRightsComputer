@@ -1,50 +1,98 @@
 Dignity and freedom day
+2020
+11
+21
+Independence Day
+2020
+08
+24
+Constitution Day
+2020
+06
+28
+Orthodox Pentecost holiday
+2020
+06
+08
+Orthodox Pentecost
+2020
+06
+07
+Victory Day Memorial Day
+2020
+05
+9
+Labor Day
+2020
+05
+1
+Orthodox Easter Day holiday
+2020
+04
+20
+Orthodox Easter Day
+2020
+04
+19
+International Womens Day
+2020
+03
+8
+Christmas Day
+2020
+01
+7
+New Years Day
+2020
+01
+1
+Dignity and freedom day
 2019
 11
 21
 Independence Day
 2019
-8
+08
 24
 Constitution Day
 2019
-6
+06
 28
 Orthodox Pentecost holiday
 2019
-6
+06
 17
 Orthodox Pentecost
 2019
-6
+06
 16
 Victory Day Memorial Day
 2019
-5
+05
 9
 Labor Day
 2019
-5
+05
 1
 Orthodox Easter Day holiday
 2019
-4
+04
 29
 Orthodox Easter Day
 2019
-4
+04
 28
 International Womens Day
 2019
-3
+03
 8
 Christmas Day
 2019
-1
+01
 7
 New Years Day
 2019
-1
+01
 1
 Dignity and freedom day
 2018
@@ -52,55 +100,55 @@ Dignity and freedom day
 21
 Independence Day
 2018
-8
+08
 24
 Constitution Day
 2018
-6
+06
 28
 Orthodox Pentecost holiday
 2018
-5
+05
 29
 Orthodox Pentecost
 2018
-5
+05
 28
 Victory Day Memorial Day
 2018
-5
+05
 9
 Labor Day Holiday
 2018
-5
+05
 2
 Labor Day
 2018
-5
+05
 1
 Orthodox Easter Day holiday
 2018
-4
+04
 9
 Orthodox Easter Day
 2018
-4
+04
 8
 International Womens Day
 2018
-3
+03
 8
 Christmas Day holiday
 2018
-1
+01
 8
 Christmas Day
 2018
-1
+01
 7
 New Years Day
 2018
-1
+01
 1
 Dignity & Freedom Day
 2017
@@ -117,7 +165,7 @@ Constitution day
 Orthodox Pentecost holiday
 2017
 06
-06
+6
 Orthodox Pentecost
 2017
 06
@@ -133,7 +181,7 @@ Orthodox Easter Day holiday
 Labor day
 2017
 05
-01
+1
 International Women's Day
 2017
 03
@@ -148,7 +196,7 @@ New Year's day
 1
 Independance Day
 2016
-8
+08
 24
 Constitution day
 2016
@@ -188,7 +236,7 @@ New Year's day
 1
 Independance Day
 2015
-8
+08
 24
 Constitution day
 2015
@@ -205,7 +253,7 @@ Orthodox Pentecost
 Victory Day/ Memorial Day
 2015
 05
-09
+9
 Labor day
 2015
 05
@@ -241,7 +289,7 @@ orthodox whit monday
 victory day
 2014
 05
-09
+9
 labour days
 2014
 05

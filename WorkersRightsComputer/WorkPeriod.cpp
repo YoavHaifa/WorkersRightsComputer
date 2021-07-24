@@ -298,7 +298,7 @@ void CWorkPeriod::WriteLastSalary(class CHtmlWriter& html)
 	//	return;
 	html.StartParagraph();
 	html.WriteEH(L"This computation does not include last salary until ", 
-		L"חישוב זה אינו כולל שכר אחרון עד לתאריך ");
+		L"חישוב זה אינו כולל משכורת אחרונה עד לתאריך ");
 	html.WriteLineEH(gWorkPeriod.mLast.ToString(), gWorkPeriod.mLast.ToHebrewString());
 	//s += mLastSalaryUntil.ToString();
 	//html.WritePara(s);
