@@ -468,7 +468,7 @@ void CWorkersRightsComputerDlg::OnComputeAll()
 }
 void CWorkersRightsComputerDlg::OnFileSaveas()
 {
-	CString sDir(L"C:\\WorkersRights\\Save");
+	CString sDir(L"F:\\WorkersRights\\Save");
 	CMyFileDialog dlg(CMyFileDialog::FD_SAVE, L"save file", sDir);
 	dlg.SetDefaultExtention(L"txt");
 	if (dlg.DoModal())
@@ -480,7 +480,7 @@ void CWorkersRightsComputerDlg::OnFileSaveas()
 }
 void CWorkersRightsComputerDlg::OnFileLoad()
 {
-	CString sDir(L"C:\\WorkersRights\\Save");
+	CString sDir(L"F:\\WorkersRights\\Save");
 	CMyFileDialog dlg(CMyFileDialog::FD_OPEN, L"saved file", sDir);
 	dlg.SetDefaultExtention(L"txt");
 	if (dlg.DoModal())
@@ -492,17 +492,17 @@ void CWorkersRightsComputerDlg::OnFileLoad()
 }
 void CWorkersRightsComputerDlg::OnTestCreatedir()
 {
-	CUtils::VerifyDirectory(L"c:\\tmp\\new_dir");
+	CUtils::VerifyDirectory(L"F:\\tmp\\new_dir");
 }
 void CWorkersRightsComputerDlg::OnFileLoadoldcase()
 {
-	CString sDir(L"C:\\WorkersRights\\New_examples\\Ioana_Raducanu_055746047");
+	CString sDir(L"F:\\WorkersRights");
 	CMyFileDialog dlg(CMyFileDialog::FD_OPEN, L"saved file", sDir);
 	dlg.SetDefaultExtention(L"txt");
 	if (dlg.DoModal())
 	{
 		CString sfName(dlg.mSelectedFileName);
-		CVerify verify(sfName);
+		CVerifyOld verify(sfName);
 		verify.Verify();
 	}
 }
@@ -529,13 +529,13 @@ DWORD WINAPI CWorkersRightsComputerDlg::StaticThreadFunc(LPVOID)
 }
 void CWorkersRightsComputerDlg::OnTestVerifybatch()
 {
-	CString sDir(L"C:\\WorkersRights\\New_examples\\Beena MOl_Thomas_M7281984");
+	CString sDir(L"F:\\WorkersRights\\Verify");
 	CMyFileDialog dlg(CMyFileDialog::FD_OPEN, L"saved file", sDir);
-	dlg.SetDefaultExtention(L"txt");
+	dlg.SetDefaultExtention(L"xml");
 	if (dlg.DoModal())
 	{
 		CString sfName(dlg.mSelectedFileName);
-		CVerify::VerifyBatch(sfName);
+		CVerify::StartVerifyBatch(sfName);
 	}
 }
 void CWorkersRightsComputerDlg::OnTestWritehtml()

@@ -7,7 +7,7 @@ public:
 
 	static void ResetAllInputs(void);
 	void Save(const wchar_t *zfName = NULL);
-	void Restore(const wchar_t *zfName = NULL);
+	bool Restore(const wchar_t *zfName = NULL);
 
 private:
 	void SaveToXml(void);
@@ -16,8 +16,8 @@ private:
 	void SaveButton(FILE *pfSave, class CButtonRef *pRef);
 	void WriteLetter(void);
 
-	void LoadFromTxtFile(void);
-	void LoadFromXmlFile(void);
+	bool LoadFromTxtFile(void);
+	bool LoadFromXmlFile(void);
 
 	FILE *mpfWrite;
 	CString msSaveId;
