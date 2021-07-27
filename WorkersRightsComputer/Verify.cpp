@@ -64,6 +64,7 @@ DWORD WINAPI CVerify::StaticVerifyBatch(LPVOID)
 				fwprintf(umpfReport, L"%s\n", (const wchar_t *)sLast);
 				fflush(umpfReport);
 			}
+			delete pVerify;
 			if (!bSame && umbBreakonDiff)
 				break;
 		}
@@ -266,7 +267,7 @@ bool CVerify::VerifyResults()
 				oldSum += pResult->mDue;
 				bFound = true;
 				if (umpfReport)
-					fwprintf(umpfReport, L"%s, ", (const wchar_t *)pResult->msName);
+					fwprintf(umpfReport, L"%s, %.2f, ", (const wchar_t *)pResult->msName, pRight->mDuePay);
 				if ((pRight->mDuePay >= (pResult->mDue - 0.2)) && (pRight->mDuePay <= (pResult->mDue + 0.2)))
 				{
 					s += L" Same";

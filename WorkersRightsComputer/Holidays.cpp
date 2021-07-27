@@ -440,6 +440,11 @@ bool CHolidays::Compute(void)
 		msDue = L"Holidays not defined";
 		return false;
 	}
+	if (msSelection == "-")
+	{
+		msDue = L"Holidays not defined";
+		return false;
+	}
 	if (!InitFromFile(msSelection))
 		return false;
 
