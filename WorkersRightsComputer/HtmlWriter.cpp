@@ -300,7 +300,7 @@ void CHtmlWriter::EndTabLine(void)
 {
 	WriteL(L"</tr>");
 }
-void CHtmlWriter::StartPensionTable(void)
+void CHtmlWriter::StartPensionTable(bool bPension, bool bSeverance)
 {
 	WriteL(L"<table style=\"width:50%\" border=1>");
 
@@ -310,23 +310,17 @@ void CHtmlWriter::StartPensionTable(void)
 	WriteLTH_EH(L"Salary", L"משכורת");
 	WriteLTH_EH(L"Months", L"חודשים");
 	WriteLTH_EH(L"Total", L"סך הכל");
-	WriteLTH_EH(L"Pension", L"קרן");
-	WriteLTH_EH(L"Fund", L"פנסיה");
+	WriteLTH_EH(L"%", L"%");
 
-	if (gpPension->mbSeverance)
-	{
-		WriteLTH_EH(L"Severance", L"קרן");
-		WriteLTH_EH(L"Fund", L"פיצויים");
-		if (gFamilyPart.mbAskOnlyForFamilyPart)
-			WriteLTH_EH(L"Sum", L"ביחד");
-		else
-			WriteLTH_EH(L"All Due", L"ביחד מגיע");
-	}
 	if (gFamilyPart.mbAskOnlyForFamilyPart)
 	{
+		if (bPension)
+			WriteLTH_EH(L"Fund", L"פנסיה");
+		else
+			WriteLTH_EH(L"Fund", L"פיצויים");
 		WriteLTH_EH(L"Family", L"מהמשפחה");
-		WriteLTH_EH(L"Due", L"מגיע");
 	}
+	WriteLTH_EH(L"Due", L"מגיע");
 
 	WriteL(L"</tr>");
 }

@@ -34,7 +34,7 @@ public:
 
 	void StartTabLine(void);
 	void EndTabLine(void);
-	void StartPensionTable(void);
+	void StartPensionTable(bool bPension = true, bool bSeverance = false);
 	void EndPensionTable(void);
 	void Write2Tab(CString &sItem);
 	void Write2Tab(const char* zText);
