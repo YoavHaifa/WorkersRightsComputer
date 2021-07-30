@@ -46,7 +46,7 @@ public:
 	bool mbEng;
 	bool mbHeb;
 	void WriteItemToHtmlTable(CString sItem, CString sItemHebrew, bool bInvertDirection = false);
-	void WriteNumericItemToHtmlTable(CString sItem);
+	void WriteNumericItemToHtmlTable(double value);
 
 	static CString umsHtmlDir;
 };

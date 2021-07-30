@@ -7,6 +7,7 @@
 #include "Holidays.h"
 #include "Pension.h"
 #include "Additional.h"
+#include "Paid.h"
 #include "Utils.h"
 #include "WorkPeriod.h"
 #include "MinWage.h"
@@ -37,6 +38,7 @@ bool CAllRights::Init()
 	mRights.AddTail(new CRecuperation);
 	mRights.AddTail(new CPension);
 	mRights.AddTail(new CAdditional);
+	mRights.AddTail(new CPaid);
 
 	/*
 	for (int i = 0; i < mn; i++)
@@ -149,9 +151,9 @@ bool CAllRights::ComputeInternal()
 	while (pos)
 	{
 		CRight *pRight = mRights.GetNext(pos);
-		mSumDue += pRight->mDuePay;
-		if (pRight->mDuePay > 0 || !pRight->mbSkipIfZero)
+		if (pRight->HasLegalValue())
 		{
+			mSumDue += pRight->mDuePay;
 			if (!sAll.IsEmpty())
 				sAll += L"\r\n";
 			sAll += pRight->msDue;
@@ -181,7 +183,7 @@ void CAllRights::WriteLetterToHtml(CHtmlWriter &html)
 		while (pos)
 		{
 			CRight *pRight = mRights.GetNext(pos);
-			if (pRight->miPrintOrder == iPrint && pRight->mDuePay > 0)
+			if (pRight->miPrintOrder == iPrint && pRight->HasLegalValue())
 			{
 				pRight->WriteLineToHtmlTable(html);
 				break;
@@ -199,8 +201,7 @@ void CAllRights::WriteTotalLineToHtmlTable(CHtmlWriter &html)
 	CString sEmpty(L"");
 	html.WriteItemToHtmlTable(sEmpty, sEmpty);
 
-	CString sSum(CRight::ToString(mSumDue));
-	html.WriteNumericItemToHtmlTable(sSum);
+	html.WriteNumericItemToHtmlTable(mSumDue);
 
 	html.WriteItemToHtmlTable(CString(L"סך הכל"), CString("Total Due"), true);
 

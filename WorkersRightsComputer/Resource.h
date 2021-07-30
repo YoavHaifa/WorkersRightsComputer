@@ -64,6 +64,8 @@
 #define IDC_CHECK_ACTIVE_PENSION        1043
 #define IDC_EDIT_ADDITIONAL_SUM         1044
 #define IDC_EDIT_EMP_EMAIL              1045
+#define IDC_EDIT_ADDITIONAL_SUM2        1045
+#define IDC_EDIT_PAID_SUM               1045
 #define IDC_EDIT_EMP_EMAIL2             1046
 #define IDC_EDIT_HOLIDAYS_PREVY_N_YEARS 1047
 #define IDC_RADIO_ID                    1048
@@ -79,6 +81,8 @@
 #define IDC_EDIT_EMP_COMMENT            1063
 #define IDC_EDIT_SUMMARY                1064
 #define IDC_RADIO_PRIVATE               1065
+#define IDC_EDIT_ADDITIONAL_DESC2       1065
+#define IDC_EDIT_PAID_DESC              1065
 #define IDC_RADIO_COMPANY               1066
 #define IDC_RADIO_OSEK                  1067
 #define IDC_EDIT4                       1068

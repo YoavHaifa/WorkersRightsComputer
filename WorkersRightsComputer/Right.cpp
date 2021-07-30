@@ -114,6 +114,20 @@ bool CRight::ComputeEnvelop(void)
 
 	return bOK;
 }
+bool CRight::HasLegalValue()
+{
+	if (mDuePay > 0)
+		return true;
+
+	if ((mDuePay == 0) && !mbSkipIfZero)
+		return true;
+
+	return false;
+}
+bool CRight::PrintToLetter()
+{
+	return mDuePay > 0;
+}
 void CRight::LogLine(const wchar_t *zText)
 {
 	WriteLine(zText);
@@ -304,17 +318,19 @@ CString CRight::GetSumLineForLetter(void)
 	s += msNameHebrew;
 	return s;
 }
-CString CRight::GetRightNameForLetter(void)
+CString CRight::GetRightNameForLetter()
 {
 	return msName;
 }
-CString CRight::GetDecriptionForLetter(void)
+CString CRight::GetDecriptionForLetter()
 {
-	return CString(" ");
+	if (!msToLetter.IsEmpty())
+		return msToLetter;
+	return msDue;
 }
-CString CRight::GetDecriptionForLetterHebrew(void)
+CString CRight::GetDecriptionForLetterHebrew()
 {
-	return CString(" ");
+	return GetDecriptionForLetter();
 }
 void CRight::WriteLine(const wchar_t *zLine)
 {
@@ -413,9 +429,42 @@ void CRight::WriteLineToHtmlTable(CHtmlWriter &html)
 	CString sDescHebrew = GetDecriptionForLetterHebrew();
 	html.WriteItemToHtmlTable(sDesc, sDescHebrew);
 
-	CString sPay = ToString(mDuePay);
-	html.WriteNumericItemToHtmlTable(sPay);
+	html.WriteNumericItemToHtmlTable(mDuePay);
 
 	html.WriteItemToHtmlTable(msNameHebrew, msName, true);
 	html.WriteL(L"</tr>");
+}
+bool CRight::IsNumber(CString& s)
+{
+	int len = s.GetLength();
+	if (len < 1)
+		return false;
+	int nDot = 0;
+	int nDig = 0;
+	for (int i = 0; i < len; i++)
+	{
+		wchar_t ch = s[i];
+		if (isdigit(ch))
+			nDig++;
+		else if (ch == '.')
+		{
+			nDot++;
+			if (nDot > 1)
+				return false;
+		}
+		else
+			return false;
+	}
+	return true;
+}
+bool CRight::GetInputNumber(CEdit* pEdit, CString& os, double& oValue)
+{
+	pEdit->GetWindowTextW(os);
+	if (!IsNumber(os))
+	{
+		pEdit->SetWindowTextW(L"");
+		return false;
+	}
+	oValue = _wtof(os);
+	return true;
 }

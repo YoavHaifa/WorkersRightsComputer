@@ -52,6 +52,8 @@ public:
 	CEdit mEditPrevYearFrom;
 	CEdit mEditAdditionalDesc;
 	CEdit mEditAdditionalSum;
+	CEdit mEditPaidDesc;
+	CEdit mEditPaidSum;
 	CEdit mEditVacationPrevYears;
 	CEdit mEditRecuperationPrevYears;
 

@@ -1,32 +1,32 @@
-﻿#include "StdAfx.h"
-#include "Additional.h"
+﻿#include "stdafx.h"
+#include "Paid.h"
 
-CAdditional::CAdditional(void)
-	: CRight(L"Additional", L"בנוסף")
+CPaid::CPaid(void)
+	: CRight(L"Paid", L"שולם")
 	, mpDescBox(NULL)
 	, mpDueBox(NULL)
 {
-	miPrintOrder = 6;
+	miPrintOrder = 7;
 	mbSkipIfZero = true;
 }
-CAdditional::~CAdditional(void)
+CPaid::~CPaid(void)
 {
 }
-bool CAdditional::SetEditRef(class CEditRef *pRef)
+bool CPaid::SetEditRef(class CEditRef* pRef)
 {
-	if (pRef->msName == "AdditionalDesc")
+	if (pRef->msName == "PaidDesc")
 	{
 		mpDescBox = &pRef->mEdit;
 		return true;
 	}
-	if (pRef->msName == "AdditionalSum")
+	if (pRef->msName == "PaidSum")
 	{
 		mpDueBox = &pRef->mEdit;
 		return true;
 	}
 	return false;
 }
-bool CAdditional::Compute(void)
+bool CPaid::Compute(void)
 {
 	msToLetter = "";
 	CString sDesc;
@@ -34,10 +34,10 @@ bool CAdditional::Compute(void)
 	if (sDesc.GetLength() < 5)
 	{
 		msDue += "Missing Description";
-		msDebug += "Description of additional issue should be 5 characters at least";
+		msDebug += "Description of pay on the account should be 5 characters at least";
 		return false;
 	}
-	
+
 	CString sDue;
 	if (!GetInputNumber(mpDueBox, sDue, mDuePay))
 	{
@@ -46,20 +46,14 @@ bool CAdditional::Compute(void)
 		return false;
 	}
 
+	mDuePay = -mDuePay;
 	msDue += sDesc;
 	msDue += L" ";
 	msDue += ToString(mDuePay);
 	msToLetter = sDesc;
 	return true;
 }
-CString CAdditional::GetRightNameForLetter(void)
+bool CPaid::HasLegalValue()
 {
-	if (mpDescBox)
-	{
-		CString sDesc;
-		mpDescBox->GetWindowTextW(sDesc);
-		return sDesc;
-	}
-	return msName;
+	return mDuePay < 0;
 }
-

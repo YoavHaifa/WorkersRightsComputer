@@ -94,6 +94,9 @@ CWorkersRightsComputerDlg::CWorkersRightsComputerDlg(CWnd* pParent /*=nullptr*/)
 	mEditBoxes.AddTail(new CEditRef(L"PrevNYear", mEditPrevNYears, L"textBox7"));
 	mEditBoxes.AddTail(new CEditRef(L"AdditionalDesc", mEditAdditionalDesc, L"textBox14"));
 	mEditBoxes.AddTail(new CEditRef(L"AdditionalSum", mEditAdditionalSum, L"textBox15"));
+	mEditBoxes.AddTail(new CEditRef(L"PaidDesc", mEditPaidDesc));
+	mEditBoxes.AddTail(new CEditRef(L"PaidSum", mEditPaidSum));
+
 	mEditBoxes.AddTail(new CEditRef(L"VacationPrevYears", mEditVacationPrevYears, L"textBox11"));
 	mEditBoxes.AddTail(new CEditRef(L"RecuperationPrevYears", mEditRecuperationPrevYears, L"textBox13"));
 
@@ -128,6 +131,8 @@ void CWorkersRightsComputerDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT_HOLIDAYS_PREVY_FROM, mEditPrevYearFrom);
 	DDX_Control(pDX, IDC_EDIT_ADDITIONAL_DESC, mEditAdditionalDesc);
 	DDX_Control(pDX, IDC_EDIT_ADDITIONAL_SUM, mEditAdditionalSum);
+	DDX_Control(pDX, IDC_EDIT_PAID_DESC, mEditPaidDesc);
+	DDX_Control(pDX, IDC_EDIT_PAID_SUM, mEditPaidSum);
 	DDX_Control(pDX, IDC_EDIT_VACATION_YEARS, mEditVacationPrevYears);
 	DDX_Control(pDX, IDC_EDIT_RECUPERATION_YEARS, mEditRecuperationPrevYears);
 	DDX_Control(pDX, IDC_COMBO_HOLIDAYS, mComboHolidays);
@@ -164,6 +169,8 @@ BEGIN_MESSAGE_MAP(CWorkersRightsComputerDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_CHECK_ACTIVE_PENSION, &CWorkersRightsComputerDlg::OnBnClickedCheckActivePension)
 	ON_CBN_SELCHANGE(IDC_COMBO_HOLIDAYS, &CWorkersRightsComputerDlg::OnCbnSelchangeComboHolidays)
 	ON_EN_CHANGE(IDC_EDIT_HOLIDAYS_LASTY_WORK, &CWorkersRightsComputerDlg::OnEnChangeEditHolidaysLastyWork)
+	ON_EN_CHANGE(IDC_EDIT_ADDITIONAL_SUM, &CWorkersRightsComputerDlg::OnInputChange)
+	ON_EN_CHANGE(IDC_EDIT_PAID_SUM, &CWorkersRightsComputerDlg::OnInputChange)
 	ON_COMMAND(ID_COMPUTE_ALL, &CWorkersRightsComputerDlg::OnComputeAll)
 	ON_COMMAND(ID_FILE_SAVEAS, &CWorkersRightsComputerDlg::OnFileSaveas)
 	ON_COMMAND(ID_FILE_LOAD, &CWorkersRightsComputerDlg::OnFileLoad)
@@ -421,12 +428,6 @@ void CWorkersRightsComputerDlg::OnCbnSelchangeComboHolidays()
 }
 void CWorkersRightsComputerDlg::OnEnChangeEditHolidaysLastyWork()
 {
-	// TODO:  If this is a RICHEDIT control, the control will not
-	// send this notification unless you override the CDialogEx::OnInitDialog()
-	// function and call CRichEditCtrl().SetEventMask()
-	// with the ENM_CHANGE flag ORed into the mask.
-
-	// TODO:  Add your control notification handler code here
 	OnInputChange();
 }
 

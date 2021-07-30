@@ -382,10 +382,10 @@ void CHtmlWriter::WriteItemToHtmlTable(CString sItem, CString sItemHebrew, bool 
 	sh += "</td>";
 	WriteLEH(s, sh);
 }
-void CHtmlWriter::WriteNumericItemToHtmlTable(CString sItem)
+void CHtmlWriter::WriteNumericItemToHtmlTable(double value)
 {
-	CString s("<td style=""direction:rtl;"">");
-	s += sItem;
+	CString s(value > 0? "<td style=""direction:rtl;"">" : "<td style=""direction:l2r;"">");
+	s += CRight::ToString(value);
 	s += "</td>";
 	WriteLEH(s, s);
 }
