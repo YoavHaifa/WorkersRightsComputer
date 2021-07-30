@@ -317,7 +317,7 @@ void CHtmlWriter::StartPensionTable(bool bPension, bool bSeverance)
 		if (bPension)
 			WriteLTH_EH(L"Fund", L"פנסיה");
 		else
-			WriteLTH_EH(L"Fund", L"פיצויים");
+			WriteLTH_EH(L"Fund", L"קרן פיצויים");
 		WriteLTH_EH(L"Family", L"מהמשפחה");
 	}
 	WriteLTH_EH(L"Due", L"מגיע");
@@ -372,13 +372,20 @@ bool CHtmlWriter::OpenHebrewLetter()
 	mpfHebrewWrite = MyFOpenWithErrorBox(msfHebrewName, L"w, ccs=UNICODE", L"HTML Unicode");
 	return true;
 }
-void CHtmlWriter::WriteItemToHtmlTable(CString sItem, CString sItemHebrew)
+void CHtmlWriter::WriteItemToHtmlTable(CString sItem, CString sItemHebrew, bool bInvertDirection)
 {
-	CString s("<td>");
+	CString s(bInvertDirection ? "<td style=""direction:rtl;"">" : "<td style=""direction:ltr;"">");
 	s += sItem;
 	s += "</td>";
-	CString sh("<td>");
+	CString sh(bInvertDirection ? "<td style=""direction:ltr;"">" : "<td style=""direction:rtl;"">");
 	sh += sItemHebrew;
 	sh += "</td>";
 	WriteLEH(s, sh);
+}
+void CHtmlWriter::WriteNumericItemToHtmlTable(CString sItem)
+{
+	CString s("<td style=""direction:rtl;"">");
+	s += sItem;
+	s += "</td>";
+	WriteLEH(s, s);
 }

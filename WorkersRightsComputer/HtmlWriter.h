@@ -45,7 +45,8 @@ public:
 	bool OpenHebrewLetter();
 	bool mbEng;
 	bool mbHeb;
-	void WriteItemToHtmlTable(CString sItem, CString sItemHebrew);
+	void WriteItemToHtmlTable(CString sItem, CString sItemHebrew, bool bInvertDirection = false);
+	void WriteNumericItemToHtmlTable(CString sItem);
 
 	static CString umsHtmlDir;
 };

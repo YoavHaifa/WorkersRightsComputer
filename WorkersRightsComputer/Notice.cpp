@@ -198,7 +198,7 @@ bool CNotice::Compute(void)
 
 	if (gFamilyPart.mbAskOnlyForFamilyPart)
 	{
-		mDuePay = mDuePay * gFamilyPart.mRatio;
+		mDuePay = mDuePay * gFamilyPart.GetRatio();
 		msDue += L" =FamilyPart=> ";
 		msDue += ToString(mDuePay);
 	}
@@ -208,6 +208,7 @@ bool CNotice::Compute(void)
 CString CNotice::GetDecriptionForLetter(void)
 {
 	CString s;
+
 	if (mbDemandFullMonth && (mnDaysPaidAfterNotice == 0))
 	{
 		s = L"Full month";
@@ -218,11 +219,18 @@ CString CNotice::GetDecriptionForLetter(void)
 		s += L" days * ";
 		s += ToString(mPayPerDay);
 	}
+
+	if (gFamilyPart.mbAskOnlyForFamilyPart)
+	{
+		s += ", Family Part ";
+		s += gFamilyPart.GetSRatio();
+	}
 	return s;
 }
 CString CNotice::GetDecriptionForLetterHebrew(void)
 {
 	CString s;
+
 	if (mbDemandFullMonth && (mnDaysPaidAfterNotice == 0))
 	{
 		s = L"חודש מלא";
@@ -232,6 +240,11 @@ CString CNotice::GetDecriptionForLetterHebrew(void)
 		s += ToString(mDueWorkDayToPay);
 		s += L" ימים * ";
 		s += ToString(mPayPerDay);
+	}
+	if (gFamilyPart.mbAskOnlyForFamilyPart)
+	{
+		s += L", חלק המשפחה ";
+		s += gFamilyPart.GetSRatio();
 	}
 	return s;
 }

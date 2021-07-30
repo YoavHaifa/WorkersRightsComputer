@@ -414,8 +414,8 @@ void CRight::WriteLineToHtmlTable(CHtmlWriter &html)
 	html.WriteItemToHtmlTable(sDesc, sDescHebrew);
 
 	CString sPay = ToString(mDuePay);
-	html.WriteItemToHtmlTable(sPay, sPay);
+	html.WriteNumericItemToHtmlTable(sPay);
 
-	html.WriteItemToHtmlTable(msNameHebrew, msName);
+	html.WriteItemToHtmlTable(msNameHebrew, msName, true);
 	html.WriteL(L"</tr>");
 }

@@ -78,9 +78,11 @@ public:
 	bool AddPeriod(CMyTime& startTime, CCompanyPartPeriod *pNewPeriod);
 	bool AddPeriod(CTime startTime, double hoursPerWeekByCompany);
 	bool AddPeriodPC(CTime startTime, double perCentByCompany); // By Percent
+	double GetRatio() { return mRatio; }
+	void SetRatio(double ratio);
+	const wchar_t * GetSRatio() { return msRatio; }
 
 	bool mbAskOnlyForFamilyPart;
-	double mRatio;
 	bool mbDefined;
 
 	CList<CCompanyPartPeriod *, CCompanyPartPeriod *> mPeriods;
@@ -93,6 +95,10 @@ public:
 	void Save(FILE *pfSave);
 	void Restore(FILE *pfRead);
 	void WriteToLetter(class CHtmlWriter &writer);
+
+private:
+	double mRatio;
+	CString msRatio;
 };
 
 extern CFamilyPart gFamilyPart;

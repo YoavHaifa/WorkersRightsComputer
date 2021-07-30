@@ -74,7 +74,7 @@ bool CSeverance::Compute(void)
 
 	if (gFamilyPart.mbAskOnlyForFamilyPart)
 	{
-		mDuePay = mDuePay * gFamilyPart.mRatio;
+		mDuePay = mDuePay * gFamilyPart.GetRatio();
 		msDue += L" =FamilyPart=> ";
 		msDue += ToString(mDuePay);
 	}
@@ -92,17 +92,31 @@ bool CSeverance::Compute(void)
 }
 CString CSeverance::GetDecriptionForLetter(void)
 {
-	CString s = ToString(mnYears, 3);
+	CString s;
+	s += ToString(mnYears, 3);
 	s += L" years * ";
 	s += ToString(mPayPerYear);
+
+	if (gFamilyPart.mbAskOnlyForFamilyPart)
+	{
+		s += ", Family Part ";
+		s += gFamilyPart.GetSRatio();
+	}
 
 	return s;
 }
 CString CSeverance::GetDecriptionForLetterHebrew(void)
 {
-	CString s = ToString(mnYears, 3);
+	CString s;
+
+	s += ToString(mnYears, 3);
 	s += L" שנים * ";
 	s += ToString(mPayPerYear);
 
+	if (gFamilyPart.mbAskOnlyForFamilyPart)
+	{
+		s += L", חלק המשפחה ";
+		s += gFamilyPart.GetSRatio();
+	}
 	return s;
 }

@@ -200,9 +200,9 @@ void CAllRights::WriteTotalLineToHtmlTable(CHtmlWriter &html)
 	html.WriteItemToHtmlTable(sEmpty, sEmpty);
 
 	CString sSum(CRight::ToString(mSumDue));
-	html.WriteItemToHtmlTable(sSum, sSum);
+	html.WriteNumericItemToHtmlTable(sSum);
 
-	html.WriteItemToHtmlTable(CString(L"סך הכל"), CString("Total Due"));
+	html.WriteItemToHtmlTable(CString(L"סך הכל"), CString("Total Due"), true);
 
 	html.WriteL(L"</tr>");
 }
