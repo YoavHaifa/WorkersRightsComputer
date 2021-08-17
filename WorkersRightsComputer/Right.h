@@ -51,6 +51,7 @@ public:
 	virtual	bool SetEditRef(CEditRef * /*pRef*/) { return false; }
 
 	virtual bool HasLegalValue();
+	virtual bool HasLegalRealValue();
 	virtual bool PrintToLetter();
 
 	virtual CString GetRightNameForLetter(void);

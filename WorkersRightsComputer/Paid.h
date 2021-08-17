@@ -11,6 +11,7 @@ public:
 	//virtual CString GetDecriptionForLetter(void)override;
 	//virtual CString GetDecriptionForLetterHebrew(void)override;
 	virtual bool HasLegalValue();
+	virtual bool HasLegalRealValue();
 
 private:
 

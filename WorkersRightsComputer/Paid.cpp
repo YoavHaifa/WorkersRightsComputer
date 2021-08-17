@@ -57,3 +57,7 @@ bool CPaid::HasLegalValue()
 {
 	return mDuePay < 0;
 }
+bool CPaid::HasLegalRealValue()
+{
+	return mDuePay < 0;
+}

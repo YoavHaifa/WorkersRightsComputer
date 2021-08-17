@@ -183,7 +183,7 @@ void CAllRights::WriteLetterToHtml(CHtmlWriter &html)
 		while (pos)
 		{
 			CRight *pRight = mRights.GetNext(pos);
-			if (pRight->miPrintOrder == iPrint && pRight->HasLegalValue())
+			if (pRight->miPrintOrder == iPrint && pRight->HasLegalRealValue())
 			{
 				pRight->WriteLineToHtmlTable(html);
 				break;

@@ -124,6 +124,13 @@ bool CRight::HasLegalValue()
 
 	return false;
 }
+bool CRight::HasLegalRealValue()
+{
+	if (mDuePay > 0)
+		return true;
+
+	return false;
+}
 bool CRight::PrintToLetter()
 {
 	return mDuePay > 0;
