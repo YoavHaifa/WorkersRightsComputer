@@ -11,6 +11,7 @@ CFamilyPart gFamilyPart;
 CFamilyPart::CFamilyPart()
 	: mbAskOnlyForFamilyPart(false)
 	, mRatio(0)
+	, msRatio(_T("0"))
 	, mbDefined(false)
 {
 }
@@ -26,7 +27,7 @@ void CFamilyPart::Clear(void)
 		mPeriods.RemoveTail();
 	}
 	mbDefined = false;
-	mRatio = 0;
+	SetRatio(0);
 	mbAskOnlyForFamilyPart = false;
 }
 void CFamilyPart::ClearLast(void)
@@ -55,7 +56,7 @@ void CFamilyPart::ClearLast(void)
 	if (mPeriods.IsEmpty())
 	{
 		mbDefined = false;
-		mRatio = 0;
+		SetRatio(0);
 		mbAskOnlyForFamilyPart = false;
 	}
 }
@@ -160,9 +161,8 @@ CString CFamilyPart::GetFullText()
 		pPrevPeriod = pPeriod;
 	}
 
-	char zBuf[128];
-	sprintf_s(zBuf, sizeof(zBuf), "Family Part is %5.2f%%", mRatio * 100);
-	s += zBuf;
+	s += "Family Part is ";
+	s += msRatio;
 	return s;
 }
 CString CFamilyPart::GetShortText()
@@ -174,9 +174,7 @@ CString CFamilyPart::GetShortText()
 	}
 	Compute();
 
-	char zBuf[128];
-	sprintf_s(zBuf, sizeof(zBuf), "Ask only for Family Part - %5.2f%%", mRatio * 100);
-	return CString(zBuf);
+	return CString(L"Ask only for Family Part - " + msRatio);
 }
 void CFamilyPart::Compute()
 {
@@ -195,7 +193,7 @@ void CFamilyPart::Compute()
 	if (pPrevPeriod)
 		gWorkPeriod.SetWeekDaysPaidByCompany(pPrevPeriod, NULL);
 
-	mRatio = gWorkPeriod.ComputeFamilyPart();
+	SetRatio(gWorkPeriod.ComputeFamilyPart());
 }
 void CFamilyPart::SaveToXml(CXMLDump &xmlDump)
 {
@@ -295,9 +293,9 @@ void CFamilyPart::WriteToLetter(CHtmlWriter &writer)
 			L"חישוב זה מתייחס רק לחלק התשלום המגיע מהמשפחה המעסיקה.");
 		writer.StartBold();
 		writer.WriteLEH(L"Family Part is ", L"חלקה של המשפחה הוא ");
-		wchar_t zBuf[128];
-		swprintf_s(zBuf, 128, L"%5.2f%%", mRatio * 100);
-		writer.WriteL(zBuf);
+		//wchar_t zBuf[128];
+		//swprintf_s(zBuf, 128, L"%5.2f%%", mRatio * 100);
+		writer.WriteL(msRatio);
 		writer.EndBold();
 		writer.WriteLineEH(L" from the payment for severance, pension and advance notice.", 
 			L"מהתשלום עבור פיצויי פיטורים, תגמולי מעסיק והודעה מוקדמת. ");
@@ -308,4 +306,11 @@ void CFamilyPart::WriteToLetter(CHtmlWriter &writer)
 			L"חישוב זה כולל את הסכומים ששולמו על ידי הביטוח הלאומי עבור פיצויים ופנסיה.");
 	}
 	writer.EndParagraph();
+}
+void CFamilyPart::SetRatio(double ratio)
+{
+	mRatio = ratio;
+	wchar_t zBuf[128];
+	swprintf_s(zBuf, 128, L"%5.2f%%", mRatio * 100);
+	msRatio = zBuf;
 }

@@ -3,6 +3,7 @@
 #include "Utils.h"
 #include "VacationTable.h"
 #include "WorkYears.h"
+#include "Config.h"
 
 const double CVacation::MIN_FRACTION_FOR_ROUND_UP = 0.9;
 
@@ -43,8 +44,9 @@ bool CVacation::ComputePerPeriod(void)
 	int nMonthInSeniorityYear = 12;
 	double daysFraction = 0;
 
-	if (gWorkYears.mnMonthsInLastYear < N_MONTH_FOR_FULL_YEARLY_VACATION)
-	{
+	//if (gWorkYears.mnMonthsInLastYear < N_MONTH_FOR_FULL_YEARLY_VACATION)
+	if (gWorkYears.mnMonthsInLastYear < gConfig.mNMonthsForFullVacation)
+		{
 		restMonths += gWorkYears.mnMonthsInLastYear;
 		seniority ++;
 		nMonthInSeniorityYear = gWorkYears.mnMonthsInLastYear;
@@ -226,7 +228,8 @@ bool CVacation::Compute(void)
 			mnSeniority = gWorkYears.mnPrevYears;
 			mnYearsForVacation = mnYearsOfUnpaidVacation;
 			LogLine(L"N Previous Years for vacation", mnYearsForVacation);
-			if (gWorkYears.mnMonthsInLastYear >= N_MONTH_FOR_FULL_YEARLY_VACATION)
+			//if (gWorkYears.mnMonthsInLastYear >= N_MONTH_FOR_FULL_YEARLY_VACATION)
+			if (gWorkYears.mnMonthsInLastYear >= gConfig.mNMonthsForFullVacation)
 			{
 				mnYearsForVacation++;
 				mnSeniority++;

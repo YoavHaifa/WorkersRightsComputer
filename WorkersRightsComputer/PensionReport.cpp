@@ -42,7 +42,7 @@ void CPensionReportPeriod::Add(int year, int month, double part)
 	mTillMonth = month;
 	mMonthParts += part;
 }
-void CPensionReportPeriod::WriteToLetter(CHtmlWriter& html)
+void CPensionReportPeriod::WriteToLetter(CHtmlWriter& html, bool bPension)
 {
 	char zBuf[256];
 	sprintf_s(zBuf, 256, "%2d/%4d", mFromMonth, mFromYear);
@@ -55,41 +55,32 @@ void CPensionReportPeriod::WriteToLetter(CHtmlWriter& html)
 
 	double totalPay = mMonthlyPay * mMonthParts;
 	html.Write2Tab(totalPay);
+	double due = 0;
 
-	html.Write2Tab("%5.2f%%", mPensionRate * 100);
+	if (bPension)
+	{
+		html.Write2Tab("%5.2f%%", mPensionRate * 100);
 
-	mDuePension = totalPay * mPensionRate;
-	html.Write2Tab(mDuePension);
-
-	if (gpPension->mbSeverance)
+		mDuePension = totalPay * mPensionRate;
+		html.Write2Tab(mDuePension);
+		due = mDuePension;
+	}
+	else
 	{
 		html.Write2Tab("%5.2f%%", mSeveranceRate * 100);
 
 		mDueSeverance = totalPay * mSeveranceRate;
 		html.Write2Tab(mDueSeverance);
-
-		html.Write2Tab(mDuePension + mDueSeverance);
+		due = mDueSeverance;
 	}
 
 	if (gFamilyPart.mbAskOnlyForFamilyPart)
 	{
 		html.Write2Tab("%5.2f%%", mFamilyPart * 100);
-		mDueFromFamily = (mDuePension + mDueSeverance) * mFamilyPart;
+
+		mDueFromFamily = due * mFamilyPart;
 		html.Write2Tab(mDueFromFamily);
 	}
-	/*
-	wchar_t zBuf[256];
-	swprintf_s(zBuf, 256, L"From %2d/%4d Till %2d/%4d salary %7.2f",
-		mFromMonth, mFromYear, mTillMonth, mTillYear, mMonthlyPay);
-	CString s(zBuf);
-	swprintf_s(zBuf, 256, L" (%5.3f months)", mMonthParts);
-	s += zBuf;
-	swprintf_s(zBuf, 256, L" %9.2f", totalPay);
-	s += zBuf;
-	swprintf_s(zBuf, 256, L" Pension %4.2f due %7.2f", mPensionRate * 100, duePension);
-	s += zBuf;
-
-	html.WriteLine(s); */
 }
 
 //------------------------------------------------------------------
@@ -123,7 +114,8 @@ void CPensionReport::AddMonth(int year, int month, double monthlyPay, double par
 		mPeriods.AddTail(mpLast);
 	}
 }
-void CPensionReport::WriteToLetter(CHtmlWriter& html)
+/*
+void CPensionReport::WriteToLetterOld(CHtmlWriter& html)
 {
 	double sumPension = 0;
 	double sumSeverance = 0;
@@ -133,7 +125,7 @@ void CPensionReport::WriteToLetter(CHtmlWriter& html)
 	while (pos)
 	{
 		html.StartTabLine();
-		CPensionReportPeriod *pPeriod = mPeriods.GetNext(pos);
+		CPensionReportPeriod* pPeriod = mPeriods.GetNext(pos);
 		pPeriod->WriteToLetter(html);
 		html.EndTabLine();
 		sumPension += pPeriod->mDuePension;
@@ -154,6 +146,73 @@ void CPensionReport::WriteToLetter(CHtmlWriter& html)
 		html.Write2Tab(" ");
 		html.Write2Tab(sumSeverance);
 		html.Write2Tab(sumPension + sumSeverance);
+	}
+	if (gFamilyPart.mbAskOnlyForFamilyPart)
+	{
+		html.Write2Tab(" ");
+		html.Write2Tab(sumFromFamily);
+	}
+	html.EndTabLine();
+	html.EndPensionTable();
+} */
+void CPensionReport::WriteToLetterPension(CHtmlWriter& html)
+{
+	double sumPension = 0;
+	double sumFromFamily = 0;
+	html.StartPensionTable(true, false);
+	POSITION pos = mPeriods.GetHeadPosition();
+	while (pos)
+	{
+		html.StartTabLine();
+		CPensionReportPeriod* pPeriod = mPeriods.GetNext(pos);
+		pPeriod->WriteToLetter(html, true);
+		html.EndTabLine();
+		sumPension += pPeriod->mDuePension;
+		sumFromFamily += pPeriod->mDueFromFamily;
+	}
+	// Sum Line
+	html.StartTabLine();
+	html.Write2TabEH(L"Sum", L"סך הכל");
+	html.Write2Tab(" ");
+	html.Write2Tab(" ");
+	html.Write2Tab(" ");
+	html.Write2Tab(" ");
+	html.Write2Tab(" ");
+	html.Write2Tab(sumPension);
+	if (gFamilyPart.mbAskOnlyForFamilyPart)
+	{
+		html.Write2Tab(" ");
+		html.Write2Tab(sumFromFamily);
+	}
+	html.EndTabLine();
+	html.EndPensionTable();
+}
+void CPensionReport::WriteToLetterSeverance(CHtmlWriter& html)
+{
+	double sumSeverance = 0;
+	double sumFromFamily = 0;
+	html.StartPensionTable(false, true);
+	POSITION pos = mPeriods.GetHeadPosition();
+	while (pos)
+	{
+		html.StartTabLine();
+		CPensionReportPeriod* pPeriod = mPeriods.GetNext(pos);
+		pPeriod->WriteToLetter(html, false);
+		html.EndTabLine();
+		sumSeverance += pPeriod->mDueSeverance;
+		sumFromFamily += pPeriod->mDueFromFamily;
+	}
+	// Sum Line
+	html.StartTabLine();
+	html.Write2TabEH(L"Sum", L"סך הכל");
+	html.Write2Tab(" ");
+	html.Write2Tab(" ");
+	html.Write2Tab(" ");
+	html.Write2Tab(" ");
+	if (gpPension->mbSeverance)
+	{
+		html.Write2Tab(" ");
+		html.Write2Tab(sumSeverance);
 	}
 	if (gFamilyPart.mbAskOnlyForFamilyPart)
 	{

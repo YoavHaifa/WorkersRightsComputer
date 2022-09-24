@@ -34,7 +34,7 @@ public:
 
 	void StartTabLine(void);
 	void EndTabLine(void);
-	void StartPensionTable(void);
+	void StartPensionTable(bool bPension = true, bool bSeverance = false);
 	void EndPensionTable(void);
 	void Write2Tab(CString &sItem);
 	void Write2Tab(const char* zText);
@@ -45,7 +45,8 @@ public:
 	bool OpenHebrewLetter();
 	bool mbEng;
 	bool mbHeb;
-	void WriteItemToHtmlTable(CString sItem, CString sItemHebrew);
+	void WriteItemToHtmlTable(CString sItem, CString sItemHebrew, bool bInvertDirection = false);
+	void WriteNumericItemToHtmlTable(double value);
 
 	static CString umsHtmlDir;
 };

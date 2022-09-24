@@ -98,7 +98,7 @@ int CFilesList::AddNamesFromFile(const wchar_t *zfName)
 	wchar_t zBuf[256];
 	while (1)
 	{
-		size_t nRead = fwscanf_s(pf,L"%s",zBuf,sizeof(zBuf));
+		size_t nRead = fwscanf_s(pf,L"%s",zBuf,(unsigned int)sizeof(zBuf));
 		if (nRead == 1)
 		{
 			Add(zBuf);

@@ -3,7 +3,8 @@
 class CRightResult
 {
 public:
-	CRightResult(FILE *pf, const wchar_t *zName);
+	CRightResult(FILE* pf, const wchar_t* zName);
+	CRightResult(class CXMLParseNode* pNode);
 	CString msName;
 	double mDue;
 };
@@ -24,6 +25,10 @@ public:
 	CVerify(const wchar_t *zfName, bool bSilent = false);
 	~CVerify();
 
+	bool Verify();
+	static void StartVerifyBatch(const wchar_t *zfName);
+
+protected:
 	static CString umsfName;
 	static bool umbBreakonDiff;
 	static FILE* umpfReport;
@@ -31,11 +36,9 @@ public:
 	static bool umbDisplayDiff;
 
 	static DWORD WINAPI StaticVerifyBatch(LPVOID);
-	static void VerifyBatch(const wchar_t *zfName);
 
 	CString msfName;
-	bool Verify();
-	bool ReadOldFile();
+	virtual bool ReadSavedFile() = 0;
 	void ReadTime(FILE *pfRead, int i);
 	CList<CRightResult *, CRightResult *> mResults;
 	CList<CHolidaysDef *, CHolidaysDef *> mHolidaysDefs;
@@ -61,5 +64,24 @@ public:
 	int mnMissing;
 	bool mbSilentMode;
 	void CheckIfNoticeSet();
+	static bool umbOldTxtFiles;
+};
+
+class CVerifyOld : public CVerify
+{
+public:
+	CVerifyOld(const wchar_t* zfName, bool bSilent = false);
+	~CVerifyOld();
+
+	virtual bool ReadSavedFile();
+};
+
+class CVerifyNew : public CVerify
+{
+public:
+	CVerifyNew(const wchar_t* zfName, bool bSilent = false);
+	~CVerifyNew();
+
+	virtual bool ReadSavedFile();
 };
 

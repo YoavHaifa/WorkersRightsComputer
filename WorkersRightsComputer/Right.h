@@ -50,6 +50,10 @@ public:
 	virtual	bool SetCheckRef(CButtonRef * /*pButton*/) { return false; }
 	virtual	bool SetEditRef(CEditRef * /*pRef*/) { return false; }
 
+	virtual bool HasLegalValue();
+	virtual bool HasLegalRealValue();
+	virtual bool PrintToLetter();
+
 	virtual CString GetRightNameForLetter(void);
 	virtual CString GetDecriptionForLetter(void);
 	virtual CString GetDecriptionForLetterHebrew(void);
@@ -79,6 +83,7 @@ public:
 	bool mbSkipIfZero;
 	double mDuePay;
 	CString msDue;
+	CString msToLetter;
 	CString msDebug;
 	CString mLabel;
 	int miPrintOrder;
@@ -109,6 +114,8 @@ public:
 	static bool GetIntFromEditBox(CEdit *pEdit, const wchar_t *zName, int &value);
 
 	static CString GetSaveDir(void);
+	bool IsNumber(CString& s);
+	bool GetInputNumber(CEdit *pEdit, CString& os, double &oValue);
 
 private:
 	static CString umsSaveDir;

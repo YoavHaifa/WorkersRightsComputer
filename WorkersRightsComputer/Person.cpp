@@ -56,7 +56,7 @@ void CPerson::StartLetter(CHtmlWriter &html)
 		if (mbIsPassport)
 		{
 			s = L"Passport: ";
-			sh = L"פספורט: ";
+			sh = L"דרכון: ";
 		}
 		else
 		{

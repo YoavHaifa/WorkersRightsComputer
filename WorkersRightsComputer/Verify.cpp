@@ -7,14 +7,17 @@
 #include "AllRights.h"
 #include "FilesList.h"
 #include "Pension.h"
+#include "Saver.h"
+#include "XmlParse.h"
 
 CString CVerify::umsfName;
 bool CVerify::umbBreakonDiff = false;
 FILE* CVerify::umpfReport = NULL;
 int CVerify::umiBatch = 0;
 bool CVerify::umbDisplayDiff = false;
+bool CVerify::umbOldTxtFiles = false;
 
-void CVerify::VerifyBatch(const wchar_t *zfName)
+void CVerify::StartVerifyBatch(const wchar_t *zfName)
 {
 	umsfName = zfName;
 	CUtils::CreateThread(StaticVerifyBatch, NULL);
@@ -33,7 +36,7 @@ DWORD WINAPI CVerify::StaticVerifyBatch(LPVOID)
 	umpfReport = MyFOpenWithErrorBox(sReportFileName, L"w", L"Log");
 
 	CFilesList list;
-	CUtils::ListFilesInDirRecursive(sPath, L"*.txt", list);
+	CUtils::ListFilesInDirRecursive(sPath, umbOldTxtFiles ? L"*.txt" : L"*.xml", list);
 
 	umiBatch = 0;
 	POSITION pos = list.GetHeadPosition();
@@ -41,14 +44,18 @@ DWORD WINAPI CVerify::StaticVerifyBatch(LPVOID)
 	{
 		CString *psfName = list.GetNext(pos);
 		CString sPrivate = CFileName::GetPrivate((const wchar_t *)*psfName);
-		if (sPrivate == L"Save.txt")
+		if (sPrivate == L"Save.txt" || sPrivate.Right(8) == "save.xml")
 		{
 			umiBatch++;
 			if (umpfReport)
 				fprintf(umpfReport, "%d, ", umiBatch);
-			CVerify verify((const wchar_t *)*psfName, true);
-			bool bSame = verify.Verify();
-			verify.WriteSummary(pfLog);
+			CVerify* pVerify = NULL;
+			if (umbOldTxtFiles)
+				pVerify = new CVerifyOld((const wchar_t *)*psfName, true);
+			else
+				pVerify = new CVerifyNew((const wchar_t *)*psfName, true);
+			bool bSame = pVerify->Verify();
+			pVerify->WriteSummary(pfLog);
 
 			if (umpfReport)
 			{
@@ -57,6 +64,7 @@ DWORD WINAPI CVerify::StaticVerifyBatch(LPVOID)
 				fwprintf(umpfReport, L"%s\n", (const wchar_t *)sLast);
 				fflush(umpfReport);
 			}
+			delete pVerify;
 			if (!bSame && umbBreakonDiff)
 				break;
 		}
@@ -94,141 +102,19 @@ CVerify::~CVerify()
 }
 bool CVerify::Verify()
 {
-	CRight::umbOldStyle = true;
-	gpPension->CorrectForOldStype();
+	if (umbOldTxtFiles)
+	{
+		CRight::umbOldStyle = true;
+		gpPension->CorrectForOldStype();
+	}
 
-	if (!ReadOldFile())
+	if (!ReadSavedFile())
 		return false;
 
 	gpDlg->OnInputChange();
 	mbAllSame = VerifyResults();
 	CRight::umbOldStyle = false;
 	return mbAllSame;
-}
-bool CVerify::ReadOldFile()
-{
-	FILE *pfRead = MyFOpenWithErrorBox(msfName, L"r", L"Old Saved File");
-	if (!pfRead)
-		return false;
-
-	mnTimesDefined = 0;
-	gpDlg->OnBnClickedButtonReset();
-	gpDlg->mbDisableComputations = true;
-	int nEditsRead = 0;
-	int nCheckRead = 0;
-	int nChecked = 0;
-
-	// Read Text Boxes
-	bool bEndFound = false;
-	CString sKey = CUtils::ReadLine(pfRead);
-	while (!sKey.IsEmpty() && sKey != L"end" && !bEndFound)
-	{
-		// Look for known boxes old names
-		POSITION pos = gpDlg->mEditBoxes.GetHeadPosition();
-		while(pos)
-		{
-			CEditRef *pRef = gpDlg->mEditBoxes.GetNext(pos);
-			if (pRef->msOldName == sKey)
-			{
-				nEditsRead++;
-				CString sValue = CUtils::ReadNextLine(pfRead);
-				pRef->mEdit.SetWindowTextW(sValue);
-				if (pRef->msOldName == L"textBox1")
-					msFirstName = sValue;
-				else if (pRef->msOldName == L"textBox2")
-					msFamilyName = sValue;
-				if (mpfLog)
-					fwprintf(mpfLog, L"<Read> Set %s %s to %s\n", (const wchar_t *)pRef->msName, 
-					(const wchar_t *)pRef->msOldName, (const wchar_t *)sValue);
-				if (sValue.Left(3) == L"end")
-					bEndFound = true;
-			}
-		}
-		if (!bEndFound)
-			sKey = CUtils::ReadLine(pfRead);
-	}
-
-	// Read Work Period
-	sKey = CUtils::ReadLine(pfRead);
-	while (!sKey.IsEmpty() && sKey != L"end")
-	{
-		if (sKey == L"dateTimePicker1")
-			ReadTime(pfRead, 1);
-		else if (sKey == L"dateTimePicker2")
-			ReadTime(pfRead, 2);
-		else if (sKey == L"dateTimePicker3")
-			ReadTime(pfRead, 3);
-		sKey = CUtils::ReadLine(pfRead);
-	}
-
-	// Read Checkboxes
-	sKey = CUtils::ReadLine(pfRead);
-	while (!sKey.IsEmpty() && sKey != L"end")
-	{
-		// Look for known boxes old names
-		bool bFound = false;
-		POSITION pos = gpDlg->mButtons.GetHeadPosition();
-		while (pos)
-		{
-			CButtonRef *pRef = gpDlg->mButtons.GetNext(pos);
-			if (pRef->msOldName == sKey)
-			{
-				nCheckRead++;
-				int value = CUtils::ReadInt(pfRead);
-				if (value)
-				{
-					pRef->mButton.SetCheck(BST_CHECKED);
-					nChecked++;
-				}
-				bFound = true;
-				break;
-			}
-		}
-		if (!bFound)
-		{
-			if (sKey.Left(8) == L"checkBox")
-			{
-				CString sRest = sKey.Right(sKey.GetLength() - 8);
-				int iDay = _wtoi(sRest);
-				if (iDay >= 4 && iDay <= 10)
-				{
-					nCheckRead++;
-					int value = CUtils::ReadInt(pfRead);
-					if (value)
-					{
-						nChecked++;
-						gWorkPeriod.SetWorkingDay(iDay - 4, 1);
-					}
-				}
-			}
-		}
-		sKey = CUtils::ReadLine(pfRead);
-	}
-	int nResults = ReadResults(pfRead);
-
-	CString s(CRight::ToString(nEditsRead));
-	s += L" edit boxes,  ";
-	s += CRight::ToString(mnTimesDefined);
-	s += L" times,  ";
-	s += CRight::ToString(nChecked);
-	s += L" / ";
-	s += CRight::ToString(nCheckRead);
-	s += L" checked, nResults ";
-	s += CRight::ToString(nResults);
-
-	CString sHolidays = SelectHolidays();
-	gpDlg->mComboHolidays.SetWindowTextW(sHolidays);
-	s += L"\r\nHolidays: ";
-	s += sHolidays;
-
-	if (!mbSilentMode)
-		CUtils::MessBox(s, L"Old Save Read");
-
-	CheckIfNoticeSet();
-	gpDlg->mbDisableComputations = false;
-	if (pfRead)
-		fclose(pfRead);
-	return true;
 }
 void CVerify::ReadTime(FILE *pfRead, int i)
 {
@@ -335,6 +221,12 @@ CRightResult::CRightResult(FILE *pfRead, const wchar_t *zName)
 		sLine = CUtils::ReadLine(pfRead);
 	}
 }
+CRightResult::CRightResult(CXMLParseNode* pNode)
+	: msName(pNode->msName)
+	, mDue(0)
+{
+	pNode->GetValue(L"Due", mDue);
+}
 void CVerify::Clear()
 {
 	while (!mResults.IsEmpty())
@@ -375,7 +267,7 @@ bool CVerify::VerifyResults()
 				oldSum += pResult->mDue;
 				bFound = true;
 				if (umpfReport)
-					fwprintf(umpfReport, L"%s, ", (const wchar_t *)pResult->msName);
+					fwprintf(umpfReport, L"%s, %.2f, ", (const wchar_t *)pResult->msName, pRight->mDuePay);
 				if ((pRight->mDuePay >= (pResult->mDue - 0.2)) && (pRight->mDuePay <= (pResult->mDue + 0.2)))
 				{
 					s += L" Same";
@@ -658,4 +550,173 @@ void CVerify::WriteSummary(FILE *pf)
 	gpDlg->DisplaySummary(s);
 }
 
+//===================================================================================
 
+CVerifyOld::CVerifyOld(const wchar_t* zfName, bool bSilent)
+	: CVerify(zfName, bSilent)
+{
+}
+CVerifyOld::~CVerifyOld()
+{
+}
+bool CVerifyOld::ReadSavedFile()
+{
+	FILE* pfRead = MyFOpenWithErrorBox(msfName, L"r", L"Old Saved File");
+	if (!pfRead)
+		return false;
+
+	mnTimesDefined = 0;
+	gpDlg->OnBnClickedButtonReset();
+	gpDlg->mbDisableComputations = true;
+	int nEditsRead = 0;
+	int nCheckRead = 0;
+	int nChecked = 0;
+
+	// Read Text Boxes
+	bool bEndFound = false;
+	CString sKey = CUtils::ReadLine(pfRead);
+	while (!sKey.IsEmpty() && sKey != L"end" && !bEndFound)
+	{
+		// Look for known boxes old names
+		POSITION pos = gpDlg->mEditBoxes.GetHeadPosition();
+		while (pos)
+		{
+			CEditRef* pRef = gpDlg->mEditBoxes.GetNext(pos);
+			if (pRef->msOldName == sKey)
+			{
+				nEditsRead++;
+				CString sValue = CUtils::ReadNextLine(pfRead);
+				pRef->mEdit.SetWindowTextW(sValue);
+				if (pRef->msOldName == L"textBox1")
+					msFirstName = sValue;
+				else if (pRef->msOldName == L"textBox2")
+					msFamilyName = sValue;
+				if (mpfLog)
+					fwprintf(mpfLog, L"<Read> Set %s %s to %s\n", (const wchar_t*)pRef->msName,
+					(const wchar_t*)pRef->msOldName, (const wchar_t*)sValue);
+				if (sValue.Left(3) == L"end")
+					bEndFound = true;
+			}
+		}
+		if (!bEndFound)
+			sKey = CUtils::ReadLine(pfRead);
+	}
+
+	// Read Work Period
+	sKey = CUtils::ReadLine(pfRead);
+	while (!sKey.IsEmpty() && sKey != L"end")
+	{
+		if (sKey == L"dateTimePicker1")
+			ReadTime(pfRead, 1);
+		else if (sKey == L"dateTimePicker2")
+			ReadTime(pfRead, 2);
+		else if (sKey == L"dateTimePicker3")
+			ReadTime(pfRead, 3);
+		sKey = CUtils::ReadLine(pfRead);
+	}
+
+	// Read Checkboxes
+	sKey = CUtils::ReadLine(pfRead);
+	while (!sKey.IsEmpty() && sKey != L"end")
+	{
+		// Look for known boxes old names
+		bool bFound = false;
+		POSITION pos = gpDlg->mButtons.GetHeadPosition();
+		while (pos)
+		{
+			CButtonRef* pRef = gpDlg->mButtons.GetNext(pos);
+			if (pRef->msOldName == sKey)
+			{
+				nCheckRead++;
+				int value = CUtils::ReadInt(pfRead);
+				if (value)
+				{
+					pRef->mButton.SetCheck(BST_CHECKED);
+					nChecked++;
+				}
+				bFound = true;
+				break;
+			}
+		}
+		if (!bFound)
+		{
+			if (sKey.Left(8) == L"checkBox")
+			{
+				CString sRest = sKey.Right(sKey.GetLength() - 8);
+				int iDay = _wtoi(sRest);
+				if (iDay >= 4 && iDay <= 10)
+				{
+					nCheckRead++;
+					int value = CUtils::ReadInt(pfRead);
+					if (value)
+					{
+						nChecked++;
+						gWorkPeriod.SetWorkingDay(iDay - 4, 1);
+					}
+				}
+			}
+		}
+		sKey = CUtils::ReadLine(pfRead);
+	}
+	int nResults = ReadResults(pfRead);
+
+	CString s(CRight::ToString(nEditsRead));
+	s += L" edit boxes,  ";
+	s += CRight::ToString(mnTimesDefined);
+	s += L" times,  ";
+	s += CRight::ToString(nChecked);
+	s += L" / ";
+	s += CRight::ToString(nCheckRead);
+	s += L" checked, nResults ";
+	s += CRight::ToString(nResults);
+
+	CString sHolidays = SelectHolidays();
+	gpDlg->mComboHolidays.SetWindowTextW(sHolidays);
+	s += L"\r\nHolidays: ";
+	s += sHolidays;
+
+	if (!mbSilentMode)
+		CUtils::MessBox(s, L"Old Save Read");
+
+	CheckIfNoticeSet();
+	gpDlg->mbDisableComputations = false;
+	if (pfRead)
+		fclose(pfRead);
+	return true;
+}
+
+//===================================================================================
+
+CVerifyNew::CVerifyNew(const wchar_t* zfName, bool bSilent)
+	: CVerify(zfName, bSilent)
+{
+}
+
+CVerifyNew::~CVerifyNew()
+{
+}
+bool CVerifyNew::ReadSavedFile()
+{
+	CSaver saver;
+	if (!saver.Restore(msfName))
+		return false;
+
+	CXMLParse XMLParse(msfName, true);
+	CXMLParseNode* pRoot = XMLParse.GetRoot();
+	if (!pRoot)
+		return false;
+
+	CXMLParseNode* pRights = pRoot->GetFirst(L"AllRightsAsComputed");
+	if (!pRights)
+		return false;
+
+	POSITION pos = pRights->GetHeadPosition();
+	while (pos)
+	{
+		CXMLParseNode* pRight = pRights->GetNext(pos);
+		CRightResult* pResult = new CRightResult(pRight);
+		mResults.AddTail(pResult);
+	}
+
+	return true;
+}

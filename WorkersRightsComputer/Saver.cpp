@@ -50,7 +50,7 @@ void CSaver::Save(const wchar_t *zfName)
 
 	WriteLetter();
 }
-void CSaver::Restore(const wchar_t* zfName)
+bool CSaver::Restore(const wchar_t* zfName)
 {
 	ResetAllInputs();
 	if (zfName)
@@ -63,9 +63,9 @@ void CSaver::Restore(const wchar_t* zfName)
 
 	CFileName fName(msfName);
 	if (fName.IsOfType(L"xml"))
-		LoadFromXmlFile();
-	else
-		LoadFromTxtFile();
+		return LoadFromXmlFile();
+
+	return LoadFromTxtFile();
 }
 void CSaver::SaveToXml(void)
 {
@@ -216,12 +216,12 @@ void CSaver::WriteLetter()
 
 	CRight::ResetSaveDirAndName();
 }
-void CSaver::LoadFromXmlFile()
+bool CSaver::LoadFromXmlFile()
 {
 	CXMLParse XMLParse(msfName, true);
 	CXMLParseNode* pRoot = XMLParse.GetRoot();
 	if (!pRoot)
-		return;
+		return false;
 
 	gpDlg->mbDisableComputations = true;
 
@@ -231,12 +231,13 @@ void CSaver::LoadFromXmlFile()
 
 	gpDlg->mbDisableComputations = false;
 	gpDlg->OnInputChange();
+	return true;
 }
-void CSaver::LoadFromTxtFile()
+bool CSaver::LoadFromTxtFile()
 {
 	mpfRead = MyFOpenWithErrorBox(msfName, L"r, ccs=UNICODE", L"for restoring");
 	if (!mpfRead)
-		return;
+		return false;
 
 	gpDlg->mbDisableComputations = true;
 	//unsigned char bom[] = { 0xEF,0xBB,0xBF };
@@ -298,4 +299,5 @@ void CSaver::LoadFromTxtFile()
 
 	gpDlg->mbDisableComputations = false;
 	gpDlg->OnInputChange();
+	return true;
 }

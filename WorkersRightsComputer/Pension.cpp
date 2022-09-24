@@ -286,7 +286,7 @@ CString CPension::GetDecriptionForLetter(void)
 	{
 		s += L"Only Pension";
 	}
-	
+	s += " (see appendix)";
 	return s;
 }
 CString CPension::GetDecriptionForLetterHebrew(void)
@@ -297,15 +297,16 @@ CString CPension::GetDecriptionForLetterHebrew(void)
 
 	if (mSeveranceDue > 0)
 	{
-		s += L"פיצויים ";
+		s += L"קרן פיצויים ";
 		s += ToString(mSeveranceDue);
 		s += L" + תגמולים ";
 		s += ToString(mPensionDue);
 	}
 	else
 	{
-		s += L"תגמולים בלבד";
+		s += L"תגמולים בלבד ";
 	}
+	s += L"(פרוט בנספח)";
 
 	return s;
 }
@@ -321,8 +322,22 @@ void CPension::WriteToLetter(class CHtmlWriter& html)
 	html.WriteEH(L"First day for pension: ", L"חישוב הפנסיה החל מתאריך: ");
 	html.WriteLineEH(mStartDateForPension.ToString(), mStartDateForPension.ToHebrewString());
 
-	mReport.WriteToLetter(html);
+	html.StartBold();
+	html.WriteLineEH(L"Pension - Gemel", L"פנסיה - גמל");
+	html.EndBold();
+
+	mReport.WriteToLetterPension(html);
 	html.EndParagraph();
+
+	if (gpPension->mbSeverance)
+	{
+		html.StartParagraph();
+		html.StartBold();
+		html.WriteLineEH(L"Severance Fund", L"קרן פיצויים");
+		html.EndBold();
+		mReport.WriteToLetterSeverance(html);
+		html.EndParagraph();
+	}
 }
 bool CPension::UpdateStartDateForPension()
 {
