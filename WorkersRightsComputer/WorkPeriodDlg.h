@@ -34,7 +34,6 @@ public:
 	bool mbEndSet;
 	bool mbNoticeSet;
 	afx_msg void OnDtnDatetimechangeDatetimepickerNotice(NMHDR *pNMHDR, LRESULT *pResult);
-	CButton mRadioMinWage;
 	CEdit mMonthlySalary;
 	CEdit mHourlySalary;
 	CEdit mHoursPerWeek;
@@ -49,6 +48,8 @@ public:
 	afx_msg void OnEnChangeEditHoursPerWeek();
 	afx_msg void OnBnClickedOk();
 	void UpdateDataFromDialog(void);
+
+	// Radio buttons for working days
 	CButton mCheckSunday;
 	CButton mCheckMonday;
 	CButton mCheckTuesday;
@@ -57,8 +58,13 @@ public:
 	CButton mCheckFriday;
 	CButton mCheckSaturday;
 	CButton *mapCheckDays[7];
+
+	// Radio buttons for wage definition mode
+	CButton mRadioMinWage;
 	CButton mRadioMonthly;
 	CButton mRadioHourly;
+	CButton mRadioWagePeriods;
+
 	CString GetDaysText();
 	afx_msg void OnBnClickedCheckSunday();
 	afx_msg void OnBnClickedCheckMonday();
@@ -71,4 +77,6 @@ public:
 	afx_msg void OnBnClickedButtonFamilyPart();
 	//CDateTimeCtrl mLastSalaryDate;
 	afx_msg void OnBnClickedCheckNoNotice();
+	afx_msg void OnBnClickedButtonEditWage();
+	afx_msg void OnBnClickedRadioDiffWages();
 };

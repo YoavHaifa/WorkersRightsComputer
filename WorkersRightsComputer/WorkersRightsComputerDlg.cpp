@@ -471,7 +471,7 @@ void CWorkersRightsComputerDlg::OnFileSaveas()
 {
 	CString sDir(L"F:\\WorkersRights\\Save");
 	CMyFileDialog dlg(CMyFileDialog::FD_SAVE, L"save file", sDir);
-	dlg.SetDefaultExtention(L"txt");
+	dlg.SetDefaultExtention(L"xml");
 	if (dlg.DoModal())
 	{
 		CString sfName(dlg.mSelectedFileName);
@@ -483,7 +483,7 @@ void CWorkersRightsComputerDlg::OnFileLoad()
 {
 	CString sDir(L"F:\\WorkersRights\\Save");
 	CMyFileDialog dlg(CMyFileDialog::FD_OPEN, L"saved file", sDir);
-	dlg.SetDefaultExtention(L"txt");
+	dlg.SetDefaultExtention(L"xml");
 	if (dlg.DoModal())
 	{
 		CString sfName(dlg.mSelectedFileName);

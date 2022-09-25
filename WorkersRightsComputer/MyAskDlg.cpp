@@ -12,7 +12,7 @@
 IMPLEMENT_DYNAMIC(CMyAskDlg, CDialogEx)
 
 CMyAskDlg::CMyAskDlg(const wchar_t *zTitle, const wchar_t *zText, CWnd* pParent /*=nullptr*/)
-	: CMyDialogEx(IDD_DIALOG1, pParent)
+	: CMyDialogEx(IDD_DIALOG_ASK, pParent)
 	, msTitle(zTitle)
 	, msText(zText)
 	, mbOK(false)

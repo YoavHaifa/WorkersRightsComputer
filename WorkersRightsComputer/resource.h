@@ -15,11 +15,14 @@
 #define IDD_DIALOG_VACATIONS            135
 #define IDD_DIALOG_FAMILY_PART          137
 #define IDD_DIALOG1                     139
+#define IDD_DIALOG_ASK                  139
+#define IDD_DIALOG_WAGE_PERIODS         141
 #define IDC_WORK_PERIOD                 1000
 #define IDC_DATETIMEPICKER_START        1001
 #define IDC_EMPLOYER                    1001
 #define IDC_DATETIMEPICKER_END          1002
 #define IDC_COMMENTS                    1002
+#define IDC_DATETIMEPICKER_START2       1002
 #define IDC_DATETIMEPICKER_NOTICE       1003
 #define IDC_EDIT_PERIODS                1004
 #define IDC_CHECK_SUNDAY                1005
@@ -120,6 +123,10 @@
 #define IDC_CHECK_PAID_VACATION         1094
 #define IDC_CHECK2                      1095
 #define IDC_CHECK_PAID_RECUP            1095
+#define IDC_RADIO_DIFF_WAGES            1096
+#define IDC_BUTTON1                     1097
+#define IDC_BUTTON_EDIT_WAGE            1097
+#define IDC_BUTTON_ADD_WAGE_PERIOD      1097
 #define ID_FILE_EXIT                    32771
 #define ID_COMPUTE_ALL                  32772
 #define ID_FILE_LOAD                    32773
@@ -136,9 +143,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        141
+#define _APS_NEXT_RESOURCE_VALUE        143
 #define _APS_NEXT_COMMAND_VALUE         32782
-#define _APS_NEXT_CONTROL_VALUE         1096
+#define _APS_NEXT_CONTROL_VALUE         1098
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

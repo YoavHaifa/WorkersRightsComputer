@@ -3,19 +3,10 @@
 #include "MyTime.h"
 #include "MonthInfo.h"
 
-
-
 class CWorkPeriod
 {
 public:
 	CWorkPeriod(void);
-
-	//void SetFirst(CTime date);
-	//void SetLast(CTime date);
-	//void SetNotice(CTime date);
-	void SetMinWage(void);
-	void SetMonthlyWage(double wage);
-	void SetHourlyWage(double wagePerHour, double nHoursPerWeek);
 
 	bool LastYearContains(class CHoliday &holiday);
 	void Reset(void);
@@ -71,11 +62,6 @@ public:
 	void LoadFromXml(class CXMLParseNode* pRoot);
 
 	void Restore(FILE *pfRead);
-	bool mbMinWage;
-	bool mbMonthlyWage;
-	double mMonthlyWage;
-	double mHourlyWage;
-	double mHoursPerWeek;
 	CString GetTextSummary();
 	CString GetShortSummary();
 	CString GetDaysText();
