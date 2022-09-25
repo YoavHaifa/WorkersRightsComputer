@@ -1,4 +1,52 @@
 New years Eve
+2022
+12
+31
+Rizal Day
+2022
+12
+30
+Christmas Day
+2022
+12
+25
+Bonifacio Day
+2022
+11
+30
+All Saints' day
+2022
+11
+1
+National Heroes Day holiday
+2022
+8
+29
+independence Day
+2022
+6
+12
+Labor Day
+2022
+5
+1
+Good Friday 
+2022
+4
+15
+Maundy Thursday 
+2022
+4
+14
+Day of valor
+2022
+4
+9
+New years day
+2022
+1
+1
+New years Eve
 2021
 12
 31
@@ -38,7 +86,7 @@ Labor Day
 2021
 5
 1
-Day of valor
+Maundy Thursday / Day of valor
 2021
 4
 9
@@ -46,20 +94,12 @@ Good Friday
 2021
 4
 2
-Maundy Thursday
-2021
-4
-1
-People power anniversary
-2021
-2
-25
 New years day
 2021
 1
 1
 New years Eve
-2021
+2020
 12
 31
 Rizal Day
