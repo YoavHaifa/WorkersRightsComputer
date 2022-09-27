@@ -45,7 +45,7 @@ public:
 	CString GetWageText();
 	afx_msg void OnEnChangeEditMonthSalary();
 	afx_msg void OnEnChangeEditHourSalary();
-	afx_msg void OnEnChangeEditHoursPerWeek();
+	afx_msg void OnEnChangeEditHoursPerMonth();
 	afx_msg void OnBnClickedOk();
 	void UpdateDataFromDialog(void);
 

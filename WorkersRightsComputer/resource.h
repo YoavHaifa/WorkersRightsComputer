@@ -22,7 +22,7 @@
 #define IDC_EMPLOYER                    1001
 #define IDC_DATETIMEPICKER_END          1002
 #define IDC_COMMENTS                    1002
-#define IDC_DATETIMEPICKER_START2       1002
+#define IDC_DATETIMEPICKER_LAST         1002
 #define IDC_DATETIMEPICKER_NOTICE       1003
 #define IDC_EDIT_PERIODS                1004
 #define IDC_CHECK_SUNDAY                1005
@@ -40,7 +40,7 @@
 #define IDC_RADIO_MONTHLY               1016
 #define IDC_RADIO_HOURLY                1017
 #define IDC_EDIT_HOUR_SALARY            1018
-#define IDC_EDIT_HOURS_PER_WEEK         1019
+#define IDC_EDIT_HOURS_PER_MONTH        1019
 #define IDC_STATIC_PERIOD               1020
 #define IDC_BUTTON_SAVE                 1021
 #define IDC_BUTTON_LOAD                 1022
@@ -127,6 +127,7 @@
 #define IDC_BUTTON1                     1097
 #define IDC_BUTTON_EDIT_WAGE            1097
 #define IDC_BUTTON_ADD_WAGE_PERIOD      1097
+#define IDC_CHECK_WAGE_PERIODS_FULL_MONTHS 1098
 #define ID_FILE_EXIT                    32771
 #define ID_COMPUTE_ALL                  32772
 #define ID_FILE_LOAD                    32773
@@ -145,7 +146,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        143
 #define _APS_NEXT_COMMAND_VALUE         32782
-#define _APS_NEXT_CONTROL_VALUE         1098
+#define _APS_NEXT_CONTROL_VALUE         1100
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

@@ -21,7 +21,14 @@ public:
 	void SaveToXml(class CXMLDump& xmlDump);
 	void LoadFromXml(class CXMLParseNode* pRoot);
 
+	void SetFirst();
+	void SetLast();
+
+	CString GetStateText();
+
 private:
+	friend class CWage;
+
 	CMyTime mFirst;
 	CMyTime mLast;
 
@@ -29,6 +36,6 @@ private:
 
 	double mMonthlyWage;
 	double mHourlyWage;
-	double mHoursPerWeek;
+	double mHoursPerMonth;
 };
 

@@ -15,22 +15,7 @@ public:
 	CString GetPeriodForLetter(void);
 	CString GetPeriodForLetterHebrew(void);
 
-	bool IsValid(void)
-	{
-		mbNegative = false;
-		if (!mFirst.mbInitialized || !mLast.mbInitialized)
-			return false;
-
-		if (mFirst > mLast)
-		{
-			mbNegative = true;
-			return false;
-		}
-		if (mnWorkDaysPerWeek < 0.05)
-			return false;
-
-		return true;
-	}
+	bool IsValid(bool bMustDefineDays = true);
 	bool Compute(void);
 	bool IsBeforeDate(CMyTime &date, int year, int month, int day);
 	bool IsAfterDate(CMyTime &date, int year, int month, int day);

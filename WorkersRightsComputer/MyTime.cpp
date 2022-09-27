@@ -274,6 +274,11 @@ CString CMyTime::ToString(void)
 	CString s = mTime.Format(_T("%A, %B %d, %Y"));
 	return s;
 }
+CString CMyTime::ToMonthString(void)
+{
+	CString s = mTime.Format(_T("%m.%Y"));
+	return s;
+}
 CString CMyTime::ToHebrewString(void)
 {
 	CString s = mTime.Format(_T("%d.%m.%Y"));

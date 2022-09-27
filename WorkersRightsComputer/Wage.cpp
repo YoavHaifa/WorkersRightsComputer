@@ -33,22 +33,10 @@ void CWage::SetMinWage(void)
 void CWage::SetMonthlyWage(double wage)
 {
 	SetSingle(WAGE_MONTHLY);
-	/*
-	mbMinWage = false;
-	mbMonthlyWage = true;
-	mMonthlyWage = wage;
-	mHourlyWage = 0;
-	mHoursPerWeek = 0;*/
 }
 void CWage::SetHourlyWage(double wagePerHour, double nHoursPerWeek)
 {
 	SetSingle(WAGE_HOURLY);
-	/*
-	mbMinWage = false;
-	mbMonthlyWage = false;
-	mMonthlyWage = 0;
-	mHourlyWage = wagePerHour;
-	mHoursPerWeek = nHoursPerWeek;*/
 }
 bool CWage::IsSinglePeriod(EWageMode& oeMode)
 {
@@ -78,24 +66,48 @@ void CWage::LoadFromXml(CXMLParseNode* pMain)
 	}
 	Clear();
 }
-/*
-void CWage::Restore(FILE* pfRead)
+double CWage::GetMonthlyWage()
 {
-	CString s = CUtils::ReadLine(pfRead);
+	if (mPeriods.GetSize() == 1)
+		return mPeriods.GetHead()->mMonthlyWage;
 
-	if (s == "MinWage")
+	CUtils::MessBox(L"Monthly wage not well defined", L"SW Error");
+	return 0;
+}
+double CWage::GetHourlyWage()
+{
+	if (mPeriods.GetSize() == 1)
+		return mPeriods.GetHead()->mHourlyWage;
+
+	CUtils::MessBox(L"Hourly wage not well defined", L"SW Error");
+	return 0;
+}
+double CWage::GetHoursPerMonth()
+{
+	if (mPeriods.GetSize() == 1)
+		return mPeriods.GetHead()->mHoursPerMonth;
+
+	CUtils::MessBox(L"Hours per month not well defined", L"SW Error");
+	return 0;
+}
+CString CWage::GetStateText()
+{
+	Update();
+
+	CString s;
+	POSITION pos = mPeriods.GetHeadPosition();
+	while (pos)
 	{
+		CWagePeriod* pPeriod = mPeriods.GetNext(pos);
+		s += pPeriod->GetStateText();
+	}
+	return s;
+}
+void CWage::Update()
+{
+	if (mPeriods.IsEmpty())
 		SetMinWage();
-	}
-	else if (s == "MonthlyWage")
-	{
-		double wage = CUtils::ReadFloat(pfRead);
-		SetMonthlyWage(wage);
-	}
-	else
-	{
-		double wage = CUtils::ReadFloat(pfRead);
-		double nHours = CUtils::ReadFloat(pfRead);
-		SetHourlyWage(wage, nHours);
-	}
-}*/
+
+	mPeriods.GetHead()->SetFirst();
+	mPeriods.GetTail()->SetLast();
+}

@@ -86,6 +86,7 @@ void CSaver::SaveToXml(void)
 
 	xmlDump.Close();
 }
+/*
 void CSaver::SaveToTxtFile(void)
 {
 	mpfWrite = MyFOpenWithErrorBox(msfName, L"w, ccs=UNICODE", L"for saving");
@@ -115,7 +116,7 @@ void CSaver::SaveToTxtFile(void)
 	}
 
 	gWorkPeriod.Save(mpfWrite);
-	/*
+	
 	sw->WriteLine("TextBoxes");
 	for (int i = 0; i < N_BOXES; i++)
 	{
@@ -150,13 +151,13 @@ void CSaver::SaveToTxtFile(void)
 	sw->WriteLine("------------");
 	mRights->Save(sw);
 	sw->WriteLine("end");
-	*/
+	
 	fwprintf(mpfWrite, L"end\n");
 	fwprintf(mpfWrite, L"------------------\n");
 
 	gAllRights.Save(mpfWrite);
 	fclose(mpfWrite);
-}
+}*/
 void CSaver::SaveEditBox(FILE *pfSave, CEditRef *pRef)
 {
 	CString sText;

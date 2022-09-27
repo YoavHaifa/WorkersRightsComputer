@@ -1,5 +1,7 @@
 #pragma once
 #include "MyDialogEx.h"
+#include "MyTime.h"
+#include "WagePeriod.h"
 
 
 // CWagePeriods dialog
@@ -23,7 +25,21 @@ protected:
 
 	CEdit mShowPeriods;
 
+	// Data for new period
+	CMyTime mFirst;
+	CMyTime mLast;
+	EWageMode meMode; // Must be "MIN", "MONTHLY" or "HOURLY"
+	double mMonthly;
+	double mHourly;
+	double mnHours;
+
 	DECLARE_MESSAGE_MAP()
-public:
+
 	void UpdateState();
+	CDateTimeCtrl mStartPeriod;
+	CDateTimeCtrl mLastInPeriod;
+	afx_msg void OnBnClickedButtonAddWagePeriod();
+
+	bool GetInputTime();
+	bool GetWage();
 };

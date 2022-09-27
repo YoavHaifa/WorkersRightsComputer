@@ -43,6 +43,7 @@ public:
 	CMyTime PrevDay(void);
 	CTimeSpan Subtract(CMyTime &other);
 	CString ToString(void);
+	CString ToMonthString(void);
 	CString ToHebrewString(void);
 	bool mbInitialized;
 	CString GetShortString();

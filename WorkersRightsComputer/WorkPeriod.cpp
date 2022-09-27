@@ -34,6 +34,25 @@ CWorkPeriod::CWorkPeriod(void)
 
 	mnDaysInMonthForDailySalary = 25;
 }
+bool CWorkPeriod::IsValid(bool bMustDefineDays)
+{
+	mbNegative = false;
+	if (!mFirst.mbInitialized || !mLast.mbInitialized)
+		return false;
+
+	if (mFirst > mLast)
+	{
+		mbNegative = true;
+		return false;
+	}
+	if (bMustDefineDays)
+	{
+		if (mnWorkDaysPerWeek < 0.05)
+			return false;
+	}
+
+	return true;
+}
 int CWorkPeriod::GetWorkingHoursInFullMonth(int year, int month)
 {
 	if (year < 2018)
@@ -355,39 +374,6 @@ void CWorkPeriod::LoadFromXml(class CXMLParseNode* pRoot)
 
 	Compute();
 }
-/*
-void CWorkPeriod::Save(FILE *pfSave)
-{
-	fwprintf(pfSave, L"WorkPeriod\n");
-	mFirst.Write(pfSave);
-	mLast.Write(pfSave);
-	mNotice.Write(pfSave);
-	//if (mbSkipNotice)
-	//	fprintf(pfSave, "Skip Notice!\n");
-	fwprintf(pfSave, L"Days\n");
-	for (int iDay = 0; iDay < 7; iDay++)
-	{
-		fwprintf(pfSave, L"%d\n", maWorkingDays[iDay] > 0 ? 1: 0);
-	}
-	if (mbMinWage)
-	{
-		fwprintf(pfSave, L"MinWage\n");
-	}
-	else if (mbMonthlyWage)
-	{
-		fwprintf(pfSave, L"MonthlyWage\n");
-		fwprintf(pfSave, L"%.2f\n", mMonthlyWage);
-	}
-	else
-	{
-		fwprintf(pfSave, L"HourlyWage\n");
-		fwprintf(pfSave, L"%.2f\n", mHourlyWage);
-		fwprintf(pfSave, L"%.2f\n", mHoursPerWeek);
-	}
-
-	gUsedVacations.Save(pfSave);
-	gFamilyPart.Save(pfSave);
-}*/
 void CWorkPeriod::Restore(FILE *pfRead)
 {
 	mFirst.Read(pfRead);
@@ -691,7 +677,7 @@ double CWorkPeriod::ComputeFamilyPart(void)
 
 	for (int i = 0; i < MAX_MONTHS; i++)
 	{
-		double companyRatio = maMonths[i].GetCompanyRatio(); // mHoursPerWeekPaidByCompany / maMonths[i].mHoursPerWeek;
+		double companyRatio = maMonths[i].GetCompanyRatio();
 		sumFractions += maMonths[i].mFraction;
 		sumCompanyRatio += companyRatio * maMonths[i].mFraction;
 		if (maMonths[i].mbLast)
