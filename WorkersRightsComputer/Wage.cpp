@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "Wage.h"
+#include "WagePeriodsDlg.h"
 #include "Utils.h"
 #include "XMLDump.h"
 #include "XMLParse.h"
@@ -7,6 +8,9 @@
 CWage gWage;
 
 CWage::CWage()
+	: mDebug(1)
+	, mpFirst(NULL)
+	, mpLast(NULL)
 {
 	SetMinWage();
 }
@@ -46,6 +50,72 @@ bool CWage::IsSinglePeriod(EWageMode& oeMode)
 	oeMode = mPeriods.GetHead()->Mode();
 	return true;
 }
+void CWage::AddPeriod(CWagePeriod* pNewPeriod)
+{
+	ClearOverlap(*pNewPeriod);
+
+	POSITION pos = mPeriods.GetHeadPosition();
+	while (pos)
+	{
+		POSITION prevPos = pos;
+		CWagePeriod* pPeriod = mPeriods.GetNext(pos);
+		if (pPeriod->mLast < pNewPeriod->mFirst)
+			continue;
+		if (prevPos)
+		{
+			mPeriods.InsertBefore(prevPos, pNewPeriod);
+			return;
+		}
+	}
+	mPeriods.AddTail(pNewPeriod);
+}
+void CWage::ClearOverlap(CWagePeriod &newPeriod)
+{
+	// After inserting new period - remove area with older definitions...
+	POSITION pos = mPeriods.GetHeadPosition();
+
+	while (pos)
+	{
+		POSITION prevPos = pos;
+		CWagePeriod* pPeriod = mPeriods.GetNext(pos);
+		if (pPeriod->mLast.IsMonthBefore(newPeriod.mFirst))
+			continue;
+
+		// current period doesn't end before new
+		if (pPeriod->mFirst.IsMonthBefore(newPeriod.mFirst))
+		{
+			// Current period starts before new - it should be shortened or split
+			bool bSplit = false;
+			if (newPeriod.mLast.IsMonthBefore(pPeriod->mLast))
+			{ // Split old period that contains the new
+				CWagePeriod* pLaterPeriod = new CWagePeriod(*pPeriod);
+				pLaterPeriod->mFirst = newPeriod.mLast.GetMonthAfter();
+				if (pos)
+					mPeriods.InsertAfter(pos, pLaterPeriod);
+				else
+					mPeriods.AddTail(pLaterPeriod);
+				bSplit = true;
+			}
+			pPeriod->mLast = newPeriod.mFirst.GetMonthBefore();
+			if (bSplit)
+				return;
+			continue;
+		}
+
+		// Current period starts after new
+		if (newPeriod.mLast.IsMonthBefore(pPeriod->mFirst))
+			return; // Finished. Assume all periods are in clear ascending order
+
+		if (newPeriod.mLast.IsMonthBefore(pPeriod->mLast))
+		{
+			// Only last part of old period will stay
+			pPeriod->mFirst = newPeriod.mLast.GetMonthAfter();
+			return;
+		}
+
+		mPeriods.RemoveAt(prevPos);
+	}
+}
 void CWage::SaveToXml(CXMLDump& xmlDump)
 {
 	CXMLDumpScope mainScope(L"WagePeriods", xmlDump);
@@ -65,6 +135,14 @@ void CWage::LoadFromXml(CXMLParseNode* pMain)
 		return;
 	}
 	Clear();
+
+	CXMLParseNode* pPeriodNode = pWage->GetFirst(L"Period");
+	while (pPeriodNode)
+	{
+		CWagePeriod* pPeriod = new CWagePeriod(pPeriodNode);
+		mPeriods.AddTail(pPeriod);
+		pPeriodNode = pWage->GetNext(L"Period", pPeriodNode);
+	}
 }
 double CWage::GetMonthlyWage()
 {
@@ -85,12 +163,12 @@ double CWage::GetHourlyWage()
 double CWage::GetHoursPerMonth()
 {
 	if (mPeriods.GetSize() == 1)
-		return mPeriods.GetHead()->mHoursPerMonth;
+		return mPeriods.GetHead()->mnHoursPerMonth;
 
 	CUtils::MessBox(L"Hours per month not well defined", L"SW Error");
 	return 0;
 }
-CString CWage::GetStateText()
+CString CWage::GetStateDesc()
 {
 	Update();
 
@@ -99,7 +177,7 @@ CString CWage::GetStateText()
 	while (pos)
 	{
 		CWagePeriod* pPeriod = mPeriods.GetNext(pos);
-		s += pPeriod->GetStateText();
+		s += pPeriod->GetStateTextLine();
 	}
 	return s;
 }
@@ -108,6 +186,9 @@ void CWage::Update()
 	if (mPeriods.IsEmpty())
 		SetMinWage();
 
-	mPeriods.GetHead()->SetFirst();
-	mPeriods.GetTail()->SetLast();
+	mpFirst = mPeriods.GetHead();
+	mpFirst->SetFirst();
+
+	mpLast = mPeriods.GetTail();
+	mpLast->SetLast();
 }

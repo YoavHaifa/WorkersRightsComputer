@@ -14,6 +14,11 @@ class CWagePeriod
 {
 public:
 	CWagePeriod(EWageMode eMode);
+	CWagePeriod(EWageMode eMode, const CMyTime& first, const CMyTime& last, double wage = 0, double nHours = 0);
+	CWagePeriod(const CWagePeriod &other);
+	CWagePeriod(class CXMLParseNode* pNode);
+
+	void Copy(const CWagePeriod &other);
 
 	bool Is(EWageMode eMode)const { return meMode == eMode; }
 	EWageMode Mode()const { return meMode; }
@@ -24,10 +29,13 @@ public:
 	void SetFirst();
 	void SetLast();
 
-	CString GetStateText();
+	CString GetStateTextLine();
 
 private:
 	friend class CWage;
+
+	static int umNewId;
+	int mId;
 
 	CMyTime mFirst;
 	CMyTime mLast;
@@ -36,6 +44,6 @@ private:
 
 	double mMonthlyWage;
 	double mHourlyWage;
-	double mHoursPerMonth;
+	double mnHoursPerMonth;
 };
 

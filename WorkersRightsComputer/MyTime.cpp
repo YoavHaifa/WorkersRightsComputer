@@ -364,6 +364,14 @@ double CMyTime::AdvanceToNextMonth(void)
 	}
 	return ((double)countDays / (countDays + nDaysInMonthStart));
 }
+void CMyTime::ToPrevMonth(void)
+{
+	int month = mMonth;
+	while (mMonth == month)
+	{
+		SubDay();
+	}
+}
 bool CMyTime::IsOnPrevMonthsTo(CMyTime &other)
 {
 	if (mYear < other.mYear)
@@ -399,4 +407,22 @@ bool CMyTime::IsMonthBefore(CMyTime &other)
 bool CMyTime::IsMonthSame(CMyTime &other)
 {
 	return (mYear == other.mYear) && (mMonth == other.mMonth);
+}
+CMyTime CMyTime::GetMonthAfter()
+{
+	CMyTime nextMonth(*this);
+	while (nextMonth.mMonth == mMonth)
+	{
+		nextMonth.AddDay();
+	}
+	return nextMonth;
+}
+CMyTime CMyTime::GetMonthBefore()
+{
+	CMyTime prevMonth(*this);
+	while (prevMonth.mMonth == mMonth)
+	{
+		prevMonth.SubDay();
+	}
+	return prevMonth;
 }

@@ -4,10 +4,12 @@
 #include "stdafx.h"
 #include "WorkersRightsComputer.h"
 #include "WagePeriodsDlg.h"
+#include "WorkPeriod.h"
 #include "Wage.h"
 #include "Utils.h"
 #include "afxdialogex.h"
 
+CWagePeriodsDlg* CWagePeriodsDlg::umpDlg = NULL;
 
 // CWagePeriods dialog
 
@@ -20,6 +22,7 @@ CWagePeriodsDlg::CWagePeriodsDlg(CWnd* pParent /*=nullptr*/)
 }
 CWagePeriodsDlg::~CWagePeriodsDlg()
 {
+	umpDlg = NULL;
 }
 void CWagePeriodsDlg::DoDataExchange(CDataExchange* pDX)
 {
@@ -41,15 +44,27 @@ BOOL CWagePeriodsDlg::OnInitDialog()
 
 	SetCheck(IDC_CHECK_WAGE_PERIODS_FULL_MONTHS, true);
 
+	if (gWage.IsSinglePeriod())
+	{
+		mStartPeriod.SetTime(&gWorkPeriod.mFirst.mTime);
+		mLastInPeriod.SetTime(&gWorkPeriod.mLast.mTime);
+	}
 	UpdateState();
+	umpDlg = this;
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
-void CWagePeriodsDlg::UpdateState()
+void CWagePeriodsDlg::UpdateState(const char* zTitle)
 {
 	// CString sState("Wage Periods\r\n");
-	CString sState = gWage.GetStateText();
+	msState = "";
+	if (zTitle)
+	{
+		msState += zTitle;
+		msState += "\r\n";
+	}
+	msState += gWage.GetStateDesc();
 
-	mShowPeriods.SetWindowText(sState);
+	mShowPeriods.SetWindowText(msState);
 }
 bool CWagePeriodsDlg::GetInputTime()
 {
@@ -81,10 +96,28 @@ bool CWagePeriodsDlg::GetWage()
 	else if (IsChecked(IDC_RADIO_MONTHLY))
 	{
 		meMode = WAGE_MONTHLY;
+		GetParameter(IDC_EDIT_MONTH_SALARY, mMonthly, 0, 100000);
+		if (mMonthly == 0)
+		{
+			CUtils::MessBox(L"Please define monthly wage", L"Input Error");
+			return false;
+		}
 	}
 	else if (IsChecked(IDC_RADIO_HOURLY))
 	{
 		meMode = WAGE_HOURLY;
+		GetParameter(IDC_EDIT_HOUR_SALARY, mHourly, 0, 10000);
+		if (mHourly == 0)
+		{
+			CUtils::MessBox(L"Please define hourly wage", L"Input Error");
+			return false;
+		}
+		GetParameter(IDC_EDIT_HOURS_PER_MONTH, mnHoursPerMonth, 0, 1000);
+		if (mnHoursPerMonth == 0)
+		{
+			CUtils::MessBox(L"Please define number of hours per month", L"Input Error");
+			return false;
+		}
 	}
 	else
 	{
@@ -101,8 +134,20 @@ void CWagePeriodsDlg::OnBnClickedButtonAddWagePeriod()
 	if (!GetWage())
 		return;
 
+	CWagePeriod* pPeriod = NULL;
+	switch (meMode)
+	{
+	case WAGE_MIN:
+		pPeriod = new CWagePeriod(meMode, mFirst, mLast);
+		break;
+	case WAGE_MONTHLY:
+		pPeriod = new CWagePeriod(meMode, mFirst, mLast, mMonthly);
+		break;
+	case WAGE_HOURLY:
+		pPeriod = new CWagePeriod(meMode, mFirst, mLast, mHourly, mnHoursPerMonth);
+		break;
+	}
 
-
-
-	CUtils::MessBox(L"Period Added", L"Notice");
+	gWage.AddPeriod(pPeriod);
+	UpdateState();
 }

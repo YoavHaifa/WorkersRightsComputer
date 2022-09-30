@@ -14,6 +14,9 @@ public:
 	CWagePeriodsDlg(CWnd* pParent = nullptr);   // standard constructor
 	virtual ~CWagePeriodsDlg();
 
+	static CWagePeriodsDlg* umpDlg;
+	void UpdateState(const char *zTitle = NULL);
+
 // Dialog Data
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_DIALOG_WAGE_PERIODS };
@@ -31,11 +34,12 @@ protected:
 	EWageMode meMode; // Must be "MIN", "MONTHLY" or "HOURLY"
 	double mMonthly;
 	double mHourly;
-	double mnHours;
+	double mnHoursPerMonth;
+
+	CString msState;
 
 	DECLARE_MESSAGE_MAP()
 
-	void UpdateState();
 	CDateTimeCtrl mStartPeriod;
 	CDateTimeCtrl mLastInPeriod;
 	afx_msg void OnBnClickedButtonAddWagePeriod();

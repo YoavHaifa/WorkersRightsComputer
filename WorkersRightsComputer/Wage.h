@@ -11,8 +11,10 @@ public:
 	void SetHourlyWage(double wagePerHour, double nHoursPerWeek);
 
 	//void Restore(FILE* pfRead);
-	// bool IsSinglePeriod() { return mPeriods.GetSize() == 1; }
+	bool IsSinglePeriod() { return mPeriods.GetSize() == 1; }
 	bool IsSinglePeriod(EWageMode& oeMode);
+
+	void AddPeriod(class CWagePeriod*);
 
 	void SaveToXml(class CXMLDump& xmlDump);
 	void LoadFromXml(class CXMLParseNode* pMain);
@@ -21,12 +23,17 @@ public:
 	double GetHourlyWage();
 	double GetHoursPerMonth();
 
-	CString GetStateText();
+	CString GetStateDesc();
+
+	int mDebug;
 
 private:
+	class CWagePeriod* mpFirst;
+	class CWagePeriod* mpLast;
 	void SetSingle(EWageMode eMode);
 	CList<class CWagePeriod*, class CWagePeriod*> mPeriods;
 	void Clear();
+	void ClearOverlap(CWagePeriod& newPeriod);
 	void Update();
 };
 
