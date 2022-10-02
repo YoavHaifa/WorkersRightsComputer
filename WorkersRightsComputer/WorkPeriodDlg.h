@@ -41,13 +41,13 @@ public:
 	afx_msg void OnBnClickedRadioMonthly();
 	afx_msg void OnBnClickedRadioHourly();
 	void SetWageMode(int mode);
-	int mWageMode;
-	CString GetWageText();
+	//CString GetWageText();
 	afx_msg void OnEnChangeEditMonthSalary();
 	afx_msg void OnEnChangeEditHourSalary();
 	afx_msg void OnEnChangeEditHoursPerMonth();
 	afx_msg void OnBnClickedOk();
 	void UpdateDataFromDialog(void);
+	bool SetWageForWholePeriod();
 
 	// Radio buttons for working days
 	CButton mCheckSunday;
@@ -79,4 +79,5 @@ public:
 	afx_msg void OnBnClickedCheckNoNotice();
 	afx_msg void OnBnClickedButtonEditWage();
 	afx_msg void OnBnClickedRadioDiffWages();
+	afx_msg void OnBnClickedButtonSetWage();
 };

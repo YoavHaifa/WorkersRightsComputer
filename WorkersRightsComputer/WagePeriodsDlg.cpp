@@ -34,6 +34,9 @@ void CWagePeriodsDlg::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(CWagePeriodsDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_ADD_WAGE_PERIOD, &CWagePeriodsDlg::OnBnClickedButtonAddWagePeriod)
+	ON_BN_CLICKED(IDC_RADIO_MIN_WAGE, &CWagePeriodsDlg::OnBnClickedRadioMinWage)
+	ON_BN_CLICKED(IDC_RADIO_MONTHLY, &CWagePeriodsDlg::OnBnClickedRadioMonthly)
+	ON_BN_CLICKED(IDC_RADIO_HOURLY, &CWagePeriodsDlg::OnBnClickedRadioHourly)
 END_MESSAGE_MAP()
 
 // CWagePeriods message handlers
@@ -44,14 +47,27 @@ BOOL CWagePeriodsDlg::OnInitDialog()
 
 	SetCheck(IDC_CHECK_WAGE_PERIODS_FULL_MONTHS, true);
 
+	SetTimes();
+
+	ClearNumericFields();
+
+	UpdateState();
+	umpDlg = this;
+	return TRUE;  // return TRUE  unless you set the focus to a control
+}
+void CWagePeriodsDlg::SetTimes()
+{
 	if (gWage.IsSinglePeriod())
 	{
 		mStartPeriod.SetTime(&gWorkPeriod.mFirst.mTime);
 		mLastInPeriod.SetTime(&gWorkPeriod.mLast.mTime);
 	}
-	UpdateState();
-	umpDlg = this;
-	return TRUE;  // return TRUE  unless you set the focus to a control
+	else if (gWage.NPeriods() >= 1)
+	{
+		CWagePeriod* pLast = gWage.GetLastPeriod();
+		mStartPeriod.SetTime(&pLast->mFirst.mTime);
+		mLastInPeriod.SetTime(&pLast->mLast.mTime);
+	}
 }
 void CWagePeriodsDlg::UpdateState(const char* zTitle)
 {
@@ -148,6 +164,28 @@ void CWagePeriodsDlg::OnBnClickedButtonAddWagePeriod()
 		break;
 	}
 
-	gWage.AddPeriod(pPeriod);
+	if (!gWage.AddPeriod(pPeriod))
+		SetTimes();
 	UpdateState();
+}
+void CWagePeriodsDlg::ClearNumericFields()
+{
+	ClearAndDisable(IDC_EDIT_MONTH_SALARY);
+	ClearAndDisable(IDC_EDIT_HOUR_SALARY);
+	ClearAndDisable(IDC_EDIT_HOURS_PER_MONTH);
+}
+void CWagePeriodsDlg::OnBnClickedRadioMinWage()
+{
+	ClearNumericFields();
+}
+void CWagePeriodsDlg::OnBnClickedRadioMonthly()
+{
+	ClearNumericFields();
+	SetAndEnable(IDC_EDIT_MONTH_SALARY, L"0");
+}
+void CWagePeriodsDlg::OnBnClickedRadioHourly()
+{
+	ClearNumericFields();
+	SetAndEnable(IDC_EDIT_HOUR_SALARY, L"0");
+	SetAndEnable(IDC_EDIT_HOURS_PER_MONTH, L"0");
 }

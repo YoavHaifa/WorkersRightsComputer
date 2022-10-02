@@ -408,7 +408,7 @@ bool CMyTime::IsMonthSame(CMyTime &other)
 {
 	return (mYear == other.mYear) && (mMonth == other.mMonth);
 }
-CMyTime CMyTime::GetMonthAfter()
+CMyTime CMyTime::GetMonthAfter() const
 {
 	CMyTime nextMonth(*this);
 	while (nextMonth.mMonth == mMonth)
@@ -417,7 +417,7 @@ CMyTime CMyTime::GetMonthAfter()
 	}
 	return nextMonth;
 }
-CMyTime CMyTime::GetMonthBefore()
+CMyTime CMyTime::GetMonthBefore() const
 {
 	CMyTime prevMonth(*this);
 	while (prevMonth.mMonth == mMonth)

@@ -59,7 +59,7 @@ public:
 	bool IsMonthBefore(int year, int month);
 	bool IsMonthBefore(CMyTime &other);
 	bool IsMonthSame(CMyTime &other);
-	CMyTime GetMonthAfter();
-	CMyTime GetMonthBefore();
+	CMyTime GetMonthAfter() const;
+	CMyTime GetMonthBefore() const;
 };
 

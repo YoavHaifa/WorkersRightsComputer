@@ -2,6 +2,7 @@
 #include "Wage.h"
 #include "WagePeriodsDlg.h"
 #include "Utils.h"
+#include "Right.h"
 #include "XMLDump.h"
 #include "XMLParse.h"
 
@@ -22,12 +23,11 @@ void CWage::Clear()
 		mPeriods.RemoveTail();
 	}
 }
-void CWage::SetSingle(EWageMode eMode)
+void CWage::SetSingle(EWageMode eMode, double wage, double nHours)
 {
-	if (mPeriods.GetSize() == 1 && mPeriods.GetHead()->Is(eMode))
-		return;
 	Clear();
-	CWagePeriod* pPeriod = new CWagePeriod(eMode);
+	CWagePeriod* pPeriod = new CWagePeriod(eMode, 
+		gWorkPeriod.mFirst, gWorkPeriod.mLast, wage, nHours);
 	mPeriods.AddTail(pPeriod);
 }
 void CWage::SetMinWage(void)
@@ -36,11 +36,11 @@ void CWage::SetMinWage(void)
 }
 void CWage::SetMonthlyWage(double wage)
 {
-	SetSingle(WAGE_MONTHLY);
+	SetSingle(WAGE_MONTHLY, wage);
 }
 void CWage::SetHourlyWage(double wagePerHour, double nHoursPerWeek)
 {
-	SetSingle(WAGE_HOURLY);
+	SetSingle(WAGE_HOURLY, wagePerHour, nHoursPerWeek);
 }
 bool CWage::IsSinglePeriod(EWageMode& oeMode)
 {
@@ -50,7 +50,7 @@ bool CWage::IsSinglePeriod(EWageMode& oeMode)
 	oeMode = mPeriods.GetHead()->Mode();
 	return true;
 }
-void CWage::AddPeriod(CWagePeriod* pNewPeriod)
+bool CWage::AddPeriod(CWagePeriod* pNewPeriod)
 {
 	ClearOverlap(*pNewPeriod);
 
@@ -64,10 +64,11 @@ void CWage::AddPeriod(CWagePeriod* pNewPeriod)
 		if (prevPos)
 		{
 			mPeriods.InsertBefore(prevPos, pNewPeriod);
-			return;
+			return true;
 		}
 	}
 	mPeriods.AddTail(pNewPeriod);
+	return true;
 }
 void CWage::ClearOverlap(CWagePeriod &newPeriod)
 {
@@ -91,7 +92,7 @@ void CWage::ClearOverlap(CWagePeriod &newPeriod)
 				CWagePeriod* pLaterPeriod = new CWagePeriod(*pPeriod);
 				pLaterPeriod->mFirst = newPeriod.mLast.GetMonthAfter();
 				if (pos)
-					mPeriods.InsertAfter(pos, pLaterPeriod);
+					mPeriods.InsertBefore(pos, pLaterPeriod);
 				else
 					mPeriods.AddTail(pLaterPeriod);
 				bSplit = true;
@@ -171,6 +172,7 @@ double CWage::GetHoursPerMonth()
 CString CWage::GetStateDesc()
 {
 	Update();
+	UniteAdjacentFileds();
 
 	CString s;
 	POSITION pos = mPeriods.GetHeadPosition();
@@ -179,6 +181,7 @@ CString CWage::GetStateDesc()
 		CWagePeriod* pPeriod = mPeriods.GetNext(pos);
 		s += pPeriod->GetStateTextLine();
 	}
+	CheckList();
 	return s;
 }
 void CWage::Update()
@@ -191,4 +194,86 @@ void CWage::Update()
 
 	mpLast = mPeriods.GetTail();
 	mpLast->SetLast();
+}
+void CWage::UniteAdjacentFileds()
+{
+	while (mPeriods.GetSize() > 1)
+	{
+		if (!UniteAdjacentPair())
+			break;
+	}
+}
+bool CWage::UniteAdjacentPair()
+{
+	POSITION pos = mPeriods.GetHeadPosition();
+	CWagePeriod* pPrevPeriod = NULL;
+	while (pos)
+	{
+		POSITION prevPos = pos;
+		CWagePeriod* pPeriod = mPeriods.GetNext(pos);
+		if (pPrevPeriod && pPeriod->MayUniteWith(*pPrevPeriod))
+		{
+			pPrevPeriod->mLast = pPeriod->mLast;
+			mPeriods.RemoveAt(prevPos);
+			return true;
+		}
+
+		pPrevPeriod = pPeriod;
+	}
+	return false;
+}
+bool CWage::CheckList()
+{
+	POSITION pos = mPeriods.GetHeadPosition();
+	CWagePeriod* pPrevPeriod = NULL;
+	while (pos)
+	{
+		CWagePeriod* pPeriod = mPeriods.GetNext(pos);
+		if (!pPeriod->Check())
+		{
+			CUtils::MessBox(L"Illegal Wage Period in list", L"SW Error");
+			return false;
+		}
+
+		if (pPrevPeriod)
+		{
+			if (!pPeriod->ComesJustAfter(*pPrevPeriod))
+			{
+				CUtils::MessBox(L"Illegal Wage Periods pair in list", L"SW Error");
+				return false;
+			}
+		}
+		pPrevPeriod = pPeriod;
+	}
+	return true;
+}
+CString CWage::GetShortText()
+{
+	EWageMode eMode;
+	if (IsSinglePeriod(eMode))
+	{
+		CWagePeriod* pPeriod = mPeriods.GetHead();
+		CString s;
+		switch (eMode)
+		{
+		case WAGE_MIN:
+			return CString("All Minimum Wage");
+		case WAGE_MONTHLY:
+			s = "Same monthly wage for all period ";
+			s += CRight::ToString(pPeriod->mMonthlyWage);
+			return s;
+		case WAGE_HOURLY:
+			s = "Same hourly wage for all period ";
+			s += CRight::ToString(pPeriod->mHourlyWage);
+			s += " (";
+			s += CRight::ToString(pPeriod->mnHoursPerMonth);
+			s += " hours per month)";
+			return s;
+		}
+		return CString("Unrecognized wage mode");
+	}
+	int n = NPeriods();
+	CString s;
+	s.Format(_T("Wage is defined for %d different periods"), n);
+	return s;
 }

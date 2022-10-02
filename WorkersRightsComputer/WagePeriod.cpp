@@ -173,3 +173,28 @@ CString CWagePeriod::GetStateTextLine()
 	s += "\r\n";
 	return s;
 }
+bool CWagePeriod::MayUniteWith(const CWagePeriod& other)
+{
+	if (meMode != other.meMode)
+		return false;
+	switch (meMode)
+	{
+	case WAGE_MIN:
+		return true;
+	case WAGE_MONTHLY:
+		return mMonthlyWage == other.mMonthlyWage;
+	case WAGE_HOURLY:
+		return (mHourlyWage == other.mHourlyWage)
+			&& (mnHoursPerMonth == other.mnHoursPerMonth);
+	}
+	return false;
+}
+bool CWagePeriod::ComesJustAfter(const CWagePeriod& other)
+{
+	CMyTime wantedMonth = other.mLast.GetMonthAfter();
+	return mFirst.IsMonthSame(wantedMonth);
+}
+bool CWagePeriod::Check()
+{
+	return mFirst <= mLast;
+}

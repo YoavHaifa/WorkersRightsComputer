@@ -26,6 +26,8 @@ protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 	virtual BOOL OnInitDialog();
 
+	void SetTimes();
+
 	CEdit mShowPeriods;
 
 	// Data for new period
@@ -44,6 +46,12 @@ protected:
 	CDateTimeCtrl mLastInPeriod;
 	afx_msg void OnBnClickedButtonAddWagePeriod();
 
+	void ClearNumericFields();
+
 	bool GetInputTime();
 	bool GetWage();
+public:
+	afx_msg void OnBnClickedRadioMinWage();
+	afx_msg void OnBnClickedRadioMonthly();
+	afx_msg void OnBnClickedRadioHourly();
 };

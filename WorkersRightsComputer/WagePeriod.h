@@ -30,9 +30,13 @@ public:
 	void SetLast();
 
 	CString GetStateTextLine();
+	bool MayUniteWith(const CWagePeriod& other);
+	bool ComesJustAfter(const CWagePeriod& other);
+	bool Check();
 
 private:
 	friend class CWage;
+	friend class CWagePeriodsDlg;
 
 	static int umNewId;
 	int mId;

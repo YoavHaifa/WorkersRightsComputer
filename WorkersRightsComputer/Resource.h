@@ -128,6 +128,8 @@
 #define IDC_BUTTON_EDIT_WAGE            1097
 #define IDC_BUTTON_ADD_WAGE_PERIOD      1097
 #define IDC_CHECK_WAGE_PERIODS_FULL_MONTHS 1098
+#define IDC_BUTTON_EDIT_WAGE2           1098
+#define IDC_BUTTON_SET_WAGE             1098
 #define ID_FILE_EXIT                    32771
 #define ID_COMPUTE_ALL                  32772
 #define ID_FILE_LOAD                    32773
