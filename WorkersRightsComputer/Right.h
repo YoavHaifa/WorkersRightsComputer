@@ -1,6 +1,5 @@
 #pragma once
 #include "WorkPeriod.h"
-#include "MinWage.h"
 
 class CEditRef
 {

@@ -40,6 +40,10 @@ public:
 	int GetWorkingHoursInFullWeek(int year, int month);
 	bool mbSkipNotice;
 
+	// Special extra hours for "live in" caregivers
+	bool mbLiveIn;
+	bool mbExtraHolidayHoursForLiveInApplied;
+
 	int CountDaysToEndOfMonth(CMyTime &date);
 	int CountWorkDaysToEndOfMonthFrom(CMyTime &firstDate);
 	void Save(FILE *pfSave);

@@ -42,6 +42,14 @@ void CWage::SetHourlyWage(double wagePerHour, double nHoursPerWeek)
 {
 	SetSingle(WAGE_HOURLY, wagePerHour, nHoursPerWeek);
 }
+bool CWage::IsAllMin()
+{
+	if (mPeriods.GetSize() < 1)
+		return true;
+	if (mPeriods.GetSize() > 1)
+		return false;
+	return mPeriods.GetHead()->Is(WAGE_MIN);
+}
 bool CWage::IsSinglePeriod(EWageMode& oeMode)
 {
 	if (mPeriods.GetSize() != 1)

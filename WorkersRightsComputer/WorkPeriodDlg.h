@@ -21,6 +21,8 @@ protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 	virtual BOOL OnInitDialog();
 
+	void SetWageGui();
+
 	DECLARE_MESSAGE_MAP()
 public:
 	CDateTimeCtrl mStartDate;
@@ -46,7 +48,7 @@ public:
 	afx_msg void OnEnChangeEditHourSalary();
 	afx_msg void OnEnChangeEditHoursPerMonth();
 	afx_msg void OnBnClickedOk();
-	void UpdateDataFromDialog(void);
+	bool UpdateDataFromDialog(void);
 	bool SetWageForWholePeriod();
 
 	// Radio buttons for working days

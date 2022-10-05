@@ -4,6 +4,7 @@
 #include "VacationTable.h"
 #include "WorkYears.h"
 #include "Config.h"
+#include "WageTable.h"
 
 const double CVacation::MIN_FRACTION_FOR_ROUND_UP = 0.9;
 
@@ -205,7 +206,7 @@ bool CVacation::Compute(void)
 
 	ComputePrevYears();
 
-	mPayPerDay = gMinWage.PayPerDayAtWorkEnd();
+	mPayPerDay = gWageTable.PayPerDayAtWorkEnd();
 	LogLine(L"Pay per day at work end", mPayPerDay);
 
 	if (gVacationTable.mn < 1)

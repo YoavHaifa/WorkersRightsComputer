@@ -128,8 +128,9 @@
 #define IDC_BUTTON_EDIT_WAGE            1097
 #define IDC_BUTTON_ADD_WAGE_PERIOD      1097
 #define IDC_CHECK_WAGE_PERIODS_FULL_MONTHS 1098
-#define IDC_BUTTON_EDIT_WAGE2           1098
 #define IDC_BUTTON_SET_WAGE             1098
+#define IDC_CHECK1                      1100
+#define IDC_CHECK_LIVE_IN               1100
 #define ID_FILE_EXIT                    32771
 #define ID_COMPUTE_ALL                  32772
 #define ID_FILE_LOAD                    32773
@@ -148,7 +149,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        143
 #define _APS_NEXT_COMMAND_VALUE         32782
-#define _APS_NEXT_CONTROL_VALUE         1100
+#define _APS_NEXT_CONTROL_VALUE         1101
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

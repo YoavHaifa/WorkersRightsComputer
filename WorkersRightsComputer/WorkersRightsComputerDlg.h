@@ -111,6 +111,7 @@ public:
 	CButton mRecuperationPaid4LastYear;
 	afx_msg void OnBnClickedCheckPaidVacation();
 	afx_msg void OnBnClickedCheckPaidRecup();
+	afx_msg void OnBnClickedCheckLiveIn();
 };
 
 extern CWorkersRightsComputerDlg *gpDlg;

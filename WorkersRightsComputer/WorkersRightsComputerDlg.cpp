@@ -184,6 +184,7 @@ BEGIN_MESSAGE_MAP(CWorkersRightsComputerDlg, CDialogEx)
 	ON_COMMAND(ID_TEST_LOADTXT, &CWorkersRightsComputerDlg::OnTestLoadtxt)
 	ON_BN_CLICKED(IDC_CHECK_PAID_VACATION, &CWorkersRightsComputerDlg::OnBnClickedCheckPaidVacation)
 	ON_BN_CLICKED(IDC_CHECK_PAID_RECUP, &CWorkersRightsComputerDlg::OnBnClickedCheckPaidRecup)
+	ON_BN_CLICKED(IDC_CHECK_LIVE_IN, &CWorkersRightsComputerDlg::OnBnClickedCheckLiveIn)
 END_MESSAGE_MAP()
 
 
@@ -229,6 +230,7 @@ BOOL CWorkersRightsComputerDlg::OnInitDialog()
 	SetTitle(sTitle + gConfig.msVersion);
 
 	CUtils::CreateThread(&StaticThreadFunc, NULL);
+	SetCheck(IDC_CHECK_LIVE_IN, gWorkPeriod.mbLiveIn);
 
 	gpDlg = this;
 	mbInitialized = true;
@@ -655,5 +657,10 @@ void CWorkersRightsComputerDlg::OnBnClickedCheckPaidVacation()
 }
 void CWorkersRightsComputerDlg::OnBnClickedCheckPaidRecup()
 {
+	OnInputChange();
+}
+void CWorkersRightsComputerDlg::OnBnClickedCheckLiveIn()
+{
+	gWorkPeriod.mbLiveIn = IsChecked(IDC_CHECK_LIVE_IN);
 	OnInputChange();
 }

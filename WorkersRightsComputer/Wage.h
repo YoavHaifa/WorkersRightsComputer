@@ -13,6 +13,7 @@ public:
 	//void Restore(FILE* pfRead);
 	bool IsSinglePeriod() { return mPeriods.GetSize() == 1; }
 	bool IsSinglePeriod(EWageMode& oeMode);
+	bool IsAllMin();
 	int NPeriods() { return (int)mPeriods.GetSize(); }
 	class CWagePeriod *GetLastPeriod() { return mPeriods.GetTail(); }
 

@@ -26,6 +26,8 @@ const wchar_t *uasDaysNames[7] =
 
 CWorkPeriod::CWorkPeriod(void)
 	: mbSkipNotice(false)
+	, mbLiveIn(true)
+	, mbExtraHolidayHoursForLiveInApplied(false)
 {
 	Reset();
 
@@ -317,6 +319,8 @@ void CWorkPeriod::SaveToXml(CXMLDump &xmlDump)
 	xmlDump.Write(L"last", mLast);
 	xmlDump.Write(L"notice", mNotice);
 	xmlDump.Write(L"b_skip_notice", mbSkipNotice);
+	xmlDump.Write(L"b_live_in", mbLiveIn);
+	xmlDump.Write(L"b_extra_holiday_hours_for_live_in_applied", mbExtraHolidayHoursForLiveInApplied);
 
 	{
 		CXMLDumpScope scope(L"Days", xmlDump);
@@ -340,6 +344,7 @@ void CWorkPeriod::LoadFromXml(class CXMLParseNode* pRoot)
 	pMain->GetValue(L"last", mLast);
 	pMain->GetValue(L"notice", mNotice);
 	pMain->GetValue(L"b_skip_notice", mbSkipNotice);
+	pMain->GetValue(L"b_live_in", mbLiveIn);
 
 	CXMLParseNode* pDays = pMain->GetFirst(L"Days");
 	if (pDays)
@@ -430,6 +435,12 @@ CString CWorkPeriod::GetTextSummary()
 
 	s += "\r\n";
 	s += gWorkPeriod.mSpanString;
+	if (!gWage.IsAllMin())
+	{
+		s += " (";
+		s += gWage.GetShortText();
+		s += ")";
+	}
 	if (gFamilyPart.mbAskOnlyForFamilyPart)
 	{
 		s += "\r\n";

@@ -88,6 +88,42 @@ BEGIN_MESSAGE_MAP(CWorkPeriodDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_SET_WAGE, &CWorkPeriodDlg::OnBnClickedButtonSetWage)
 END_MESSAGE_MAP()
 
+void CWorkPeriodDlg::SetWageGui()
+{
+	mRadioMinWage.SetCheck(BST_UNCHECKED);
+	mRadioMonthly.SetCheck(BST_UNCHECKED);
+	mRadioHourly.SetCheck(BST_UNCHECKED);
+	mRadioWagePeriods.SetCheck(BST_UNCHECKED);
+
+	EWageMode eWageMode;
+	if (gWage.IsSinglePeriod(eWageMode))
+	{
+		switch (eWageMode)
+		{
+		case WAGE_MIN:
+			mRadioMinWage.SetCheck(BST_CHECKED);
+			break;
+		case WAGE_MONTHLY:
+			mRadioMonthly.SetCheck(BST_CHECKED);
+			SetWageMode(IDC_RADIO_MONTHLY);
+			mMonthlySalary.SetWindowTextW(CRight::ToString(gWage.GetMonthlyWage()));
+			break;
+		case WAGE_HOURLY:
+			mRadioHourly.SetCheck(BST_CHECKED);
+			SetWageMode(IDC_RADIO_HOURLY);
+			mHourlySalary.SetWindowTextW(CRight::ToString(gWage.GetHourlyWage()));
+			mHoursPerWeek.SetWindowTextW(CRight::ToString(gWage.GetHoursPerMonth()));
+		}
+		Enable(IDC_BUTTON_SET_WAGE);
+	}
+	else // Different wage periods as defined by the user in inner dialog
+	{
+		mRadioWagePeriods.SetCheck(BST_CHECKED);
+		SetWageMode(WAGE_UNDEF);
+		Disable(IDC_BUTTON_SET_WAGE);
+	}
+}
+
 BOOL CWorkPeriodDlg::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
@@ -120,30 +156,7 @@ BOOL CWorkPeriodDlg::OnInitDialog()
 			mapCheckDays[iDay]->SetCheck(BST_UNCHECKED);
 	}
 
-	EWageMode eWageMode;
-	if (gWage.IsSinglePeriod(eWageMode))
-	{
-		switch (eWageMode)
-		{
-		case WAGE_MIN:
-			mRadioMinWage.SetCheck(BST_CHECKED);
-			break;
-		case WAGE_MONTHLY:
-			mRadioMonthly.SetCheck(BST_CHECKED);
-			SetWageMode(IDC_RADIO_MONTHLY);
-			mMonthlySalary.SetWindowTextW(CRight::ToString(gWage.GetMonthlyWage()));
-			break;
-		case WAGE_HOURLY:
-			mRadioHourly.SetCheck(BST_CHECKED);
-			SetWageMode(IDC_RADIO_HOURLY);
-			mHourlySalary.SetWindowTextW(CRight::ToString(gWage.GetHourlyWage()));
-			mHoursPerWeek.SetWindowTextW(CRight::ToString(gWage.GetHoursPerMonth()));
-		}
-	}
-	else // Different wage periods as defined by the user in inner dialog
-	{
-		mRadioWagePeriods.SetCheck(BST_CHECKED);
-	}
+	SetWageGui();
 
 	UpdateText();
 	return TRUE;  // return TRUE  unless you set the focus to a control
@@ -321,7 +334,7 @@ void CWorkPeriodDlg::OnEnChangeEditHoursPerMonth()
 {
 	UpdateText();
 }
-void CWorkPeriodDlg::UpdateDataFromDialog(void)
+bool CWorkPeriodDlg::UpdateDataFromDialog(void)
 {
 	CTime time;
 	DWORD flags = mStartDate.GetTime(time);
@@ -339,7 +352,7 @@ void CWorkPeriodDlg::UpdateDataFromDialog(void)
 			gWorkPeriod.SetWorkingDay(iDay, 0);
 	}
 
-	SetWageForWholePeriod();
+	return SetWageForWholePeriod();
 
 	//if (IsChecked(IDC_CHECK_NOT_INCLUDING))
 	//	gWorkPeriod.mbNotIncludingLastSalary = true;
@@ -351,9 +364,8 @@ void CWorkPeriodDlg::UpdateDataFromDialog(void)
 }
 void CWorkPeriodDlg::OnBnClickedOk()
 {
-	UpdateDataFromDialog();
-
-	CDialogEx::OnOK();
+	if (UpdateDataFromDialog())
+		CDialogEx::OnOK();
 }
 CString CWorkPeriodDlg::GetDaysText()
 {
@@ -433,7 +445,9 @@ void CWorkPeriodDlg::OnBnClickedCheckSaturday()
 }
 void CWorkPeriodDlg::OnBnClickedOk3()
 {
-	UpdateDataFromDialog();
+	if (!UpdateDataFromDialog())
+		return;
+
 	if (!gWorkPeriod.IsValid())
 	{
 		CUtils::MessBox(L"Work period not fully defined", L"Notice");
@@ -464,7 +478,7 @@ void CWorkPeriodDlg::OnBnClickedCheckNoNotice()
 void CWorkPeriodDlg::OnBnClickedButtonEditWage()
 {
 	UpdateDataFromDialog();
-	if (!gWorkPeriod.IsValid(false/*bMustDefineDays*/))
+	if (!gWorkPeriod.IsValid(false /*!bMustDefineDays*/))
 	{
 		CUtils::MessBox(L"Please define work period", L"Notice");
 		return;
@@ -472,6 +486,7 @@ void CWorkPeriodDlg::OnBnClickedButtonEditWage()
 
 	CWagePeriodsDlg dlg;
 	dlg.DoModal();
+	SetWageGui();
 	UpdateText();
 }
 void CWorkPeriodDlg::OnBnClickedRadioDiffWages()
@@ -502,6 +517,11 @@ bool CWorkPeriodDlg::SetWageForWholePeriod()
 				gWage.SetMonthlyWage(wage);
 				return true;
 			}
+			else
+			{
+				CUtils::MessBox(L"Monthly wage is not defined", L"Input Error");
+				return false;
+			}
 		}
 		return false;
 	}
@@ -519,6 +539,16 @@ bool CWorkPeriodDlg::SetWageForWholePeriod()
 						gWage.SetHourlyWage(wage, nHours);
 						return true;
 					}
+					else
+					{
+						CUtils::MessBox(L"Number of hours is not defined", L"Input Error");
+						return false;
+					}
+				}
+				else
+				{
+					CUtils::MessBox(L"Hourly wage is not defined", L"Input Error");
+					return false;
 				}
 			}
 		}

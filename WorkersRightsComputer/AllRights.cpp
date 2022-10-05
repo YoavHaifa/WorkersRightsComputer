@@ -10,7 +10,7 @@
 #include "Paid.h"
 #include "Utils.h"
 #include "WorkPeriod.h"
-#include "MinWage.h"
+#include "WageTable.h"
 #include "WorkersRightsComputerDlg.h"
 #include "LogoWriter.h"
 #include "HtmlWriter.h"
@@ -123,7 +123,7 @@ bool CAllRights::ComputeInternal()
 		pRight->Init();
 	}
 
-	if (gMinWage.mn < 1)
+	if (!gWageTable.IsValid())
 	{
 		CUtils::MessBox(L"Wage Table not initialized!", L"Installation Error");
 		return false;
