@@ -21,10 +21,10 @@ public:
 
 	bool InitFromFile(void);
 	void PrintLog(void);
+	double ComputeMonthlyPay(int year, int month);
 
 	int mn;
 	CLevel **map;
-
 };
 
 extern CMinWage gMinWage;

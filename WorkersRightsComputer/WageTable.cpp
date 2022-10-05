@@ -1,16 +1,19 @@
 #include "stdafx.h"
 #include "WageTable.h"
 #include "WorkPeriod.h"
+#include "Wage.h"
 
 CWageTable gWageTable;
 
 CWageTable::CWageTable()
 	: mn(0)
+	, miFirst(-1)
+	, miLast(-2)
 {
 }
 bool CWageTable::IsValid(void)
 {
-	return mn > 0;
+	return (mn > 0) && (miFirst >= 0) && (miLast == (miFirst + mn - 1));
 }
 double CWageTable::ComputeHolidayPrice(int year, int month)
 {
@@ -59,7 +62,6 @@ double CWageTable::PayPerDayAtWorkEnd(void)
 	double payPerMonth = PayPerMonthAtWorkEnd();
 	return (payPerMonth / gWorkPeriod.mnDaysInMonthForDailySalary);
 }
-
 double CWageTable::ComputeMonthlyPay(int year, int month)
 {
 	if (mn < 1)

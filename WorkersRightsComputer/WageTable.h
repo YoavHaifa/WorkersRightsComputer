@@ -17,6 +17,7 @@ class CWageTable
 public:
 	CWageTable();
 	bool IsValid(void);
+	void Prepare();
 
 	double PayPerMonthAtWorkEnd(void);
 	double PayPerDayAtWorkEnd(void);
@@ -27,7 +28,14 @@ private:
 	double ComputeHolidayPriceBaseWage(int year, int month);
 
 	int mn;
-	CWageLevel** map;
+	static const int YEAR0 = 1970;
+	static const int N_MONTHS = 12;
+	static const int N_YEARS = 100;
+	double maWage[N_YEARS][N_MONTHS];
+	class CWagePeriod *mapPeriod[N_YEARS][N_MONTHS];
+	int miFirst;
+	int miLast;
+	//CWageLevel** map;
 };
 
 extern CWageTable gWageTable;

@@ -59,3 +59,22 @@ void CMinWage::PrintLog(void)
 	}
 	fclose(pfWrite);
 }
+double CMinWage::ComputeMonthlyPay(int year, int month)
+{
+	if (mn < 1)
+		return 0;
+
+	for (int i = 0; i < mn; i++)
+	{
+		if (
+			(map[i]->mYear < year)
+			||
+			((map[i]->mYear == year) && (map[i]->mMonth <= month))
+			)
+		{
+			return map[i]->mWage;
+		}
+	}
+
+	return (map[mn - 1]->mWage);
+}
