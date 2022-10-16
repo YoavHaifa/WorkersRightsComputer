@@ -28,9 +28,9 @@ private:
 	double ComputeHolidayPriceBaseWage(int year, int month);
 
 	int mn;
-	static const int YEAR0 = 1970;
+	static const int YEAR0 = 1950;
 	static const int N_MONTHS = 12;
-	static const int N_YEARS = 100;
+	static const int N_YEARS = 200;
 	double maWage[N_YEARS][N_MONTHS];
 	class CWagePeriod *mapPeriod[N_YEARS][N_MONTHS];
 	int miFirst;

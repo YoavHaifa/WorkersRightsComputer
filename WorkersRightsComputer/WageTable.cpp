@@ -33,6 +33,9 @@ double CWageTable::ComputeHolidayPrice(int year, int month)
 }
 double CWageTable::ComputeHolidayPriceBaseWage(int year, int month)
 {
+	int iYear = year - YEAR0;
+	return maWage[iYear][month - 1];
+	/*
 	for (int i = 0; i < mn; i++)
 	{
 		if (
@@ -45,7 +48,7 @@ double CWageTable::ComputeHolidayPriceBaseWage(int year, int month)
 		}
 	}
 
-	return map[mn - 1]->mWage;
+	return map[mn - 1]->mWage;*/
 }
 double CWageTable::PayPerMonthAtWorkEnd(void)
 {
@@ -66,7 +69,10 @@ double CWageTable::ComputeMonthlyPay(int year, int month)
 {
 	if (mn < 1)
 		return 0;
+	int iYear = year - YEAR0;
+	return maWage[iYear][month - 1];
 
+	/*
 	for (int i = 0; i < mn; i++)
 	{
 		if (
@@ -79,5 +85,5 @@ double CWageTable::ComputeMonthlyPay(int year, int month)
 		}
 	}
 
-	return (map[mn - 1]->mWage);
+	return (map[mn - 1]->mWage);*/
 }

@@ -123,16 +123,16 @@ bool CAllRights::ComputeInternal()
 		pRight->Init();
 	}
 
-	if (!gWageTable.IsValid())
-	{
-		CUtils::MessBox(L"Wage Table not initialized!", L"Installation Error");
-		return false;
-	}
-
 	if (!gWorkPeriod.IsValid())
 	{
 		if (gpDlg)
 			gpDlg->DisplaySummary(L"Please define work period");
+		return false;
+	}
+
+	if (!gWageTable.IsValid())
+	{
+		CUtils::MessBox(L"Wage Table not initialized!", L"Installation Error");
 		return false;
 	}
 

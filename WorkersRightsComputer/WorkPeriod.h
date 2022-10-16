@@ -1,5 +1,4 @@
 #pragma once
-#include "LogoWriter.h"
 #include "MyTime.h"
 #include "MonthInfo.h"
 
@@ -10,13 +9,12 @@ public:
 
 	bool LastYearContains(class CHoliday &holiday);
 	void Reset(void);
-	// void WriteToLetter(CLogoWriter &lw);
 	void WriteToLetter(class CHtmlWriter &html);
 	CString GetPeriodForLetter(void);
 	CString GetPeriodForLetterHebrew(void);
 
 	bool IsValid(bool bMustDefineDays = true);
-	bool Compute(void);
+	bool Compute(const wchar_t *zAt = NULL);
 	bool IsBeforeDate(CMyTime &date, int year, int month, int day);
 	bool IsAfterDate(CMyTime &date, int year, int month, int day);
 

@@ -136,7 +136,7 @@ void CWorkPeriod::SetNotice(CTime date)
 
 	Compute();
 }*/
-bool CWorkPeriod::Compute(void)
+bool CWorkPeriod::Compute(const wchar_t* zAt)
 {
 	CountWorkingDays();
 
@@ -174,7 +174,7 @@ bool CWorkPeriod::Compute(void)
 
 	gFamilyPart.Compute();
 
-	gWorkPeriod.Log(L"Computed");
+	Log(zAt? zAt : L"Computed");
 	return true;
 }
 bool CWorkPeriod::IsBeforeDate(CMyTime &date, int year, int month, int day)
@@ -372,12 +372,12 @@ void CWorkPeriod::LoadFromXml(class CXMLParseNode* pRoot)
 		pMain->GetValue(L"HoursPerWeek", mHoursPerWeek);
 	}*/
 
-	Compute();
+	Compute(L"LoadFromXml1");
 
 	gUsedVacations.LoadFromXml(pMain);
 	gFamilyPart.LoadFromXml(pMain);
 
-	Compute();
+	Compute(L"LoadFromXml2");
 }
 void CWorkPeriod::Restore(FILE *pfRead)
 {
