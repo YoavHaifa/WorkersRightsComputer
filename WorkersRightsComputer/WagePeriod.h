@@ -34,6 +34,13 @@ public:
 	bool ComesJustAfter(const CWagePeriod& other);
 	bool Check();
 
+	CMyTime GetFirstMonth() { return mFirst; }
+	CMyTime GetLastMonth() { return mLast; }
+	bool GetNextMonth(CMyTime &ioTime);
+
+	double GetMonthlyWage(const CMyTime &time);
+	CString GetSMode();
+
 private:
 	friend class CWage;
 	friend class CWagePeriodsDlg;

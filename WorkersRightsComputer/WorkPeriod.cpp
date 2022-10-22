@@ -87,55 +87,7 @@ void CWorkPeriod::Reset(void)
 
 	mbSkipNotice = false;
 }
-//void CWorkPeriod::SetFirst(CTime date)
-//{
-//	mFirst.Set(date);
-//	Compute();
-//}
-/*
-void CWorkPeriod::SetLast(CTime date)
-{
-	mLast.Set(date);
 
-	if (mNotice.mbInitialized && mNotice > mLast)
-	{
-		mNotice = mLast;
-		MessageBoxA(NULL, "How to set notice?", "SW", MB_OK);
-		//mNoticeDateTimePicker->Value = mNotice;
-	}
-	else
-	{
-		if (!mNotice.mbInitialized)
-		{
-			SetNotice(date);
-			MessageBoxA(NULL, "How to set notice?", "SW", MB_OK);
-			//mNoticeDateTimePicker->Value = mNotice;
-		}
-	}
-
-	Compute();
-}*/
-/*
-void CWorkPeriod::SetNotice(CTime date)
-{
-	mNotice.Set(date);
-	if (!mLast.mbInitialized)
-		return;
-
-	if (mNotice > mLast)
-	{
-		static int count = 0;
-		mNotice = mLast;
-		MessageBox(NULL, L"How to set notice?", L"SW", MB_OK);
-		//mNoticeDateTimePicker->Value = mLast;
-		mNotice.Reset();
-		if (!count++)
-			MessageBox(NULL, L"Notice Date can't be after last day at work!", L"Notice", MB_OK);
-		return;
-	}
-
-	Compute();
-}*/
 bool CWorkPeriod::Compute(const wchar_t* zAt)
 {
 	CountWorkingDays();
@@ -268,15 +220,6 @@ int CWorkPeriod::CountWorkDaysToEndOfMonthFrom(CMyTime &firstDate)
 	}
 	return n;
 }
-/*
-void CWorkPeriod::WriteToLetter(CLogoWriter &lw)
-{
-	CString s = L"Work Period: ";
-	s += mFirst.ToString();
-	s += " - ";
-	s += mLast.ToString();
-	lw.WriteLine(s);
-} */
 void CWorkPeriod::WriteToLetter(class CHtmlWriter &html)
 {
 	CString s = L"Work Period: ";
@@ -625,9 +568,7 @@ void CWorkPeriod::Debug(const wchar_t *zAt)
 }
 void CWorkPeriod::Log(const wchar_t *zAt)
 {
-	CString sfName(L"WorkPeriod_");
-	sfName += zAt;
-	FILE *pfLog = CUtils::TryOpenLogFile(sfName);
+	FILE *pfLog = CUtils::TryOpenLogFile(L"WorkPeriod", zAt);
 	if (!pfLog)
 		return;
 

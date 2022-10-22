@@ -31,6 +31,9 @@ public:
 
 	CString GetShortText();
 
+	POSITION GetHeadPosition() { return mPeriods.GetHeadPosition(); }
+	class CWagePeriod* GetNext(POSITION &pos) { return mPeriods.GetNext(pos); }
+
 	int mDebug;
 
 private:
@@ -43,6 +46,8 @@ private:
 	void Update();
 	void UniteAdjacentFileds();
 	bool UniteAdjacentPair();
+public:
+	bool VerifyWorkPeriod();
 };
 
 extern CWage gWage;

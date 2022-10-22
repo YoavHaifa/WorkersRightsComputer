@@ -355,7 +355,7 @@ CHolidaysDef::CHolidaysDef(const wchar_t *zfName)
 	if (!pf)
 		return;
 
-	FILE *pfLog = CUtils::TryOpenLogFile(L"CHolidaysDef_read");
+	FILE *pfLog = CUtils::TryOpenLogFile(L"HolidaysDef", L"read");
 	if (pfLog)
 		fwprintf(pfLog, L"%s\n", zfName);
 

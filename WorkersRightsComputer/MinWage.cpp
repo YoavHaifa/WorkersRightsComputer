@@ -78,3 +78,7 @@ double CMinWage::ComputeMonthlyPay(int year, int month)
 
 	return (map[mn - 1]->mWage);
 }
+double CMinWage::GetMonthlyWage(const CMyTime& time)
+{
+	return ComputeMonthlyPay(time.mYear, time.mMonth);
+}

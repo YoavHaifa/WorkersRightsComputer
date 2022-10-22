@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "Wage.h"
+#include "WageTable.h"
 #include "WagePeriodsDlg.h"
 #include "Utils.h"
 #include "Right.h"
@@ -152,6 +153,8 @@ void CWage::LoadFromXml(CXMLParseNode* pMain)
 		mPeriods.AddTail(pPeriod);
 		pPeriodNode = pWage->GetNext(L"Period", pPeriodNode);
 	}
+
+	gWageTable.Prepare(L"LoadFromXml");
 }
 double CWage::GetMonthlyWage()
 {
@@ -284,4 +287,28 @@ CString CWage::GetShortText()
 	CString s;
 	s.Format(_T("Wage is defined for %d different periods"), n);
 	return s;
+}
+bool CWage::VerifyWorkPeriod()
+{
+	bool bShouldCheck = true;
+	while (bShouldCheck && mPeriods.GetSize() > 1)
+	{
+		bShouldCheck = false;
+		CWagePeriod* pFirst = mPeriods.GetHead();
+		CMyTime lastOfFirst = pFirst->GetLastMonth();
+		if (lastOfFirst.IsMonthBefore(gWorkPeriod.mFirst))
+		{
+			mPeriods.RemoveHead();
+			bShouldCheck = true;
+		}
+		CWagePeriod* pLast = mPeriods.GetTail();
+		CMyTime firstOfLast = pLast->GetFirstMonth();
+		if (gWorkPeriod.mLast.IsMonthBefore(firstOfLast) && mPeriods.GetSize() > 1)
+		{
+			mPeriods.RemoveTail();
+			bShouldCheck = true;
+		}
+	}
+	Update();
+	return gWageTable.Prepare(L"VerifyWorkPeriod");
 }

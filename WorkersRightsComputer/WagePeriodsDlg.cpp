@@ -6,6 +6,7 @@
 #include "WagePeriodsDlg.h"
 #include "WorkPeriod.h"
 #include "Wage.h"
+#include "WageTable.h"
 #include "Utils.h"
 #include "afxdialogex.h"
 
@@ -141,6 +142,11 @@ bool CWagePeriodsDlg::GetWage()
 		return false;
 	}
 	return true;
+}
+void CWagePeriodsDlg::OnOK()
+{
+	gWageTable.Prepare(L"OK_Dialog");
+	CMyDialogEx::OnOK();
 }
 void CWagePeriodsDlg::OnBnClickedButtonAddWagePeriod()
 {

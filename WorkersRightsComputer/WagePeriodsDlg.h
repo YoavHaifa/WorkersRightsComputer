@@ -45,6 +45,7 @@ protected:
 	CDateTimeCtrl mStartPeriod;
 	CDateTimeCtrl mLastInPeriod;
 	afx_msg void OnBnClickedButtonAddWagePeriod();
+	virtual void OnOK();
 
 	void ClearNumericFields();
 

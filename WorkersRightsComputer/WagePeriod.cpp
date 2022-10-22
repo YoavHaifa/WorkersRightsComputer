@@ -6,6 +6,7 @@
 #include "Right.h"
 #include "Wage.h"
 #include "Utils.h"
+#include "MinWage.h"
 
 const wchar_t* azWageMode[] =
 {
@@ -139,6 +140,10 @@ void CWagePeriod::SaveToXml(class CXMLDump& xmlDump)
 		break;
 	}
 }
+CString CWagePeriod::GetSMode()
+{
+	return CString(azWageMode[meMode]);
+}
 CString CWagePeriod::GetStateTextLine()
 {
 	CString s;
@@ -197,4 +202,26 @@ bool CWagePeriod::ComesJustAfter(const CWagePeriod& other)
 bool CWagePeriod::Check()
 {
 	return mFirst <= mLast;
+}
+bool CWagePeriod::GetNextMonth(CMyTime& ioTime)
+{
+	CMyTime nextMonth = ioTime.GetMonthAfter();
+	if (mLast.IsMonthBefore(nextMonth))
+		return false;
+	ioTime = nextMonth;
+	return true;
+}
+double CWagePeriod::GetMonthlyWage(const CMyTime &time)
+{
+	switch (meMode)
+	{
+	case WAGE_MIN:
+		return gMinWage.GetMonthlyWage(time);
+	case WAGE_MONTHLY:
+		return mMonthlyWage;
+	case WAGE_HOURLY:
+		return mHourlyWage * mnHoursPerMonth;
+	}
+	CUtils::MessBox(L"<CWagePeriod::GetMonthlyWage> bad mode", L"SW Error");
+	return 0;
 }

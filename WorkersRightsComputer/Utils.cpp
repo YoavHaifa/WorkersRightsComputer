@@ -136,7 +136,7 @@ FILE* CUtils::OpenLogFile(const wchar_t* zName, bool bAppend)
 	sfName += L".log";
 	return TryOpenStreamWriter(sfName, L"log", bAppend);
 }
-FILE* CUtils::TryOpenLogFile(const wchar_t* zName, bool bAppend)
+FILE* CUtils::TryOpenLogFile(const wchar_t* zName, const wchar_t* zAt, bool bAppend)
 {
 	CString sfName = GetBaseDir();
 	sfName += "Log";
@@ -144,6 +144,11 @@ FILE* CUtils::TryOpenLogFile(const wchar_t* zName, bool bAppend)
 		return NULL;
 	sfName += "\\";
 	sfName += zName;
+	if (zAt)
+	{
+		sfName += "_";
+		sfName += zAt;
+	}
 	sfName += L".log";
 	return TryOpenStreamWriter(sfName, L"log", bAppend, false /*bReportError*/);
 }

@@ -16,8 +16,11 @@ class CWageTable
 {
 public:
 	CWageTable();
+
+	void Clear();
 	bool IsValid(void);
-	void Prepare();
+	bool Prepare(const wchar_t* zAt);
+	void Log(const wchar_t* zAt);
 
 	double PayPerMonthAtWorkEnd(void);
 	double PayPerDayAtWorkEnd(void);
@@ -35,6 +38,8 @@ private:
 	class CWagePeriod *mapPeriod[N_YEARS][N_MONTHS];
 	int miFirst;
 	int miLast;
+
+	int mDebug;
 	//CWageLevel** map;
 };
 

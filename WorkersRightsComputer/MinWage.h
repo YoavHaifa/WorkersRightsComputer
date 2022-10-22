@@ -22,6 +22,7 @@ public:
 	bool InitFromFile(void);
 	void PrintLog(void);
 	double ComputeMonthlyPay(int year, int month);
+	double GetMonthlyWage(const class CMyTime& time);
 
 	int mn;
 	CLevel **map;

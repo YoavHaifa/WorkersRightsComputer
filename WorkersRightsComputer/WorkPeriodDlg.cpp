@@ -352,7 +352,9 @@ bool CWorkPeriodDlg::UpdateDataFromDialog(void)
 			gWorkPeriod.SetWorkingDay(iDay, 0);
 	}
 
-	return SetWageForWholePeriod();
+	bool bOK = SetWageForWholePeriod();
+	bOK &= gWage.VerifyWorkPeriod();
+	return bOK;
 
 	//if (IsChecked(IDC_CHECK_NOT_INCLUDING))
 	//	gWorkPeriod.mbNotIncludingLastSalary = true;
@@ -365,7 +367,7 @@ bool CWorkPeriodDlg::UpdateDataFromDialog(void)
 void CWorkPeriodDlg::OnBnClickedOk()
 {
 	if (UpdateDataFromDialog())
-		CDialogEx::OnOK();
+		CMyDialogEx::OnOK();
 }
 CString CWorkPeriodDlg::GetDaysText()
 {
