@@ -138,20 +138,22 @@ void CWage::SaveToXml(CXMLDump& xmlDump)
 }
 void CWage::LoadFromXml(CXMLParseNode* pMain)
 {
-	CXMLParseNode* pWage = pMain->GetFirst(L"WagePeriods");
-	if (!pWage)
-	{
-		SetMinWage();
-		return;
-	}
 	Clear();
 
-	CXMLParseNode* pPeriodNode = pWage->GetFirst(L"Period");
-	while (pPeriodNode)
+	CXMLParseNode* pWage = pMain->GetFirst(L"WagePeriods");
+	if (pWage)
 	{
-		CWagePeriod* pPeriod = new CWagePeriod(pPeriodNode);
-		mPeriods.AddTail(pPeriod);
-		pPeriodNode = pWage->GetNext(L"Period", pPeriodNode);
+		CXMLParseNode* pPeriodNode = pWage->GetFirst(L"Period");
+		while (pPeriodNode)
+		{
+			CWagePeriod* pPeriod = new CWagePeriod(pPeriodNode);
+			mPeriods.AddTail(pPeriod);
+			pPeriodNode = pWage->GetNext(L"Period", pPeriodNode);
+		}
+	}
+	else // !pWage
+	{
+		SetMinWage();
 	}
 
 	gWageTable.Prepare(L"LoadFromXml");
