@@ -14,10 +14,13 @@ void CConfig::InitFromXml()
 {
 	CString sfName = CUtils::GetBaseDir();
 	sfName += L"Config.xml";
-	CXMLParse xmlParse(sfName);
+	CXMLParse xmlParse(sfName, true /*bUnicode*/);
 	CXMLParseNode* pRoot = xmlParse.GetRoot();
 	if (!pRoot)
 		return;
+
+	// CString sHebrew;
+	// pRoot->GetValue(L"try_hebrew", sHebrew);
 
 	pRoot->GetValue(L"version", msVersion);
 	pRoot->GetValue(L"save_dir", msSaveRoot);
