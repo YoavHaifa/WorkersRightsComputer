@@ -130,9 +130,14 @@ bool CAllRights::ComputeInternal()
 		return false;
 	}
 
+	if (!gWageTable.Prepare(L"AllRights_Compute"))
+	{
+		CUtils::MessBox(L"Failed to prepare Wage Table!", L"SW Error");
+		return false;
+	}
 	if (!gWageTable.IsValid())
 	{
-		CUtils::MessBox(L"Wage Table not initialized!", L"Installation Error");
+		CUtils::MessBox(L"Wage Table not initialized!", L"SW Error");
 		return false;
 	}
 
