@@ -71,6 +71,7 @@ CWorkersRightsComputerDlg::CWorkersRightsComputerDlg(CWnd* pParent /*=nullptr*/)
 	: CMyDialogEx(IDD_WORKERSRIGHTSCOMPUTER_DIALOG, pParent)
 	, mbInitialized(false)
 	, mbDisableComputations(false)
+	, mbSaveInProcess(false)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 
@@ -290,6 +291,9 @@ HCURSOR CWorkersRightsComputerDlg::OnQueryDragIcon()
 
 void CWorkersRightsComputerDlg::OnOK()
 {
+	if (!VerifyThatNotInSave())
+		return;
+		
 	CMyAskDlg dlg(L"Verify OK", L"Do you want save and to exit?");
 	if (dlg.Ask())
 	{
@@ -300,6 +304,9 @@ void CWorkersRightsComputerDlg::OnOK()
 
 void CWorkersRightsComputerDlg::OnCancel()
 {
+	if (!VerifyThatNotInSave())
+		return;
+
 	CMyAskDlg dlg(L"Verify Cancel", L"Do you want to exit without saving?");
 	if (dlg.Ask())
 		CDialogEx::OnCancel();
@@ -328,12 +335,24 @@ void CWorkersRightsComputerDlg::OnBnClickedWorkPeriod()
 		OnInputChange();
 	}
 }
-
-
 void CWorkersRightsComputerDlg::OnBnClickedButtonSave()
 {
-	CSaver saver;
-	saver.Save();
+	if (VerifyThatNotInSave())
+	{
+		mbSaveInProcess = true;
+		CSaver saver;
+		saver.Save();
+		mbSaveInProcess = false;
+	}
+}
+bool CWorkersRightsComputerDlg::VerifyThatNotInSave()
+{
+	if (mbSaveInProcess)
+	{
+		CUtils::MessBox(L"Please OK previous save", L"Warning");
+		return false;
+	}
+	return true;
 }
 void CWorkersRightsComputerDlg::OnBnClickedButtonLoad()
 {

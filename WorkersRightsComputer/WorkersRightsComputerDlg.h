@@ -40,6 +40,7 @@ public:
 	afx_msg void OnBnClickedWorkPeriod();
 	afx_msg void OnBnClickedButtonSave();
 	afx_msg void OnBnClickedButtonLoad();
+	bool VerifyThatNotInSave();
 	CEdit mEditFirstName;
 	CEdit mEditFamilyName;
 	CEdit mEditID;
@@ -89,6 +90,7 @@ public:
 	afx_msg void OnFileLoadoldcase();
 	void OnInputChange();
 	bool mbDisableComputations;
+	bool mbSaveInProcess;
 	CEdit mEditPrevNYears;
 	static DWORD WINAPI StaticThreadFunc(LPVOID);
 	afx_msg void OnTestVerifybatch();
