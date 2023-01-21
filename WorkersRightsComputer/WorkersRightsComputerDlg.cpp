@@ -615,15 +615,15 @@ void CWorkersRightsComputerDlg::SaveToXml(CXMLDump &xmlDump)
 		}
 	}
 }
-void CWorkersRightsComputerDlg::LoadFromXml(CXMLParseNode* pRoot)
+bool CWorkersRightsComputerDlg::LoadFromXml(CXMLParseNode* pRoot)
 {
 	CXMLParseNode *pMain = pRoot->GetFirst(L"MainDialog");
 	if (!pMain)
-		return;
+		return false;
 
 	CXMLParseNode *pEdit = pMain->GetFirst(L"EditBoxes");
 	if (!pEdit)
-		return;
+		return false;
 	CString sText;
 	POSITION pos = mEditBoxes.GetHeadPosition();
 	while (pos)
@@ -638,7 +638,7 @@ void CWorkersRightsComputerDlg::LoadFromXml(CXMLParseNode* pRoot)
 
 	CXMLParseNode* pButtons = pMain->GetFirst(L"Buttons");
 	if (!pButtons)
-		return;
+		return false;
 	pos = mButtons.GetHeadPosition();
 	while (pos)
 	{
@@ -646,6 +646,7 @@ void CWorkersRightsComputerDlg::LoadFromXml(CXMLParseNode* pRoot)
 		if (pButtons->GetValue((const wchar_t*)pRef->msName, sText))
 			pRef->mButton.SetCheck(sText == L"checked" ? BST_CHECKED : 0);
 	}
+	return true;
 }
 void CWorkersRightsComputerDlg::OnTestLoadxml()
 {

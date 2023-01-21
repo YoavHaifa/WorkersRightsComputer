@@ -16,7 +16,6 @@ private:
 	void SaveButton(FILE *pfSave, class CButtonRef *pRef);
 	void WriteLetter(void);
 
-	bool LoadFromTxtFile(void);
 	bool LoadFromXmlFile(void);
 
 	FILE *mpfWrite;

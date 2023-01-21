@@ -103,7 +103,7 @@ public:
 	CEdit mAddress;
 	CEdit mEmail;
 	void SaveToXml(class CXMLDump& xmlDump);
-	void LoadFromXml(class CXMLParseNode *pRoot);
+	bool LoadFromXml(class CXMLParseNode *pRoot);
 	afx_msg void OnTestLoadxml();
 	void WriteEditorToLetter(class CHtmlWriter& html);
 	afx_msg void OnTestLoadtxt();
