@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Config.h"
 #include "XmlParse.h"
+#include "XmlDump.h"
 #include "Utils.h"
 
 CConfig gConfig;
@@ -26,4 +27,34 @@ void CConfig::InitFromXml()
 	pRoot->GetValue(L"save_dir", msSaveRoot);
 	pRoot->GetValue(L"b_14_days_severance", mb14DaysUnpaidVacation4SeveranceDefault);
 	pRoot->GetValue(L"n_months_for_full_vacation", mNMonthsForFullVacation);
+
+	RestoreState();
+}
+
+bool CConfig::SaveState()
+{
+	CString sDir = CUtils::GetBaseDir();
+	CXMLDump dump((const wchar_t*)sDir, L"State", L"latest");
+
+	dump.Write(L"save_dir", msSaveRoot);
+	dump.Write(L"filled_by_english",msFilledBy );
+	dump.Write(L"filled_by_hebrew", msFilledByHebrew);
+	dump.Write(L"contact_phone", msContactPhone);
+	dump.Write(L"contact_fax", msContactFax);
+	dump.Write(L"contact_email", msContactEmail);
+
+	return true;
+}
+
+bool CConfig::RestoreState()
+{
+	CString sDir = CUtils::GetBaseDir();
+	CXMLParse xmlParse((const wchar_t*)sDir, L"State", L"latest", true /*bUnicode*/);
+	//CXMLParse xmlParse(sDir, true /*bUnicode*/);
+	CXMLParseNode* pRoot = xmlParse.GetRoot();
+	if (!pRoot)
+		return false;
+
+	pRoot->GetValue(L"save_dir", msSaveRoot);
+	return true;
 }

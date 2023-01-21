@@ -1,9 +1,10 @@
 #pragma once
+#include "MyDialogEx.h"
 
 
 // COnOpenDlg dialog
 
-class COnOpenDlg : public CDialogEx
+class COnOpenDlg : public CMyDialogEx
 {
 	DECLARE_DYNAMIC(COnOpenDlg)
 
@@ -18,7 +19,12 @@ public:
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+	virtual BOOL OnInitDialog();
+	virtual void OnOK();
 	virtual void OnCancel();
 
 	DECLARE_MESSAGE_MAP()
+public:
+	afx_msg void OnBnClickedButtonDefineDir();
+	void UpdateFromGUI();
 };

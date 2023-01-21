@@ -18,7 +18,8 @@ public:
 	bool GetParameter(int id, int &oValue, int minValue, int maxValue);
 	bool GetParameter(int id, float &oValue, float minValue, float maxValue);
 	bool GetParameter(int id, double &oValue, double minValue, double maxValue);
-	void GetParameter(int id, bool &bFlag);
+	void GetParameter(int id, bool& bFlag);
+	bool GetParameter(int id, CString& sText);
 
 	bool IsChecked(int id);
 	void SetCheck(int id, bool bCheck);

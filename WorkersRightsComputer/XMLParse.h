@@ -87,7 +87,7 @@ public:
     } EXmlElementType;
 
     CXMLParse(void);
-    CXMLParse(const wchar_t *zDir, const wchar_t *zName, const wchar_t *zRoot);
+    CXMLParse(const wchar_t *zDir, const wchar_t *zName, const wchar_t *zRoot, bool bUnicode);
 	CXMLParse(const wchar_t* zfName, int offset = 0);
 	CXMLParse(const wchar_t* zfName, bool bUnicode);
 	CXMLParse(const wchar_t *zName, const wchar_t *pMemory, int len);

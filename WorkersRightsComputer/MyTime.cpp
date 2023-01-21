@@ -51,6 +51,14 @@ CMyTime::CMyTime(int year, int month, int day)
 CMyTime::~CMyTime()
 {
 }
+bool CMyTime::IsValid()
+{
+	if (!mbInitialized)
+		return false;
+	if (mYear == 0)
+		return false;
+	return true;
+}
 void CMyTime::SetNow(void)
 {
 	Set(CTime::GetCurrentTime());

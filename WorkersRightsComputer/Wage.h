@@ -6,6 +6,8 @@ class CWage
 public:
 	CWage();
 
+	bool IsValid();
+
 	void SetMinWage(void);
 	void SetMonthlyWage(double wage);
 	void SetHourlyWage(double wagePerHour, double nHoursPerWeek);

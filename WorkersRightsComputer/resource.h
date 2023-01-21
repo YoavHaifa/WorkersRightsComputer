@@ -120,11 +120,12 @@
 #define IDC_BUTTON_EDIT_CONTACT         1093
 #define IDC_EDIT1                       1093
 #define IDC_EDIT_PAY_PER_HOLY_DAY       1093
+#define IDC_EDIT_SAVE_DIR               1093
 #define IDC_CHECK_PAID_VACATION         1094
 #define IDC_CHECK2                      1095
 #define IDC_CHECK_PAID_RECUP            1095
 #define IDC_RADIO_DIFF_WAGES            1096
-#define IDC_BUTTON1                     1097
+#define IDC_BUTTON_DEFINE_DIR           1097
 #define IDC_BUTTON_EDIT_WAGE            1097
 #define IDC_BUTTON_ADD_WAGE_PERIOD      1097
 #define IDC_CHECK_WAGE_PERIODS_FULL_MONTHS 1098
@@ -148,7 +149,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        143
+#define _APS_NEXT_RESOURCE_VALUE        144
 #define _APS_NEXT_COMMAND_VALUE         32782
 #define _APS_NEXT_CONTROL_VALUE         1101
 #define _APS_NEXT_SYMED_VALUE           101

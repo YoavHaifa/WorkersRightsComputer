@@ -127,6 +127,15 @@ void CMyDialogEx::GetParameter(int id, bool &bFlag)
 		bFlag = ChkState == BST_CHECKED;
 	}
 }
+bool CMyDialogEx::GetParameter(int id, CString& sText)
+{
+	CWnd* pWnd = GetDlgItem(id);
+	if (!pWnd)
+		return false;
+	
+	pWnd->GetWindowText(sText);
+	return true;
+}
 bool CMyDialogEx::IsChecked(int id)
 {
     CButton *pButton = (CButton *)GetDlgItem(id);

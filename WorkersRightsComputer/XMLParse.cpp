@@ -527,7 +527,7 @@ CXMLParse::CXMLParse(void)
 , meNextType (XML_UNDEF)
 {
 }
-CXMLParse::CXMLParse(const wchar_t *zDir, const wchar_t *zName, const wchar_t *zRoot)
+CXMLParse::CXMLParse(const wchar_t *zDir, const wchar_t *zName, const wchar_t *zRoot, bool bUnicode)
 : msName(zName)
 , mpf(NULL)
 , mpMemoryToParse(NULL)
@@ -542,7 +542,7 @@ CXMLParse::CXMLParse(const wchar_t *zDir, const wchar_t *zName, const wchar_t *z
 	CFileName fName(zName);
 	fName.ChangePath(zDir);
 	fName.AddMetaTypeAndType(zRoot, L"xml");
-	OpenFile(fName);
+	OpenFile(fName, 0, bUnicode);
 }
 CXMLParse::CXMLParse(const wchar_t* zfName, int offset)
 	: msName(zfName)

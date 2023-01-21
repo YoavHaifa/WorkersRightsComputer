@@ -103,6 +103,10 @@ CWagePeriod::CWagePeriod(CXMLParseNode* pNode)
 		CUtils::MessBox(L"Failed to restored saved wage period", L"Save/Restore Error");
 	}
 }
+bool CWagePeriod::IsValid()
+{
+	return mFirst.IsValid() && mLast.IsValid();
+}
 void CWagePeriod::Copy(const CWagePeriod& other)
 {
 	meMode = other.meMode;
