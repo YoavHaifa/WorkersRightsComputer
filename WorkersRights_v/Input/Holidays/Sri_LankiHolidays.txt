@@ -1,4 +1,68 @@
 Christmas Day (Christians)
+2023
+12
+25
+Deepavali
+2023
+10
+12
+Vap full moon poya
+2023
+10
+28
+Binara Full moon poya
+2023
+9
+29
+Nikini full moon poya
+2023
+08
+30
+Eid al Adha - Feast of Sacrifice (Muslims)
+2023
+6
+29
+Vesak Full Moon Poya Day
+2023
+5
+5
+Labour Day
+2023
+5
+1
+Eid al Fitr End of Ramadan (Muslims)
+2023
+4
+22
+Sinhala and Tamil New Year
+2023
+4
+13
+Good Friday (Christians)
+2023
+04
+7
+Bak Full Moon Poya Day
+2023
+4
+5
+Maha Shivaratri
+2023
+02
+18
+Indepdendance Day
+2023
+02
+04
+Tamil Thai Pongal day
+2023
+01
+14
+Duruthu Full moon poya
+2023
+01
+6
+Christmas Day (Christians)
 2022
 12
 25
@@ -43,7 +107,7 @@ Good Friday (Christians)
 04
 15
 Sinhala and Tamil New Year
-2021
+2022
 4
 13
 Maha Shivaratri
