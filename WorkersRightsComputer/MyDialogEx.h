@@ -25,14 +25,18 @@ public:
 	void SetMenuCheck(int id, bool bCheck);
 
 	void SetTitle(const wchar_t * zText);
-	bool SetText(int id, const wchar_t * zText);
+	bool Clear(int id);
+	bool SetText(int id, const wchar_t* zText);
 	bool SetText(int id, const wchar_t * zText1, const wchar_t * zText2);
 	bool GetItemText(int id, CString &sText);
 	CString GetText(int id);
 	CString GetTextOptional(int id);
 	void SetStatusWindow(int id);
 
-	bool Enable(int id, bool bEnable);
+	bool Enable(int id, bool bEnable = true);
+	bool Disable(int id);
+	bool ClearAndDisable(int id);
+	bool SetAndEnable(int id, const wchar_t* zText);
 
 private:
 	//void OnUserCrash(CString &sText);

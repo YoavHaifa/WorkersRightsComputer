@@ -40,6 +40,7 @@ public:
 	afx_msg void OnBnClickedWorkPeriod();
 	afx_msg void OnBnClickedButtonSave();
 	afx_msg void OnBnClickedButtonLoad();
+	bool VerifyThatNotInSave();
 	CEdit mEditFirstName;
 	CEdit mEditFamilyName;
 	CEdit mEditID;
@@ -89,6 +90,7 @@ public:
 	afx_msg void OnFileLoadoldcase();
 	void OnInputChange();
 	bool mbDisableComputations;
+	bool mbSaveInProcess;
 	CEdit mEditPrevNYears;
 	static DWORD WINAPI StaticThreadFunc(LPVOID);
 	afx_msg void OnTestVerifybatch();
@@ -101,7 +103,7 @@ public:
 	CEdit mAddress;
 	CEdit mEmail;
 	void SaveToXml(class CXMLDump& xmlDump);
-	void LoadFromXml(class CXMLParseNode *pRoot);
+	bool LoadFromXml(class CXMLParseNode *pRoot);
 	afx_msg void OnTestLoadxml();
 	void WriteEditorToLetter(class CHtmlWriter& html);
 	afx_msg void OnTestLoadtxt();
@@ -111,6 +113,7 @@ public:
 	CButton mRecuperationPaid4LastYear;
 	afx_msg void OnBnClickedCheckPaidVacation();
 	afx_msg void OnBnClickedCheckPaidRecup();
+	afx_msg void OnBnClickedCheckLiveIn();
 };
 
 extern CWorkersRightsComputerDlg *gpDlg;

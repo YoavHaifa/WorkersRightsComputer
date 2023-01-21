@@ -1,7 +1,91 @@
-December Soltice
-2020
+Constitution Day
+2022
 12
+8
+Teachers Day
+2022
+10
+1
+Independence Day
+2022
+9
+1
+Eid Al Adha
+2021
+7
+09
+Remembrance Day
+2022
+5
+9
+Eid Al Fitr
+2022
+5
+3
+Nowruz
+2022
+3
 21
+International Women's Day
+2022
+3
+08
+New Year
+2022
+1
+1
+Constitution Day
+2021
+12
+8
+Teachers Day
+2021
+10
+1
+Independence Day
+2021
+9
+1
+Eid Al Adha
+2021
+7
+20
+Nowruz
+2021
+5
+21
+Eid Al Fitr
+2021
+5
+23
+Remembrance Day
+2021
+5
+9
+International Women's Day
+2021
+3
+8
+Defenders of the Motherland Day
+2021
+1
+14
+New Year's Day
+2021
+1
+1
+International Women's Day
+2021
+3
+8
+Defenders of the Motherland Day
+2021
+1
+14
+New Year's Day
+2021
+1
+1
 Constitution Day
 2020
 12
@@ -10,10 +94,6 @@ Teachers Day
 2020
 10
 1
-September Equniox
-2020
-9
-22
 Independence Day
 2020
 9
@@ -46,8 +126,12 @@ Defenders of the Motherland Day
 2020
 1
 14
-New Year's Day
+December Soltice
 2020
+12
+21
+New Year's Day
+2021
 1
 1
 December Soltice

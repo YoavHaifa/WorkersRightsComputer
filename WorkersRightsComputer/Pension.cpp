@@ -8,6 +8,7 @@
 #include "FamilyPart.h"
 #include "WorkYears.h"
 #include "UsedVacations.h"
+#include "WageTable.h"
 
 CPension *gpPension = NULL;
 
@@ -118,7 +119,7 @@ void CPension::AddMonth(int year, int month, int nDays /* if 0 - full */, bool b
 		part = pInfo->mFraction;
 	}
 
-	double monthlyPay = gMinWage.ComputeMonthlyPay(year, month);
+	double monthlyPay = gWageTable.ComputeMonthlyPay(year, month);
 
 	double penRate = mpPensionRates->RatePerMonth(year, month);
 	double pensionDue = monthlyPay * penRate * part;

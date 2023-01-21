@@ -2,7 +2,7 @@
 #include "Severance.h"
 #include "WorkPeriod.h"
 #include "WorkYears.h"
-#include "MinWage.h"
+#include "WageTable.h"
 #include "FamilyPart.h"
 #include "UsedVacations.h"
 
@@ -38,7 +38,7 @@ bool CSeverance::Compute(void)
 	}
 
 	mnYears = gWorkYears.mYearsForSeverance;
-	mPayPerYear = gMinWage.ComputeMonthlyPay(gWorkPeriod.mLast.mYear, gWorkPeriod.mLast.mMonth);
+	mPayPerYear = gWageTable.ComputeMonthlyPay(gWorkPeriod.mLast.mYear, gWorkPeriod.mLast.mMonth);
 	if (mnYears < MIN_PERIOD)
 	{
 		//double partYearThreshold = (double)N_MIN_MONTHS_FOR_SPECIAL_CASE / 12 - 0.002;

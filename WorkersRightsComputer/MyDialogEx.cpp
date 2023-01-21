@@ -159,15 +159,22 @@ void CMyDialogEx::SetTitle(const wchar_t * zText)
 {
 	SetWindowText(zText);
 }
-bool CMyDialogEx::SetText(int id, const wchar_t * zText)
+bool CMyDialogEx::SetText(int id, const wchar_t* zText)
 {
-    CWnd *pWnd = GetDlgItem(id);
-    if (!pWnd)
+	CWnd* pWnd = GetDlgItem(id);
+	if (!pWnd)
 		return false;
-        
+
 	pWnd->SetWindowText(zText);
-	//if (mbWriteToPipe)
-	//	WriteToPipe(zText);
+	return true;
+}
+bool CMyDialogEx::Clear(int id)
+{
+	CWnd* pWnd = GetDlgItem(id);
+	if (!pWnd)
+		return false;
+
+	pWnd->SetWindowText(L"");
 	return true;
 }
 bool CMyDialogEx::SetText(int id, const wchar_t * zText1, const wchar_t * zText2)
@@ -227,6 +234,33 @@ bool CMyDialogEx::Enable(int id, bool bEnable)
 		return false;
 		
 	pWnd->EnableWindow(bEnable);
+	return true;
+}
+bool CMyDialogEx::Disable(int id)
+{
+    CWnd *pWnd = GetDlgItem(id);
+    if (!pWnd)
+		return false;
+		
+	pWnd->EnableWindow(false);
+	return true;
+}
+bool CMyDialogEx::ClearAndDisable(int id)
+{
+	CWnd* pWnd = GetDlgItem(id);
+	if (!pWnd)
+		return false;
+	pWnd->SetWindowText(L"");
+	pWnd->EnableWindow(false);
+	return true;
+}
+bool CMyDialogEx::SetAndEnable(int id, const wchar_t* zText)
+{
+	CWnd* pWnd = GetDlgItem(id);
+	if (!pWnd)
+		return false;
+	pWnd->SetWindowText(zText);
+	pWnd->EnableWindow(true);
 	return true;
 }
 /*

@@ -71,6 +71,7 @@ CWorkersRightsComputerDlg::CWorkersRightsComputerDlg(CWnd* pParent /*=nullptr*/)
 	: CMyDialogEx(IDD_WORKERSRIGHTSCOMPUTER_DIALOG, pParent)
 	, mbInitialized(false)
 	, mbDisableComputations(false)
+	, mbSaveInProcess(false)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 
@@ -184,6 +185,7 @@ BEGIN_MESSAGE_MAP(CWorkersRightsComputerDlg, CDialogEx)
 	ON_COMMAND(ID_TEST_LOADTXT, &CWorkersRightsComputerDlg::OnTestLoadtxt)
 	ON_BN_CLICKED(IDC_CHECK_PAID_VACATION, &CWorkersRightsComputerDlg::OnBnClickedCheckPaidVacation)
 	ON_BN_CLICKED(IDC_CHECK_PAID_RECUP, &CWorkersRightsComputerDlg::OnBnClickedCheckPaidRecup)
+	ON_BN_CLICKED(IDC_CHECK_LIVE_IN, &CWorkersRightsComputerDlg::OnBnClickedCheckLiveIn)
 END_MESSAGE_MAP()
 
 
@@ -229,6 +231,7 @@ BOOL CWorkersRightsComputerDlg::OnInitDialog()
 	SetTitle(sTitle + gConfig.msVersion);
 
 	CUtils::CreateThread(&StaticThreadFunc, NULL);
+	SetCheck(IDC_CHECK_LIVE_IN, gWorkPeriod.mbLiveIn);
 
 	gpDlg = this;
 	mbInitialized = true;
@@ -288,6 +291,9 @@ HCURSOR CWorkersRightsComputerDlg::OnQueryDragIcon()
 
 void CWorkersRightsComputerDlg::OnOK()
 {
+	if (!VerifyThatNotInSave())
+		return;
+		
 	CMyAskDlg dlg(L"Verify OK", L"Do you want save and to exit?");
 	if (dlg.Ask())
 	{
@@ -298,6 +304,9 @@ void CWorkersRightsComputerDlg::OnOK()
 
 void CWorkersRightsComputerDlg::OnCancel()
 {
+	if (!VerifyThatNotInSave())
+		return;
+
 	CMyAskDlg dlg(L"Verify Cancel", L"Do you want to exit without saving?");
 	if (dlg.Ask())
 		CDialogEx::OnCancel();
@@ -326,12 +335,24 @@ void CWorkersRightsComputerDlg::OnBnClickedWorkPeriod()
 		OnInputChange();
 	}
 }
-
-
 void CWorkersRightsComputerDlg::OnBnClickedButtonSave()
 {
-	CSaver saver;
-	saver.Save();
+	if (VerifyThatNotInSave())
+	{
+		mbSaveInProcess = true;
+		CSaver saver;
+		saver.Save();
+		mbSaveInProcess = false;
+	}
+}
+bool CWorkersRightsComputerDlg::VerifyThatNotInSave()
+{
+	if (mbSaveInProcess)
+	{
+		CUtils::MessBox(L"Please OK previous save", L"Warning");
+		return false;
+	}
+	return true;
 }
 void CWorkersRightsComputerDlg::OnBnClickedButtonLoad()
 {
@@ -471,7 +492,7 @@ void CWorkersRightsComputerDlg::OnFileSaveas()
 {
 	CString sDir(L"F:\\WorkersRights\\Save");
 	CMyFileDialog dlg(CMyFileDialog::FD_SAVE, L"save file", sDir);
-	dlg.SetDefaultExtention(L"txt");
+	dlg.SetDefaultExtention(L"xml");
 	if (dlg.DoModal())
 	{
 		CString sfName(dlg.mSelectedFileName);
@@ -483,7 +504,7 @@ void CWorkersRightsComputerDlg::OnFileLoad()
 {
 	CString sDir(L"F:\\WorkersRights\\Save");
 	CMyFileDialog dlg(CMyFileDialog::FD_OPEN, L"saved file", sDir);
-	dlg.SetDefaultExtention(L"txt");
+	dlg.SetDefaultExtention(L"xml");
 	if (dlg.DoModal())
 	{
 		CString sfName(dlg.mSelectedFileName);
@@ -594,15 +615,15 @@ void CWorkersRightsComputerDlg::SaveToXml(CXMLDump &xmlDump)
 		}
 	}
 }
-void CWorkersRightsComputerDlg::LoadFromXml(CXMLParseNode* pRoot)
+bool CWorkersRightsComputerDlg::LoadFromXml(CXMLParseNode* pRoot)
 {
 	CXMLParseNode *pMain = pRoot->GetFirst(L"MainDialog");
 	if (!pMain)
-		return;
+		return false;
 
 	CXMLParseNode *pEdit = pMain->GetFirst(L"EditBoxes");
 	if (!pEdit)
-		return;
+		return false;
 	CString sText;
 	POSITION pos = mEditBoxes.GetHeadPosition();
 	while (pos)
@@ -617,7 +638,7 @@ void CWorkersRightsComputerDlg::LoadFromXml(CXMLParseNode* pRoot)
 
 	CXMLParseNode* pButtons = pMain->GetFirst(L"Buttons");
 	if (!pButtons)
-		return;
+		return false;
 	pos = mButtons.GetHeadPosition();
 	while (pos)
 	{
@@ -625,6 +646,7 @@ void CWorkersRightsComputerDlg::LoadFromXml(CXMLParseNode* pRoot)
 		if (pButtons->GetValue((const wchar_t*)pRef->msName, sText))
 			pRef->mButton.SetCheck(sText == L"checked" ? BST_CHECKED : 0);
 	}
+	return true;
 }
 void CWorkersRightsComputerDlg::OnTestLoadxml()
 {
@@ -655,5 +677,10 @@ void CWorkersRightsComputerDlg::OnBnClickedCheckPaidVacation()
 }
 void CWorkersRightsComputerDlg::OnBnClickedCheckPaidRecup()
 {
+	OnInputChange();
+}
+void CWorkersRightsComputerDlg::OnBnClickedCheckLiveIn()
+{
+	gWorkPeriod.mbLiveIn = IsChecked(IDC_CHECK_LIVE_IN);
 	OnInputChange();
 }

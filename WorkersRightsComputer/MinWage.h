@@ -1,5 +1,4 @@
 #pragma once
-#include "WorkPeriod.h"
 
 struct CLevel
 {
@@ -22,15 +21,11 @@ public:
 
 	bool InitFromFile(void);
 	void PrintLog(void);
-	double ComputeHolidayPriceBaseWage(int year, int month);
-	double ComputeHolidayPrice(int year, int month);
-	double PayPerMonthAtWorkEnd(void);
-	double PayPerDayAtWorkEnd(void);
 	double ComputeMonthlyPay(int year, int month);
+	double GetMonthlyWage(const class CMyTime& time);
 
 	int mn;
 	CLevel **map;
-
 };
 
 extern CMinWage gMinWage;

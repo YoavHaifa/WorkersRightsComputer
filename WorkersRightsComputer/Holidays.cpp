@@ -1,7 +1,7 @@
 ﻿#include "StdAfx.h"
 #include "Holidays.h"
 #include "WorkPeriod.h"
-#include "MinWage.h"
+#include "WageTable.h"
 #include "Utils.h"
 #include "WorkYears.h"
 #include "WorkersRightsComputerDlg.h"
@@ -389,7 +389,7 @@ void CHolidays::ComputePayPrevYears(void)
 		if (mRateSetByUser > 0)
 			payPerDay = mRateSetByUser;
 		else
-			payPerDay = gMinWage.ComputeHolidayPrice(payDate.mYear, payDate.mMonth);
+			payPerDay = gWageTable.ComputeHolidayPrice(payDate.mYear, payDate.mMonth);
 		double payPerYear = payPerDay * nDaysPerYear;
 		RememberPayParDay(payPerDay);
 		LogLine(L"pay per day in prev year", payPerDay);
@@ -518,6 +518,6 @@ bool CHolidays::ComputeHolidayPrice(CHoliday& holiday)
 	if (mRateSetByUser > 0)
 		holiday.mPrice = mRateSetByUser;
 	else
-		holiday.mPrice = gMinWage.ComputeHolidayPrice(holiday.mYear, holiday.mMonth);
+		holiday.mPrice = gWageTable.ComputeHolidayPrice(holiday.mYear, holiday.mMonth);
 	return true;
 }

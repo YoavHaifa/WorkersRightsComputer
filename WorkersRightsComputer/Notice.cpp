@@ -3,7 +3,7 @@
 #include "WorkPeriod.h"
 #include "WorkYears.h"
 #include "FamilyPart.h"
-
+#include "WageTable.h"
 
 CNotice::CNotice(void)
 	: CRight(L"Notice", L"הודעה מוקדמת")
@@ -114,7 +114,7 @@ bool CNotice::Compute(void)
 
 	if (mbDemandFullMonth && (mnDaysPaidAfterNotice == 0))
 	{
-		double payPerMonth = gMinWage.PayPerMonthAtWorkEnd();
+		double payPerMonth = gWageTable.PayPerMonthAtWorkEnd();
 		msDebug += L"Pay per month ";
 		msDebug += ToString(payPerMonth);
 		/*
@@ -185,7 +185,7 @@ bool CNotice::Compute(void)
 		msDue += L" - extra "; // mDuePay.ToString("F2");
 		msDue += ToString(mDueWorkDayToPay);
 		msDue += L" days ";
-		mPayPerDay = gMinWage.PayPerDayAtWorkEnd();
+		mPayPerDay = gWageTable.PayPerDayAtWorkEnd();
 		LogLine(L"Pay per day at work end", mPayPerDay);
 
 		msDue += L" * ";

@@ -11,12 +11,11 @@ public:
 
 private:
 	void SaveToXml(void);
-	void SaveToTxtFile(void);
+	//void SaveToTxtFile(void);
 	void SaveEditBox(FILE *pfSave, class CEditRef *pRef);
 	void SaveButton(FILE *pfSave, class CButtonRef *pRef);
 	void WriteLetter(void);
 
-	bool LoadFromTxtFile(void);
 	bool LoadFromXmlFile(void);
 
 	FILE *mpfWrite;

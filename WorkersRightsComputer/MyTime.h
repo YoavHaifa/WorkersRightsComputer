@@ -43,6 +43,7 @@ public:
 	CMyTime PrevDay(void);
 	CTimeSpan Subtract(CMyTime &other);
 	CString ToString(void);
+	CString ToMonthString(void);
 	CString ToHebrewString(void);
 	bool mbInitialized;
 	CString GetShortString();
@@ -51,11 +52,14 @@ public:
 	int GetNDaysBefore(CMyTime& dayAfter);
 	bool IsWorkingDay();
 	double AdvanceToNextMonth(void);
+	void ToPrevMonth(void);
 	bool IsOnPrevMonthsTo(CMyTime &time);
 	bool MonthContains(CMyTime date);
 	void SetClearDate();
 	bool IsMonthBefore(int year, int month);
 	bool IsMonthBefore(CMyTime &other);
 	bool IsMonthSame(CMyTime &other);
+	CMyTime GetMonthAfter() const;
+	CMyTime GetMonthBefore() const;
 };
 

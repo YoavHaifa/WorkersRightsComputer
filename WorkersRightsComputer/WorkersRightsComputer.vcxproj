@@ -189,6 +189,10 @@
     <ClInclude Include="AllRights.h" />
     <ClInclude Include="Config.h" />
     <ClInclude Include="Paid.h" />
+    <ClInclude Include="Wage.h" />
+    <ClInclude Include="WagePeriod.h" />
+    <ClInclude Include="WagePeriodsDlg.h" />
+    <ClInclude Include="WageTable.h" />
     <ClInclude Include="WorkSpan.h" />
     <ClInclude Include="WorkYear.h" />
     <ClInclude Include="MyAskDlg.h" />
@@ -239,6 +243,10 @@
     <ClCompile Include="AllRights.cpp" />
     <ClCompile Include="Config.cpp" />
     <ClCompile Include="Paid.cpp" />
+    <ClCompile Include="Wage.cpp" />
+    <ClCompile Include="WagePeriod.cpp" />
+    <ClCompile Include="WagePeriodsDlg.cpp" />
+    <ClCompile Include="WageTable.cpp" />
     <ClCompile Include="WorkSpan.cpp" />
     <ClCompile Include="WorkYear.cpp" />
     <ClCompile Include="MyAskDlg.cpp" />

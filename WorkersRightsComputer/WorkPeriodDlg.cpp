@@ -14,6 +14,8 @@
 #include "FamilyPart.h"
 #include "Utils.h"
 #include "Config.h"
+#include "WagePeriodsDlg.h"
+#include "Wage.h"
 
 
 // CWorkPeriodDlg dialog
@@ -22,7 +24,6 @@ IMPLEMENT_DYNAMIC(CWorkPeriodDlg, CDialogEx)
 
 CWorkPeriodDlg::CWorkPeriodDlg(CWnd* pParent /*=nullptr*/)
 	: CMyDialogEx(IDD_DIALOG_WORK_PERIOD, pParent)
-	, mWageMode(IDC_RADIO_MIN_WAGE)
 {
 	mapCheckDays[0] = &mCheckSunday;
 	mapCheckDays[1] = &mCheckMonday;
@@ -42,10 +43,9 @@ void CWorkPeriodDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_DATETIMEPICKER_END, mEndDate);
 	DDX_Control(pDX, IDC_DATETIMEPICKER_NOTICE, mNoticeDate);
 	DDX_Control(pDX, IDC_EDIT_PERIODS, mShow);
-	DDX_Control(pDX, IDC_RADIO_MIN_WAGE, mRadioMinWage);
 	DDX_Control(pDX, IDC_EDIT_MONTH_SALARY, mMonthlySalary);
 	DDX_Control(pDX, IDC_EDIT_HOUR_SALARY, mHourlySalary);
-	DDX_Control(pDX, IDC_EDIT_HOURS_PER_WEEK, mHoursPerWeek);
+	DDX_Control(pDX, IDC_EDIT_HOURS_PER_MONTH, mHoursPerWeek);
 	DDX_Control(pDX, IDC_CHECK_SUNDAY, mCheckSunday);
 	DDX_Control(pDX, IDC_CHECK_MONDAY, mCheckMonday);
 	DDX_Control(pDX, IDC_CHECK_TUESDAY, mCheckTuesday);
@@ -53,8 +53,11 @@ void CWorkPeriodDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_CHECK_THURSDAY, mCheckThursday);
 	DDX_Control(pDX, IDC_CHECK_FRIDAY, mCheckFriday);
 	DDX_Control(pDX, IDC_CHECK_SATURDAY, mCheckSaturday);
+
+	DDX_Control(pDX, IDC_RADIO_MIN_WAGE, mRadioMinWage);
 	DDX_Control(pDX, IDC_RADIO_MONTHLY, mRadioMonthly);
 	DDX_Control(pDX, IDC_RADIO_HOURLY, mRadioHourly);
+	DDX_Control(pDX, IDC_RADIO_DIFF_WAGES, mRadioWagePeriods);
 	//DDX_Control(pDX, IDC_DATETIMEPICKER_NOTICE2, mLastSalaryDate);
 }
 
@@ -68,7 +71,7 @@ BEGIN_MESSAGE_MAP(CWorkPeriodDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_RADIO_HOURLY, &CWorkPeriodDlg::OnBnClickedRadioHourly)
 	ON_EN_CHANGE(IDC_EDIT_MONTH_SALARY, &CWorkPeriodDlg::OnEnChangeEditMonthSalary)
 	ON_EN_CHANGE(IDC_EDIT_HOUR_SALARY, &CWorkPeriodDlg::OnEnChangeEditHourSalary)
-	ON_EN_CHANGE(IDC_EDIT_HOURS_PER_WEEK, &CWorkPeriodDlg::OnEnChangeEditHoursPerWeek)
+	ON_EN_CHANGE(IDC_EDIT_HOURS_PER_MONTH, &CWorkPeriodDlg::OnEnChangeEditHoursPerMonth)
 	ON_BN_CLICKED(IDOK, &CWorkPeriodDlg::OnBnClickedOk)
 	ON_BN_CLICKED(IDC_CHECK_SUNDAY, &CWorkPeriodDlg::OnBnClickedCheckSunday)
 	ON_BN_CLICKED(IDC_CHECK_MONDAY, &CWorkPeriodDlg::OnBnClickedCheckMonday)
@@ -80,7 +83,46 @@ BEGIN_MESSAGE_MAP(CWorkPeriodDlg, CDialogEx)
 	ON_BN_CLICKED(IDOK3, &CWorkPeriodDlg::OnBnClickedOk3)
 	ON_BN_CLICKED(IDC_BUTTON_FAMILY_PART, &CWorkPeriodDlg::OnBnClickedButtonFamilyPart)
 	ON_BN_CLICKED(IDC_CHECK_NO_NOTICE, &CWorkPeriodDlg::OnBnClickedCheckNoNotice)
+	ON_BN_CLICKED(IDC_BUTTON_EDIT_WAGE, &CWorkPeriodDlg::OnBnClickedButtonEditWage)
+	ON_BN_CLICKED(IDC_RADIO_DIFF_WAGES, &CWorkPeriodDlg::OnBnClickedRadioDiffWages)
+	ON_BN_CLICKED(IDC_BUTTON_SET_WAGE, &CWorkPeriodDlg::OnBnClickedButtonSetWage)
 END_MESSAGE_MAP()
+
+void CWorkPeriodDlg::SetWageGui()
+{
+	mRadioMinWage.SetCheck(BST_UNCHECKED);
+	mRadioMonthly.SetCheck(BST_UNCHECKED);
+	mRadioHourly.SetCheck(BST_UNCHECKED);
+	mRadioWagePeriods.SetCheck(BST_UNCHECKED);
+
+	EWageMode eWageMode;
+	if (gWage.IsSinglePeriod(eWageMode))
+	{
+		switch (eWageMode)
+		{
+		case WAGE_MIN:
+			mRadioMinWage.SetCheck(BST_CHECKED);
+			break;
+		case WAGE_MONTHLY:
+			mRadioMonthly.SetCheck(BST_CHECKED);
+			SetWageMode(IDC_RADIO_MONTHLY);
+			mMonthlySalary.SetWindowTextW(CRight::ToString(gWage.GetMonthlyWage()));
+			break;
+		case WAGE_HOURLY:
+			mRadioHourly.SetCheck(BST_CHECKED);
+			SetWageMode(IDC_RADIO_HOURLY);
+			mHourlySalary.SetWindowTextW(CRight::ToString(gWage.GetHourlyWage()));
+			mHoursPerWeek.SetWindowTextW(CRight::ToString(gWage.GetHoursPerMonth()));
+		}
+		Enable(IDC_BUTTON_SET_WAGE);
+	}
+	else // Different wage periods as defined by the user in inner dialog
+	{
+		mRadioWagePeriods.SetCheck(BST_CHECKED);
+		SetWageMode(WAGE_UNDEF);
+		Disable(IDC_BUTTON_SET_WAGE);
+	}
+}
 
 BOOL CWorkPeriodDlg::OnInitDialog()
 {
@@ -114,21 +156,7 @@ BOOL CWorkPeriodDlg::OnInitDialog()
 			mapCheckDays[iDay]->SetCheck(BST_UNCHECKED);
 	}
 
-	if (gWorkPeriod.mbMinWage)
-		mRadioMinWage.SetCheck(BST_CHECKED);
-	else if (gWorkPeriod.mbMonthlyWage)
-	{
-		mRadioMonthly.SetCheck(BST_CHECKED);
-		SetWageMode(IDC_RADIO_MONTHLY);
-		mMonthlySalary.SetWindowTextW(CRight::ToString(gWorkPeriod.mMonthlyWage));
-	}
-	else
-	{
-		mRadioHourly.SetCheck(BST_CHECKED);
-		SetWageMode(IDC_RADIO_HOURLY);
-		mHourlySalary.SetWindowTextW(CRight::ToString(gWorkPeriod.mHourlyWage));
-		mHoursPerWeek.SetWindowTextW(CRight::ToString(gWorkPeriod.mHoursPerWeek));
-	}
+	SetWageGui();
 
 	UpdateText();
 	return TRUE;  // return TRUE  unless you set the focus to a control
@@ -208,7 +236,7 @@ int CWorkPeriodDlg::UpdateText()
 	sAll += gUsedVacations.GetVacationsShortText();
 	sAll += "\r\n";
 
-	sAll += GetWageText();
+	sAll += gWage.GetShortText();
 	sAll += "\r\n";
 
 	if (gFamilyPart.mbAskOnlyForFamilyPart)
@@ -235,8 +263,6 @@ void CWorkPeriodDlg::OnBnClickedRadioHourly()
 }
 void CWorkPeriodDlg::SetWageMode(int mode)
 {
-	mWageMode = mode;
-
 	CString sEmpty;
 	mMonthlySalary.SetWindowText(sEmpty);
 	mHourlySalary.SetWindowText(sEmpty);
@@ -246,6 +272,7 @@ void CWorkPeriodDlg::SetWageMode(int mode)
 	mHourlySalary.EnableWindow(mode == IDC_RADIO_HOURLY);
 	mHoursPerWeek.EnableWindow(mode == IDC_RADIO_HOURLY);
 }
+/*
 CString CWorkPeriodDlg::GetWageText()
 {
 	if (mWageMode == IDC_RADIO_MIN_WAGE)
@@ -294,7 +321,7 @@ CString CWorkPeriodDlg::GetWageText()
 		return sRet;
 	}
 	return CString(L"Wage: Not Defined");
-}
+}*/
 void CWorkPeriodDlg::OnEnChangeEditMonthSalary()
 {
 	UpdateText();
@@ -303,11 +330,11 @@ void CWorkPeriodDlg::OnEnChangeEditHourSalary()
 {
 	UpdateText();
 }
-void CWorkPeriodDlg::OnEnChangeEditHoursPerWeek()
+void CWorkPeriodDlg::OnEnChangeEditHoursPerMonth()
 {
 	UpdateText();
 }
-void CWorkPeriodDlg::UpdateDataFromDialog(void)
+bool CWorkPeriodDlg::UpdateDataFromDialog(void)
 {
 	CTime time;
 	DWORD flags = mStartDate.GetTime(time);
@@ -325,21 +352,9 @@ void CWorkPeriodDlg::UpdateDataFromDialog(void)
 			gWorkPeriod.SetWorkingDay(iDay, 0);
 	}
 
-	if (mRadioMinWage.GetCheck() == BST_CHECKED)
-		gWorkPeriod.SetMinWage();
-	else if (mRadioMonthly.GetCheck() == BST_CHECKED)
-	{
-		CString sWageText;
-		mMonthlySalary.GetWindowTextW(sWageText);
-		gWorkPeriod.SetMonthlyWage(_wtof(sWageText));
-	}
-	else
-	{
-		CString sWageText, snHoursText;
-		mHourlySalary.GetWindowTextW(sWageText);
-		mHoursPerWeek.GetWindowTextW(snHoursText);
-		gWorkPeriod.SetHourlyWage(_wtof(sWageText), _wtof(snHoursText));
-	}
+	bool bOK = SetWageForWholePeriod();
+	bOK &= gWage.VerifyWorkPeriod();
+	return bOK;
 
 	//if (IsChecked(IDC_CHECK_NOT_INCLUDING))
 	//	gWorkPeriod.mbNotIncludingLastSalary = true;
@@ -351,9 +366,8 @@ void CWorkPeriodDlg::UpdateDataFromDialog(void)
 }
 void CWorkPeriodDlg::OnBnClickedOk()
 {
-	UpdateDataFromDialog();
-
-	CDialogEx::OnOK();
+	if (UpdateDataFromDialog())
+		CMyDialogEx::OnOK();
 }
 CString CWorkPeriodDlg::GetDaysText()
 {
@@ -433,7 +447,9 @@ void CWorkPeriodDlg::OnBnClickedCheckSaturday()
 }
 void CWorkPeriodDlg::OnBnClickedOk3()
 {
-	UpdateDataFromDialog();
+	if (!UpdateDataFromDialog())
+		return;
+
 	if (!gWorkPeriod.IsValid())
 	{
 		CUtils::MessBox(L"Work period not fully defined", L"Notice");
@@ -460,4 +476,85 @@ void CWorkPeriodDlg::OnBnClickedCheckNoNotice()
 {
 	gWorkPeriod.mbSkipNotice = IsChecked(IDC_CHECK_NO_NOTICE);
 	UpdateText();
+}
+void CWorkPeriodDlg::OnBnClickedButtonEditWage()
+{
+	UpdateDataFromDialog();
+	if (!gWorkPeriod.IsValid(false /*!bMustDefineDays*/))
+	{
+		CUtils::MessBox(L"Please define work period", L"Notice");
+		return;
+	}
+
+	CWagePeriodsDlg dlg;
+	dlg.DoModal();
+	SetWageGui();
+	UpdateText();
+}
+void CWorkPeriodDlg::OnBnClickedRadioDiffWages()
+{
+	OnBnClickedButtonEditWage();
+}
+void CWorkPeriodDlg::OnBnClickedButtonSetWage()
+{
+	if (SetWageForWholePeriod())
+		UpdateText();
+	else
+		CUtils::MessBox(L"Missing parameters for wage definition", L"Input error");
+}
+bool CWorkPeriodDlg::SetWageForWholePeriod()
+{
+	if (mRadioMinWage.GetCheck() == BST_CHECKED)
+	{
+		gWage.SetMinWage();
+		return true;
+	}
+	double wage = 0;
+	if (mRadioMonthly.GetCheck() == BST_CHECKED)
+	{
+		if (GetParameter(IDC_EDIT_MONTH_SALARY, wage, 0, 1000000))
+		{
+			if (wage > 0)
+			{
+				gWage.SetMonthlyWage(wage);
+				return true;
+			}
+			else
+			{
+				CUtils::MessBox(L"Monthly wage is not defined", L"Input Error");
+				return false;
+			}
+		}
+		return false;
+	}
+	if (mRadioHourly.GetCheck() == BST_CHECKED)
+	{
+		double nHours = 0;
+		if (GetParameter(IDC_EDIT_HOUR_SALARY, wage, 0, 10000))
+		{
+			if (wage > 0)
+			{
+				if (GetParameter(IDC_EDIT_HOURS_PER_MONTH, nHours, 0, 10000))
+				{
+					if (nHours > 0)
+					{
+						gWage.SetHourlyWage(wage, nHours);
+						return true;
+					}
+					else
+					{
+						CUtils::MessBox(L"Number of hours is not defined", L"Input Error");
+						return false;
+					}
+				}
+				else
+				{
+					CUtils::MessBox(L"Hourly wage is not defined", L"Input Error");
+					return false;
+				}
+			}
+		}
+		return false;
+	}
+	return true;
 }

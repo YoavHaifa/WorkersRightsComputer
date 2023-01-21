@@ -10,7 +10,7 @@
 #include "Paid.h"
 #include "Utils.h"
 #include "WorkPeriod.h"
-#include "MinWage.h"
+#include "WageTable.h"
 #include "WorkersRightsComputerDlg.h"
 #include "LogoWriter.h"
 #include "HtmlWriter.h"
@@ -123,16 +123,21 @@ bool CAllRights::ComputeInternal()
 		pRight->Init();
 	}
 
-	if (gMinWage.mn < 1)
-	{
-		CUtils::MessBox(L"Wage Table not initialized!", L"Installation Error");
-		return false;
-	}
-
 	if (!gWorkPeriod.IsValid())
 	{
 		if (gpDlg)
 			gpDlg->DisplaySummary(L"Please define work period");
+		return false;
+	}
+
+	if (!gWageTable.Prepare(L"AllRights_Compute"))
+	{
+		CUtils::MessBox(L"Failed to prepare Wage Table!", L"SW Error");
+		return false;
+	}
+	if (!gWageTable.IsValid())
+	{
+		CUtils::MessBox(L"Wage Table not initialized!", L"SW Error");
 		return false;
 	}
 

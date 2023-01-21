@@ -9,6 +9,7 @@
 #include "XMLDump.h"
 #include "XMLParse.h"
 #include "WorkYears.h"
+#include "Wage.h"
 
 CWorkPeriod gWorkPeriod;
 
@@ -24,12 +25,9 @@ const wchar_t *uasDaysNames[7] =
 };
 
 CWorkPeriod::CWorkPeriod(void)
-	: mbMinWage(true)
-	, mbMonthlyWage(false)
-	, mMonthlyWage(0)
-	, mHourlyWage(0)
-	, mHoursPerWeek(0)
-	, mbSkipNotice(false)
+	: mbSkipNotice(false)
+	, mbLiveIn(true)
+	, mbExtraHolidayHoursForLiveInApplied(false)
 {
 	Reset();
 
@@ -37,6 +35,25 @@ CWorkPeriod::CWorkPeriod(void)
 	mnWorkDaysPerWeek = 0;
 
 	mnDaysInMonthForDailySalary = 25;
+}
+bool CWorkPeriod::IsValid(bool bMustDefineDays)
+{
+	mbNegative = false;
+	if (!mFirst.mbInitialized || !mLast.mbInitialized)
+		return false;
+
+	if (mFirst > mLast)
+	{
+		mbNegative = true;
+		return false;
+	}
+	if (bMustDefineDays)
+	{
+		if (mnWorkDaysPerWeek < 0.05)
+			return false;
+	}
+
+	return true;
 }
 int CWorkPeriod::GetWorkingHoursInFullMonth(int year, int month)
 {
@@ -63,87 +80,15 @@ void CWorkPeriod::Reset(void)
 	for (int i = 0; i < 7; i++)
 		maWorkingDays[i] = 0;
 
-	SetMinWage();
+	gWage.SetMinWage();
 	gUsedVacations.ClearAllVacations();
 	gWorkYears.Clear();
 	gFamilyPart.Clear();
 
 	mbSkipNotice = false;
 }
-void CWorkPeriod::SetMinWage(void)
-{
-	mbMinWage = true;
-	mbMonthlyWage = false;
-	mMonthlyWage = 0;
-	mHourlyWage = 0;
-	mHoursPerWeek = 0;
-}
-void CWorkPeriod::SetMonthlyWage(double wage)
-{
-	mbMinWage = false;
-	mbMonthlyWage = true;
-	mMonthlyWage = wage;
-	mHourlyWage = 0;
-	mHoursPerWeek = 0;
-}
-void CWorkPeriod::SetHourlyWage(double wagePerHour, double nHoursPerWeek)
-{
-	mbMinWage = false;
-	mbMonthlyWage = false;
-	mMonthlyWage = 0;
-	mHourlyWage = wagePerHour;
-	mHoursPerWeek = nHoursPerWeek;
-}
-//void CWorkPeriod::SetFirst(CTime date)
-//{
-//	mFirst.Set(date);
-//	Compute();
-//}
-/*
-void CWorkPeriod::SetLast(CTime date)
-{
-	mLast.Set(date);
 
-	if (mNotice.mbInitialized && mNotice > mLast)
-	{
-		mNotice = mLast;
-		MessageBoxA(NULL, "How to set notice?", "SW", MB_OK);
-		//mNoticeDateTimePicker->Value = mNotice;
-	}
-	else
-	{
-		if (!mNotice.mbInitialized)
-		{
-			SetNotice(date);
-			MessageBoxA(NULL, "How to set notice?", "SW", MB_OK);
-			//mNoticeDateTimePicker->Value = mNotice;
-		}
-	}
-
-	Compute();
-}*/
-/*
-void CWorkPeriod::SetNotice(CTime date)
-{
-	mNotice.Set(date);
-	if (!mLast.mbInitialized)
-		return;
-
-	if (mNotice > mLast)
-	{
-		static int count = 0;
-		mNotice = mLast;
-		MessageBox(NULL, L"How to set notice?", L"SW", MB_OK);
-		//mNoticeDateTimePicker->Value = mLast;
-		mNotice.Reset();
-		if (!count++)
-			MessageBox(NULL, L"Notice Date can't be after last day at work!", L"Notice", MB_OK);
-		return;
-	}
-
-	Compute();
-}*/
-bool CWorkPeriod::Compute(void)
+bool CWorkPeriod::Compute(const wchar_t* zAt)
 {
 	CountWorkingDays();
 
@@ -181,7 +126,7 @@ bool CWorkPeriod::Compute(void)
 
 	gFamilyPart.Compute();
 
-	gWorkPeriod.Log(L"Computed");
+	Log(zAt? zAt : L"Computed");
 	return true;
 }
 bool CWorkPeriod::IsBeforeDate(CMyTime &date, int year, int month, int day)
@@ -275,15 +220,6 @@ int CWorkPeriod::CountWorkDaysToEndOfMonthFrom(CMyTime &firstDate)
 	}
 	return n;
 }
-/*
-void CWorkPeriod::WriteToLetter(CLogoWriter &lw)
-{
-	CString s = L"Work Period: ";
-	s += mFirst.ToString();
-	s += " - ";
-	s += mLast.ToString();
-	lw.WriteLine(s);
-} */
 void CWorkPeriod::WriteToLetter(class CHtmlWriter &html)
 {
 	CString s = L"Work Period: ";
@@ -326,6 +262,8 @@ void CWorkPeriod::SaveToXml(CXMLDump &xmlDump)
 	xmlDump.Write(L"last", mLast);
 	xmlDump.Write(L"notice", mNotice);
 	xmlDump.Write(L"b_skip_notice", mbSkipNotice);
+	xmlDump.Write(L"b_live_in", mbLiveIn);
+	xmlDump.Write(L"b_extra_holiday_hours_for_live_in_applied", mbExtraHolidayHoursForLiveInApplied);
 
 	{
 		CXMLDumpScope scope(L"Days", xmlDump);
@@ -334,21 +272,7 @@ void CWorkPeriod::SaveToXml(CXMLDump &xmlDump)
 			xmlDump.Write(uasDaysNames[iDay], maWorkingDays[iDay] > 0 ? 1: 0);
 		}
 	}
-	if (mbMinWage)
-	{
-		xmlDump.Write(L"bMinWage", mbMinWage);
-	}
-	else if (mbMonthlyWage)
-	{
-		xmlDump.Write(L"bMonthlyWage", mbMonthlyWage);
-		xmlDump.Write(L"MonthlyWage", mMonthlyWage);
-	}
-	else
-	{
-		xmlDump.Write(L"bHourlyWage", true);
-		xmlDump.Write(L"HourlyWage", mHourlyWage);
-		xmlDump.Write(L"HoursPerWeek", mHoursPerWeek);
-	}
+	gWage.SaveToXml(xmlDump);
 
 	gUsedVacations.SaveToXml(xmlDump);
 	gFamilyPart.SaveToXml(xmlDump);
@@ -363,18 +287,20 @@ void CWorkPeriod::LoadFromXml(class CXMLParseNode* pRoot)
 	pMain->GetValue(L"last", mLast);
 	pMain->GetValue(L"notice", mNotice);
 	pMain->GetValue(L"b_skip_notice", mbSkipNotice);
+	pMain->GetValue(L"b_live_in", mbLiveIn);
 
+	CXMLParseNode* pDays = pMain->GetFirst(L"Days");
+	if (pDays)
 	{
-		CXMLParseNode* pDays = pMain->GetFirst(L"Days");
-		if (pDays)
+		for (int iDay = 0; iDay < 7; iDay++)
 		{
-			for (int iDay = 0; iDay < 7; iDay++)
-			{
-				pDays->GetValue(uasDaysNames[iDay], maWorkingDays[iDay]);
-			}
+			pDays->GetValue(uasDaysNames[iDay], maWorkingDays[iDay]);
 		}
 	}
 
+	gWage.LoadFromXml(pMain);
+
+	/*
 	bool bHourly = false;
 	if (pMain->GetValue(L"bMinWage", mbMinWage))
 	{
@@ -387,49 +313,14 @@ void CWorkPeriod::LoadFromXml(class CXMLParseNode* pRoot)
 	{
 		pMain->GetValue(L"HourlyWage", mHourlyWage);
 		pMain->GetValue(L"HoursPerWeek", mHoursPerWeek);
-	}
+	}*/
 
-	//pMain->GetValue(L"bNotIncludingLastSalary", mbNotIncludingLastSalary);
-	//pMain->GetValue(L"last_salary_until", mLastSalaryUntil);
-
-	Compute();
+	Compute(L"LoadFromXml1");
 
 	gUsedVacations.LoadFromXml(pMain);
 	gFamilyPart.LoadFromXml(pMain);
 
-	Compute();
-}
-void CWorkPeriod::Save(FILE *pfSave)
-{
-	fwprintf(pfSave, L"WorkPeriod\n");
-	mFirst.Write(pfSave);
-	mLast.Write(pfSave);
-	mNotice.Write(pfSave);
-	//if (mbSkipNotice)
-	//	fprintf(pfSave, "Skip Notice!\n");
-	fwprintf(pfSave, L"Days\n");
-	for (int iDay = 0; iDay < 7; iDay++)
-	{
-		fwprintf(pfSave, L"%d\n", maWorkingDays[iDay] > 0 ? 1: 0);
-	}
-	if (mbMinWage)
-	{
-		fwprintf(pfSave, L"MinWage\n");
-	}
-	else if (mbMonthlyWage)
-	{
-		fwprintf(pfSave, L"MonthlyWage\n");
-		fwprintf(pfSave, L"%.2f\n", mMonthlyWage);
-	}
-	else
-	{
-		fwprintf(pfSave, L"HourlyWage\n");
-		fwprintf(pfSave, L"%.2f\n", mHourlyWage);
-		fwprintf(pfSave, L"%.2f\n", mHoursPerWeek);
-	}
-
-	gUsedVacations.Save(pfSave);
-	gFamilyPart.Save(pfSave);
+	Compute(L"LoadFromXml2");
 }
 void CWorkPeriod::Restore(FILE *pfRead)
 {
@@ -448,22 +339,11 @@ void CWorkPeriod::Restore(FILE *pfRead)
 	s = CUtils::ReadLine(pfRead);
 	if (s == "MinWage")
 	{
-		SetMinWage();
+		gWage.SetMinWage();
 	}
-	else if (s == "MonthlyWage")
-	{
-		double wage = CUtils::ReadFloat(pfRead);
-		SetMonthlyWage(wage);
-	}
-	else
-	{
-		double wage = CUtils::ReadFloat(pfRead);
-		double nHours = CUtils::ReadFloat(pfRead);
-		SetHourlyWage(wage, nHours);
-	}
+
 	InitDetailsForEachMonth();
 
-		
 	s = CUtils::ReadLine(pfRead);
 	if (s == "Vacations")
 	{
@@ -498,6 +378,12 @@ CString CWorkPeriod::GetTextSummary()
 
 	s += "\r\n";
 	s += gWorkPeriod.mSpanString;
+	if (!gWage.IsAllMin())
+	{
+		s += " (";
+		s += gWage.GetShortText();
+		s += ")";
+	}
 	if (gFamilyPart.mbAskOnlyForFamilyPart)
 	{
 		s += "\r\n";
@@ -682,9 +568,7 @@ void CWorkPeriod::Debug(const wchar_t *zAt)
 }
 void CWorkPeriod::Log(const wchar_t *zAt)
 {
-	CString sfName(L"WorkPeriod_");
-	sfName += zAt;
-	FILE *pfLog = CUtils::TryOpenLogFile(sfName);
+	FILE *pfLog = CUtils::TryOpenLogFile(L"WorkPeriod", zAt);
 	if (!pfLog)
 		return;
 
@@ -745,7 +629,7 @@ double CWorkPeriod::ComputeFamilyPart(void)
 
 	for (int i = 0; i < MAX_MONTHS; i++)
 	{
-		double companyRatio = maMonths[i].GetCompanyRatio(); // mHoursPerWeekPaidByCompany / maMonths[i].mHoursPerWeek;
+		double companyRatio = maMonths[i].GetCompanyRatio();
 		sumFractions += maMonths[i].mFraction;
 		sumCompanyRatio += companyRatio * maMonths[i].mFraction;
 		if (maMonths[i].mbLast)

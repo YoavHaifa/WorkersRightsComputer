@@ -28,7 +28,7 @@ public:
 	//static FILE * OpenInputFile(const wchar_t *zName, const wchar_t *zExtension);
 	static FILE * OpenOutputFile(const wchar_t *zName, const wchar_t *zExtension);
 	static FILE* OpenLogFile(const wchar_t* zName, bool bAppend = false);
-	static FILE* TryOpenLogFile(const wchar_t* zName, bool bAppend = false);
+	static FILE* TryOpenLogFile(const wchar_t* zName, const wchar_t* zAt = NULL, bool bAppend = false);
 	static FILE * OpenSpecialLogFile(const wchar_t *zName);
 	// static FILE * OpenSaveFileRead(const wchar_t *zName);
 

@@ -1,46 +1,20 @@
 #pragma once
-#include "LogoWriter.h"
 #include "MyTime.h"
 #include "MonthInfo.h"
-
-
 
 class CWorkPeriod
 {
 public:
 	CWorkPeriod(void);
 
-	//void SetFirst(CTime date);
-	//void SetLast(CTime date);
-	//void SetNotice(CTime date);
-	void SetMinWage(void);
-	void SetMonthlyWage(double wage);
-	void SetHourlyWage(double wagePerHour, double nHoursPerWeek);
-
 	bool LastYearContains(class CHoliday &holiday);
 	void Reset(void);
-	// void WriteToLetter(CLogoWriter &lw);
 	void WriteToLetter(class CHtmlWriter &html);
 	CString GetPeriodForLetter(void);
 	CString GetPeriodForLetterHebrew(void);
 
-	bool IsValid(void)
-	{
-		mbNegative = false;
-		if (!mFirst.mbInitialized || !mLast.mbInitialized)
-			return false;
-
-		if (mFirst > mLast)
-		{
-			mbNegative = true;
-			return false;
-		}
-		if (mnWorkDaysPerWeek < 0.05)
-			return false;
-
-		return true;
-	}
-	bool Compute(void);
+	bool IsValid(bool bMustDefineDays = true);
+	bool Compute(const wchar_t *zAt = NULL);
 	bool IsBeforeDate(CMyTime &date, int year, int month, int day);
 	bool IsAfterDate(CMyTime &date, int year, int month, int day);
 
@@ -64,6 +38,10 @@ public:
 	int GetWorkingHoursInFullWeek(int year, int month);
 	bool mbSkipNotice;
 
+	// Special extra hours for "live in" caregivers
+	bool mbLiveIn;
+	bool mbExtraHolidayHoursForLiveInApplied;
+
 	int CountDaysToEndOfMonth(CMyTime &date);
 	int CountWorkDaysToEndOfMonthFrom(CMyTime &firstDate);
 	void Save(FILE *pfSave);
@@ -71,11 +49,6 @@ public:
 	void LoadFromXml(class CXMLParseNode* pRoot);
 
 	void Restore(FILE *pfRead);
-	bool mbMinWage;
-	bool mbMonthlyWage;
-	double mMonthlyWage;
-	double mHourlyWage;
-	double mHoursPerWeek;
 	CString GetTextSummary();
 	CString GetShortSummary();
 	CString GetDaysText();

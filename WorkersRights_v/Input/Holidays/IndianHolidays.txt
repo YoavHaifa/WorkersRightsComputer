@@ -1,4 +1,56 @@
 Christmas Day
+2022
+12
+25
+Guru Nanak Jayanti
+2022
+11
+8
+Diwali
+2022
+10
+24
+Dussehra Vijaya Dashami
+2022
+10
+5
+Mahatma Gandhis Birthday
+2022
+10
+2
+Ganesh Charturthi Vinayaka Chaturthi
+2022
+8
+19
+Independence Day
+2022
+8
+15
+Buddha Purnima
+2022
+5
+16
+Good Friday
+2022
+4
+15
+Mahavir Hanati
+2022
+4
+14
+Holi
+2022
+3
+18
+Maha Shivaratri
+2022
+3
+1
+Republic Day National Day
+2022
+1
+26
+Christmas Day
 2021
 12
 25
@@ -18,15 +70,19 @@ Mahatma Gandhis Birthday
 2021
 10
 2
+Ganesh Charturthi Vinayaka Chaturthi
+2021
+8
+30
 Independence Day
 2021
 8
 15
-Budha Purnima
+Buddha Purnima
 2021
 5
 26
-Mahavir Jayanthi
+Mahavir Hanati
 2021
 4
 25
@@ -35,7 +91,7 @@ Ram Navami Vaishnava
 4
 21
 Good Friday
-2020
+2021
 4
 2
 Holi
@@ -50,11 +106,11 @@ Republic Day National Day
 2021
 1
 26
-New Years Day
+Lohri
 2021
 1
-1
-Christmas Day
+13
+Chrstmas day
 2020
 12
 25

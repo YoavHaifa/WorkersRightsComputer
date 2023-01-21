@@ -274,6 +274,11 @@ CString CMyTime::ToString(void)
 	CString s = mTime.Format(_T("%A, %B %d, %Y"));
 	return s;
 }
+CString CMyTime::ToMonthString(void)
+{
+	CString s = mTime.Format(_T("%m.%Y"));
+	return s;
+}
 CString CMyTime::ToHebrewString(void)
 {
 	CString s = mTime.Format(_T("%d.%m.%Y"));
@@ -359,6 +364,14 @@ double CMyTime::AdvanceToNextMonth(void)
 	}
 	return ((double)countDays / (countDays + nDaysInMonthStart));
 }
+void CMyTime::ToPrevMonth(void)
+{
+	int month = mMonth;
+	while (mMonth == month)
+	{
+		SubDay();
+	}
+}
 bool CMyTime::IsOnPrevMonthsTo(CMyTime &other)
 {
 	if (mYear < other.mYear)
@@ -394,4 +407,22 @@ bool CMyTime::IsMonthBefore(CMyTime &other)
 bool CMyTime::IsMonthSame(CMyTime &other)
 {
 	return (mYear == other.mYear) && (mMonth == other.mMonth);
+}
+CMyTime CMyTime::GetMonthAfter() const
+{
+	CMyTime nextMonth(*this);
+	while (nextMonth.mMonth == mMonth)
+	{
+		nextMonth.AddDay();
+	}
+	return nextMonth;
+}
+CMyTime CMyTime::GetMonthBefore() const
+{
+	CMyTime prevMonth(*this);
+	while (prevMonth.mMonth == mMonth)
+	{
+		prevMonth.SubDay();
+	}
+	return prevMonth;
 }
