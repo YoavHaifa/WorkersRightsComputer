@@ -9,6 +9,7 @@ public:
 	CString msSaveRoot;
 	bool mb14DaysUnpaidVacation4SeveranceDefault;
 	int mNMonthsForFullVacation;
+	CString msFilledBy;
 };
 
 extern CConfig gConfig;

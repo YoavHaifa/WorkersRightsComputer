@@ -23,6 +23,7 @@
 #include "HtmlWriter.h"
 #include "Config.h"
 #include "WorkYears.h"
+#include "OnOpenDlg.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -236,6 +237,9 @@ BOOL CWorkersRightsComputerDlg::OnInitDialog()
 	gpDlg = this;
 	mbInitialized = true;
 	mbDisableComputations = false;
+
+	COnOpenDlg initDlg;
+	initDlg.DoModal();
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }

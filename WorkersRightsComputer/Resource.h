@@ -129,6 +129,7 @@
 #define IDC_BUTTON_ADD_WAGE_PERIOD      1097
 #define IDC_CHECK_WAGE_PERIODS_FULL_MONTHS 1098
 #define IDC_BUTTON_SET_WAGE             1098
+#define IDD_DIALOG_ON_OPEN              1099
 #define IDC_CHECK1                      1100
 #define IDC_CHECK_LIVE_IN               1100
 #define ID_FILE_EXIT                    32771
