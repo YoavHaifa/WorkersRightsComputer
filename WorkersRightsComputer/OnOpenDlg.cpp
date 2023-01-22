@@ -17,6 +17,7 @@ IMPLEMENT_DYNAMIC(COnOpenDlg, CDialogEx)
 
 COnOpenDlg::COnOpenDlg(CWnd* pParent /*=nullptr*/)
 	: CMyDialogEx(IDD_DIALOG_ON_OPEN, pParent)
+	, mbDefineDirCanceled(false)
 {
 
 }
@@ -71,6 +72,8 @@ void COnOpenDlg::OnBnClickedButtonDefineDir()
 		SetText(IDC_EDIT_SAVE_DIR, dlg.msFolderName);
 		gConfig.msSaveRoot = dlg.msFolderName;
 	}
+	else
+		mbDefineDirCanceled = true;
 }
 
 void COnOpenDlg::UpdateFromGUI()
@@ -89,6 +92,9 @@ bool COnOpenDlg::VerifySaveDir()
 	while (gConfig.msSaveRoot.IsEmpty() || !CUtils::VerifyDirectory(gConfig.msSaveRoot))
 	{
 		OnBnClickedButtonDefineDir();
+		if (mbDefineDirCanceled)
+			exit(1);
+
 		nFailed++;
 		if (nFailed > 3)
 			exit(1);

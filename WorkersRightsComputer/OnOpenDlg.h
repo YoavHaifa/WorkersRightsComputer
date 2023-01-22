@@ -28,4 +28,5 @@ public:
 	afx_msg void OnBnClickedButtonDefineDir();
 	void UpdateFromGUI();
 	bool VerifySaveDir();
+	bool mbDefineDirCanceled;
 };

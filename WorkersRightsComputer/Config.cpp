@@ -49,7 +49,8 @@ bool CConfig::SaveState()
 bool CConfig::RestoreState()
 {
 	CString sDir = CUtils::GetBaseDir();
-	CXMLParse xmlParse((const wchar_t*)sDir, L"State", L"latest", true /*bUnicode*/);
+	CXMLParse xmlParse((const wchar_t*)sDir, L"State", L"latest", 
+		true /*bUnicode*/, true /*bOptional*/);
 	//CXMLParse xmlParse(sDir, true /*bUnicode*/);
 	CXMLParseNode* pRoot = xmlParse.GetRoot();
 	if (!pRoot)
