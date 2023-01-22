@@ -188,6 +188,7 @@
     <ClInclude Include="Additional.h" />
     <ClInclude Include="AllRights.h" />
     <ClInclude Include="Config.h" />
+    <ClInclude Include="LetterSavedDlg.h" />
     <ClInclude Include="MyFolderDialog.h" />
     <ClInclude Include="OnOpenDlg.h" />
     <ClInclude Include="Paid.h" />
@@ -244,6 +245,7 @@
     <ClCompile Include="Additional.cpp" />
     <ClCompile Include="AllRights.cpp" />
     <ClCompile Include="Config.cpp" />
+    <ClCompile Include="LetterSavedDlg.cpp" />
     <ClCompile Include="MyFolderDialog.cpp" />
     <ClCompile Include="OnOpenDlg.cpp" />
     <ClCompile Include="Paid.cpp" />

@@ -8,6 +8,7 @@
 #include "afxdialogex.h"
 #include "Config.h"
 #include "MyFolderDialog.h"
+#include "Utils.h"
 
 
 // COnOpenDlg dialog
@@ -32,7 +33,16 @@ void COnOpenDlg::DoDataExchange(CDataExchange* pDX)
 BOOL COnOpenDlg::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
+
+	if (!VerifySaveDir())
+		exit(1);
+
 	SetText(IDC_EDIT_SAVE_DIR, gConfig.msSaveRoot);
+	SetText(IDC_EDIT_CONTACT_TEL, gConfig.msContactPhone);
+	SetText(IDC_EDIT_CONTACT_FAX, gConfig.msContactFax);
+	SetText(IDC_EDIT_CONTACT_EMAIL, gConfig.msContactEmail);
+	SetText(IDC_EDIT_OPERATOR_ENGLISH, gConfig.msFilledBy);
+	SetText(IDC_EDIT_OPERATOR_HEBREW, gConfig.msFilledByHebrew);
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
@@ -59,10 +69,29 @@ void COnOpenDlg::OnBnClickedButtonDefineDir()
 	if (dlg.DoModal())
 	{
 		SetText(IDC_EDIT_SAVE_DIR, dlg.msFolderName);
+		gConfig.msSaveRoot = dlg.msFolderName;
 	}
 }
 
 void COnOpenDlg::UpdateFromGUI()
 {
 	GetParameter(IDC_EDIT_SAVE_DIR, gConfig.msSaveRoot);
+	GetParameter(IDC_EDIT_CONTACT_TEL, gConfig.msContactPhone);
+	GetParameter(IDC_EDIT_CONTACT_FAX, gConfig.msContactFax);
+	GetParameter(IDC_EDIT_CONTACT_EMAIL, gConfig.msContactEmail);
+	GetParameter(IDC_EDIT_OPERATOR_ENGLISH, gConfig.msFilledBy);
+	GetParameter(IDC_EDIT_OPERATOR_HEBREW, gConfig.msFilledByHebrew);
+}
+
+bool COnOpenDlg::VerifySaveDir()
+{
+	int nFailed = -1;
+	while (gConfig.msSaveRoot.IsEmpty() || !CUtils::VerifyDirectory(gConfig.msSaveRoot))
+	{
+		OnBnClickedButtonDefineDir();
+		nFailed++;
+		if (nFailed > 3)
+			exit(1);
+	}
+	return true;
 }

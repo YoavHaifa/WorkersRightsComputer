@@ -100,6 +100,7 @@ public:
 	CButton mRadiID;
 	CButton mRadioPassport;
 	CEdit mFilledBy;
+	CEdit mFilledByHebrew;
 	CEdit mAddress;
 	CEdit mEmail;
 	void SaveToXml(class CXMLDump& xmlDump);
@@ -108,7 +109,7 @@ public:
 	void WriteEditorToLetter(class CHtmlWriter& html);
 	afx_msg void OnTestLoadtxt();
 	// Allows user to set special rate per holidays
-	CEdit mEditPayPerEachHolyDay;
+	// CEdit mEditPayPerEachHolyDay;
 	CButton mVacationPaid4LastYear;
 	CButton mRecuperationPaid4LastYear;
 	afx_msg void OnBnClickedCheckPaidVacation();

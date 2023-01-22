@@ -85,6 +85,7 @@ CWorkersRightsComputerDlg::CWorkersRightsComputerDlg(CWnd* pParent /*=nullptr*/)
 	mEditBoxes.AddTail(new CEditRef(L"Address", mAddress, NULL, false));
 	mEditBoxes.AddTail(new CEditRef(L"Email", mEmail, NULL, false));
 	mEditBoxes.AddTail(new CEditRef(L"FilledBy", mFilledBy, NULL, false));
+	mEditBoxes.AddTail(new CEditRef(L"FilledByHebrew", mFilledByHebrew, NULL, false));
 
 	// Employment details
 	mEditBoxes.AddTail(new CEditRef(L"LastYearWork", mEditLastYearWork, L"textBox9"));
@@ -102,7 +103,7 @@ CWorkersRightsComputerDlg::CWorkersRightsComputerDlg(CWnd* pParent /*=nullptr*/)
 	mEditBoxes.AddTail(new CEditRef(L"VacationPrevYears", mEditVacationPrevYears, L"textBox11"));
 	mEditBoxes.AddTail(new CEditRef(L"RecuperationPrevYears", mEditRecuperationPrevYears, L"textBox13"));
 
-	mEditBoxes.AddTail(new CEditRef(L"PayRatePerHoliday", mEditPayPerEachHolyDay));
+	// mEditBoxes.AddTail(new CEditRef(L"PayRatePerHoliday", mEditPayPerEachHolyDay));
 
 
 	mButtons.AddTail(new CButtonRef(L"AllowSevLess", mAllowSevLess, L"checkBox1"));
@@ -148,9 +149,10 @@ void CWorkersRightsComputerDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_RADIO_ID, mRadiID);
 	DDX_Control(pDX, IDC_RADIO_PASSPORT, mRadioPassport);
 	DDX_Control(pDX, IDC_EDIT_FILLED_BY, mFilledBy);
+	DDX_Control(pDX, IDC_EDIT_FILLED_BY_HEBREW, mFilledByHebrew);
 	DDX_Control(pDX, IDC_EDIT_ADDRESS, mAddress);
 	DDX_Control(pDX, IDC_EDIT_EMAIL, mEmail);
-	DDX_Control(pDX, IDC_EDIT_PAY_PER_HOLY_DAY, mEditPayPerEachHolyDay);
+	// DDX_Control(pDX, IDC_EDIT_PAY_PER_HOLY_DAY, mEditPayPerEachHolyDay);
 	DDX_Control(pDX, IDC_CHECK_PAID_VACATION, mVacationPaid4LastYear);
 	DDX_Control(pDX, IDC_CHECK_PAID_RECUP, mRecuperationPaid4LastYear);
 }
@@ -240,6 +242,9 @@ BOOL CWorkersRightsComputerDlg::OnInitDialog()
 
 	COnOpenDlg initDlg;
 	initDlg.DoModal();
+
+	SetText(IDC_EDIT_FILLED_BY, gConfig.msFilledBy);
+	SetText(IDC_EDIT_FILLED_BY_HEBREW, gConfig.msFilledByHebrew);
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
@@ -384,7 +389,8 @@ void CWorkersRightsComputerDlg::ResetAllInputs(void)
 		pButton->mButton.SetCheck(BST_UNCHECKED);
 	}
 	mComboHolidays.SetWindowTextW(L"Select set of Holidays");
-
+	mFilledBy.SetWindowTextW(gConfig.msFilledBy);
+	mFilledByHebrew.SetWindowTextW(gConfig.msFilledByHebrew);
 }
 void CWorkersRightsComputerDlg::InitHolidaysCombo()
 {
@@ -673,7 +679,13 @@ void CWorkersRightsComputerDlg::OnTestLoadtxt()
 void CWorkersRightsComputerDlg::WriteEditorToLetter(CHtmlWriter& html)
 {
 	CString sEditor(GetText(IDC_EDIT_FILLED_BY));
-	html.WriteLineEH(L"Prepared by: ", L"הוכן על ידי: ", sEditor);
+	CString sEditorH(GetText(IDC_EDIT_FILLED_BY_HEBREW));
+	CString sPrepared(L"Prepared by: ");
+	sPrepared += sEditor;
+	CString sPreparedH(L"הוכן על ידי: ");
+	sPreparedH += sEditorH;
+
+	html.WriteLineEH(sPrepared, sPreparedH);
 }
 void CWorkersRightsComputerDlg::OnBnClickedCheckPaidVacation()
 {

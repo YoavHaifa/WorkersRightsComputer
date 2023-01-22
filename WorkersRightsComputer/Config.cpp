@@ -56,5 +56,10 @@ bool CConfig::RestoreState()
 		return false;
 
 	pRoot->GetValue(L"save_dir", msSaveRoot);
+	pRoot->GetValue(L"filled_by_english", msFilledBy);
+	pRoot->GetValue(L"filled_by_hebrew", msFilledByHebrew);
+	pRoot->GetValue(L"contact_phone", msContactPhone);
+	pRoot->GetValue(L"contact_fax", msContactFax);
+	pRoot->GetValue(L"contact_email", msContactEmail);
 	return true;
 }

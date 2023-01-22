@@ -17,6 +17,7 @@
 #define IDD_DIALOG1                     139
 #define IDD_DIALOG_ASK                  139
 #define IDD_DIALOG_WAGE_PERIODS         141
+#define IDD_DIALOG2                     144
 #define IDC_WORK_PERIOD                 1000
 #define IDC_DATETIMEPICKER_START        1001
 #define IDC_EMPLOYER                    1001
@@ -92,6 +93,7 @@
 #define IDC_EDIT6                       1069
 #define IDC_EDIT_FILLED_BY              1071
 #define IDC_DATETIMEPICKER_VAC_START    1072
+#define IDC_EDIT_FILLED_BY_HEBREW       1072
 #define IDC_DATETIMEPICKER_VAC_END      1073
 #define IDC_BUTTON_VAC_ADD              1074
 #define IDC_BUTTON_VAC_CLEAR            1075
@@ -133,6 +135,12 @@
 #define IDD_DIALOG_ON_OPEN              1099
 #define IDC_CHECK1                      1100
 #define IDC_CHECK_LIVE_IN               1100
+#define IDC_EDIT_CONTACT_TEL            1101
+#define IDC_EDIT_CONTACT_FAX            1102
+#define IDC_STATIC_FILE_NAME            1102
+#define IDC_EDIT_CONTACT_EMAIL          1103
+#define IDC_EDIT_OPERATOR_ENGLISH       1104
+#define IDC_EDIT_OPERATOR_HEBREW        1105
 #define ID_FILE_EXIT                    32771
 #define ID_COMPUTE_ALL                  32772
 #define ID_FILE_LOAD                    32773
@@ -149,9 +157,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        144
+#define _APS_NEXT_RESOURCE_VALUE        146
 #define _APS_NEXT_COMMAND_VALUE         32782
-#define _APS_NEXT_CONTROL_VALUE         1101
+#define _APS_NEXT_CONTROL_VALUE         1103
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
