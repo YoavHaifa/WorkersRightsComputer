@@ -22,7 +22,7 @@ CHolidays::CHolidays(void)
 	, mpNDaysPaidPrevYearsBox(NULL)
 	, mpPrevYearsFromBox(NULL)
 	, mpPrevNYearsBox(NULL)
-	, mpPayRatePerHolidayBox(NULL)
+	//, mpPayRatePerHolidayBox(NULL)
 	, mRateSetByUser(0)
 {
 	miPrintOrder = 4;
@@ -69,11 +69,12 @@ bool CHolidays::SetEditRef(class CEditRef *pRef)
 		mpPrevNYearsBox = &pRef->mEdit;
 		return true;
 	}
+	/*
 	if (pRef->msName == "PayRatePerHoliday")
 	{
 		mpPayRatePerHolidayBox = &pRef->mEdit;
 		return true;
-	}
+	}*/
 
 	return false;
 }
@@ -448,11 +449,13 @@ bool CHolidays::Compute(void)
 	if (!InitFromFile(msSelection))
 		return false;
 
+	/*
 	mRateSetByUser = SafeGetDoubleFromTextBox(*mpPayRatePerHolidayBox);
 	if (mRateSetByUser < 0)
 		mRateSetByUser = 0;
 	if (mRateSetByUser > 0)
 		LogLine(L"Pay rate per holiday set by user", mRateSetByUser);
+		*/
 
 	mnInLastYear = NInLastYear();
 	// TEMP - This edit box role is not clear -

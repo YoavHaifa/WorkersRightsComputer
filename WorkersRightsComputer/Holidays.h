@@ -50,7 +50,7 @@ public:
 	CEdit *mpNDaysPaidPrevYearsBox;
 	CEdit *mpPrevYearsFromBox;
 	CEdit* mpPrevNYearsBox;
-	CEdit* mpPayRatePerHolidayBox;
+	//CEdit* mpPayRatePerHolidayBox;
 
 	int mn;
 	CString msfName;

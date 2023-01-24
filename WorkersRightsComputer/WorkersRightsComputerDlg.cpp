@@ -179,7 +179,7 @@ BEGIN_MESSAGE_MAP(CWorkersRightsComputerDlg, CDialogEx)
 	ON_COMMAND(ID_FILE_SAVEAS, &CWorkersRightsComputerDlg::OnFileSaveas)
 	ON_COMMAND(ID_FILE_LOAD, &CWorkersRightsComputerDlg::OnFileLoad)
 	ON_COMMAND(ID_TEST_CREATEDIR, &CWorkersRightsComputerDlg::OnTestCreatedir)
-	ON_COMMAND(ID_FILE_LOADOLDCASE, &CWorkersRightsComputerDlg::OnFileLoadoldcase)
+	//ON_COMMAND(ID_FILE_LOADOLDCASE, &CWorkersRightsComputerDlg::OnFileLoadoldcase)
 	ON_COMMAND(ID_TEST_VERIFYBATCH, &CWorkersRightsComputerDlg::OnTestVerifybatch)
 	ON_COMMAND(ID_TEST_WRITEHTML, &CWorkersRightsComputerDlg::OnTestWritehtml)
 	ON_BN_CLICKED(IDC_EMPLOYER, &CWorkersRightsComputerDlg::OnBnClickedEmployer)
@@ -370,10 +370,10 @@ void CWorkersRightsComputerDlg::OnBnClickedButtonLoad()
 }
 void CWorkersRightsComputerDlg::OnBnClickedButtonReset()
 {
-	CSaver::ResetAllInputs();
+	CSaver::ResetAllInputs(false /*!bLoading*/);
 	OnInputChange();
 }
-void CWorkersRightsComputerDlg::ResetAllInputs(void)
+void CWorkersRightsComputerDlg::ResetAllInputs(bool bLoading)
 {
 	POSITION pos = mEditBoxes.GetHeadPosition();
 	while (pos)
@@ -389,8 +389,12 @@ void CWorkersRightsComputerDlg::ResetAllInputs(void)
 		pButton->mButton.SetCheck(BST_UNCHECKED);
 	}
 	mComboHolidays.SetWindowTextW(L"Select set of Holidays");
-	mFilledBy.SetWindowTextW(gConfig.msFilledBy);
-	mFilledByHebrew.SetWindowTextW(gConfig.msFilledByHebrew);
+	if (!bLoading)
+	{
+		mFilledBy.SetWindowTextW(gConfig.msFilledBy);
+		mFilledByHebrew.SetWindowTextW(gConfig.msFilledByHebrew);
+
+	}
 }
 void CWorkersRightsComputerDlg::InitHolidaysCombo()
 {
@@ -526,6 +530,7 @@ void CWorkersRightsComputerDlg::OnTestCreatedir()
 {
 	CUtils::VerifyDirectory(L"F:\\tmp\\new_dir");
 }
+/*
 void CWorkersRightsComputerDlg::OnFileLoadoldcase()
 {
 	CString sDir(L"F:\\WorkersRights");
@@ -537,7 +542,7 @@ void CWorkersRightsComputerDlg::OnFileLoadoldcase()
 		CVerifyOld verify(sfName);
 		verify.Verify();
 	}
-}
+}*/
 void CWorkersRightsComputerDlg::OnInputChange()
 {
 	if (mbDisableComputations)

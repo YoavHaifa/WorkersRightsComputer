@@ -26,10 +26,10 @@ CSaver::~CSaver()
 	if (mpfRead)
 		fclose(mpfRead);
 }
-void CSaver::ResetAllInputs(void)
+void CSaver::ResetAllInputs(bool bLoading)
 {
 	if (gpDlg)
-		gpDlg->ResetAllInputs();
+		gpDlg->ResetAllInputs(bLoading);
 	gWorkPeriod.Reset();
 	CPerson::ClearContacts();
 }
@@ -53,7 +53,6 @@ void CSaver::Save(const wchar_t *zfName)
 }
 bool CSaver::Restore(const wchar_t* zfName)
 {
-	ResetAllInputs();
 	if (zfName)
 		msfName = zfName;
 	else
@@ -64,7 +63,10 @@ bool CSaver::Restore(const wchar_t* zfName)
 
 	CFileName fName(msfName);
 	if (fName.IsOfType(L"xml"))
+	{
+		ResetAllInputs(true /*bLoading*/);
 		return LoadFromXmlFile();
+	}
 
 	CUtils::MessBox(L"Saved file should be XML", L"Input Error");
 	return false;

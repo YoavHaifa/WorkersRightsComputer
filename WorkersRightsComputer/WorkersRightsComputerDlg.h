@@ -61,7 +61,7 @@ public:
 	CList<CEditRef *, CEditRef *> mEditBoxes;
 	CComboBox mComboHolidays;
 	afx_msg void OnBnClickedButtonReset();
-	void ResetAllInputs(void);
+	void ResetAllInputs(bool bLoading);
 
 	CButton mAllowSevLess;
 	CButton mDemandVac4Prev;
@@ -87,7 +87,7 @@ public:
 	afx_msg void OnFileLoad();
 
 	afx_msg void OnTestCreatedir();
-	afx_msg void OnFileLoadoldcase();
+	//afx_msg void OnFileLoadoldcase();
 	void OnInputChange();
 	bool mbDisableComputations;
 	bool mbSaveInProcess;
