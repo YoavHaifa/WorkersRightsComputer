@@ -115,6 +115,7 @@ public:
 	afx_msg void OnBnClickedCheckPaidVacation();
 	afx_msg void OnBnClickedCheckPaidRecup();
 	afx_msg void OnBnClickedCheckLiveIn();
+	afx_msg void OnBnClickedButtonPrevYearsHolidays();
 };
 
 extern CWorkersRightsComputerDlg *gpDlg;

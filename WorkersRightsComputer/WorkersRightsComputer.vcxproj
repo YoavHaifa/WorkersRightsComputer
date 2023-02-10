@@ -192,6 +192,7 @@
     <ClInclude Include="MyFolderDialog.h" />
     <ClInclude Include="OnOpenDlg.h" />
     <ClInclude Include="Paid.h" />
+    <ClInclude Include="PrevYearsHolidaysDlg.h" />
     <ClInclude Include="Wage.h" />
     <ClInclude Include="WagePeriod.h" />
     <ClInclude Include="WagePeriodsDlg.h" />
@@ -249,6 +250,7 @@
     <ClCompile Include="MyFolderDialog.cpp" />
     <ClCompile Include="OnOpenDlg.cpp" />
     <ClCompile Include="Paid.cpp" />
+    <ClCompile Include="PrevYearsHolidaysDlg.cpp" />
     <ClCompile Include="Wage.cpp" />
     <ClCompile Include="WagePeriod.cpp" />
     <ClCompile Include="WagePeriodsDlg.cpp" />

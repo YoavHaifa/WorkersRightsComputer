@@ -24,6 +24,7 @@
 #include "Config.h"
 #include "WorkYears.h"
 #include "OnOpenDlg.h"
+#include "PrevYearsHolidaysDlg.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -189,6 +190,7 @@ BEGIN_MESSAGE_MAP(CWorkersRightsComputerDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_CHECK_PAID_VACATION, &CWorkersRightsComputerDlg::OnBnClickedCheckPaidVacation)
 	ON_BN_CLICKED(IDC_CHECK_PAID_RECUP, &CWorkersRightsComputerDlg::OnBnClickedCheckPaidRecup)
 	ON_BN_CLICKED(IDC_CHECK_LIVE_IN, &CWorkersRightsComputerDlg::OnBnClickedCheckLiveIn)
+	ON_BN_CLICKED(IDC_BUTTON_PREV_YEARS_HOLIDAYS, &CWorkersRightsComputerDlg::OnBnClickedButtonPrevYearsHolidays)
 END_MESSAGE_MAP()
 
 
@@ -704,4 +706,11 @@ void CWorkersRightsComputerDlg::OnBnClickedCheckLiveIn()
 {
 	gWorkPeriod.mbLiveIn = IsChecked(IDC_CHECK_LIVE_IN);
 	OnInputChange();
+}
+void CWorkersRightsComputerDlg::OnBnClickedButtonPrevYearsHolidays()
+{
+	CPrevYearsHolidaysDlg dlg;
+	if (dlg.DoModal() == IDOK)
+	{
+	}
 }
