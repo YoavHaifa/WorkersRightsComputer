@@ -135,7 +135,7 @@ void CUsedVacations::SaveToXml(CXMLDump &xmlDump)
 	}
 	xmlDump.Write(L"bAdd14DaysUnpaidVacation4Severance", mbAdd14DaysUnpaidVacation4Severance);
 }
-void CUsedVacations::LoadFromXml(class CXMLParseNode* pRoot)
+void CUsedVacations::LoadFromXml(CXMLParseNode* pRoot)
 {
 	CXMLParseNode* pMain = pRoot->GetFirst(L"UsedVacations");
 	if (!pMain)

@@ -10,6 +10,7 @@
 #include "XMLParse.h"
 #include "WorkYears.h"
 #include "Wage.h"
+#include "HolidaysDue.h"
 
 CWorkPeriod gWorkPeriod;
 
@@ -276,6 +277,7 @@ void CWorkPeriod::SaveToXml(CXMLDump &xmlDump)
 
 	gUsedVacations.SaveToXml(xmlDump);
 	gFamilyPart.SaveToXml(xmlDump);
+	gHolidaysDue.SaveToXml(xmlDump);
 }
 void CWorkPeriod::LoadFromXml(class CXMLParseNode* pRoot)
 {
@@ -319,6 +321,7 @@ void CWorkPeriod::LoadFromXml(class CXMLParseNode* pRoot)
 
 	gUsedVacations.LoadFromXml(pMain);
 	gFamilyPart.LoadFromXml(pMain);
+	gHolidaysDue.LoadFromXml(pMain);
 
 	Compute(L"LoadFromXml2");
 }

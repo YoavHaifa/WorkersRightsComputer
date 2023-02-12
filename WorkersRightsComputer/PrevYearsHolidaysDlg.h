@@ -19,6 +19,18 @@ public:
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+	virtual BOOL OnInitDialog();
 
 	DECLARE_MESSAGE_MAP()
+
+	bool mbInitializing;
+
+	afx_msg void OnEnChangeEditHolidaysPrevy();
+	afx_msg void OnEnChangeEditHolidaysPrevy1();
+	afx_msg void OnEnChangeEditHolidaysPrevy2();
+	afx_msg void OnEnChangeEditHolidaysPrevy3();
+	afx_msg void OnEnChangeEditHolidaysPrevy4();
+	afx_msg void OnEnChangeEditHolidaysPrevy5();
+	afx_msg void OnEnChangeEditHolidaysPrevy6();
+	afx_msg void OnEnChangeEditHolidaysPrevy7();
 };
