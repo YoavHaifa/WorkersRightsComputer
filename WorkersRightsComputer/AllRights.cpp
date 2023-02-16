@@ -212,7 +212,14 @@ void CAllRights::WriteTotalLineToHtmlTable(CHtmlWriter &html)
 
 	html.WriteL(L"</tr>");
 }
-
+CHolidays* CAllRights::GetHolidays()
+{
+	if (!mpHolidays)
+		return NULL;
+	if (!mpHolidays->IsValid())
+		return NULL;
+	return mpHolidays;
+}
 CString CAllRights::GetHolidaysSelection()
 {
 	if (!mpHolidays)

@@ -27,8 +27,10 @@ public:
 	CList <CRight *, CRight *> mRights;
 	double mSumDue;
 	CString msLabelTotal;
+
 	class CHolidays *mpHolidays;
 	CString GetHolidaysSelection();
+	class CHolidays* GetHolidays();
 };
 
 extern CAllRights gAllRights;

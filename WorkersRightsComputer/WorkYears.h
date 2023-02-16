@@ -17,6 +17,8 @@ public:
 	bool WorkedAtLeastNMonths(int nMonths);
 	bool LastYearDoContains(class CHoliday& holiday);
 
+	CWorkYear * GetByReverseIndex(int iFromLast);
+
 	int mn;
 	int mnMonthsInLastYear;
 	int mnDaysInLastYear;

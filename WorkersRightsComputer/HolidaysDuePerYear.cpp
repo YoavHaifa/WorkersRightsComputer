@@ -3,6 +3,8 @@
 #include "PrevYearsHolidaysDlg.h"
 #include "XMLDump.h"
 #include "XMLParse.h"
+#include "WorkYear.h"
+#include "Holidays.h"
 
 int CHolidaysDuePerYear::umId = -1; // First to be constructed is "mSum" - not real year!
 
@@ -17,14 +19,19 @@ void SHolidayData::OnGuiChange(CPrevYearsHolidaysDlg* pDlg)
 {
 	pDlg->GetParameter(mGuiId, mValue);
 }
-
+void SHolidayData::SetInvisible(CPrevYearsHolidaysDlg* pDlg)
+{
+	pDlg->SetInvisible(mGuiId);
+	mValue = 0;
+}
 //---------------------------------------------------------------------------------------
 // class CHolidaysDuePerYear
 
-CHolidaysDuePerYear::CHolidaysDuePerYear(int idWorked, int idPaid, int idExist, int idDue)
-	: mWorked(idWorked)
+CHolidaysDuePerYear::CHolidaysDuePerYear(int idPrompt, int idWorked, int idPaid, int idExist, int idDue)
+	: mIdPrompt(idPrompt)
+	, mWorked(idWorked)
 	, mPaid(idPaid)
-	, mInYear(idExist, 9)
+	, mInYear(idExist, CHolidays::MAX_HOLIDAYS_PER_YEAR)
 	, mDue(idDue)
 	, mId(umId++)
 {
@@ -53,13 +60,42 @@ void CHolidaysDuePerYear::Add(CHolidaysDuePerYear& other)
 		pData->mValue += pOtherData->mValue;
 	}
 }
-void CHolidaysDuePerYear::UpdateGui(CPrevYearsHolidaysDlg* pDlg)
+void CHolidaysDuePerYear::UpdateGui(CPrevYearsHolidaysDlg* pDlg, CWorkYear* pWorkYear)
 {
+	// Update Period
+	if (pWorkYear)
+	{
+		CString s;
+		if (mId == 0)
+			s = "Last Year: ";
+		else
+			s.Format(L"Prev Year %d: ", mId);
+		s += pWorkYear->mFirstDay.ToHebrewString();
+		s += " - ";
+		s += pWorkYear->mLastDay.ToHebrewString();
+		pDlg->SetParameter(mIdPrompt, s);
+
+		if (mInYear.mValue == 0 && mId > 0)
+			mInYear.mValue = CHolidays::MAX_HOLIDAYS_PER_YEAR;
+	}
+
+	// Set all fields in GUI
 	POSITION pos = mData.GetHeadPosition();
 	while (pos)
 	{
 		SHolidayData* pData = mData.GetNext(pos);
 		pData->UpdateGui(pDlg);
+	}
+}
+void CHolidaysDuePerYear::SetInvisible(CPrevYearsHolidaysDlg* pDlg)
+{
+	pDlg->SetInvisible(mIdPrompt);
+
+	POSITION pos = mData.GetHeadPosition();
+	while (pos)
+	{
+		SHolidayData* pData = mData.GetNext(pos);
+		pData->SetInvisible(pDlg);
 	}
 }
 bool CHolidaysDuePerYear::ValidateValues()
@@ -110,3 +146,4 @@ void CHolidaysDuePerYear::LoadFromXml(CXMLParseNode* pNode)
 	pNode->GetValue(L"InYear", mInYear.mValue);
 	ValidateValues();
 }
+

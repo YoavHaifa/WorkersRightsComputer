@@ -25,6 +25,7 @@
 #include "WorkYears.h"
 #include "OnOpenDlg.h"
 #include "PrevYearsHolidaysDlg.h"
+#include "Holidays.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -709,6 +710,11 @@ void CWorkersRightsComputerDlg::OnBnClickedCheckLiveIn()
 }
 void CWorkersRightsComputerDlg::OnBnClickedButtonPrevYearsHolidays()
 {
+	// Return "holidays" only if it is valid!
+	CHolidays* pHolidays = gAllRights.GetHolidays();
+	if (!pHolidays)
+		return;
+
 	CPrevYearsHolidaysDlg dlg;
 	if (dlg.DoModal() == IDOK)
 	{

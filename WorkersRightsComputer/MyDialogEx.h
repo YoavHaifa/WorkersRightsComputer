@@ -13,6 +13,7 @@ public:
 	void SetParameter(int id, int value);
 	void SetParameter(int id, float value);
 	void SetParameter(int id, double value);
+	void SetParameter(int id, CString& sText);
 
 	bool GetParameter(int id, int &oValue);
 	bool GetParameter(int id, int &oValue, int minValue, int maxValue);
@@ -38,6 +39,7 @@ public:
 	bool Disable(int id);
 	bool ClearAndDisable(int id);
 	bool SetAndEnable(int id, const wchar_t* zText);
+	bool SetInvisible(int id);
 
 private:
 	//void OnUserCrash(CString &sText);

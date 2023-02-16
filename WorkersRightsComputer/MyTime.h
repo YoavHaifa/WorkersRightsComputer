@@ -43,9 +43,9 @@ public:
 	CMyTime NextDay(void);
 	CMyTime PrevDay(void);
 	CTimeSpan Subtract(CMyTime &other);
-	CString ToString(void);
-	CString ToMonthString(void);
-	CString ToHebrewString(void);
+	CString ToString();
+	CString ToMonthString();
+	CString ToHebrewString();
 	bool mbInitialized;
 	CString GetShortString();
 	int GetNMonthsBefore(CMyTime& dayAfter, int *pnExtraDays = NULL);

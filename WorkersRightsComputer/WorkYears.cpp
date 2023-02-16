@@ -160,3 +160,9 @@ bool CWorkYears::LastYearDoContains(class CHoliday& holiday)
 {
 	return maYears[mn-1].Contains(holiday);
 }
+CWorkYear* CWorkYears::GetByReverseIndex(int iFromLast)
+{
+	if (iFromLast > mn - 1)
+		return NULL;
+	return &maYears[mn - 1 - iFromLast];
+}

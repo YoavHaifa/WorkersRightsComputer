@@ -47,6 +47,14 @@ void CMyDialogEx::SetParameter(int id, double value)
         pWnd->SetWindowText(zBuf);
     }
 }
+void CMyDialogEx::SetParameter(int id, CString& sText)
+{
+    CWnd *pWnd = GetDlgItem(id);
+    if (pWnd)
+    {
+        pWnd->SetWindowText(sText);
+    }
+}
 void CMyDialogEx::SetParameter(int id, bool bFlag)
 {
 	CButton *pButton=(CButton *)GetDlgItem(id);
@@ -270,6 +278,14 @@ bool CMyDialogEx::SetAndEnable(int id, const wchar_t* zText)
 		return false;
 	pWnd->SetWindowText(zText);
 	pWnd->EnableWindow(true);
+	return true;
+}
+bool CMyDialogEx::SetInvisible(int id)
+{
+	CWnd* pWnd = GetDlgItem(id);
+	if (!pWnd)
+		return false;
+	pWnd->ShowWindow(SW_HIDE);
 	return true;
 }
 /*
