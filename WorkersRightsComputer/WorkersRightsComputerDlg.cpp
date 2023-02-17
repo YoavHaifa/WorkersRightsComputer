@@ -94,10 +94,10 @@ CWorkersRightsComputerDlg::CWorkersRightsComputerDlg(CWnd* pParent /*=nullptr*/)
 	mEditBoxes.AddTail(new CEditRef(L"LastYearWork", mEditLastYearWork, L"textBox9"));
 	mEditBoxes.AddTail(new CEditRef(L"LastYearPaid", mEditLastYearPaid, L"textBox3"));
 	mEditBoxes.AddTail(new CEditRef(L"LastYearFrom", mEditLastYearFrom, L"textBox4"));
-	mEditBoxes.AddTail(new CEditRef(L"PrevYearWork", mEditPrevYearWork, L"textBox10"));
-	mEditBoxes.AddTail(new CEditRef(L"PrevYearPaid", mEditPrevYearPaid, L"textBox5"));
-	mEditBoxes.AddTail(new CEditRef(L"PrevYearFrom", mEditPrevYearFrom, L"textBox6"));
-	mEditBoxes.AddTail(new CEditRef(L"PrevNYear", mEditPrevNYears, L"textBox7"));
+	//mEditBoxes.AddTail(new CEditRef(L"PrevYearWork", mEditPrevYearWork, L"textBox10"));
+	//mEditBoxes.AddTail(new CEditRef(L"PrevYearPaid", mEditPrevYearPaid, L"textBox5"));
+	//mEditBoxes.AddTail(new CEditRef(L"PrevYearFrom", mEditPrevYearFrom, L"textBox6"));
+	//mEditBoxes.AddTail(new CEditRef(L"PrevNYear", mEditPrevNYears, L"textBox7"));
 	mEditBoxes.AddTail(new CEditRef(L"AdditionalDesc", mEditAdditionalDesc, L"textBox14"));
 	mEditBoxes.AddTail(new CEditRef(L"AdditionalSum", mEditAdditionalSum, L"textBox15"));
 	mEditBoxes.AddTail(new CEditRef(L"PaidDesc", mEditPaidDesc));
@@ -125,16 +125,16 @@ CWorkersRightsComputerDlg::CWorkersRightsComputerDlg(CWnd* pParent /*=nullptr*/)
 void CWorkersRightsComputerDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
-	DDX_Control(pDX, IDC_EDIT_HOLIDAYS_LASTY_WORK, mEditLastYearWork);
+	DDX_Control(pDX, IDC_EDIT_HOLIDAYS_PREVY_WORK, mEditLastYearWork);
 	DDX_Control(pDX, IDC_EDIT_FIRST_NAME, mEditFirstName);
 	DDX_Control(pDX, IDC_EDIT_FAMILY_NAME, mEditFamilyName);
 	DDX_Control(pDX, IDC_EDIT_ID, mEditID);
 	DDX_Control(pDX, IDC_EDIT_TEL, mEditTel);
-	DDX_Control(pDX, IDC_EDIT_HOLIDAYS_LASTY_PAID, mEditLastYearPaid);
-	DDX_Control(pDX, IDC_EDIT_HOLIDAYS_LASTY_FROM, mEditLastYearFrom);
-	DDX_Control(pDX, IDC_EDIT_HOLIDAYS_PREVY_WORK, mEditPrevYearWork);
-	DDX_Control(pDX, IDC_EDIT_HOLIDAYS_PREVY_PAID, mEditPrevYearPaid);
-	DDX_Control(pDX, IDC_EDIT_HOLIDAYS_PREVY_FROM, mEditPrevYearFrom);
+	DDX_Control(pDX, IDC_EDIT_HOLIDAYS_PREVY_PAID, mEditLastYearPaid);
+	DDX_Control(pDX, IDC_EDIT_HOLIDAYS_PREVY_FROM, mEditLastYearFrom);
+	//DDX_Control(pDX, IDC_EDIT_HOLIDAYS_PREVY_WORK, mEditPrevYearWork);
+	//DDX_Control(pDX, IDC_EDIT_HOLIDAYS_PREVY_PAID, mEditPrevYearPaid);
+	//DDX_Control(pDX, IDC_EDIT_HOLIDAYS_PREVY_FROM, mEditPrevYearFrom);
 	DDX_Control(pDX, IDC_EDIT_ADDITIONAL_DESC, mEditAdditionalDesc);
 	DDX_Control(pDX, IDC_EDIT_ADDITIONAL_SUM, mEditAdditionalSum);
 	DDX_Control(pDX, IDC_EDIT_PAID_DESC, mEditPaidDesc);
@@ -148,7 +148,7 @@ void CWorkersRightsComputerDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_CHECK_ONLY_SEVERANCE, mEntitledOnly2Sev);
 	DDX_Control(pDX, IDC_CHECK_ACTIVE_PENSION, mHadPensionBefore);
 	DDX_Control(pDX, IDC_EDIT_SUMMARY, mSummary);
-	DDX_Control(pDX, IDC_EDIT_HOLIDAYS_PREVY_N_YEARS, mEditPrevNYears);
+	//DDX_Control(pDX, IDC_EDIT_HOLIDAYS_PREVY_N_YEARS, mEditPrevNYears);
 	DDX_Control(pDX, IDC_RADIO_ID, mRadiID);
 	DDX_Control(pDX, IDC_RADIO_PASSPORT, mRadioPassport);
 	DDX_Control(pDX, IDC_EDIT_FILLED_BY, mFilledBy);
@@ -175,7 +175,9 @@ BEGIN_MESSAGE_MAP(CWorkersRightsComputerDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_CHECK_ONLY_SEVERANCE, &CWorkersRightsComputerDlg::OnBnClickedCheckOnlySeverance)
 	ON_BN_CLICKED(IDC_CHECK_ACTIVE_PENSION, &CWorkersRightsComputerDlg::OnBnClickedCheckActivePension)
 	ON_CBN_SELCHANGE(IDC_COMBO_HOLIDAYS, &CWorkersRightsComputerDlg::OnCbnSelchangeComboHolidays)
-	ON_EN_CHANGE(IDC_EDIT_HOLIDAYS_LASTY_WORK, &CWorkersRightsComputerDlg::OnEnChangeEditHolidaysLastyWork)
+	ON_EN_CHANGE(IDC_EDIT_HOLIDAYS_PREVY_WORK, &CWorkersRightsComputerDlg::OnEnChangeEditHolidaysLastyWork)
+	ON_EN_CHANGE(IDC_EDIT_HOLIDAYS_PREVY_PAID, &CWorkersRightsComputerDlg::OnEnChangeEditHolidaysLastyWork)
+	ON_EN_CHANGE(IDC_EDIT_HOLIDAYS_PREVY_FROM, &CWorkersRightsComputerDlg::OnEnChangeEditHolidaysLastyWork)
 	ON_EN_CHANGE(IDC_EDIT_ADDITIONAL_SUM, &CWorkersRightsComputerDlg::OnInputChange)
 	ON_EN_CHANGE(IDC_EDIT_PAID_SUM, &CWorkersRightsComputerDlg::OnInputChange)
 	ON_COMMAND(ID_COMPUTE_ALL, &CWorkersRightsComputerDlg::OnComputeAll)
@@ -249,6 +251,8 @@ BOOL CWorkersRightsComputerDlg::OnInitDialog()
 
 	SetText(IDC_EDIT_FILLED_BY, gConfig.msFilledBy);
 	SetText(IDC_EDIT_FILLED_BY_HEBREW, gConfig.msFilledByHebrew);
+
+	gHolidaysDue.UpdateMainDialog(this);
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
@@ -346,8 +350,8 @@ void CWorkersRightsComputerDlg::OnBnClickedWorkPeriod()
 				SetCheck(IDC_CHECK_ONLY_SEVERANCE, true);
 		}
 		OnInputChange();
-		gHolidaysDue.VerifyWorkPeriod();
 	}
+	gHolidaysDue.VerifyWorkPeriod(this);
 }
 void CWorkersRightsComputerDlg::OnBnClickedButtonSave()
 {
@@ -372,11 +376,13 @@ void CWorkersRightsComputerDlg::OnBnClickedButtonLoad()
 {
 	CSaver saver;
 	saver.Restore();
+	gHolidaysDue.UpdateMainDialog(this);
 }
 void CWorkersRightsComputerDlg::OnBnClickedButtonReset()
 {
 	CSaver::ResetAllInputs(false /*!bLoading*/);
 	OnInputChange();
+	gHolidaysDue.UpdateMainDialog(this);
 }
 void CWorkersRightsComputerDlg::ResetAllInputs(bool bLoading)
 {
@@ -553,6 +559,8 @@ void CWorkersRightsComputerDlg::OnInputChange()
 	if (mbDisableComputations)
 		return;
 
+	gHolidaysDue.VerifyWorkPeriod(this);
+
 	gAllRights.Compute();
 }
 DWORD WINAPI CWorkersRightsComputerDlg::StaticThreadFunc(LPVOID)
@@ -717,9 +725,10 @@ void CWorkersRightsComputerDlg::OnBnClickedButtonPrevYearsHolidays()
 	if (!pHolidays)
 		return;
 
-	gHolidaysDue.VerifyWorkPeriod();
+	gHolidaysDue.VerifyWorkPeriod(this);
 	CPrevYearsHolidaysDlg dlg;
 	if (dlg.DoModal() == IDOK)
 	{
 	}
+	gHolidaysDue.UpdateMainDialog(this);
 }

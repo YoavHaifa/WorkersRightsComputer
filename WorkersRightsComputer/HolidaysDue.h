@@ -9,13 +9,16 @@ public:
 	CHolidaysDue();
 
 	void Reset();
-	void VerifyWorkPeriod();
+	bool VerifyWorkPeriod(class CMyDialogEx* pMainDlg);
 	void SetSavedWorkPeriod();
 	void SetWorkPeriod();
-	void InitDialog(class CPrevYearsHolidaysDlg *pDlg);
-	void OnGuiChange(int iYear, CPrevYearsHolidaysDlg *pDlg);
+	void InitDialog(CMyDialogEx* pDlg);
+	void OnGuiChange(int iYear, CMyDialogEx* pDlg);
 	void SaveToXml(class CXMLDump& xmlDump);
 	void LoadFromXml(class CXMLParseNode* pRoot);
+
+	// Support Main WRC Dialog
+	void UpdateMainDialog(CMyDialogEx* pMainDlg);
 
 private:
 	void SetYearsByWorkPeriod();
@@ -24,12 +27,19 @@ private:
 	CMyTime mLastInPeriod;
 	CString msHolidaysSelection;
 
+	bool mbPeriodAndHolidaysDefined;
 	bool mbDefinedBySpecialDialog;
 
-	void UpdateSum(CPrevYearsHolidaysDlg *pDlg);
+	void UpdateSum(CMyDialogEx* pDlg = NULL);
 
+	int mn;
 	CList <class CHolidaysDuePerYear*, CHolidaysDuePerYear*> mHolidaysPerYer;
 	CHolidaysDuePerYear mSum;
+	CHolidaysDuePerYear mSumPrev;
+	CHolidaysDuePerYear* mpLastYear;
+
+	static const int N_MAIN_DLG_FIELDS = 11;
+	unsigned int maMainDlgFields[N_MAIN_DLG_FIELDS];
 };
 
 extern CHolidaysDue gHolidaysDue;

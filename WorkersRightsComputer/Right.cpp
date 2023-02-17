@@ -274,6 +274,9 @@ bool CRight::TryReadInt(FILE *pfRead, const wchar_t *zText, int &value)
 }
 bool CRight::TryConvertInt(const wchar_t *zSource, const wchar_t *zText, int &value)
 {
+	while (zSource[0] == ' ')
+		zSource++;
+
 	if (!isdigit(zSource[0]))
 	{
 		CString s(L"Convert Integer Error: <");

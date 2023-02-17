@@ -8,9 +8,9 @@ struct SHolidayData
 		, mGuiId(id)
 	{}
 
-	void UpdateGui(class CPrevYearsHolidaysDlg* pDlg);
-	void OnGuiChange(CPrevYearsHolidaysDlg* pDlg);
-	void SetInvisible(CPrevYearsHolidaysDlg* pDlg);
+	void UpdateGui(class CMyDialogEx* pDlg);
+	void OnGuiChange(CMyDialogEx* pDlg);
+	void SetInvisible(CMyDialogEx* pDlg);
 
 	int mValue;
 	int mGuiId;
@@ -19,6 +19,7 @@ struct SHolidayData
 class CHolidaysDuePerYear
 {
 public:
+	CHolidaysDuePerYear();
 	CHolidaysDuePerYear(int idPrompt, int idWorked, int idPaid, int idExist, int idDue);
 
 	// Initializations
@@ -27,18 +28,20 @@ public:
 	void SetIgnore() { mbRelevant = false; }
 
 	// Dialog Functionality
-	void UpdateGui(class CPrevYearsHolidaysDlg* pDlg);
-	void OnGuiChange(CPrevYearsHolidaysDlg* pDlg);
+	void UpdateGui(class CMyDialogEx* pDlg);
+	void OnGuiChange(CMyDialogEx* pDlg);
 	void Add(CHolidaysDuePerYear &other);
 	void SaveToXml(class CXMLDump& xmlDump);
 	void LoadFromXml(class CXMLParseNode* pNode);
 	void SetNInYear(int n) { mInYear.mValue = n; }
 
+	void UpdateShortText(CMyDialogEx* pDlg, int id);
+
 	int mId;
 	bool mbRelevant;
 
 private:
-	void SetInvisible(CPrevYearsHolidaysDlg* pDlg);
+	void SetInvisible(CMyDialogEx* pDlg);
 	bool ValidateValues();
 
 	static int umId;
@@ -47,6 +50,8 @@ private:
 	SHolidayData mPaid;
 	SHolidayData mInYear;
 	SHolidayData mDue;
+
+	int mnInSum;
 
 	int mIdPrompt;
 	CString msPrompt;

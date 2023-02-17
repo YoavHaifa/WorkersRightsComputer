@@ -48,9 +48,9 @@ public:
 	CEdit mEditLastYearWork;
 	CEdit mEditLastYearPaid;
 	CEdit mEditLastYearFrom;
-	CEdit mEditPrevYearWork;
-	CEdit mEditPrevYearPaid;
-	CEdit mEditPrevYearFrom;
+	//CEdit mEditPrevYearWork;
+	//CEdit mEditPrevYearPaid;
+	//CEdit mEditPrevYearFrom;
 	CEdit mEditAdditionalDesc;
 	CEdit mEditAdditionalSum;
 	CEdit mEditPaidDesc;
@@ -91,7 +91,7 @@ public:
 	void OnInputChange();
 	bool mbDisableComputations;
 	bool mbSaveInProcess;
-	CEdit mEditPrevNYears;
+	//CEdit mEditPrevNYears;
 	static DWORD WINAPI StaticThreadFunc(LPVOID);
 	afx_msg void OnTestVerifybatch();
 	afx_msg void OnTestWritehtml();

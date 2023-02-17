@@ -288,6 +288,14 @@ bool CMyDialogEx::SetInvisible(int id)
 	pWnd->ShowWindow(SW_HIDE);
 	return true;
 }
+bool CMyDialogEx::SetVisible(int id)
+{
+	CWnd* pWnd = GetDlgItem(id);
+	if (!pWnd)
+		return false;
+	pWnd->ShowWindow(SW_SHOW);
+	return true;
+}
 /*
 static int five = 5;
 void CMyDialogEx::OnUserCrash(CString &sText)

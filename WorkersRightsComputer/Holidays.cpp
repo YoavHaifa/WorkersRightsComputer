@@ -366,9 +366,9 @@ void CHolidays::ComputePayPrevYears(void)
 {
 	//msw->WriteLine("ComputePayPrevYears");
 
-	int nWorked = SafeGetIntFromTextBox(*mpNDaysWorkedPrevYearsBox);
-	int nPaid = SafeGetIntFromTextBox(*mpNDaysPaidPrevYearsBox);
-	double nYears = SafeGetDoubleFromTextBox(*mpPrevNYearsBox);
+	int nWorked = 0; // SafeGetIntFromTextBox(*mpNDaysWorkedPrevYearsBox);
+	int nPaid = 0; // SafeGetIntFromTextBox(*mpNDaysPaidPrevYearsBox);
+	double nYears = 0; // SafeGetDoubleFromTextBox(*mpPrevNYearsBox);
 	int nDaysPerYear = nWorked - nPaid;
 
 	LogLine(L"nWorked", nWorked);
