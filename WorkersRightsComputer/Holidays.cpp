@@ -429,12 +429,8 @@ void CHolidays::RememberPayParDay(double value)
 			mMinPayPerDay = value;
 	}
 }
-bool CHolidays::Compute(void)
+bool CHolidays::InitDefinition()
 {
-	mnDaysToPay = 0;
-	mMinPayPerDay = 0;
-	mMaxPayPerDay = 0;
-
 	msSelection = gpDlg->GetHolidaysSet();
 	if (msSelection.IsEmpty())
 	{
@@ -449,13 +445,16 @@ bool CHolidays::Compute(void)
 	if (!InitFromFile(msSelection))
 		return false;
 
-	/*
-	mRateSetByUser = SafeGetDoubleFromTextBox(*mpPayRatePerHolidayBox);
-	if (mRateSetByUser < 0)
-		mRateSetByUser = 0;
-	if (mRateSetByUser > 0)
-		LogLine(L"Pay rate per holiday set by user", mRateSetByUser);
-		*/
+	return true;
+}
+bool CHolidays::Compute(void)
+{
+	mnDaysToPay = 0;
+	mMinPayPerDay = 0;
+	mMaxPayPerDay = 0;
+
+	if (!InitDefinition())
+		return false;
 
 	mnInLastYear = NInLastYear();
 	// TEMP - This edit box role is not clear -

@@ -24,7 +24,8 @@ public:
 	bool operator > (CMyTime &other);
 	bool operator < (CMyTime &other);
 	bool operator <= (CMyTime &other);
-	bool operator >= (CMyTime &other);
+	bool operator >= (CMyTime& other);
+	bool operator == (CMyTime& other);
 	CMyTime & operator = (CTime &time);
 
 	CTime mTime;

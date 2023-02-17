@@ -7,12 +7,14 @@
 #include "AllRights.h"
 #include "Holidays.h"
 #include "WorkYears.h"
+#include "Utils.h"
 
 CHolidaysDue gHolidaysDue;
 
 CHolidaysDue::CHolidaysDue()
 	: mSum(IDC_STATIC_PY_SUM, IDC_EDIT_HOLIDAYS_PREVY_WORK_SUM,
 		IDC_EDIT_HOLIDAYS_PREVY_PAID_SUM, IDC_EDIT_HOLIDAYS_PREVY_FROM_SUM, IDC_EDIT_HOLIDAYS_PREVY_DUE_SUM)
+	, mbDefinedBySpecialDialog(false)
 {
 	mHolidaysPerYer.AddTail(new CHolidaysDuePerYear(IDC_STATIC_PY,
 		IDC_EDIT_HOLIDAYS_PREVY_WORK, IDC_EDIT_HOLIDAYS_PREVY_PAID, 
@@ -39,15 +41,66 @@ CHolidaysDue::CHolidaysDue()
 		IDC_EDIT_HOLIDAYS_PREVY_WORK7, IDC_EDIT_HOLIDAYS_PREVY_PAID7, 
 		IDC_EDIT_HOLIDAYS_PREVY_FROM7, IDC_EDIT_HOLIDAYS_PREVY_DUE7));
 }
-void CHolidaysDue::InitDialog(CPrevYearsHolidaysDlg* pDlg)
+void CHolidaysDue::Reset()
 {
+	mFirstInPeriod.Reset();
+	mLastInPeriod.Reset();
+	mbDefinedBySpecialDialog = false;
+	msHolidaysSelection = "";
+
+	POSITION pos = mHolidaysPerYer.GetHeadPosition();
+	while (pos)
+	{
+		CHolidaysDuePerYear* pYear = mHolidaysPerYer.GetNext(pos);
+		pYear->Zero();
+	}
+}
+void CHolidaysDue::SetWorkPeriod()
+{
+	mFirstInPeriod = gWorkPeriod.mFirst;
+	mLastInPeriod = gWorkPeriod.mLast;
 	CHolidays* pHolidays = gAllRights.GetHolidays();
 	if (pHolidays)
-	{ // Init number of holidays in last year
-		int nInLast = pHolidays->NInLastYear();
-		CHolidaysDuePerYear* pYear = mHolidaysPerYer.GetHead();
-		pYear->SetNInYear(nInLast);
+	{
+		msHolidaysSelection = pHolidays->msSelection;
 	}
+}
+void CHolidaysDue::SetSavedWorkPeriod()
+{
+	SetWorkPeriod();
+	SetYearsByWorkPeriod();
+}
+void CHolidaysDue::VerifyWorkPeriod()
+{
+	CHolidays* pHolidays = gAllRights.GetHolidays();
+	if (!pHolidays)
+		return;
+
+	bool bNewPeriod = true;
+	if ((mFirstInPeriod == gWorkPeriod.mFirst)
+		&& (mLastInPeriod == gWorkPeriod.mLast))
+		bNewPeriod = false;
+
+	if (!bNewPeriod	&& (pHolidays->msSelection == msHolidaysSelection))
+		return;
+
+	// New work period - initialize to "undefined"
+	if (mbDefinedBySpecialDialog)
+	{
+		if (bNewPeriod)
+		{
+			CUtils::MessBox(L"Due to new work period definition - previous years' holidays were reset", L"Warning");
+		}
+		else
+			CUtils::MessBox(L"Due to new holidays selection - previous years' holidays were reset", L"Warning");
+	}
+
+	Reset();
+	SetWorkPeriod();
+	SetYearsByWorkPeriod();
+}
+void CHolidaysDue::SetYearsByWorkPeriod()
+{
 	int iFromLast = 0;
 	POSITION pos = mHolidaysPerYer.GetHeadPosition();
 	while (pos)
@@ -55,12 +108,32 @@ void CHolidaysDue::InitDialog(CPrevYearsHolidaysDlg* pDlg)
 		CHolidaysDuePerYear* pYear = mHolidaysPerYer.GetNext(pos);
 		CWorkYear* pWorkYear = gWorkYears.GetByReverseIndex(iFromLast);
 		if (pWorkYear)
-			pYear->UpdateGui(pDlg, pWorkYear);
+			pYear->Init(pWorkYear);
 		else
-			pYear->SetInvisible(pDlg);
+			pYear->SetIgnore();
 		iFromLast++;
 	}
+
+	// Init number of holidays in last year
+	CHolidays* pHolidays = gAllRights.GetHolidays();
+	if (!pHolidays)
+		return;
+	int nInLast = pHolidays->NInLastYear();
+	CHolidaysDuePerYear* pYear = mHolidaysPerYer.GetHead();
+	pYear->SetNInYear(nInLast);
+
+	mSum.mbRelevant = true;
+}
+void CHolidaysDue::InitDialog(CPrevYearsHolidaysDlg* pDlg)
+{
+	POSITION pos = mHolidaysPerYer.GetHeadPosition();
+	while (pos)
+	{
+		CHolidaysDuePerYear* pYear = mHolidaysPerYer.GetNext(pos);
+		pYear->UpdateGui(pDlg);
+	}
 	UpdateSum(pDlg);
+	mbDefinedBySpecialDialog = true;
 }
 void CHolidaysDue::OnGuiChange(int iYear, CPrevYearsHolidaysDlg* pDlg)
 {
@@ -97,6 +170,8 @@ void CHolidaysDue::SaveToXml(CXMLDump& xmlDump)
 {
 	CXMLDumpScope scope(L"HolidaysDue", xmlDump);
 
+	xmlDump.Write(L"bDefinedBySpecialDialog", mbDefinedBySpecialDialog);
+
 	POSITION pos = mHolidaysPerYer.GetHeadPosition();
 	while (pos)
 	{
@@ -106,9 +181,13 @@ void CHolidaysDue::SaveToXml(CXMLDump& xmlDump)
 }
 void CHolidaysDue::LoadFromXml(class CXMLParseNode* pRoot)
 {
+	SetSavedWorkPeriod();
+
 	CXMLParseNode* pMain = pRoot->GetFirst(L"HolidaysDue");
 	if (!pMain)
 		return;
+
+	pMain->GetValue(L"bDefinedBySpecialDialog", mbDefinedBySpecialDialog);
 
 	CXMLParseNode* pYearNode = pMain->GetFirst(L"Year");
 	POSITION pos = mHolidaysPerYer.GetHeadPosition();

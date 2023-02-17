@@ -216,7 +216,7 @@ CHolidays* CAllRights::GetHolidays()
 {
 	if (!mpHolidays)
 		return NULL;
-	if (!mpHolidays->IsValid())
+	if (!mpHolidays->InitDefinition())
 		return NULL;
 	return mpHolidays;
 }

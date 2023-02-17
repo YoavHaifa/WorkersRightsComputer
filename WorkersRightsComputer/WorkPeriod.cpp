@@ -85,6 +85,7 @@ void CWorkPeriod::Reset(void)
 	gUsedVacations.ClearAllVacations();
 	gWorkYears.Clear();
 	gFamilyPart.Clear();
+	gHolidaysDue.Reset();
 
 	mbSkipNotice = false;
 }

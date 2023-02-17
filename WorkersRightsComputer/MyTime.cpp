@@ -259,7 +259,7 @@ bool CMyTime::operator >= (CMyTime &other)
 {
 	return other <= *this;
 }
-bool CMyTime::operator <= (CMyTime &other)
+bool CMyTime::operator <= (CMyTime& other)
 {
 	if (mYear > other.mYear)
 		return false;
@@ -270,6 +270,16 @@ bool CMyTime::operator <= (CMyTime &other)
 	if (mMonth < other.mMonth)
 		return true;
 	if (mDay > other.mDay)
+		return false;
+	return true;
+}
+bool CMyTime::operator == (CMyTime& other)
+{
+	if (mYear != other.mYear)
+		return false;
+	if (mMonth != other.mMonth)
+		return false;
+	if (mDay != other.mDay)
 		return false;
 	return true;
 }

@@ -60,32 +60,39 @@ void CHolidaysDuePerYear::Add(CHolidaysDuePerYear& other)
 		pData->mValue += pOtherData->mValue;
 	}
 }
-void CHolidaysDuePerYear::UpdateGui(CPrevYearsHolidaysDlg* pDlg, CWorkYear* pWorkYear)
+void CHolidaysDuePerYear::Init(CWorkYear* pWorkYear)
 {
 	// Update Period
-	if (pWorkYear)
-	{
-		CString s;
-		if (mId == 0)
-			s = "Last Year: ";
-		else
-			s.Format(L"Prev Year %d: ", mId);
-		s += pWorkYear->mFirstDay.ToHebrewString();
-		s += " - ";
-		s += pWorkYear->mLastDay.ToHebrewString();
-		pDlg->SetParameter(mIdPrompt, s);
+	CString s;
+	if (mId == 0)
+		s = "Last Year: ";
+	else
+		s.Format(L"Prev Year %d: ", mId);
+	s += pWorkYear->mFirstDay.ToHebrewString();
+	s += " - ";
+	s += pWorkYear->mLastDay.ToHebrewString();
+	msPrompt = s;
 
-		if (mInYear.mValue == 0 && mId > 0)
-			mInYear.mValue = CHolidays::MAX_HOLIDAYS_PER_YEAR;
-	}
-
-	// Set all fields in GUI
-	POSITION pos = mData.GetHeadPosition();
-	while (pos)
+	Zero();
+	mInYear.mValue = CHolidays::MAX_HOLIDAYS_PER_YEAR;
+	mbRelevant = true;
+}
+void CHolidaysDuePerYear::UpdateGui(CPrevYearsHolidaysDlg* pDlg)
+{
+	if (mbRelevant)
 	{
-		SHolidayData* pData = mData.GetNext(pos);
-		pData->UpdateGui(pDlg);
+		pDlg->SetParameter(mIdPrompt, msPrompt);
+
+		// Set all fields in GUI
+		POSITION pos = mData.GetHeadPosition();
+		while (pos)
+		{
+			SHolidayData* pData = mData.GetNext(pos);
+			pData->UpdateGui(pDlg);
+		}
 	}
+	else
+		SetInvisible(pDlg);
 }
 void CHolidaysDuePerYear::SetInvisible(CPrevYearsHolidaysDlg* pDlg)
 {

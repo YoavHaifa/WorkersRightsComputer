@@ -26,6 +26,7 @@
 #include "OnOpenDlg.h"
 #include "PrevYearsHolidaysDlg.h"
 #include "Holidays.h"
+#include "HolidaysDue.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -345,6 +346,7 @@ void CWorkersRightsComputerDlg::OnBnClickedWorkPeriod()
 				SetCheck(IDC_CHECK_ONLY_SEVERANCE, true);
 		}
 		OnInputChange();
+		gHolidaysDue.VerifyWorkPeriod();
 	}
 }
 void CWorkersRightsComputerDlg::OnBnClickedButtonSave()
@@ -715,6 +717,7 @@ void CWorkersRightsComputerDlg::OnBnClickedButtonPrevYearsHolidays()
 	if (!pHolidays)
 		return;
 
+	gHolidaysDue.VerifyWorkPeriod();
 	CPrevYearsHolidaysDlg dlg;
 	if (dlg.DoModal() == IDOK)
 	{
