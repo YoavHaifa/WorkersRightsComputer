@@ -254,7 +254,8 @@ BOOL CWorkersRightsComputerDlg::OnInitDialog()
 
 	gHolidaysDue.UpdateMainDialog(this);
 
-	return TRUE;  // return TRUE  unless you set the focus to a control
+	GotoDlgCtrl(GetDlgItem(IDC_EDIT_FIRST_NAME));
+	return FALSE;  // return TRUE  unless you set the focus to a control
 }
 
 void CWorkersRightsComputerDlg::OnSysCommand(UINT nID, LPARAM lParam)
