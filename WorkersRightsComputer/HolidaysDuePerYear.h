@@ -41,6 +41,9 @@ public:
 	int GetDue() { return mDue.mValue; }
 	int GetNInSum() { return mnInSum; }
 
+	// Load from Old Save
+	void SetValues(int nWorked, int nPaid);
+
 	int mId;
 	bool mbRelevant;
 

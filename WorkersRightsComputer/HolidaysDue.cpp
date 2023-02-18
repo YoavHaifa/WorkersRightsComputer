@@ -241,27 +241,67 @@ void CHolidaysDue::SaveToXml(CXMLDump& xmlDump)
 		pYear->SaveToXml(xmlDump);
 	}
 }
-void CHolidaysDue::LoadFromXml(class CXMLParseNode* pRoot)
+void CHolidaysDue::LoadFromXml(CXMLParseNode* pWorkPeriod, CXMLParseNode* pRoot)
 {
 	SetSavedWorkPeriod();
 
-	CXMLParseNode* pMain = pRoot->GetFirst(L"HolidaysDue");
-	if (!pMain)
-		return;
-
-	pMain->GetValue(L"bDefinedBySpecialDialog", mbDefinedBySpecialDialog);
-
-	CXMLParseNode* pYearNode = pMain->GetFirst(L"Year");
-	POSITION pos = mHolidaysPerYer.GetHeadPosition();
-	while (pYearNode && pos)
+	CXMLParseNode* pHolidaysDueNode = pWorkPeriod->GetFirst(L"HolidaysDue");
+	if (!pHolidaysDueNode)
 	{
-		CHolidaysDuePerYear* pYear = mHolidaysPerYer.GetNext(pos);
-		pYear->LoadFromXml(pYearNode);
+		LoadFromOldXml(pRoot);
+	}
+	else
+	{
+		pHolidaysDueNode->GetValue(L"bDefinedBySpecialDialog", mbDefinedBySpecialDialog);
 
-		pYearNode = pMain->GetNext(L"Year", pYearNode);
+		CXMLParseNode* pYearNode = pHolidaysDueNode->GetFirst(L"Year");
+		POSITION pos = mHolidaysPerYer.GetHeadPosition();
+		while (pYearNode && pos)
+		{
+			CHolidaysDuePerYear* pYear = mHolidaysPerYer.GetNext(pos);
+			pYear->LoadFromXml(pYearNode);
+
+			pYearNode = pHolidaysDueNode->GetNext(L"Year", pYearNode);
+		}
 	}
 
 	UpdateSum();
+}
+void CHolidaysDue::LoadFromOldXml(CXMLParseNode* pRoot)
+{
+	CXMLParseNode* pMainDlgNode = pRoot->GetFirstDeep(L"EditBoxes");
+	if (!pMainDlgNode)
+		return;
+
+	// Init last year
+	int nLastWorked = 0;
+	int nLastPaid = 0;
+	pMainDlgNode->GetValue(L"LastYearWork", nLastWorked);
+	pMainDlgNode->GetValue(L"LastYearPaid", nLastPaid);
+	mpLastYear->SetValues(nLastWorked, nLastPaid);
+
+	// Init previous years
+	int nPrevWorked = 0;
+	int nPrevPaid = 0;
+	int nYears = 0;
+	pMainDlgNode->GetValue(L"PrevYearWork", nPrevWorked);
+	pMainDlgNode->GetValue(L"PrevYearPaid", nPrevPaid);
+	pMainDlgNode->GetValue(L"PrevNYear", nYears);
+	if (nPrevWorked > nPrevPaid)
+		mbDefinedBySpecialDialog = true;
+
+	if (nYears == 0)
+		nYears = 1;
+
+	POSITION pos = mHolidaysPerYer.GetHeadPosition();
+	mHolidaysPerYer.GetNext(pos); // Skip first (which is "last year")
+	int i = 1;
+	while (pos && nYears > 0)
+	{
+		CHolidaysDuePerYear* pYear = mHolidaysPerYer.GetNext(pos);
+		pYear->SetValues(nLastWorked, nLastPaid);
+		nYears--;
+	}
 }
 int CHolidaysDue::GetNDueLastYear()
 {
@@ -275,6 +315,8 @@ int CHolidaysDue::GetNDueLastYear()
 }
 int CHolidaysDue::GetNPrevYears()
 {
+	if (mSumPrev.GetDue() == 0)
+		return 1;
 	return mn;
 }
 int CHolidaysDue::GetNDuePrevYear(int iWanted)

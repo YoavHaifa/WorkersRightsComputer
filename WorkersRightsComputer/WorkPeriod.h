@@ -44,7 +44,6 @@ public:
 
 	int CountDaysToEndOfMonth(CMyTime &date);
 	int CountWorkDaysToEndOfMonthFrom(CMyTime &firstDate);
-	void Save(FILE *pfSave);
 	void SaveToXml(class CXMLDump &xmlDump);
 	void LoadFromXml(class CXMLParseNode* pRoot);
 

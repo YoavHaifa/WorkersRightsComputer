@@ -282,17 +282,17 @@ void CWorkPeriod::SaveToXml(CXMLDump &xmlDump)
 }
 void CWorkPeriod::LoadFromXml(class CXMLParseNode* pRoot)
 {
-	CXMLParseNode* pMain = pRoot->GetFirst(L"WorkPeriod");
-	if (!pMain)
+	CXMLParseNode* pWorkPeriodNode = pRoot->GetFirst(L"WorkPeriod");
+	if (!pWorkPeriodNode)
 		return;
 
-	pMain->GetValue(L"first", mFirst);
-	pMain->GetValue(L"last", mLast);
-	pMain->GetValue(L"notice", mNotice);
-	pMain->GetValue(L"b_skip_notice", mbSkipNotice);
-	pMain->GetValue(L"b_live_in", mbLiveIn);
+	pWorkPeriodNode->GetValue(L"first", mFirst);
+	pWorkPeriodNode->GetValue(L"last", mLast);
+	pWorkPeriodNode->GetValue(L"notice", mNotice);
+	pWorkPeriodNode->GetValue(L"b_skip_notice", mbSkipNotice);
+	pWorkPeriodNode->GetValue(L"b_live_in", mbLiveIn);
 
-	CXMLParseNode* pDays = pMain->GetFirst(L"Days");
+	CXMLParseNode* pDays = pWorkPeriodNode->GetFirst(L"Days");
 	if (pDays)
 	{
 		for (int iDay = 0; iDay < 7; iDay++)
@@ -301,28 +301,28 @@ void CWorkPeriod::LoadFromXml(class CXMLParseNode* pRoot)
 		}
 	}
 
-	gWage.LoadFromXml(pMain);
+	gWage.LoadFromXml(pWorkPeriodNode);
 
 	/*
 	bool bHourly = false;
-	if (pMain->GetValue(L"bMinWage", mbMinWage))
+	if (pWorkPeriodNode->GetValue(L"bMinWage", mbMinWage))
 	{
 	}
-	else if (pMain->GetValue(L"bMonthlyWage", mbMonthlyWage))
+	else if (pWorkPeriodNode->GetValue(L"bMonthlyWage", mbMonthlyWage))
 	{
-		pMain->GetValue(L"MonthlyWage", mMonthlyWage);
+		pWorkPeriodNode->GetValue(L"MonthlyWage", mMonthlyWage);
 	}
-	else if (pMain->GetValue(L"bHourlyWage", bHourly))
+	else if (pWorkPeriodNode->GetValue(L"bHourlyWage", bHourly))
 	{
-		pMain->GetValue(L"HourlyWage", mHourlyWage);
-		pMain->GetValue(L"HoursPerWeek", mHoursPerWeek);
+		pWorkPeriodNode->GetValue(L"HourlyWage", mHourlyWage);
+		pWorkPeriodNode->GetValue(L"HoursPerWeek", mHoursPerWeek);
 	}*/
 
 	Compute(L"LoadFromXml1");
 
-	gUsedVacations.LoadFromXml(pMain);
-	gFamilyPart.LoadFromXml(pMain);
-	gHolidaysDue.LoadFromXml(pMain);
+	gUsedVacations.LoadFromXml(pWorkPeriodNode);
+	gFamilyPart.LoadFromXml(pWorkPeriodNode);
+	gHolidaysDue.LoadFromXml(pWorkPeriodNode, pRoot);
 
 	Compute(L"LoadFromXml2");
 }

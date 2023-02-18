@@ -183,4 +183,9 @@ void CHolidaysDuePerYear::UpdateShortText(CMyDialogEx* pDlg, int id)
 		pDlg->SetParameter(id, s);
 	}
 }
-
+void CHolidaysDuePerYear::SetValues(int nWorked, int nPaid)
+{
+	mWorked.mValue = nWorked;
+	mPaid.mValue = nPaid;
+	ValidateValues();
+}

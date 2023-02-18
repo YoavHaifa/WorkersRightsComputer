@@ -536,6 +536,7 @@ void CWorkersRightsComputerDlg::OnFileLoad()
 		CString sfName(dlg.mSelectedFileName);
 		CSaver saver;
 		saver.Restore(sfName);
+		gHolidaysDue.UpdateMainDialog(this);
 	}
 }
 void CWorkersRightsComputerDlg::OnTestCreatedir()

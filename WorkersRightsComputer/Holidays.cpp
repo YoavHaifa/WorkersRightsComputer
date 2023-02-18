@@ -311,6 +311,7 @@ void CHolidays::ComputePayLastYear(void)
 
 	//int nToSum = mnWorkedLastYear - mnPaidLastYear;
 	int nToSum = gHolidaysDue.GetNDueLastYear();
+	LogLine(L"n days due in last year", nToSum);
 	if (nToSum > MAX_HOLIDAYS_PER_YEAR)
 		nToSum = MAX_HOLIDAYS_PER_YEAR;
 	if (nToSum < 1)
@@ -384,20 +385,24 @@ int CHolidays::AddPay4PrevYear(int iPrev)
 }
 void CHolidays::ComputePayPrevYears()
 {
-	int nPrevYears = gHolidaysDue.GetNPrevYears();
+	int nPrevYears = gHolidaysDue.GetNPrevYears() - 1; // excluding last year
 	LogLine(L"nPrevYears with holidays", nPrevYears);
-	if (nPrevYears < 2)
+	if (nPrevYears < 1)
 		return;
 
+	int nYearsWithHolidays = 0;
 	int nDays = 0;
-	for (int iPrev = 1; iPrev < nPrevYears; iPrev++)
+	for (int iPrev = 1; iPrev <= nPrevYears; iPrev++)
 	{
-		nDays += AddPay4PrevYear(iPrev);
+		int nDaysAdded = AddPay4PrevYear(iPrev);
+		nDays += nDaysAdded;
+		if (nDaysAdded > 0)
+			nYearsWithHolidays++;
 	}
 
 	// msw->WriteLine("");
 	msDue += L" + ";
-	msDue += ToString(nPrevYears-1);
+	msDue += ToString(nYearsWithHolidays);
 	msDue += L" years, ";
 	msDue += ToString(nDays);
 	msDue += L" days ";

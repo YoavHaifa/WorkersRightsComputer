@@ -15,7 +15,7 @@ public:
 	void InitDialog(CMyDialogEx* pDlg);
 	void OnGuiChange(int iYear, CMyDialogEx* pDlg);
 	void SaveToXml(class CXMLDump& xmlDump);
-	void LoadFromXml(class CXMLParseNode* pRoot);
+	void LoadFromXml(class CXMLParseNode* pWorkPeriod, CXMLParseNode* pRoot);
 
 	// Support Main WRC Dialog
 	void UpdateMainDialog(CMyDialogEx* pMainDlg);
@@ -27,6 +27,7 @@ public:
 	int GetNDuePrevYear(int i);
 
 private:
+	void LoadFromOldXml(CXMLParseNode* pRoot);
 	void SetYearsByWorkPeriod();
 
 	CMyTime mFirstInPeriod;
