@@ -84,7 +84,7 @@ inline FILE * MyFOpenWithErrorBox(const wchar_t *zfName, const wchar_t *zMode, c
 			//wchar_t zErr[128];
 			//_wcserror_s(zErr, sizeof(zErr), err);
 			wchar_t zMsg[256];
-			swprintf_s(zMsg, 256, L"Error %d\n\r File exist\n\r ", err);
+			swprintf_s(zMsg, 256, L"Error %d\n\r File exists\n\r ", err);
 			s += zMsg;
 		}
 

@@ -37,10 +37,13 @@ public:
 	bool InitFromFileInternals(FILE *pfRead, FILE *pfLog);
 	void PrintLog();
 	int NInLastYear(void);
+	CString GetSelection() { return msSelection; }
+	bool Is(const CString &sSelection) { return msSelection == sSelection; }
 
 	static const int MAX_HOLIDAYS_PER_YEAR = 9;
 	static const int MAX_HOLIDAYS_DEFINED = 200;
 
+private:
 	bool mbValid;
 
 	CEdit *mpNDaysInLastYearBox;
@@ -56,23 +59,25 @@ public:
 	int mn;
 	CString msfName;
 	CHoliday *map[MAX_HOLIDAYS_DEFINED];
-	int mnWorkedLastYear;
-	int mnPaidLastYear;
+	//int mnWorkedLastYear;
+	//int mnPaidLastYear;
 	int mnInLastYear;
 
 	double mnDaysToPay;
 	double mMinPayPerDay;
 	double mMaxPayPerDay;
-	double mRateSetByUser;
+	//double mRateSetByUser;
 	void RememberPayParDay(double value);
 	bool ComputeHolidayPrice(class CHoliday& holiday);
 
-	void ComputePayLastYear(void);
-	void ComputePayPrevYears(void);
+	void ComputePayLastYear();
+	void ComputePayPrevYearsOld(); // Before the new class CHolidaysDue
+	void ComputePayPrevYears();
+	int AddPay4PrevYear(int i);
 
 	void AddToDebug(int i, bool bPrice);
-	void SetNPaidLastYear(int nPaid){mnPaidLastYear = nPaid;}
-	void SetNWorkedLastYear(int nWorked){mnWorkedLastYear = nWorked;}
+	//void SetNPaidLastYear(int nPaid){mnPaidLastYear = nPaid;}
+	//void SetNWorkedLastYear(int nWorked){mnWorkedLastYear = nWorked;}
 	CString msSelection;
 };
 

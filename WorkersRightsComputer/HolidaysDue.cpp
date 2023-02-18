@@ -104,10 +104,14 @@ void CHolidaysDue::SetWorkPeriod()
 	mFirstInPeriod = gWorkPeriod.mFirst;
 	mLastInPeriod = gWorkPeriod.mLast;
 	CHolidays* pHolidays = gAllRights.GetHolidays();
-	if (pHolidays && !pHolidays->msSelection.IsEmpty())
+	if (pHolidays)
 	{
-		msHolidaysSelection = pHolidays->msSelection;
-		mbPeriodAndHolidaysDefined = true;
+		CString sSelection = pHolidays->GetSelection();
+		if (!sSelection.IsEmpty())
+		{
+			msHolidaysSelection = sSelection;
+			mbPeriodAndHolidaysDefined = true;
+		}
 	}
 }
 void CHolidaysDue::SetSavedWorkPeriod()
@@ -116,7 +120,7 @@ void CHolidaysDue::SetSavedWorkPeriod()
 	SetYearsByWorkPeriod();
 }
 bool CHolidaysDue::VerifyWorkPeriod(CMyDialogEx* pMainDlg)
-{
+{ // Return "false" if no change
 	CHolidays* pHolidays = gAllRights.GetHolidays();
 	if (!pHolidays)
 		return false;
@@ -126,7 +130,7 @@ bool CHolidaysDue::VerifyWorkPeriod(CMyDialogEx* pMainDlg)
 		&& (mLastInPeriod == gWorkPeriod.mLast))
 		bNewPeriod = false;
 
-	if (!bNewPeriod	&& (pHolidays->msSelection == msHolidaysSelection))
+	if (!bNewPeriod	&& (pHolidays->Is(msHolidaysSelection)))
 		return false;
 
 	// New work period - initialize to "undefined"
@@ -259,4 +263,30 @@ void CHolidaysDue::LoadFromXml(class CXMLParseNode* pRoot)
 
 	UpdateSum();
 }
+int CHolidaysDue::GetNDueLastYear()
+{
+	if (!mpLastYear)
+	{
+		CUtils::MessBox(L"<CHolidaysDue::GetNDueLastYear> mpLastYear is NULL", L"SW Error");
+		return 0;
+	}
 
+	return mpLastYear->GetDue();
+}
+int CHolidaysDue::GetNPrevYears()
+{
+	return mn;
+}
+int CHolidaysDue::GetNDuePrevYear(int iWanted)
+{
+	int i = 0;
+	POSITION pos = mHolidaysPerYer.GetHeadPosition();
+	while (pos)
+	{
+		CHolidaysDuePerYear* pYear = mHolidaysPerYer.GetNext(pos);
+		if (i == iWanted && pYear->mbRelevant)
+			return pYear->GetDue();
+		i++;
+	}
+	return -1;
+}

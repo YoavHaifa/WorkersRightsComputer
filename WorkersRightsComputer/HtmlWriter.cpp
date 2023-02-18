@@ -42,7 +42,7 @@ bool CHtmlWriter::CopyLogo(const wchar_t* zfName)
 	CopyFile(sLogoSrc, sLogoTarget, FALSE);
 	return true;
 }
-int CHtmlWriter::WriteLetterFromTemplate(const wchar_t* zfName)
+bool CHtmlWriter::WriteLetterFromTemplate(const wchar_t* zfName)
 {
 	CopyLogo(zfName);
 
@@ -50,8 +50,11 @@ int CHtmlWriter::WriteLetterFromTemplate(const wchar_t* zfName)
 
 	msfName = zfName;
 	mpfWrite = MyFOpenWithErrorBox(msfName, L"w, ccs=UNICODE", L"HTML Unicode");
+	if (!mpfWrite)
+		return false;
 
-	OpenHebrewLetter();
+	if (!OpenHebrewLetter())
+		return false;
 
 	CString s;
 	int n = 0;
@@ -79,7 +82,7 @@ int CHtmlWriter::WriteLetterFromTemplate(const wchar_t* zfName)
 
 	//CUtils::MessBox(msfName, L"Letter Saved");
 
-	return n;
+	return n > 0;
 }
 void CHtmlWriter::ReplaceTemplateVariable(void)
 {
@@ -395,7 +398,7 @@ bool CHtmlWriter::OpenHebrewLetter()
 	msfHebrewName = msfName;
 	msfHebrewName.Replace(L"english", L"hebrew");
 	mpfHebrewWrite = MyFOpenWithErrorBox(msfHebrewName, L"w, ccs=UNICODE", L"HTML Unicode");
-	return true;
+	return mpfHebrewWrite != NULL;
 }
 void CHtmlWriter::WriteItemToHtmlTable(CString sItem, CString sItemHebrew, bool bInvertDirection)
 {

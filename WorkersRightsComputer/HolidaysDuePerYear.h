@@ -37,6 +37,10 @@ public:
 
 	void UpdateShortText(CMyDialogEx* pDlg, int id);
 
+	// Interface for computations
+	int GetDue() { return mDue.mValue; }
+	int GetNInSum() { return mnInSum; }
+
 	int mId;
 	bool mbRelevant;
 

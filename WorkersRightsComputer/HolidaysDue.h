@@ -21,6 +21,11 @@ public:
 	void UpdateMainDialog(CMyDialogEx* pMainDlg);
 	void OnMainDialogChange(CMyDialogEx* pMainDlg);
 
+	// Interface for computations
+	int GetNDueLastYear();
+	int GetNPrevYears();
+	int GetNDuePrevYear(int i);
+
 private:
 	void SetYearsByWorkPeriod();
 

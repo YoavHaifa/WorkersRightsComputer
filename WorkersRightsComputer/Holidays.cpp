@@ -5,6 +5,7 @@
 #include "Utils.h"
 #include "WorkYears.h"
 #include "WorkersRightsComputerDlg.h"
+#include "HolidaysDue.h"
 
 void CHoliday::Log(FILE *pf)
 {
@@ -23,11 +24,11 @@ CHolidays::CHolidays(void)
 	, mpPrevYearsFromBox(NULL)
 	, mpPrevNYearsBox(NULL)
 	//, mpPayRatePerHolidayBox(NULL)
-	, mRateSetByUser(0)
+	//, mRateSetByUser(0)
 {
 	miPrintOrder = 4;
-	mnWorkedLastYear = -1;
-	mnPaidLastYear = -1;
+	//mnWorkedLastYear = -1;
+	//mnPaidLastYear = -1;
 
 	for (int i = 0; i < MAX_HOLIDAYS_DEFINED; i++)
 		map[i] = NULL;
@@ -294,10 +295,10 @@ int CHolidays::NInLastYear(void)
 
 void CHolidays::ComputePayLastYear(void)
 {
-	if (mnWorkedLastYear < 0 || mnPaidLastYear < 0)
-	{
-		return;
-	}
+	//if (mnWorkedLastYear < 0 || mnPaidLastYear < 0)
+	//{
+	//	return;
+	//}
 
 	for (int i = 0; i < mn; i++)
 	{
@@ -308,7 +309,8 @@ void CHolidays::ComputePayLastYear(void)
 		}
 	}
 
-	int nToSum = mnWorkedLastYear - mnPaidLastYear;
+	//int nToSum = mnWorkedLastYear - mnPaidLastYear;
+	int nToSum = gHolidaysDue.GetNDueLastYear();
 	if (nToSum > MAX_HOLIDAYS_PER_YEAR)
 		nToSum = MAX_HOLIDAYS_PER_YEAR;
 	if (nToSum < 1)
@@ -362,9 +364,47 @@ void CHolidays::ComputePayLastYear(void)
 	msDue += ToString(nSummed);
 	msDue += L" days ";
 }
-void CHolidays::ComputePayPrevYears(void)
+int CHolidays::AddPay4PrevYear(int iPrev)
 {
-	//msw->WriteLine("ComputePayPrevYears");
+	int nDue = gHolidaysDue.GetNDuePrevYear(iPrev);
+	LogLine(L"prev year", iPrev);
+	LogLine(L"n days due", nDue);
+	if (nDue > 0)
+	{
+		CMyTime payDate = gWorkYears.GetPrevYearEnd(iPrev);
+		double payPerDay = gWageTable.ComputeHolidayPrice(payDate.mYear, payDate.mMonth);
+		double payPerYear = payPerDay * nDue;
+		RememberPayParDay(payPerDay);
+		LogLine(L"pay per day in prev year", payPerDay);
+		mnDaysToPay += nDue;
+		LogLine(L"pay per year", payPerYear);
+		mDuePay += payPerYear;
+	}
+	return nDue;
+}
+void CHolidays::ComputePayPrevYears()
+{
+	int nPrevYears = gHolidaysDue.GetNPrevYears();
+	LogLine(L"nPrevYears with holidays", nPrevYears);
+	if (nPrevYears < 2)
+		return;
+
+	int nDays = 0;
+	for (int iPrev = 1; iPrev < nPrevYears; iPrev++)
+	{
+		nDays += AddPay4PrevYear(iPrev);
+	}
+
+	// msw->WriteLine("");
+	msDue += L" + ";
+	msDue += ToString(nPrevYears-1);
+	msDue += L" years, ";
+	msDue += ToString(nDays);
+	msDue += L" days ";
+}
+void CHolidays::ComputePayPrevYearsOld()
+{
+		//msw->WriteLine("ComputePayPrevYears");
 
 	int nWorked = 0; // SafeGetIntFromTextBox(*mpNDaysWorkedPrevYearsBox);
 	int nPaid = 0; // SafeGetIntFromTextBox(*mpNDaysPaidPrevYearsBox);
@@ -387,9 +427,9 @@ void CHolidays::ComputePayPrevYears(void)
 	{
 		CMyTime payDate = gWorkYears.GetPrevYearEnd(iPrev++);
 		double payPerDay;
-		if (mRateSetByUser > 0)
-			payPerDay = mRateSetByUser;
-		else
+		//if (mRateSetByUser > 0)
+		//	payPerDay = mRateSetByUser;
+		//else
 			payPerDay = gWageTable.ComputeHolidayPrice(payDate.mYear, payDate.mMonth);
 		double payPerYear = payPerDay * nDaysPerYear;
 		RememberPayParDay(payPerDay);
@@ -466,11 +506,11 @@ bool CHolidays::Compute(void)
 	mpNDaysInLastYearBox->SetWindowText (ToString(mnInLastYear));
 	LogLine(L"n days in last year", mnInLastYear);
 
-	if (GetIntFromEditBox(mpNDaysPaidLastYearBox, L"mpNDaysPaidLastYearBox", mnPaidLastYear))
-		LogLine(L"n paid last year", mnPaidLastYear);
+	//if (GetIntFromEditBox(mpNDaysPaidLastYearBox, L"mpNDaysPaidLastYearBox", mnPaidLastYear))
+	//	LogLine(L"n paid last year", mnPaidLastYear);
 
-	if (GetIntFromEditBox(mpNDaysWorkedLastYearBox, L"mpNDaysWorkedLastYearBox", mnWorkedLastYear))
-		LogLine(L"n worked last year", mnWorkedLastYear);
+	//if (GetIntFromEditBox(mpNDaysWorkedLastYearBox, L"mpNDaysWorkedLastYearBox", mnWorkedLastYear))
+	//	LogLine(L"n worked last year", mnWorkedLastYear);
 
 	ComputePayLastYear();
 	ComputePayPrevYears();
@@ -521,9 +561,9 @@ CString CHolidays::GetDecriptionForLetterHebrew(void)
 }
 bool CHolidays::ComputeHolidayPrice(CHoliday& holiday)
 {
-	if (mRateSetByUser > 0)
-		holiday.mPrice = mRateSetByUser;
-	else
-		holiday.mPrice = gWageTable.ComputeHolidayPrice(holiday.mYear, holiday.mMonth);
+	//if (mRateSetByUser > 0)
+	//	holiday.mPrice = mRateSetByUser;
+	//else
+	holiday.mPrice = gWageTable.ComputeHolidayPrice(holiday.mYear, holiday.mMonth);
 	return true;
 }

@@ -224,7 +224,7 @@ CString CAllRights::GetHolidaysSelection()
 {
 	if (!mpHolidays)
 		return CString();
-	return mpHolidays->msSelection;
+	return mpHolidays->GetSelection();
 }
 void CAllRights::Save(FILE *pfWrite)
 {

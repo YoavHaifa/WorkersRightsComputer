@@ -5,7 +5,7 @@ public:
 	CHtmlWriter();
 	~CHtmlWriter();
 	bool CopyLogo(const wchar_t* zfName);
-	int WriteLetterFromTemplate(const wchar_t* zfName);
+	bool WriteLetterFromTemplate(const wchar_t* zfName);
 	FILE* mpfWrite;
 	FILE* mpfHebrewWrite;
 	FILE *mpfRead;
