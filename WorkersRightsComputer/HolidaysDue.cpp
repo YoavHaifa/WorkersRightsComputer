@@ -79,6 +79,10 @@ void CHolidaysDue::UpdateMainDialog(CMyDialogEx* pMainDlg)
 	UpdateSum();
 	mSumPrev.UpdateShortText(pMainDlg, IDC_STATIC_HOLIDAY_PREVS);
 }
+void CHolidaysDue::OnMainDialogChange(CMyDialogEx* pMainDlg)
+{
+	mpLastYear->OnGuiChange(pMainDlg);
+}
 void CHolidaysDue::Reset()
 {
 	mFirstInPeriod.Reset();

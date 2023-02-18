@@ -431,7 +431,11 @@ void CHolidays::RememberPayParDay(double value)
 }
 bool CHolidays::InitDefinition()
 {
-	msSelection = gpDlg->GetHolidaysSet();
+	CString sWantedSet(gpDlg->GetHolidaysSet());
+	if (mbValid && msSelection == sWantedSet)
+		return true;
+
+	msSelection = sWantedSet;
 	if (msSelection.IsEmpty())
 	{
 		msDue = L"Holidays not defined";

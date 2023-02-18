@@ -179,6 +179,6 @@ bool CSaver::LoadFromXmlFile()
 	CPerson::LoadContactsFromXml(pRoot);
 
 	gpDlg->mbDisableComputations = false;
-	gpDlg->OnInputChange();
+	gpDlg->OnInputChange(true);
 	return true;
 }

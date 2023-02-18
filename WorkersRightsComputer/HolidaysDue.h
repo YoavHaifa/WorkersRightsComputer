@@ -19,6 +19,7 @@ public:
 
 	// Support Main WRC Dialog
 	void UpdateMainDialog(CMyDialogEx* pMainDlg);
+	void OnMainDialogChange(CMyDialogEx* pMainDlg);
 
 private:
 	void SetYearsByWorkPeriod();

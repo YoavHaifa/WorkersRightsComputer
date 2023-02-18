@@ -178,8 +178,8 @@ BEGIN_MESSAGE_MAP(CWorkersRightsComputerDlg, CDialogEx)
 	ON_EN_CHANGE(IDC_EDIT_HOLIDAYS_PREVY_WORK, &CWorkersRightsComputerDlg::OnEnChangeEditHolidaysLastyWork)
 	ON_EN_CHANGE(IDC_EDIT_HOLIDAYS_PREVY_PAID, &CWorkersRightsComputerDlg::OnEnChangeEditHolidaysLastyWork)
 	ON_EN_CHANGE(IDC_EDIT_HOLIDAYS_PREVY_FROM, &CWorkersRightsComputerDlg::OnEnChangeEditHolidaysLastyWork)
-	ON_EN_CHANGE(IDC_EDIT_ADDITIONAL_SUM, &CWorkersRightsComputerDlg::OnInputChange)
-	ON_EN_CHANGE(IDC_EDIT_PAID_SUM, &CWorkersRightsComputerDlg::OnInputChange)
+	ON_EN_CHANGE(IDC_EDIT_ADDITIONAL_SUM, &CWorkersRightsComputerDlg::CallOnInputChange)
+	ON_EN_CHANGE(IDC_EDIT_PAID_SUM, &CWorkersRightsComputerDlg::CallOnInputChange)
 	ON_COMMAND(ID_COMPUTE_ALL, &CWorkersRightsComputerDlg::OnComputeAll)
 	ON_COMMAND(ID_FILE_SAVEAS, &CWorkersRightsComputerDlg::OnFileSaveas)
 	ON_COMMAND(ID_FILE_LOAD, &CWorkersRightsComputerDlg::OnFileLoad)
@@ -555,14 +555,26 @@ void CWorkersRightsComputerDlg::OnFileLoadoldcase()
 		verify.Verify();
 	}
 }*/
-void CWorkersRightsComputerDlg::OnInputChange()
+void CWorkersRightsComputerDlg::CallOnInputChange()
+{
+	OnInputChange();
+}
+void CWorkersRightsComputerDlg::OnInputChange(bool bJustLoaded)
 {
 	if (mbDisableComputations)
 		return;
 
+	static bool ubInChange = false;
+	if (ubInChange)
+		return;
+	ubInChange = true;
+
 	gHolidaysDue.VerifyWorkPeriod(this);
+	if (!bJustLoaded)
+		gHolidaysDue.OnMainDialogChange(this);
 
 	gAllRights.Compute();
+	ubInChange = false;
 }
 DWORD WINAPI CWorkersRightsComputerDlg::StaticThreadFunc(LPVOID)
 {

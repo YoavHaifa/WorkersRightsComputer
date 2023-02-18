@@ -88,7 +88,8 @@ public:
 
 	afx_msg void OnTestCreatedir();
 	//afx_msg void OnFileLoadoldcase();
-	void OnInputChange();
+	void CallOnInputChange();
+	void OnInputChange(bool bJustLoaded = false);
 	bool mbDisableComputations;
 	bool mbSaveInProcess;
 	//CEdit mEditPrevNYears;
