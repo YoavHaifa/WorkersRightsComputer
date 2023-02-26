@@ -59,25 +59,28 @@ CHolidaysDue::CHolidaysDue()
 	maMainDlgFields[9] = IDC_BUTTON_PREV_YEARS_HOLIDAYS;
 	maMainDlgFields[10] = IDC_CHECK_LIVE_IN;
 }
-void CHolidaysDue::UpdateMainDialog(CMyDialogEx* pMainDlg)
+void CHolidaysDue::UpdateMainDialog()
 {
+	if (!gpDlg)
+		return;
+
 	// Should we see holidays at all?
 	if (mbPeriodAndHolidaysDefined)
 	{
 		for (int i = 0; i < N_MAIN_DLG_FIELDS; i++)
-			pMainDlg->SetVisible(maMainDlgFields[i]);
+			gpDlg->SetVisible(maMainDlgFields[i]);
 	}
 	else
 	{
 		for (int i = 0; i < N_MAIN_DLG_FIELDS; i++)
-			pMainDlg->SetInvisible(maMainDlgFields[i]);
+			gpDlg->SetInvisible(maMainDlgFields[i]);
 		return;
 	}
 
 	// Set content to relevant fields
-	mpLastYear->UpdateGui(pMainDlg);
+	mpLastYear->UpdateGui(gpDlg);
 	UpdateSum();
-	mSumPrev.UpdateShortText(pMainDlg, IDC_STATIC_HOLIDAY_PREVS);
+	mSumPrev.UpdateShortText(gpDlg, IDC_STATIC_HOLIDAY_PREVS);
 }
 void CHolidaysDue::OnMainDialogChange(CMyDialogEx* pMainDlg)
 {
@@ -147,8 +150,7 @@ bool CHolidaysDue::VerifyWorkPeriod(CMyDialogEx* pMainDlg)
 	Reset();
 	SetWorkPeriod();
 	SetYearsByWorkPeriod();
-	if (pMainDlg)
-		UpdateMainDialog(pMainDlg);
+	UpdateMainDialog();
 	return true; // Changed
 }
 void CHolidaysDue::SetYearsByWorkPeriod()

@@ -19,6 +19,7 @@
 #define IDD_DIALOG_WAGE_PERIODS         141
 #define IDD_DIALOG2                     144
 #define IDD_DIALOG_PREV_HOLIDAYS        146
+#define IDD_DIALOG_COMMENTS             148
 #define IDC_WORK_PERIOD                 1000
 #define IDC_DATETIMEPICKER_START        1001
 #define IDC_EMPLOYER                    1001
@@ -52,11 +53,7 @@
 #define IDC_EDIT_ID                     1026
 #define IDC_EDIT_TEL                    1027
 #define IDC_COMBO_HOLIDAYS              1028
-//#define IDC_EDIT_HOLIDAYS_LASTY_WORK    1029
-//#define IDC_EDIT_HOLIDAYS_LASTY_PAID    1030
-//#define IDC_EDIT_HOLIDAYS_LASTY_FROM    1031
 #define IDC_STATIC_LAST_YEAR            1032
-//#define IDC_EDIT_HOLIDAYS_LASTY_DUE     1032
 #define IDC_STATIC_PREV_YEAR            1036
 #define IDC_CHECK_SEVERANCE_LESS_THAN_YEAR 1037
 #define IDC_CHECK_VACATION_YEARS        1038
@@ -122,9 +119,13 @@
 #define IDC_EDIT1                       1093
 #define IDC_EDIT_PAY_PER_HOLY_DAY       1093
 #define IDC_EDIT_SAVE_DIR               1093
+#define IDC_EDIT_COMMENT1               1093
 #define IDC_CHECK_PAID_VACATION         1094
+#define IDC_EDIT_COMMENT2               1094
+#define IDC_EDIT_COMMENT2_              1094
 #define IDC_CHECK2                      1095
 #define IDC_CHECK_PAID_RECUP            1095
+#define IDC_EDIT_COMMENT3               1095
 #define IDC_RADIO_DIFF_WAGES            1096
 #define IDC_BUTTON_DEFINE_DIR           1097
 #define IDC_BUTTON_EDIT_WAGE            1097
@@ -134,6 +135,7 @@
 #define IDD_DIALOG_ON_OPEN              1099
 #define IDC_CHECK1                      1100
 #define IDC_CHECK_LIVE_IN               1100
+#define IDC_CHECK_DISPLAY_COMMENTS      1100
 #define IDC_EDIT_CONTACT_TEL            1101
 #define IDC_EDIT_CONTACT_FAX            1102
 #define IDC_STATIC_FILE_NAME            1102
@@ -191,6 +193,8 @@
 #define IDC_STATIC_HL_PAID              1161
 #define IDC_STATIC_HL_FROM              1162
 #define IDC_STATIC_HOLIDAY_PREVS        1163
+#define IDC_BUTTON1                     1163
+#define IDC_BUTTON_CLEAR_COMMENTS       1163
 #define IDC_STATIC_HL_DUE               1164
 #define ID_FILE_EXIT                    32771
 #define ID_COMPUTE_ALL                  32772
@@ -208,9 +212,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        148
+#define _APS_NEXT_RESOURCE_VALUE        150
 #define _APS_NEXT_COMMAND_VALUE         32782
-#define _APS_NEXT_CONTROL_VALUE         1163
+#define _APS_NEXT_CONTROL_VALUE         1164
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

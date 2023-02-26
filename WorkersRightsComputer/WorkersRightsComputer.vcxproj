@@ -187,6 +187,8 @@
   <ItemGroup>
     <ClInclude Include="Additional.h" />
     <ClInclude Include="AllRights.h" />
+    <ClInclude Include="Comments.h" />
+    <ClInclude Include="CommentsDlg.h" />
     <ClInclude Include="Config.h" />
     <ClInclude Include="HolidaysDue.h" />
     <ClInclude Include="HolidaysDuePerYear.h" />
@@ -247,6 +249,8 @@
   <ItemGroup>
     <ClCompile Include="Additional.cpp" />
     <ClCompile Include="AllRights.cpp" />
+    <ClCompile Include="Comments.cpp" />
+    <ClCompile Include="CommentsDlg.cpp" />
     <ClCompile Include="Config.cpp" />
     <ClCompile Include="HolidaysDue.cpp" />
     <ClCompile Include="HolidaysDuePerYear.cpp" />

@@ -27,6 +27,7 @@
 #include "PrevYearsHolidaysDlg.h"
 #include "Holidays.h"
 #include "HolidaysDue.h"
+#include "CommentsDlg.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -252,7 +253,7 @@ BOOL CWorkersRightsComputerDlg::OnInitDialog()
 	SetText(IDC_EDIT_FILLED_BY, gConfig.msFilledBy);
 	SetText(IDC_EDIT_FILLED_BY_HEBREW, gConfig.msFilledByHebrew);
 
-	gHolidaysDue.UpdateMainDialog(this);
+	gHolidaysDue.UpdateMainDialog();
 
 	GotoDlgCtrl(GetDlgItem(IDC_EDIT_FIRST_NAME));
 	return FALSE;  // return TRUE  unless you set the focus to a control
@@ -377,13 +378,12 @@ void CWorkersRightsComputerDlg::OnBnClickedButtonLoad()
 {
 	CSaver saver;
 	saver.Restore();
-	gHolidaysDue.UpdateMainDialog(this);
 }
 void CWorkersRightsComputerDlg::OnBnClickedButtonReset()
 {
 	CSaver::ResetAllInputs(false /*!bLoading*/);
 	OnInputChange();
-	gHolidaysDue.UpdateMainDialog(this);
+	gHolidaysDue.UpdateMainDialog();
 }
 void CWorkersRightsComputerDlg::ResetAllInputs(bool bLoading)
 {
@@ -536,7 +536,6 @@ void CWorkersRightsComputerDlg::OnFileLoad()
 		CString sfName(dlg.mSelectedFileName);
 		CSaver saver;
 		saver.Restore(sfName);
-		gHolidaysDue.UpdateMainDialog(this);
 	}
 }
 void CWorkersRightsComputerDlg::OnTestCreatedir()
@@ -618,7 +617,8 @@ void CWorkersRightsComputerDlg::OnBnClickedEmployer()
 }
 void CWorkersRightsComputerDlg::OnBnClickedComments()
 {
-	// TODO: Add your control notification handler code here
+	CCommentsDlg dlg;
+	dlg.DoModal();
 }
 void CWorkersRightsComputerDlg::SaveToXml(CXMLDump &xmlDump)
 {
@@ -744,5 +744,5 @@ void CWorkersRightsComputerDlg::OnBnClickedButtonPrevYearsHolidays()
 	if (dlg.DoModal() == IDOK)
 	{
 	}
-	gHolidaysDue.UpdateMainDialog(this);
+	gHolidaysDue.UpdateMainDialog();
 }

@@ -18,7 +18,7 @@ public:
 	void LoadFromXml(class CXMLParseNode* pWorkPeriod, CXMLParseNode* pRoot);
 
 	// Support Main WRC Dialog
-	void UpdateMainDialog(CMyDialogEx* pMainDlg);
+	void UpdateMainDialog();
 	void OnMainDialogChange(CMyDialogEx* pMainDlg);
 
 	// Interface for computations

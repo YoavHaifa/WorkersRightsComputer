@@ -12,6 +12,8 @@
 #include "Config.h"
 #include "Person.h"
 #include "FileName.h"
+#include "Comments.h"
+#include "HolidaysDue.h"
 
 
 CSaver::CSaver()
@@ -32,6 +34,7 @@ void CSaver::ResetAllInputs(bool bLoading)
 		gpDlg->ResetAllInputs(bLoading);
 	gWorkPeriod.Reset();
 	CPerson::ClearContacts();
+	gComments.Clear();
 }
 void CSaver::Save(const wchar_t *zfName)
 {
@@ -65,7 +68,12 @@ bool CSaver::Restore(const wchar_t* zfName)
 	if (fName.IsOfType(L"xml"))
 	{
 		ResetAllInputs(true /*bLoading*/);
-		return LoadFromXmlFile();
+		bool bOK = LoadFromXmlFile();
+
+		gHolidaysDue.UpdateMainDialog();
+		gComments.OnLoad();
+
+		return bOK;
 	}
 
 	CUtils::MessBox(L"Saved file should be XML", L"Input Error");
@@ -82,8 +90,8 @@ void CSaver::SaveToXml(void)
 	gpDlg->SaveToXml(xmlDump);
 
 	gWorkPeriod.SaveToXml(xmlDump);
-
 	CPerson::SaveContactsToXml(xmlDump);
+	gComments.SaveToXml(xmlDump);
 
 	gAllRights.SaveToXml(xmlDump);
 	xmlDump.Write(L"software_version", gConfig.msVersion);
@@ -177,6 +185,7 @@ bool CSaver::LoadFromXmlFile()
 	}
 	gWorkPeriod.LoadFromXml(pRoot);
 	CPerson::LoadContactsFromXml(pRoot);
+	gComments.LoadFromXml(pRoot);
 
 	gpDlg->mbDisableComputations = false;
 	gpDlg->OnInputChange(true);
