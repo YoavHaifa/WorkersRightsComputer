@@ -22,7 +22,8 @@ public:
 	void WriteTotalLineToHtmlTable(class CHtmlWriter &html);
 
 	bool Compute(void);
-	bool ComputeInternal(void);
+	bool AllInputDefined();
+	bool ComputeInternal();
 
 	CList <CRight *, CRight *> mRights;
 	double mSumDue;

@@ -49,6 +49,7 @@ public:
 	virtual	bool SetCheckRef(CButtonRef * /*pButton*/) { return false; }
 	virtual	bool SetEditRef(CEditRef * /*pRef*/) { return false; }
 
+	virtual bool MissingInput(CString &iosText);
 	virtual bool HasLegalValue();
 	virtual bool HasLegalRealValue();
 	virtual bool PrintToLetter();

@@ -57,6 +57,7 @@ public:
 	CEdit mEditPaidSum;
 	CEdit mEditVacationPrevYears;
 	CEdit mEditRecuperationPrevYears;
+	CEdit mEditNDaysPaidLastYear;
 
 	CList<CEditRef *, CEditRef *> mEditBoxes;
 	CComboBox mComboHolidays;
@@ -88,8 +89,8 @@ public:
 
 	afx_msg void OnTestCreatedir();
 	//afx_msg void OnFileLoadoldcase();
-	void CallOnInputChange();
-	void OnInputChange(bool bJustLoaded = false);
+	void OnInputChange();
+	void OnInputChange(bool bJustLoaded);
 	bool mbDisableComputations;
 	bool mbSaveInProcess;
 	//CEdit mEditPrevNYears;
@@ -111,10 +112,12 @@ public:
 	afx_msg void OnTestLoadtxt();
 	// Allows user to set special rate per holidays
 	// CEdit mEditPayPerEachHolyDay;
-	CButton mVacationPaid4LastYear;
+	CButton mVacationPaidAll4LastYear;
+	CButton mVacationPaidDays4LastYear;
+	CButton mVacationPaidNone4LastYear;
 	CButton mRecuperationPaid4LastYear;
-	afx_msg void OnBnClickedCheckPaidVacation();
-	afx_msg void OnBnClickedCheckPaidRecup();
+	//afx_msg void OnBnClickedCheckPaidVacation();
+	//afx_msg void OnBnClickedCheckPaidRecup();
 	afx_msg void OnBnClickedCheckLiveIn();
 	afx_msg void OnBnClickedButtonPrevYearsHolidays();
 };

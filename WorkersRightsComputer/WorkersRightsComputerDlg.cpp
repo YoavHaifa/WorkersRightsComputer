@@ -95,10 +95,6 @@ CWorkersRightsComputerDlg::CWorkersRightsComputerDlg(CWnd* pParent /*=nullptr*/)
 	mEditBoxes.AddTail(new CEditRef(L"LastYearWork", mEditLastYearWork, L"textBox9"));
 	mEditBoxes.AddTail(new CEditRef(L"LastYearPaid", mEditLastYearPaid, L"textBox3"));
 	mEditBoxes.AddTail(new CEditRef(L"LastYearFrom", mEditLastYearFrom, L"textBox4"));
-	//mEditBoxes.AddTail(new CEditRef(L"PrevYearWork", mEditPrevYearWork, L"textBox10"));
-	//mEditBoxes.AddTail(new CEditRef(L"PrevYearPaid", mEditPrevYearPaid, L"textBox5"));
-	//mEditBoxes.AddTail(new CEditRef(L"PrevYearFrom", mEditPrevYearFrom, L"textBox6"));
-	//mEditBoxes.AddTail(new CEditRef(L"PrevNYear", mEditPrevNYears, L"textBox7"));
 	mEditBoxes.AddTail(new CEditRef(L"AdditionalDesc", mEditAdditionalDesc, L"textBox14"));
 	mEditBoxes.AddTail(new CEditRef(L"AdditionalSum", mEditAdditionalSum, L"textBox15"));
 	mEditBoxes.AddTail(new CEditRef(L"PaidDesc", mEditPaidDesc));
@@ -106,9 +102,7 @@ CWorkersRightsComputerDlg::CWorkersRightsComputerDlg(CWnd* pParent /*=nullptr*/)
 
 	mEditBoxes.AddTail(new CEditRef(L"VacationPrevYears", mEditVacationPrevYears, L"textBox11"));
 	mEditBoxes.AddTail(new CEditRef(L"RecuperationPrevYears", mEditRecuperationPrevYears, L"textBox13"));
-
-	// mEditBoxes.AddTail(new CEditRef(L"PayRatePerHoliday", mEditPayPerEachHolyDay));
-
+	mEditBoxes.AddTail(new CEditRef(L"VacationDaysPaidLastYear", mEditNDaysPaidLastYear));
 
 	mButtons.AddTail(new CButtonRef(L"AllowSevLess", mAllowSevLess, L"checkBox1"));
 	mButtons.AddTail(new CButtonRef(L"DemandVac4Prev", mDemandVac4Prev, L"checkBox2"));
@@ -119,7 +113,11 @@ CWorkersRightsComputerDlg::CWorkersRightsComputerDlg(CWnd* pParent /*=nullptr*/)
 	mButtons.AddTail(new CButtonRef(L"RadioID", mRadiID, NULL, false));
 	mButtons.AddTail(new CButtonRef(L"RadioPass", mRadioPassport, NULL, false));
 
-	mButtons.AddTail(new CButtonRef(L"PaidLastYVacation", mVacationPaid4LastYear, NULL));
+	// Notice that the radio button "PaidLastYVacation" replaces the old checkbox
+	// Its name stays the same for backward compatibility - April 15, 2023
+	mButtons.AddTail(new CButtonRef(L"PaidLastYVacation", mVacationPaidAll4LastYear, NULL));
+	mButtons.AddTail(new CButtonRef(L"PaidDaysLastYVacation", mVacationPaidDays4LastYear, NULL));
+	mButtons.AddTail(new CButtonRef(L"PaidNoneLastYVacation", mVacationPaidNone4LastYear, NULL, false));
 	mButtons.AddTail(new CButtonRef(L"PaidLastYRecuperation", mRecuperationPaid4LastYear, NULL));
 }
 
@@ -142,6 +140,7 @@ void CWorkersRightsComputerDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT_PAID_SUM, mEditPaidSum);
 	DDX_Control(pDX, IDC_EDIT_VACATION_YEARS, mEditVacationPrevYears);
 	DDX_Control(pDX, IDC_EDIT_RECUPERATION_YEARS, mEditRecuperationPrevYears);
+	DDX_Control(pDX, IDC_EDIT_LAST_YEAR_VACATION_DAYS, mEditNDaysPaidLastYear);
 	DDX_Control(pDX, IDC_COMBO_HOLIDAYS, mComboHolidays);
 	DDX_Control(pDX, IDC_CHECK_SEVERANCE_LESS_THAN_YEAR, mAllowSevLess);
 	DDX_Control(pDX, IDC_CHECK_VACATION_YEARS, mDemandVac4Prev);
@@ -157,7 +156,9 @@ void CWorkersRightsComputerDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT_ADDRESS, mAddress);
 	DDX_Control(pDX, IDC_EDIT_EMAIL, mEmail);
 	// DDX_Control(pDX, IDC_EDIT_PAY_PER_HOLY_DAY, mEditPayPerEachHolyDay);
-	DDX_Control(pDX, IDC_CHECK_PAID_VACATION, mVacationPaid4LastYear);
+	DDX_Control(pDX, IDC_RADIO_ALL_LAST_YEAR_VACATION, mVacationPaidAll4LastYear);
+	DDX_Control(pDX, IDC_RADIO_LAST_YEAR_VACATION_DAYS, mVacationPaidDays4LastYear);
+	DDX_Control(pDX, IDC_RADIO_LAST_YEAR_VACATION_NONE, mVacationPaidNone4LastYear);
 	DDX_Control(pDX, IDC_CHECK_PAID_RECUP, mRecuperationPaid4LastYear);
 }
 
@@ -179,8 +180,8 @@ BEGIN_MESSAGE_MAP(CWorkersRightsComputerDlg, CDialogEx)
 	ON_EN_CHANGE(IDC_EDIT_HOLIDAYS_PREVY_WORK, &CWorkersRightsComputerDlg::OnEnChangeEditHolidaysLastyWork)
 	ON_EN_CHANGE(IDC_EDIT_HOLIDAYS_PREVY_PAID, &CWorkersRightsComputerDlg::OnEnChangeEditHolidaysLastyWork)
 	ON_EN_CHANGE(IDC_EDIT_HOLIDAYS_PREVY_FROM, &CWorkersRightsComputerDlg::OnEnChangeEditHolidaysLastyWork)
-	ON_EN_CHANGE(IDC_EDIT_ADDITIONAL_SUM, &CWorkersRightsComputerDlg::CallOnInputChange)
-	ON_EN_CHANGE(IDC_EDIT_PAID_SUM, &CWorkersRightsComputerDlg::CallOnInputChange)
+	ON_EN_CHANGE(IDC_EDIT_ADDITIONAL_SUM, &CWorkersRightsComputerDlg::OnInputChange)
+	ON_EN_CHANGE(IDC_EDIT_PAID_SUM, &CWorkersRightsComputerDlg::OnInputChange)
 	ON_COMMAND(ID_COMPUTE_ALL, &CWorkersRightsComputerDlg::OnComputeAll)
 	ON_COMMAND(ID_FILE_SAVEAS, &CWorkersRightsComputerDlg::OnFileSaveas)
 	ON_COMMAND(ID_FILE_LOAD, &CWorkersRightsComputerDlg::OnFileLoad)
@@ -192,8 +193,12 @@ BEGIN_MESSAGE_MAP(CWorkersRightsComputerDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_COMMENTS, &CWorkersRightsComputerDlg::OnBnClickedComments)
 	ON_COMMAND(ID_TEST_LOADXML, &CWorkersRightsComputerDlg::OnTestLoadxml)
 	ON_COMMAND(ID_TEST_LOADTXT, &CWorkersRightsComputerDlg::OnTestLoadtxt)
-	ON_BN_CLICKED(IDC_CHECK_PAID_VACATION, &CWorkersRightsComputerDlg::OnBnClickedCheckPaidVacation)
-	ON_BN_CLICKED(IDC_CHECK_PAID_RECUP, &CWorkersRightsComputerDlg::OnBnClickedCheckPaidRecup)
+	//ON_BN_CLICKED(IDC_CHECK_PAID_VACATION, &CWorkersRightsComputerDlg::OnBnClickedCheckPaidVacation)
+	ON_BN_CLICKED(IDC_RADIO_ALL_LAST_YEAR_VACATION, &CWorkersRightsComputerDlg::OnInputChange)
+	ON_BN_CLICKED(IDC_RADIO_LAST_YEAR_VACATION_DAYS, &CWorkersRightsComputerDlg::OnInputChange)
+	ON_BN_CLICKED(IDC_RADIO_LAST_YEAR_VACATION_NONE, &CWorkersRightsComputerDlg::OnInputChange)
+	ON_EN_CHANGE(IDC_EDIT_LAST_YEAR_VACATION_DAYS, &CWorkersRightsComputerDlg::OnInputChange)
+	ON_BN_CLICKED(IDC_CHECK_PAID_RECUP, &CWorkersRightsComputerDlg::OnInputChange)
 	ON_BN_CLICKED(IDC_CHECK_LIVE_IN, &CWorkersRightsComputerDlg::OnBnClickedCheckLiveIn)
 	ON_BN_CLICKED(IDC_BUTTON_PREV_YEARS_HOLIDAYS, &CWorkersRightsComputerDlg::OnBnClickedButtonPrevYearsHolidays)
 END_MESSAGE_MAP()
@@ -236,6 +241,7 @@ BOOL CWorkersRightsComputerDlg::OnInitDialog()
 	InitHolidaysCombo();
 	InitializeAllRights();
 	mRadioPassport.SetCheck(1);
+	mVacationPaidNone4LastYear.SetCheck(1);
 	gConfig.InitFromXml();
 	CString sTitle(L"Workers Rights Computer - Experimental Beta Version ");
 	SetTitle(sTitle + gConfig.msVersion);
@@ -394,11 +400,16 @@ void CWorkersRightsComputerDlg::ResetAllInputs(bool bLoading)
 		pEdit->mEdit.SetWindowTextW(L"0");
 	}
 
+	static int i = 0;
 	pos = mButtons.GetHeadPosition();
 	while (pos)
 	{
 		CButtonRef* pButton = mButtons.GetNext(pos);
-		pButton->mButton.SetCheck(BST_UNCHECKED);
+		if (pButton->msName == "PaidNoneLastYVacation")
+			pButton->mButton.SetCheck(BST_CHECKED);
+		else
+			pButton->mButton.SetCheck(BST_UNCHECKED);
+		i++;
 	}
 	mComboHolidays.SetWindowTextW(L"Select set of Holidays");
 	if (!bLoading)
@@ -542,22 +553,9 @@ void CWorkersRightsComputerDlg::OnTestCreatedir()
 {
 	CUtils::VerifyDirectory(L"F:\\tmp\\new_dir");
 }
-/*
-void CWorkersRightsComputerDlg::OnFileLoadoldcase()
+void CWorkersRightsComputerDlg::OnInputChange()
 {
-	CString sDir(L"F:\\WorkersRights");
-	CMyFileDialog dlg(CMyFileDialog::FD_OPEN, L"saved file", sDir);
-	dlg.SetDefaultExtention(L"txt");
-	if (dlg.DoModal())
-	{
-		CString sfName(dlg.mSelectedFileName);
-		CVerifyOld verify(sfName);
-		verify.Verify();
-	}
-}*/
-void CWorkersRightsComputerDlg::CallOnInputChange()
-{
-	OnInputChange();
+	OnInputChange(false);
 }
 void CWorkersRightsComputerDlg::OnInputChange(bool bJustLoaded)
 {
@@ -568,6 +566,8 @@ void CWorkersRightsComputerDlg::OnInputChange(bool bJustLoaded)
 	if (ubInChange)
 		return;
 	ubInChange = true;
+
+
 
 	gHolidaysDue.VerifyWorkPeriod(this);
 	if (!bJustLoaded)
@@ -719,14 +719,14 @@ void CWorkersRightsComputerDlg::WriteEditorToLetter(CHtmlWriter& html)
 
 	html.WriteLineEH(sPrepared, sPreparedH);
 }
-void CWorkersRightsComputerDlg::OnBnClickedCheckPaidVacation()
-{
-	OnInputChange();
-}
-void CWorkersRightsComputerDlg::OnBnClickedCheckPaidRecup()
-{
-	OnInputChange();
-}
+//void CWorkersRightsComputerDlg::OnBnClickedCheckPaidVacation()
+//{
+//	OnInputChange();
+//}
+//void CWorkersRightsComputerDlg::OnBnClickedCheckPaidRecup()
+//{
+//	OnInputChange();
+//}
 void CWorkersRightsComputerDlg::OnBnClickedCheckLiveIn()
 {
 	gWorkPeriod.mbLiveIn = IsChecked(IDC_CHECK_LIVE_IN);

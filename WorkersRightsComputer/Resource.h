@@ -120,7 +120,7 @@
 #define IDC_EDIT_PAY_PER_HOLY_DAY       1093
 #define IDC_EDIT_SAVE_DIR               1093
 #define IDC_EDIT_COMMENT1               1093
-#define IDC_CHECK_PAID_VACATION         1094
+#define IDC_EDIT_LAST_YEAR_VACATION_DAYS 1093
 #define IDC_EDIT_COMMENT2               1094
 #define IDC_EDIT_COMMENT2_              1094
 #define IDC_CHECK2                      1095
@@ -136,6 +136,7 @@
 #define IDC_CHECK1                      1100
 #define IDC_CHECK_LIVE_IN               1100
 #define IDC_CHECK_DISPLAY_COMMENTS      1100
+#define IDC_CHECK_MATERNITY             1100
 #define IDC_EDIT_CONTACT_TEL            1101
 #define IDC_EDIT_CONTACT_FAX            1102
 #define IDC_STATIC_FILE_NAME            1102
@@ -196,6 +197,10 @@
 #define IDC_BUTTON1                     1163
 #define IDC_BUTTON_CLEAR_COMMENTS       1163
 #define IDC_STATIC_HL_DUE               1164
+#define IDC_RADIO_ALL_LAST_YEAR_VACATION 1165
+#define IDC_RADIO_LAST_YEAR_VACATION_DAYS 1166
+#define IDC_RADIO3                      1167
+#define IDC_RADIO_LAST_YEAR_VACATION_NONE 1167
 #define ID_FILE_EXIT                    32771
 #define ID_COMPUTE_ALL                  32772
 #define ID_FILE_LOAD                    32773
@@ -214,7 +219,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        150
 #define _APS_NEXT_COMMAND_VALUE         32782
-#define _APS_NEXT_CONTROL_VALUE         1164
+#define _APS_NEXT_CONTROL_VALUE         1168
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

@@ -111,9 +111,26 @@ bool CAllRights::Compute(void)
 	bInCompute = false;
 	return bOK;
 }
+bool CAllRights::AllInputDefined()
+{
+	CString sMissing(L"Missing Input:\r\n");
+	POSITION pos = mRights.GetHeadPosition();
+	while (pos)
+	{
+		CRight* pRight = mRights.GetNext(pos);
+		if (pRight->MissingInput(sMissing))
+		{
+			if (gpDlg)
+				gpDlg->DisplaySummary(sMissing);
+			return false;
+		}
+	}
+	return true;
+}
 bool CAllRights::ComputeInternal()
 {
-	//double totalDue = 0;
+	if (!AllInputDefined())
+		return false;
 
 	bool bOK = true;
 	POSITION pos = mRights.GetHeadPosition();

@@ -10,6 +10,7 @@ public:
 
 	virtual	bool SetCheckRef(CButtonRef *pButton) override;
 	virtual	bool SetEditRef(class CEditRef *pRef) override;
+	virtual bool MissingInput(CString& iosText) override;
 
 	static const int MIN_DAYS_FOR_SHORT_RULE = 75;
 	static const int SHORT_RULE_PER_CENT = 4;
@@ -22,7 +23,8 @@ public:
 
 	static const double MIN_FRACTION_FOR_ROUND_UP;
 
-	CEdit *mpPrevYearsBox;
+	CEdit* mpPrevYearsBox;
+	CEdit* mpLastYearsPaidDaysBox;
 
 	double mnYearsForVacation;
 	double mnMonthsForVacation;
@@ -30,17 +32,22 @@ public:
 	int mnSeniority;
 
 	bool mbUseShortRule;
-	bool mbLastYearPaid;
+	bool mbLastYearAllPaid;
+	bool mbLastYearDaysPaid;
+	bool mnLastYearDaysPaid;
 	double mnDueDays;
 	CButtonRef* mpbDemandForPreviousYears;
-	CButtonRef* mpbPaid4LastYear;
+	CButtonRef* mpbAllPaid4LastYear;
+	CButtonRef* mpbDaysPaid4LastYear;
 	double mnYearsOfUnpaidVacation;
 	double mnDaysOfPaidVacation;
+	double mnDaysPaidLastYear;
 	CString msDesc;
 	CString msDescHebrew;
 
 	//int GetNDaysPerYear(int seniority, double nDaysPerWeek);
 	virtual bool Compute(void) override;
+	bool ComputePerLastYear();
 	bool ComputePerPeriod(void);
 	virtual CString GetDecriptionForLetter(void)override;
 	virtual CString GetDecriptionForLetterHebrew(void)override;
@@ -50,6 +57,7 @@ public:
 	int mCurMonth;
 	void CountBackMonth(void);
 
+	bool GetGUIValue(CEdit* pEdit, double& oValue, CButtonRef* pButton);
 	void ComputePrevYears(void);
 	void ComputeLastYearByShortRule(void);
 };

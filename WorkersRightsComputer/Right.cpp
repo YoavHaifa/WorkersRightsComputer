@@ -114,6 +114,10 @@ bool CRight::ComputeEnvelop(void)
 
 	return bOK;
 }
+bool CRight::MissingInput(CString& /*iosText*/)
+{
+	return false;
+}
 bool CRight::HasLegalValue()
 {
 	if (mDuePay > 0)
