@@ -365,6 +365,7 @@ void CWorkersRightsComputerDlg::OnBnClickedButtonSave()
 {
 	if (VerifyThatNotInSave())
 	{
+		OnInputChange();
 		mbSaveInProcess = true;
 		CSaver saver;
 		saver.Save();

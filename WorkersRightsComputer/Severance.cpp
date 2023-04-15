@@ -34,7 +34,7 @@ bool CSeverance::Compute(void)
 	{
 		mDuePay = 0;
 		msDue += L"Entitle ONLY to Severance Fund - None here";
-		return false;
+		return true;
 	}
 
 	mnYears = gWorkYears.mYearsForSeverance;
@@ -57,7 +57,7 @@ bool CSeverance::Compute(void)
 		{
 			mDuePay = 0;
 			msDue += L"None - Period too short";
-			return false;
+			return true;
 		}
 	}
 	else

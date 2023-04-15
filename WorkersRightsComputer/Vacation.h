@@ -47,8 +47,9 @@ public:
 
 	//int GetNDaysPerYear(int seniority, double nDaysPerWeek);
 	virtual bool Compute(void) override;
-	bool ComputePerLastYear();
-	bool ComputePerPeriod(void);
+	bool ComputeInternals();
+	bool ReducePaidDays();
+	bool ComputePerPeriod();
 	virtual CString GetDecriptionForLetter(void)override;
 	virtual CString GetDecriptionForLetterHebrew(void)override;
 	void PrepareString(void);
@@ -59,6 +60,6 @@ public:
 
 	bool GetGUIValue(CEdit* pEdit, double& oValue, CButtonRef* pButton);
 	void ComputePrevYears(void);
-	void ComputeLastYearByShortRule(void);
+	bool ComputeByShortRule(void);
 };
 

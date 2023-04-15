@@ -32,6 +32,9 @@ public:
 	class CHolidays *mpHolidays;
 	CString GetHolidaysSelection();
 	class CHolidays* GetHolidays();
+
+	bool mbComputedOK;
+	CString msError;
 };
 
 extern CAllRights gAllRights;

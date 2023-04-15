@@ -21,6 +21,7 @@ CAllRights gAllRights;
 
 CAllRights::CAllRights()
 	: mpHolidays(NULL)
+	, mbComputedOK(false)
 {
 }
 CAllRights::~CAllRights()
@@ -55,6 +56,8 @@ void CAllRights::Clear(void)
 		mRights.RemoveTail();
 	}
 	mpHolidays = NULL;
+	mbComputedOK = false;
+	msError = L"";
 }
 bool CAllRights::SetCheckRef(CButtonRef *pButton)
 {
@@ -103,13 +106,12 @@ bool CAllRights::Compute(void)
 	if (bInCompute)
 		return false;
 	bInCompute = true;
-	bool bOK = true;
 
 	iComputing = iCompute;
-	bOK = ComputeInternal();
+	mbComputedOK = ComputeInternal();
 
 	bInCompute = false;
-	return bOK;
+	return mbComputedOK;
 }
 bool CAllRights::AllInputDefined()
 {
@@ -122,6 +124,7 @@ bool CAllRights::AllInputDefined()
 		{
 			if (gpDlg)
 				gpDlg->DisplaySummary(sMissing);
+			msError = sMissing;
 			return false;
 		}
 	}
@@ -144,17 +147,20 @@ bool CAllRights::ComputeInternal()
 	{
 		if (gpDlg)
 			gpDlg->DisplaySummary(L"Please define work period");
+		msError = L"Work Period not well defined";
 		return false;
 	}
 
 	if (!gWageTable.Prepare(L"AllRights_Compute"))
 	{
-		CUtils::MessBox(L"Failed to prepare Wage Table!", L"SW Error");
+		msError = L"Failed to prepare Wage Table!";
+		CUtils::MessBox(msError, L"SW Error");
 		return false;
 	}
 	if (!gWageTable.IsValid())
 	{
-		CUtils::MessBox(L"Wage Table not initialized!", L"SW Error");
+		msError = L"Wage Table not initialized!";
+		CUtils::MessBox(msError, L"SW Error");
 		return false;
 	}
 
@@ -163,7 +169,13 @@ bool CAllRights::ComputeInternal()
 	while (pos)
 	{
 		CRight *pRight = mRights.GetNext(pos);
-		pRight->ComputeEnvelop();
+		if (!pRight->ComputeEnvelop())
+		{
+			msError = pRight->msName;
+			msError += " Error: ";
+			msError += pRight->msDue;
+			bOK = false;
+		}
 	}
 
 	FILE *pfWrite = CUtils::OpenLogFile(L"Total");

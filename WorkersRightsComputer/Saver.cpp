@@ -52,7 +52,14 @@ void CSaver::Save(const wchar_t *zfName)
 
 	SaveToXml();
 
-	WriteLetter();
+	if (gAllRights.mbComputedOK)
+		WriteLetter();
+	else
+	{
+		CString s(L"Last Computation Failed, Letter Not Saved.\r\n");
+		s += gAllRights.msError;
+		CUtils::MessBox(s, L"Warning");
+	}
 }
 bool CSaver::Restore(const wchar_t* zfName)
 {
