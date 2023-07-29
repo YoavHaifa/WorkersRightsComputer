@@ -626,7 +626,7 @@ void CWorkPeriod::SetWeekDaysPaidByCompany(class CCompanyPartPeriod *pFrom, clas
 			return;
 	}
 }
-double CWorkPeriod::ComputeFamilyPart(void)
+double CWorkPeriod::ComputeFamilyPart()
 {
 	double sumFractions = 0;
 	double sumCompanyRatio = 0;
@@ -641,5 +641,28 @@ double CWorkPeriod::ComputeFamilyPart(void)
 	}
 
 	double companyTotalRatio = sumCompanyRatio / sumFractions;
+	return 1 - companyTotalRatio;
+}
+double CWorkPeriod::ComputeFamilyPartLastMonths(int nMonthsWanted)
+{
+	double sumFractions = 0;
+	double sumCompanyRatio = 0;
+
+	double missingFraction = nMonthsWanted;
+	int iLast = mnMonthsDetailed - 1;
+
+	for (int iMonth = iLast; iMonth >= 0 && missingFraction > 0; iMonth--)
+	{
+		double companyRatio = maMonths[iMonth].GetCompanyRatio();
+		double fraction = min(maMonths[iMonth].mFraction, missingFraction);
+
+		sumFractions += fraction;
+		missingFraction -= fraction;
+		sumCompanyRatio += companyRatio * fraction;
+	}
+
+	double companyTotalRatio = 0;
+	if (sumFractions > 0)
+		companyTotalRatio = sumCompanyRatio / sumFractions;
 	return 1 - companyTotalRatio;
 }

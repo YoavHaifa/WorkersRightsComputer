@@ -198,8 +198,11 @@ bool CNotice::Compute(void)
 
 	if (gFamilyPart.mbAskOnlyForFamilyPart)
 	{
-		mDuePay = mDuePay * gFamilyPart.GetRatio();
-		msDue += L" =FamilyPart=> ";
+		//mDuePay = mDuePay * gFamilyPart.GetRatio();
+		double familyRatio = gWorkPeriod.ComputeFamilyPartLastMonths(3);
+		LogLine(L"Family part - average last 3 month", familyRatio);
+		mDuePay = mDuePay * familyRatio;
+		msDue += L" =FamilyPart(ByLast3Months)=> ";
 		msDue += ToString(mDuePay);
 	}
 
