@@ -11,8 +11,9 @@ CVacationTable::CVacationTable()
 	: mnVacationsComputed(0)
 	, mpfLog(0)
 {
-	if (InitFromFile())
-		PrintLog();
+	// ALLOW_DAD
+	//if (InitFromFile())
+	//	PrintLog();
 }
 
 
@@ -59,6 +60,7 @@ bool CVacationTable::InitFromFile(void)
 
 		mn++;
 	}
+	PrintLog();
 	return true;
 }
 bool CVacationTable::PrintLog(void)

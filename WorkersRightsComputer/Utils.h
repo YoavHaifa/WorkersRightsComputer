@@ -56,6 +56,11 @@ public:
 	static bool CreateProcess(const wchar_t * zProgram, const wchar_t * zParameters, PROCESS_INFORMATION *opProcInfo = NULL);
 	static bool umbCreateConsoleWindow;
 	static void CUtils::OpenTextFile(const wchar_t * zfName);
+	static bool ReadCommandLine(const CString& sCommand, CString& osfName);
+	static CString msApplicationPath;
+
+private:
+	static bool ReadFileNameFromCommandLine(const CString& sCommand, CString& osfName, CString& osRest);
 };
 
 inline FILE * MyFOpenWithErrorBox(const wchar_t *zfName, const wchar_t *zMode, const wchar_t *zDesc, FILE *pfLog = NULL)

@@ -261,6 +261,12 @@ BOOL CWorkersRightsComputerDlg::OnInitDialog()
 
 	gHolidaysDue.UpdateMainDialog();
 
+	if (!msStartFile.IsEmpty())
+	{
+		CSaver saver;
+		saver.Restore(msStartFile);
+	}
+
 	GotoDlgCtrl(GetDlgItem(IDC_EDIT_FIRST_NAME));
 	return FALSE;  // return TRUE  unless you set the focus to a control
 }

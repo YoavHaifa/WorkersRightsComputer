@@ -14,6 +14,7 @@ CVacation::CVacation(void)
 	, mPayPerDay(0)
 {
 	miPrintOrder = 2;
+	gVacationTable.InitFromFile();
 }
 bool CVacation::SetCheckRef(CButtonRef *pButton)
 {

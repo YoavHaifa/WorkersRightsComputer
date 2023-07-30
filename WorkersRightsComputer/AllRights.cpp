@@ -16,6 +16,7 @@
 #include "HtmlWriter.h"
 #include "Person.h"
 #include "XMLDump.h"
+#include "MinWage.h"
 
 CAllRights gAllRights;
 
@@ -30,6 +31,8 @@ CAllRights::~CAllRights()
 bool CAllRights::Init()
 {
 	Clear();
+
+	gMinWage.InitFromFile();
 
 	mRights.AddTail(new CSeverance);
 	mRights.AddTail(new CNotice);

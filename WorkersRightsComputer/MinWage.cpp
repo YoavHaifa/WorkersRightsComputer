@@ -8,7 +8,8 @@ CMinWage gMinWage;
 
 CMinWage::CMinWage(void)
 {
-	InitFromFile();
+	// ALLOW_DAD
+	// InitFromFile();
 }
 bool CMinWage::IsValid(void)
 {

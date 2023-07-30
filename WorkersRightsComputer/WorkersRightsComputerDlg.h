@@ -17,8 +17,9 @@ public:
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_WORKERSRIGHTSCOMPUTER_DIALOG };
 #endif
+	CString msStartFile;
 
-	protected:
+protected:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV support
 
 
