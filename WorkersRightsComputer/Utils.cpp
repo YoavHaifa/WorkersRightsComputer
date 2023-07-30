@@ -590,6 +590,11 @@ bool CUtils::ReadCommandLine(const CString& sCommand, CString& osfName)
 
 	if (!ReadFileNameFromCommandLine(sRest, osfName, sRest))
 		return false;
+	if (!CFileName::StaticIsOfType(osfName, L"xml"))
+	{
+		MessBox(osfName, L"Workers Rights Computer can open only ""xml"" files");
+		exit(1);
+	}
 	return (!osfName.IsEmpty());
 }
 static int GetMinFind(int i1, int i2)
