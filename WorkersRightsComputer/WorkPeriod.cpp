@@ -28,6 +28,7 @@ const wchar_t *uasDaysNames[7] =
 CWorkPeriod::CWorkPeriod(void)
 	: mbSkipNotice(false)
 	, mbLiveIn(true)
+	, mbCaregiver(false)
 	, mbExtraHolidayHoursForLiveInApplied(false)
 {
 	Reset();
@@ -265,6 +266,7 @@ void CWorkPeriod::SaveToXml(CXMLDump &xmlDump)
 	xmlDump.Write(L"notice", mNotice);
 	xmlDump.Write(L"b_skip_notice", mbSkipNotice);
 	xmlDump.Write(L"b_live_in", mbLiveIn);
+	xmlDump.Write(L"b_caregiver", mbCaregiver);
 	xmlDump.Write(L"b_extra_holiday_hours_for_live_in_applied", mbExtraHolidayHoursForLiveInApplied);
 
 	{
@@ -291,6 +293,7 @@ void CWorkPeriod::LoadFromXml(class CXMLParseNode* pRoot)
 	pWorkPeriodNode->GetValue(L"notice", mNotice);
 	pWorkPeriodNode->GetValue(L"b_skip_notice", mbSkipNotice);
 	pWorkPeriodNode->GetValue(L"b_live_in", mbLiveIn);
+	pWorkPeriodNode->GetValue(L"b_caregiver", mbCaregiver);
 
 	CXMLParseNode* pDays = pWorkPeriodNode->GetFirst(L"Days");
 	if (pDays)

@@ -38,6 +38,9 @@ public:
 	int GetWorkingHoursInFullWeek(int year, int month);
 	bool mbSkipNotice;
 
+	// Special mode for caregivers
+	bool mbCaregiver;
+
 	// Special extra hours for "live in" caregivers
 	bool mbLiveIn;
 	bool mbExtraHolidayHoursForLiveInApplied;

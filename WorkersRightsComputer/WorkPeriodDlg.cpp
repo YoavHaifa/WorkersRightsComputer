@@ -131,6 +131,13 @@ BOOL CWorkPeriodDlg::OnInitDialog()
 	mHourlySalary.EnableWindow(FALSE);
 	mHoursPerWeek.EnableWindow(FALSE);
 
+	if (gWorkPeriod.mbCaregiver)
+	{
+		SetInvisible(IDC_RADIO_HOURLY);
+		SetInvisible(IDC_STATIC_HOURLY_TEXT);
+		//mRadioHourly.EnableWindow(FALSE);
+	}
+
 	if (gWorkPeriod.mFirst.mbInitialized)
 	{
 		mStartDate.SetTime(&gWorkPeriod.mFirst.mTime);

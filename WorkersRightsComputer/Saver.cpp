@@ -79,6 +79,7 @@ bool CSaver::Restore(const wchar_t* zfName)
 
 		gHolidaysDue.UpdateMainDialog();
 		gComments.OnLoad();
+		gpDlg->OnLoad();
 
 		return bOK;
 	}

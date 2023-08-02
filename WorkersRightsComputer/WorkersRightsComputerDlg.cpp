@@ -28,6 +28,7 @@
 #include "Holidays.h"
 #include "HolidaysDue.h"
 #include "CommentsDlg.h"
+#include "PrevYearsVacationsDlg.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -201,6 +202,8 @@ BEGIN_MESSAGE_MAP(CWorkersRightsComputerDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_CHECK_PAID_RECUP, &CWorkersRightsComputerDlg::OnInputChange)
 	ON_BN_CLICKED(IDC_CHECK_LIVE_IN, &CWorkersRightsComputerDlg::OnBnClickedCheckLiveIn)
 	ON_BN_CLICKED(IDC_BUTTON_PREV_YEARS_HOLIDAYS, &CWorkersRightsComputerDlg::OnBnClickedButtonPrevYearsHolidays)
+	ON_BN_CLICKED(IDC_CHECK_CAREGIVER, &CWorkersRightsComputerDlg::OnBnClickedCheckCaregiver)
+	ON_BN_CLICKED(IDC_BUTTON_VACATIONS_PREV_YEARS, &CWorkersRightsComputerDlg::OnBnClickedButtonVacationsPrevYears)
 END_MESSAGE_MAP()
 
 
@@ -247,7 +250,7 @@ BOOL CWorkersRightsComputerDlg::OnInitDialog()
 	SetTitle(sTitle + gConfig.msVersion);
 
 	CUtils::CreateThread(&StaticThreadFunc, NULL);
-	SetCheck(IDC_CHECK_LIVE_IN, gWorkPeriod.mbLiveIn);
+	OnLoad();
 
 	gpDlg = this;
 	mbInitialized = true;
@@ -270,7 +273,11 @@ BOOL CWorkersRightsComputerDlg::OnInitDialog()
 	GotoDlgCtrl(GetDlgItem(IDC_EDIT_FIRST_NAME));
 	return FALSE;  // return TRUE  unless you set the focus to a control
 }
-
+void CWorkersRightsComputerDlg::OnLoad()
+{
+	SetCheck(IDC_CHECK_LIVE_IN, gWorkPeriod.mbLiveIn);
+	SetCheck(IDC_CHECK_CAREGIVER, gWorkPeriod.mbCaregiver);
+}
 void CWorkersRightsComputerDlg::OnSysCommand(UINT nID, LPARAM lParam)
 {
 	if ((nID & 0xFFF0) == IDM_ABOUTBOX)
@@ -574,8 +581,6 @@ void CWorkersRightsComputerDlg::OnInputChange(bool bJustLoaded)
 		return;
 	ubInChange = true;
 
-
-
 	gHolidaysDue.VerifyWorkPeriod(this);
 	if (!bJustLoaded)
 		gHolidaysDue.OnMainDialogChange(this);
@@ -739,6 +744,12 @@ void CWorkersRightsComputerDlg::OnBnClickedCheckLiveIn()
 	gWorkPeriod.mbLiveIn = IsChecked(IDC_CHECK_LIVE_IN);
 	OnInputChange();
 }
+
+void CWorkersRightsComputerDlg::OnBnClickedCheckCaregiver()
+{
+	gWorkPeriod.mbCaregiver = IsChecked(IDC_CHECK_CAREGIVER);
+}
+
 void CWorkersRightsComputerDlg::OnBnClickedButtonPrevYearsHolidays()
 {
 	// Return "holidays" only if it is valid!
@@ -752,4 +763,10 @@ void CWorkersRightsComputerDlg::OnBnClickedButtonPrevYearsHolidays()
 	{
 	}
 	gHolidaysDue.UpdateMainDialog();
+}
+
+void CWorkersRightsComputerDlg::OnBnClickedButtonVacationsPrevYears()
+{
+	CPrevYearsVacationsDlg dlg;
+	dlg.DoModal();
 }

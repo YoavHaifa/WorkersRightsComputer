@@ -197,6 +197,7 @@
     <ClInclude Include="OnOpenDlg.h" />
     <ClInclude Include="Paid.h" />
     <ClInclude Include="PrevYearsHolidaysDlg.h" />
+    <ClInclude Include="PrevYearsVacationsDlg.h" />
     <ClInclude Include="Wage.h" />
     <ClInclude Include="WagePeriod.h" />
     <ClInclude Include="WagePeriodsDlg.h" />
@@ -259,6 +260,7 @@
     <ClCompile Include="OnOpenDlg.cpp" />
     <ClCompile Include="Paid.cpp" />
     <ClCompile Include="PrevYearsHolidaysDlg.cpp" />
+    <ClCompile Include="PrevYearsVacationsDlg.cpp" />
     <ClCompile Include="Wage.cpp" />
     <ClCompile Include="WagePeriod.cpp" />
     <ClCompile Include="WagePeriodsDlg.cpp" />

@@ -13,7 +13,7 @@
 IMPLEMENT_DYNAMIC(CLetterSavedDlg, CDialogEx)
 
 CLetterSavedDlg::CLetterSavedDlg(CWnd* pParent /*=nullptr*/)
-	: CMyDialogEx(IDD_DIALOG2, pParent)
+	: CMyDialogEx(IDD_DIALOG_LETTER_SAVED, pParent)
 {
 
 }

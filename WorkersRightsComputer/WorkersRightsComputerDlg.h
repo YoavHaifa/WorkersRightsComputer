@@ -42,6 +42,8 @@ public:
 	afx_msg void OnBnClickedButtonSave();
 	afx_msg void OnBnClickedButtonLoad();
 	bool VerifyThatNotInSave();
+	void OnLoad();
+
 	CEdit mEditFirstName;
 	CEdit mEditFamilyName;
 	CEdit mEditID;
@@ -121,6 +123,8 @@ public:
 	//afx_msg void OnBnClickedCheckPaidRecup();
 	afx_msg void OnBnClickedCheckLiveIn();
 	afx_msg void OnBnClickedButtonPrevYearsHolidays();
+	afx_msg void OnBnClickedCheckCaregiver();
+	afx_msg void OnBnClickedButtonVacationsPrevYears();
 };
 
 extern CWorkersRightsComputerDlg *gpDlg;
