@@ -50,7 +50,7 @@ public:
 	void SaveToXml(class CXMLDump &xmlDump);
 	void LoadFromXml(class CXMLParseNode* pRoot);
 
-	void Restore(FILE *pfRead);
+	//void Restore(FILE *pfRead);
 	CString GetTextSummary();
 	CString GetShortSummary();
 	CString GetDaysText();

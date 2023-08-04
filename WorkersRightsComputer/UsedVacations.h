@@ -6,12 +6,14 @@ public:
 	CUsedVacations();
 	~CUsedVacations();
 
-	void AddVacation(class CVacationUsed *pVacationUsed);
-	void Save(FILE *pfSave);
+	//void AddVacation(class CVacationUsed* pVacationUsed);
+	void AddVacation(class CMyTime &firstDay, CMyTime &lastDay, 
+		bool bMaternity, double nMaternityPaidWeeks, bool bMaternityPension);
+	//void Save(FILE *pfSave);
 	void SaveToXml(class CXMLDump &xmlDump);
 	void LoadFromXml(class CXMLParseNode* pRoot);
 
-	void Restore(FILE *pfRead);
+	//void Restore(FILE *pfRead);
 	bool IsEmpty(void) { return mVacationsUsed.IsEmpty(); }
 
 	CList<class CVacationUsed*, class CVacationUsed*> mVacationsUsed;

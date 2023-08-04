@@ -4,13 +4,19 @@
 class CVacationUsed
 {
 public:
-	CVacationUsed(CMyTime firstDay, CMyTime lastDay);
+	CVacationUsed(CMyTime &firstDay, CMyTime &lastDay);
 	~CVacationUsed();
+
+	virtual void SaveToXml(class CXMLDump& xmlDump);
+	virtual CString GetText();
+	virtual void ShortLog(FILE* pf, bool bNewLine = true);
+	virtual void LongLog(FILE* pf);
+
+	bool mbIsMaternityLeave;
 
 	CMyTime mFirstDay;
 	CMyTime mFirstDayUnpaid;
 	CMyTime mLastDay;
-	CString GetText();
 	int mnDays;
 	int mnWorkDays;
 	void Compute();
@@ -18,8 +24,6 @@ public:
 	int mnUnPaid;
 	int mnUnpaidCalendarDays;
 	int mnUnpaidUsedForSeverance;
-	void ShortLog(FILE *pf);
-	void LongLog(FILE *pf);
 	void SetPartiallyPaid(int nPaidDays);
 
 	int CountDaysOfUnpaidVacation(CMyTime& first, CMyTime& last);

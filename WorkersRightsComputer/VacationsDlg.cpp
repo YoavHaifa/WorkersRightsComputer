@@ -17,6 +17,7 @@ IMPLEMENT_DYNAMIC(CVacationsDlg, CDialogEx)
 
 CVacationsDlg::CVacationsDlg(CWnd* pParent /*=nullptr*/)
 	: CMyDialogEx(IDD_DIALOG_VACATIONS, pParent)
+	, mnCurrentWeeks(30)
 {
 
 }
@@ -30,6 +31,9 @@ void CVacationsDlg::DoDataExchange(CDataExchange* pDX)
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_DATETIMEPICKER_VAC_START, mEditFirstDay);
 	DDX_Control(pDX, IDC_DATETIMEPICKER_VAC_END, mEditLastDay);
+	DDX_Control(pDX, IDC_CHECK_MATERNITY, mIsMaternityLeave);
+	DDX_Control(pDX, IDC_EDIT_MATERNITY_N_PAID_WEEKS, mnPaidMLWeeks);
+	DDX_Control(pDX, IDC_CHECK_MATERNITY_PENSION, mDeservesPension);
 }
 
 
@@ -38,6 +42,7 @@ BEGIN_MESSAGE_MAP(CVacationsDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_VAC_CLEAR_LAST, &CVacationsDlg::OnBnClickedButtonVacClearLast)
 	ON_BN_CLICKED(IDC_BUTTON_VAC_CLEAR, &CVacationsDlg::OnBnClickedButtonVacClear)
 	ON_BN_CLICKED(IDC_CHECK_14DAYS_VAC4SEVRANCE, &CVacationsDlg::OnBnClickedCheck14daysVac4sevrance)
+	ON_BN_CLICKED(IDC_CHECK_MATERNITY, &CVacationsDlg::OnBnClickedCheckMaternity)
 END_MESSAGE_MAP()
 
 BOOL CVacationsDlg::OnInitDialog()
@@ -48,8 +53,22 @@ BOOL CVacationsDlg::OnInitDialog()
 		SetCheck(IDC_CHECK_14DAYS_VAC4SEVRANCE, true);
 
 	UpdateText();
+	SetMaternityLeave(false);
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
+}
+
+void CVacationsDlg::SetMaternityLeave(bool bMaternityLeave)
+{
+	SetCheck(IDC_CHECK_MATERNITY, bMaternityLeave);
+	SetVisible(IDC_STATIC_MATERNITY_TEXT, bMaternityLeave);
+	SetVisible(IDC_EDIT_MATERNITY_N_PAID_WEEKS, bMaternityLeave);
+	SetVisible(IDC_CHECK_MATERNITY_PENSION, bMaternityLeave);
+	if (bMaternityLeave)
+	{
+		SetParameter(IDC_EDIT_MATERNITY_N_PAID_WEEKS, 15);
+		SetCheck(IDC_CHECK_MATERNITY_PENSION, false);
+	}
 }
 
 // CVacationsDlg message handlers
@@ -80,9 +99,18 @@ void CVacationsDlg::OnBnClickedButtonVacAdd()
 		return;
 	}
 
-	CVacationUsed *pVac = new CVacationUsed(mStart, mEnd);
-	gUsedVacations.AddVacation(pVac);
+	//CVacationUsed *pVac = new CVacationUsed(mStart, mEnd);
+	bool bMaternity = IsChecked(IDC_CHECK_MATERNITY);
+	double nPaidWeeks = 0;
+	bool bMaternityPension = false;
+	if (bMaternity)
+	{
+		GetParameter(IDC_EDIT_MATERNITY_N_PAID_WEEKS, nPaidWeeks, 0, mnCurrentWeeks);
+		bMaternityPension = IsChecked(IDC_CHECK_MATERNITY_PENSION);
+	}
+	gUsedVacations.AddVacation(mStart, mEnd, bMaternity, nPaidWeeks, bMaternityPension);
 	UpdateText();
+	SetMaternityLeave(false);
 }
 void CVacationsDlg::UpdateText()
 {
@@ -103,4 +131,11 @@ void CVacationsDlg::OnBnClickedCheck14daysVac4sevrance()
 {
 	gUsedVacations.mbAdd14DaysUnpaidVacation4Severance = IsChecked(IDC_CHECK_14DAYS_VAC4SEVRANCE);
 	UpdateText();
+}
+
+
+void CVacationsDlg::OnBnClickedCheckMaternity()
+{
+	bool bMaternity = IsChecked(IDC_CHECK_MATERNITY);
+	SetMaternityLeave(bMaternity);
 }

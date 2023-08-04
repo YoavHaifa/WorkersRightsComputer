@@ -57,5 +57,6 @@ private:
 	double mMonthlyWage;
 	double mHourlyWage;
 	double mnHoursPerMonth;
+	double mMonthlyBonus;
 };
 

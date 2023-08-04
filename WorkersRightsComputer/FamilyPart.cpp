@@ -266,6 +266,7 @@ void CFamilyPart::Save(FILE *pfSave)
 
 	fwprintf(pfSave, L"EndFamilyPart\n");
 }
+/*
 void CFamilyPart::Restore(FILE *pfRead)
 {
 	Clear();
@@ -283,7 +284,7 @@ void CFamilyPart::Restore(FILE *pfRead)
 		mbAskOnlyForFamilyPart = true;
 		s = CUtils::ReadLine(pfRead); // read last line
 	}
-}
+}*/
 void CFamilyPart::WriteToLetter(CHtmlWriter &writer)
 {
 	writer.StartParagraph();

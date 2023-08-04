@@ -93,7 +93,7 @@ public:
 	void LoadFromXml(class CXMLParseNode* pRoot);
 
 	void Save(FILE *pfSave);
-	void Restore(FILE *pfRead);
+	//void Restore(FILE *pfRead);
 	void WriteToLetter(class CHtmlWriter &writer);
 
 private:

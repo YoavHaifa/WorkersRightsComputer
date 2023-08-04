@@ -17,13 +17,10 @@
 #include "WagePeriodsDlg.h"
 #include "Wage.h"
 
-
-// CWorkPeriodDlg dialog
-
 IMPLEMENT_DYNAMIC(CWorkPeriodDlg, CDialogEx)
 
 CWorkPeriodDlg::CWorkPeriodDlg(CWnd* pParent /*=nullptr*/)
-	: CMyDialogEx(IDD_DIALOG_WORK_PERIOD, pParent)
+	: CWageDefBaseDlg(IDD_DIALOG_WORK_PERIOD, pParent)
 {
 	mapCheckDays[0] = &mCheckSunday;
 	mapCheckDays[1] = &mCheckMonday;
@@ -86,6 +83,7 @@ BEGIN_MESSAGE_MAP(CWorkPeriodDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_EDIT_WAGE, &CWorkPeriodDlg::OnBnClickedButtonEditWage)
 	ON_BN_CLICKED(IDC_RADIO_DIFF_WAGES, &CWorkPeriodDlg::OnBnClickedRadioDiffWages)
 	ON_BN_CLICKED(IDC_BUTTON_SET_WAGE, &CWorkPeriodDlg::OnBnClickedButtonSetWage)
+	ON_BN_CLICKED(IDC_CHECK_MONTHLY_BONUS, &CWorkPeriodDlg::OnBnClickedCheckMonthlyBonus)
 END_MESSAGE_MAP()
 
 void CWorkPeriodDlg::SetWageGui()
@@ -126,17 +124,11 @@ void CWorkPeriodDlg::SetWageGui()
 
 BOOL CWorkPeriodDlg::OnInitDialog()
 {
-	CDialogEx::OnInitDialog();
+	CWageDefBaseDlg::OnInitDialog();
+
 	mMonthlySalary.EnableWindow(FALSE);
 	mHourlySalary.EnableWindow(FALSE);
 	mHoursPerWeek.EnableWindow(FALSE);
-
-	if (gWorkPeriod.mbCaregiver)
-	{
-		SetInvisible(IDC_RADIO_HOURLY);
-		SetInvisible(IDC_STATIC_HOURLY_TEXT);
-		//mRadioHourly.EnableWindow(FALSE);
-	}
 
 	if (gWorkPeriod.mFirst.mbInitialized)
 	{
@@ -564,4 +556,11 @@ bool CWorkPeriodDlg::SetWageForWholePeriod()
 		return false;
 	}
 	return true;
+}
+
+void CWorkPeriodDlg::OnBnClickedCheckMonthlyBonus()
+{
+	bool bMonthly = IsChecked(IDC_CHECK_MONTHLY_BONUS);
+	SetVisible(IDC_STATIC_MONTHLY_BONUS_TEXT, bMonthly);
+	SetVisible(IDC_EDIT_MONTHLY_BONUS, bMonthly);
 }

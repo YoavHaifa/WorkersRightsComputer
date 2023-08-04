@@ -5,9 +5,10 @@
 #include "VacationTable.h"
 #include "MonthInfo.h"
 #include "WorkYear.h"
+#include "XMLDump.h"
 
 
-CVacationUsed::CVacationUsed(CMyTime firstDay, CMyTime lastDay)
+CVacationUsed::CVacationUsed(CMyTime &firstDay, CMyTime &lastDay)
 	: mFirstDay(firstDay)
 	, mLastDay(lastDay)
 	, mnDays(0)
@@ -15,11 +16,17 @@ CVacationUsed::CVacationUsed(CMyTime firstDay, CMyTime lastDay)
 	, mnUnPaid(0)
 	, mnUnpaidCalendarDays(0)
 	, mnUnpaidUsedForSeverance(0)
+	, mbIsMaternityLeave(false)
 {
 	mnDays = firstDay.GetNDaysUntil(mLastDay);
 }
 CVacationUsed::~CVacationUsed()
 {
+}
+void CVacationUsed::SaveToXml(class CXMLDump& xmlDump)
+{
+	xmlDump.Write(L"FirstDay", mFirstDay);
+	xmlDump.Write(L"LastDay", mLastDay);
 }
 CString CVacationUsed::GetText()
 {
@@ -40,10 +47,12 @@ void CVacationUsed::Compute()
 
 	gVacationTable.ComputeNextVacation(*this);
 }
-void CVacationUsed::ShortLog(FILE *pf)
+void CVacationUsed::ShortLog(FILE *pf, bool bNewLine)
 {
-	fprintf(pf, "%d/%d/%d - %d/%d/%d\n",
+	fprintf(pf, "%d/%d/%d - %d/%d/%d",
 		mFirstDay.mDay, mFirstDay.mMonth, mFirstDay.mYear, mLastDay.mDay, mLastDay.mMonth, mLastDay.mYear);
+	if (bNewLine)
+		fprintf(pf, "\n");
 }
 void CVacationUsed::LongLog(FILE *pf)
 {

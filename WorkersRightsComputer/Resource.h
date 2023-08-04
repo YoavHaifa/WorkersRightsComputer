@@ -20,7 +20,7 @@
 #define IDD_DIALOG_LETTER_SAVED         144
 #define IDD_DIALOG_PREV_HOLIDAYS        146
 #define IDD_DIALOG_COMMENTS             148
-#define IDD_DIALOG_PREV_YEARS_VACATIONS                     152
+#define IDD_DIALOG_PREV_YEARS_VACATIONS 152
 #define IDC_WORK_PERIOD                 1000
 #define IDC_DATETIMEPICKER_START        1001
 #define IDC_EMPLOYER                    1001
@@ -47,6 +47,8 @@
 #define IDC_EDIT_HOURS_PER_MONTH        1019
 #define IDC_STATIC_PERIOD               1020
 #define IDC_BUTTON_SAVE                 1021
+#define IDC_EDIT_MONTH_SALARY2          1021
+#define IDC_EDIT_MONTHLY_BONUS          1021
 #define IDC_BUTTON_LOAD                 1022
 #define IDC_BUTTON_RESET                1023
 #define IDC_EDIT_FIRST_NAME             1024
@@ -122,11 +124,13 @@
 #define IDC_EDIT_SAVE_DIR               1093
 #define IDC_EDIT_COMMENT1               1093
 #define IDC_EDIT_LAST_YEAR_VACATION_DAYS 1093
+#define IDC_EDIT_MATERNITY_N_PAID_WEEKS 1093
 #define IDC_EDIT_COMMENT2               1094
 #define IDC_EDIT_COMMENT2_              1094
 #define IDC_CHECK2                      1095
 #define IDC_CHECK_PAID_RECUP            1095
 #define IDC_EDIT_COMMENT3               1095
+#define IDC_CHECK_MATERNITY_PENSION     1095
 #define IDC_RADIO_DIFF_WAGES            1096
 #define IDC_BUTTON_DEFINE_DIR           1097
 #define IDC_BUTTON_EDIT_WAGE            1097
@@ -138,6 +142,7 @@
 #define IDC_CHECK_LIVE_IN               1100
 #define IDC_CHECK_DISPLAY_COMMENTS      1100
 #define IDC_CHECK_MATERNITY             1100
+#define IDC_CHECK_MONTHLY_BONUS         1100
 #define IDC_EDIT_CONTACT_TEL            1101
 #define IDC_CHECK_LIVE_IN2              1101
 #define IDC_CHECK_CAREGIVER             1101
@@ -206,6 +211,9 @@
 #define IDC_RADIO_LAST_YEAR_VACATION_NONE 1167
 #define IDC_STATIC_HOURLY_TEXT          1168
 #define IDC_BUTTON_VACATIONS_PREV_YEARS 1169
+#define IDC_STATIC_N_VACATION_WEEKS     1170
+#define IDC_STATIC_MATERNITY_TEXT       1171
+#define IDC_STATIC_MONTHLY_BONUS_TEXT   1172
 #define ID_FILE_EXIT                    32771
 #define ID_COMPUTE_ALL                  32772
 #define ID_FILE_LOAD                    32773
@@ -224,7 +232,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        154
 #define _APS_NEXT_COMMAND_VALUE         32782
-#define _APS_NEXT_CONTROL_VALUE         1170
+#define _APS_NEXT_CONTROL_VALUE         1173
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

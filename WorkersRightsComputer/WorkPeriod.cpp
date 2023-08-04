@@ -329,6 +329,7 @@ void CWorkPeriod::LoadFromXml(class CXMLParseNode* pRoot)
 
 	Compute(L"LoadFromXml2");
 }
+/*
 void CWorkPeriod::Restore(FILE *pfRead)
 {
 	mFirst.Read(pfRead);
@@ -360,7 +361,7 @@ void CWorkPeriod::Restore(FILE *pfRead)
 	if (s == "FamilyPart")
 		gFamilyPart.Restore(pfRead);
 	gWorkPeriod.Compute();
-}
+}*/
 CString CWorkPeriod::GetShortSummary()
 {
 	CString s(L"Work period: ");

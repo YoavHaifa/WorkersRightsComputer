@@ -4,6 +4,7 @@
 #include "Utils.h"
 #include "VacationsDlg.h"
 #include "VacationUsed.h"
+#include "MaternityLeave.h"
 #include "VacationTable.h"
 #include "XMLDump.h"
 #include "HtmlWriter.h"
@@ -23,8 +24,15 @@ CUsedVacations::~CUsedVacations()
 {
 	ClearAllVacations();
 }
-void CUsedVacations::AddVacation(class CVacationUsed *pNewVacation)
+void CUsedVacations::AddVacation(CMyTime& firstDay, CMyTime& lastDay,
+	bool bMaternity, double nMaternityPaidWeeks, bool bMaternityPension)
 {
+	CVacationUsed* pNewVacation = NULL;
+	if (bMaternity)
+		pNewVacation = new CMaternityLeave(firstDay, lastDay, nMaternityPaidWeeks, bMaternityPension);
+	else
+		pNewVacation = new CVacationUsed(firstDay, lastDay);
+
 	bool bCopyRest = false;
 	CVacationUsed *pPrevVac = NULL;
 	POSITION pos = mVacationsUsed.GetHeadPosition();
@@ -130,8 +138,7 @@ void CUsedVacations::SaveToXml(CXMLDump &xmlDump)
 	{
 		CVacationUsed *pVac = mVacationsUsed.GetNext(pos);
 		CXMLDumpScope scope1(L"Vacation", xmlDump);
-		xmlDump.Write(L"FirstDay", pVac->mFirstDay);
-		xmlDump.Write(L"LastDay", pVac->mLastDay);
+		pVac->SaveToXml(xmlDump);
 	}
 	xmlDump.Write(L"bAdd14DaysUnpaidVacation4Severance", mbAdd14DaysUnpaidVacation4Severance);
 }
@@ -150,14 +157,22 @@ void CUsedVacations::LoadFromXml(CXMLParseNode* pRoot)
 		{
 			if (pVacation->GetValue(L"LastDay", last))
 			{
-				CVacationUsed* pVac = new CVacationUsed(first, last);
-				AddVacation(pVac);
+				bool bMaternity = false;
+				bool bMaternityPension = false;
+				double nMaternityPaidWeeks = 0;
+				if (pVacation->GetValue(L"b_maternity", bMaternity) && bMaternity)
+				{
+					pVacation->GetValue(L"b_maternity_paid_weeks", nMaternityPaidWeeks);
+					pVacation->GetValue(L"b_maternity_pension", bMaternityPension);
+				}
+				AddVacation(first, last, bMaternity, nMaternityPaidWeeks, bMaternityPension);
 			}
 		}
 		pVacation = pMain->GetNext(L"Vacation", pVacation);
 	}
 	pMain->GetValue(L"bAdd14DaysUnpaidVacation4Severance", mbAdd14DaysUnpaidVacation4Severance);
 }
+/*
 void CUsedVacations::Save(FILE *pfSave)
 {
 	if (mVacationsUsed.GetSize() < 1)
@@ -177,7 +192,8 @@ void CUsedVacations::Save(FILE *pfSave)
 		fprintf(pfSave, "mbAdd14DaysUnpaidVacation4Severance\n");
 
 	fwprintf(pfSave, L"EndVacations\n");
-}
+}*/
+/*
 void CUsedVacations::Restore(FILE *pfRead)
 {
 	ClearAllVacations();
@@ -198,7 +214,7 @@ void CUsedVacations::Restore(FILE *pfRead)
 		s = CUtils::ReadLine(pfRead);
 	}
 	Compute();
-}
+}*/
 void CUsedVacations::Compute()
 {
 	if (!gWorkPeriod.IsValid())

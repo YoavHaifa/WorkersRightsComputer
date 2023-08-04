@@ -26,6 +26,7 @@ CWagePeriod::CWagePeriod(EWageMode eMode)
 	, mMonthlyWage(0)
 	, mHourlyWage(0)
 	, mnHoursPerMonth(0)
+	, mMonthlyBonus(0)
 	, mId(umNewId++)
 {
 	static int un = 0;
@@ -38,6 +39,7 @@ CWagePeriod::CWagePeriod(EWageMode eMode, const CMyTime& first, const CMyTime& l
 	, mMonthlyWage(0)
 	, mHourlyWage(0)
 	, mnHoursPerMonth(0)
+	, mMonthlyBonus(0)
 	, mId(umNewId++)
 {
 	if (meMode == WAGE_MONTHLY)
@@ -91,6 +93,7 @@ CWagePeriod::CWagePeriod(CXMLParseNode* pNode)
 		bError = true;
 		sError = "Failed to find mode for wage period";
 	}
+	pNode->GetValue(L"monthly_bonus", mMonthlyBonus);
 
 	if (!bError)
 	{
@@ -115,6 +118,7 @@ void CWagePeriod::Copy(const CWagePeriod& other)
 	mMonthlyWage = other.mMonthlyWage;
 	mHourlyWage = other.mHourlyWage;
 	mnHoursPerMonth = other.mnHoursPerMonth;
+	mMonthlyBonus = other.mMonthlyBonus;
 }
 void CWagePeriod::SetFirst()
 {
@@ -143,6 +147,8 @@ void CWagePeriod::SaveToXml(class CXMLDump& xmlDump)
 	default:
 		break;
 	}
+	if (mMonthlyBonus > 0)
+		xmlDump.Write(L"monthly_bonus", mMonthlyBonus);
 }
 CString CWagePeriod::GetSMode()
 {

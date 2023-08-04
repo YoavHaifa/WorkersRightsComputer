@@ -40,7 +40,7 @@ public:
 	bool ClearAndDisable(int id);
 	bool SetAndEnable(int id, const wchar_t* zText);
 	bool SetInvisible(int id);
-	bool SetVisible(int id);
+	bool SetVisible(int id, bool flag = true);
 
 private:
 	//void OnUserCrash(CString &sText);

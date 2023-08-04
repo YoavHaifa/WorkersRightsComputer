@@ -288,8 +288,11 @@ bool CMyDialogEx::SetInvisible(int id)
 	pWnd->ShowWindow(SW_HIDE);
 	return true;
 }
-bool CMyDialogEx::SetVisible(int id)
+bool CMyDialogEx::SetVisible(int id, bool flag)
 {
+	if (!flag)
+		return SetInvisible(id);
+
 	CWnd* pWnd = GetDlgItem(id);
 	if (!pWnd)
 		return false;

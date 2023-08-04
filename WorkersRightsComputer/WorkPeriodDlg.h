@@ -1,10 +1,11 @@
 #pragma once
-#include "MyDialogEx.h"
+//#include "MyDialogEx.h"
+#include "WageDefBaseDlg.h"
 
 
 // CWorkPeriodDlg dialog
 
-class CWorkPeriodDlg : public CMyDialogEx
+class CWorkPeriodDlg : public CWageDefBaseDlg
 {
 	DECLARE_DYNAMIC(CWorkPeriodDlg)
 
@@ -82,4 +83,5 @@ public:
 	afx_msg void OnBnClickedButtonEditWage();
 	afx_msg void OnBnClickedRadioDiffWages();
 	afx_msg void OnBnClickedButtonSetWage();
+	afx_msg void OnBnClickedCheckMonthlyBonus();
 };
