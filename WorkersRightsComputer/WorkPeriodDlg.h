@@ -2,7 +2,6 @@
 //#include "MyDialogEx.h"
 #include "WageDefBaseDlg.h"
 
-
 // CWorkPeriodDlg dialog
 
 class CWorkPeriodDlg : public CWageDefBaseDlg

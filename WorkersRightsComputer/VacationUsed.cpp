@@ -34,11 +34,14 @@ CString CVacationUsed::GetText()
 	s += " - ";
 	s += mLastDay.ToString();
 	s += ",  ";
-	s += CRight::ToString(mnWorkDays);
-	s += " / ";
-	s += CRight::ToString(mnDays);
-	s += " Working Days, Unpaid ";
-	s += CRight::ToString(mnUnPaid);
+	if (!mbIsMaternityLeave)
+	{
+		s += CRight::ToString(mnWorkDays);
+		s += " / ";
+		s += CRight::ToString(mnDays);
+		s += " Working Days, Unpaid ";
+		s += CRight::ToString(mnUnPaid);
+	}
 	return s;
 }
 void CVacationUsed::Compute()

@@ -14,6 +14,7 @@ public:
 
 private:
 	int mnPaidWeeks;
+	double mnWeeks;
 	bool mbPaidWeeksDeservePension;
 };
 

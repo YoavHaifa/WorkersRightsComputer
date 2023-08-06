@@ -180,7 +180,9 @@ void CVacationsDlg::OnDtnDatetimechangeDatetimepickerVacStart(NMHDR* pNMHDR, LRE
 	mStart.SetDate(time);
 	if (!mbStartSet)
 	{
-		mEditLastDay.SetTime(&time);
+		CTime time1;
+		mEditFirstDay.GetTime(time1);
+		mEditLastDay.SetTime(&time1);
 		SetVisible(IDC_DATETIMEPICKER_VAC_END);
 	}
 	mbStartSet = true;

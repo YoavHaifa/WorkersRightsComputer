@@ -9,6 +9,7 @@ CMaternityLeave::CMaternityLeave(CMyTime firstDay, CMyTime lastDay,
 	, mnPaidWeeks(nPaidWeeks)
 	, mbPaidWeeksDeservePension(bPaidWeeksDeservePension)
 {
+	mnWeeks = firstDay.GetNWeeksUntil(lastDay);
 	mbIsMaternityLeave = true;
 }
 
@@ -24,23 +25,25 @@ void CMaternityLeave::SaveToXml(class CXMLDump& xmlDump)
 CString CMaternityLeave::GetText()
 {
 	CString s(CVacationUsed::GetText());
-	s += "\r\nMaternity: Paid ";
+	s += "Maternity: Paid ";
 	s += CRight::ToString(mnPaidWeeks);
+	s += " / ";
+	s += CRight::ToString(mnWeeks);
 	s += " weeks. ";
 	if (mnPaidWeeks > 0)
 	{
 		if (mbPaidWeeksDeservePension)
-			s += "Paid weeks desserve pension.";
+			s += " + pension";
 		else
-			s += "Paid weeks do not desserve pension.";
+			s += " no pension";
 	}
 	return s;
 }
 void CMaternityLeave::ShortLog(FILE* pf)
 {
 	CVacationUsed::ShortLog(pf, false);
-	fprintf(pf, " Maternity Leave - %.2f weeks paid, Pension: %s\n",
-		mnPaidWeeks, mbPaidWeeksDeservePension ? "Yes" : "No");
+	fprintf(pf, " Maternity Leave - %d / %.2f weeks paid, Pension: %s\n",
+		mnPaidWeeks, mnWeeks, mbPaidWeeksDeservePension ? "Yes" : "No");
 }
 void CMaternityLeave::LongLog(FILE* pf)
 {

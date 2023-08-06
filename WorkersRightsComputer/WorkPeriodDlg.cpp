@@ -121,7 +121,6 @@ void CWorkPeriodDlg::SetWageGui()
 		Disable(IDC_BUTTON_SET_WAGE);
 	}
 }
-
 BOOL CWorkPeriodDlg::OnInitDialog()
 {
 	CWageDefBaseDlg::OnInitDialog();
@@ -145,7 +144,7 @@ BOOL CWorkPeriodDlg::OnInitDialog()
 	{
 		mbEndSet = true;
 		mEndDate.SetTime(&gWorkPeriod.mLast.mTime);
-		SetInvisible(IDC_DATETIMEPICKER_END);
+		SetVisible(IDC_DATETIMEPICKER_END);
 	}
 	else
 	{
@@ -175,13 +174,13 @@ BOOL CWorkPeriodDlg::OnInitDialog()
 }
 // CWorkPeriodDlg message handlers
 
-
 void CWorkPeriodDlg::OnDtnDatetimechangeDatetimepickerStart(NMHDR * /*pNMHDR*/, LRESULT *pResult)
 {
 	//LPNMDATETIMECHANGE pDTChange = reinterpret_cast<LPNMDATETIMECHANGE>(pNMHDR);
 	mbStartSet = true;
 	UpdateText();
 	*pResult = 0;
+	SetVisible(IDC_DATETIMEPICKER_END);
 }
 
 void CWorkPeriodDlg::OnDtnDatetimechangeDatetimepickerEnd(NMHDR * /*pNMHDR*/, LRESULT *pResult)
@@ -190,6 +189,13 @@ void CWorkPeriodDlg::OnDtnDatetimechangeDatetimepickerEnd(NMHDR * /*pNMHDR*/, LR
 	mbEndSet = true;
 	UpdateText();
 	*pResult = 0;
+	SetVisible(IDC_DATETIMEPICKER_NOTICE);
+	if (!mbNoticeSet)
+	{
+		CTime time;
+		mEndDate.GetTime(time);
+		mNoticeDate.SetTime(&time);
+	}
 }
 
 void CWorkPeriodDlg::OnDtnDatetimechangeDatetimepickerNotice(NMHDR * /*pNMHDR*/, LRESULT *pResult)

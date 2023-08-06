@@ -54,6 +54,7 @@ public:
 // Implementation
 protected:
 	DECLARE_MESSAGE_MAP()
+public:
 };
 
 CAboutDlg::CAboutDlg() : CDialogEx(IDD_ABOUTBOX)
@@ -776,3 +777,4 @@ void CWorkersRightsComputerDlg::OnBnClickedButtonVacationsPrevYears()
 	CPrevYearsVacationsDlg dlg;
 	dlg.DoModal();
 }
+
