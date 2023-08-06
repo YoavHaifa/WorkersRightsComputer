@@ -5,7 +5,7 @@ class CMaternityLeave : public CVacationUsed
 {
 public:
 	CMaternityLeave(CMyTime firstDay, CMyTime lastDay, 
-		double nPaidWeeks, bool bPaidWeeksDeservePension);
+		int nPaidWeeks, bool bPaidWeeksDeservePension);
 
 	virtual void SaveToXml(class CXMLDump& xmlDump);
 	virtual CString GetText();
@@ -13,7 +13,7 @@ public:
 	virtual void LongLog(FILE* pf);
 
 private:
-	double mnPaidWeeks;
+	int mnPaidWeeks;
 	bool mbPaidWeeksDeservePension;
 };
 

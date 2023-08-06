@@ -195,9 +195,9 @@ BEGIN_MESSAGE_MAP(CWorkersRightsComputerDlg, CDialogEx)
 	ON_COMMAND(ID_TEST_LOADXML, &CWorkersRightsComputerDlg::OnTestLoadxml)
 	ON_COMMAND(ID_TEST_LOADTXT, &CWorkersRightsComputerDlg::OnTestLoadtxt)
 	//ON_BN_CLICKED(IDC_CHECK_PAID_VACATION, &CWorkersRightsComputerDlg::OnBnClickedCheckPaidVacation)
-	ON_BN_CLICKED(IDC_RADIO_ALL_LAST_YEAR_VACATION, &CWorkersRightsComputerDlg::OnInputChange)
-	ON_BN_CLICKED(IDC_RADIO_LAST_YEAR_VACATION_DAYS, &CWorkersRightsComputerDlg::OnInputChange)
-	ON_BN_CLICKED(IDC_RADIO_LAST_YEAR_VACATION_NONE, &CWorkersRightsComputerDlg::OnInputChange)
+	ON_BN_CLICKED(IDC_RADIO_ALL_LAST_YEAR_VACATION, &CWorkersRightsComputerDlg::OnRadioPaidVacationForLastYearChange)
+	ON_BN_CLICKED(IDC_RADIO_LAST_YEAR_VACATION_DAYS, &CWorkersRightsComputerDlg::OnRadioPaidVacationForLastYearChange)
+	ON_BN_CLICKED(IDC_RADIO_LAST_YEAR_VACATION_NONE, &CWorkersRightsComputerDlg::OnRadioPaidVacationForLastYearChange)
 	ON_EN_CHANGE(IDC_EDIT_LAST_YEAR_VACATION_DAYS, &CWorkersRightsComputerDlg::OnInputChange)
 	ON_BN_CLICKED(IDC_CHECK_PAID_RECUP, &CWorkersRightsComputerDlg::OnInputChange)
 	ON_BN_CLICKED(IDC_CHECK_LIVE_IN, &CWorkersRightsComputerDlg::OnBnClickedCheckLiveIn)
@@ -587,6 +587,12 @@ void CWorkersRightsComputerDlg::OnInputChange(bool bJustLoaded)
 
 	gAllRights.Compute();
 	ubInChange = false;
+}
+void CWorkersRightsComputerDlg::OnRadioPaidVacationForLastYearChange()
+{
+	if (!IsChecked(IDC_RADIO_LAST_YEAR_VACATION_DAYS))
+		Clear(IDC_EDIT_LAST_YEAR_VACATION_DAYS);
+	OnInputChange();
 }
 DWORD WINAPI CWorkersRightsComputerDlg::StaticThreadFunc(LPVOID)
 {

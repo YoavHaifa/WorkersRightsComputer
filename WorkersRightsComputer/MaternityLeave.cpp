@@ -4,7 +4,7 @@
 #include "Right.h"
 
 CMaternityLeave::CMaternityLeave(CMyTime firstDay, CMyTime lastDay,
-	double nPaidWeeks, bool bPaidWeeksDeservePension)
+	int nPaidWeeks, bool bPaidWeeksDeservePension)
 	: CVacationUsed(firstDay, lastDay)
 	, mnPaidWeeks(nPaidWeeks)
 	, mbPaidWeeksDeservePension(bPaidWeeksDeservePension)
@@ -17,7 +17,7 @@ void CMaternityLeave::SaveToXml(class CXMLDump& xmlDump)
 	CVacationUsed::SaveToXml(xmlDump);
 
 	xmlDump.Write(L"b_maternity", mbIsMaternityLeave);
-	xmlDump.Write(L"b_maternity_paid_weeks", mnPaidWeeks);
+	xmlDump.Write(L"n_maternity_paid_weeks", mnPaidWeeks);
 	xmlDump.Write(L"b_maternity_pension", mbPaidWeeksDeservePension);
 }
 

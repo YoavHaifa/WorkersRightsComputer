@@ -25,7 +25,7 @@ CUsedVacations::~CUsedVacations()
 	ClearAllVacations();
 }
 void CUsedVacations::AddVacation(CMyTime& firstDay, CMyTime& lastDay,
-	bool bMaternity, double nMaternityPaidWeeks, bool bMaternityPension)
+	bool bMaternity, int nMaternityPaidWeeks, bool bMaternityPension)
 {
 	CVacationUsed* pNewVacation = NULL;
 	if (bMaternity)
@@ -159,10 +159,10 @@ void CUsedVacations::LoadFromXml(CXMLParseNode* pRoot)
 			{
 				bool bMaternity = false;
 				bool bMaternityPension = false;
-				double nMaternityPaidWeeks = 0;
+				int nMaternityPaidWeeks = 0;
 				if (pVacation->GetValue(L"b_maternity", bMaternity) && bMaternity)
 				{
-					pVacation->GetValue(L"b_maternity_paid_weeks", nMaternityPaidWeeks);
+					pVacation->GetValue(L"n_maternity_paid_weeks", nMaternityPaidWeeks);
 					pVacation->GetValue(L"b_maternity_pension", bMaternityPension);
 				}
 				AddVacation(first, last, bMaternity, nMaternityPaidWeeks, bMaternityPension);
@@ -172,49 +172,6 @@ void CUsedVacations::LoadFromXml(CXMLParseNode* pRoot)
 	}
 	pMain->GetValue(L"bAdd14DaysUnpaidVacation4Severance", mbAdd14DaysUnpaidVacation4Severance);
 }
-/*
-void CUsedVacations::Save(FILE *pfSave)
-{
-	if (mVacationsUsed.GetSize() < 1)
-		return;
-
-	fwprintf(pfSave, L"Vacations\n");
-
-	POSITION pos = mVacationsUsed.GetHeadPosition();
-	while (pos)
-	{
-		CVacationUsed *pVac = mVacationsUsed.GetNext(pos);
-		fwprintf(pfSave, L"Vacation\n");
-		pVac->mFirstDay.Write(pfSave);
-		pVac->mLastDay.Write(pfSave);
-	}
-	if (mbAdd14DaysUnpaidVacation4Severance)
-		fprintf(pfSave, "mbAdd14DaysUnpaidVacation4Severance\n");
-
-	fwprintf(pfSave, L"EndVacations\n");
-}*/
-/*
-void CUsedVacations::Restore(FILE *pfRead)
-{
-	ClearAllVacations();
-	CString s = CUtils::ReadLine(pfRead);
-	while (s == "Vacation")
-	{
-		CMyTime mFirst;
-		CMyTime mLast;
-		mFirst.Read(pfRead);
-		mLast.Read(pfRead);
-		CVacationUsed *pVac = new CVacationUsed(mFirst, mLast);
-		AddVacation(pVac);
-		s = CUtils::ReadLine(pfRead);
-	}
-	if (s == "mbAdd14DaysUnpaidVacation4Severance")
-	{
-		mbAdd14DaysUnpaidVacation4Severance = true;
-		s = CUtils::ReadLine(pfRead);
-	}
-	Compute();
-}*/
 void CUsedVacations::Compute()
 {
 	if (!gWorkPeriod.IsValid())

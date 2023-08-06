@@ -94,6 +94,7 @@ public:
 	//afx_msg void OnFileLoadoldcase();
 	void OnInputChange();
 	void OnInputChange(bool bJustLoaded);
+	void OnRadioPaidVacationForLastYearChange();
 	bool mbDisableComputations;
 	bool mbSaveInProcess;
 	//CEdit mEditPrevNYears;

@@ -50,6 +50,7 @@ public:
 	bool mbInitialized;
 	CString GetShortString();
 	int GetNMonthsBefore(CMyTime& dayAfter, int *pnExtraDays = NULL);
+	double GetNWeeksUntil(CMyTime& lastDay);
 	int GetNDaysUntil(CMyTime& lastDay);
 	int GetNDaysBefore(CMyTime& dayAfter);
 	bool IsWorkingDay();

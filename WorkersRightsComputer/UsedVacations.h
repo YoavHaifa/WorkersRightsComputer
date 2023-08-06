@@ -6,9 +6,8 @@ public:
 	CUsedVacations();
 	~CUsedVacations();
 
-	//void AddVacation(class CVacationUsed* pVacationUsed);
 	void AddVacation(class CMyTime &firstDay, CMyTime &lastDay, 
-		bool bMaternity, double nMaternityPaidWeeks, bool bMaternityPension);
+		bool bMaternity, int nMaternityPaidWeeks, bool bMaternityPension);
 	//void Save(FILE *pfSave);
 	void SaveToXml(class CXMLDump &xmlDump);
 	void LoadFromXml(class CXMLParseNode* pRoot);

@@ -135,15 +135,28 @@ BOOL CWorkPeriodDlg::OnInitDialog()
 		mStartDate.SetTime(&gWorkPeriod.mFirst.mTime);
 		mbStartSet = true;
 	}
+	else
+	{
+		SetInvisible(IDC_DATETIMEPICKER_END);
+		SetInvisible(IDC_DATETIMEPICKER_NOTICE);
+	}
+
 	if (gWorkPeriod.mLast.mbInitialized)
 	{
 		mbEndSet = true;
 		mEndDate.SetTime(&gWorkPeriod.mLast.mTime);
+		SetInvisible(IDC_DATETIMEPICKER_END);
 	}
+	else
+	{
+		SetInvisible(IDC_DATETIMEPICKER_NOTICE);
+	}
+
 	if (gWorkPeriod.mNotice.mbInitialized)
 	{
 		mbNoticeSet = true;
 		mNoticeDate.SetTime(&gWorkPeriod.mNotice.mTime);
+		SetVisible(IDC_DATETIMEPICKER_NOTICE);
 	}
 	SetCheck(IDC_CHECK_NO_NOTICE, gWorkPeriod.mbSkipNotice);
 
@@ -338,6 +351,7 @@ bool CWorkPeriodDlg::UpdateDataFromDialog(void)
 	CTime time;
 	DWORD flags = mStartDate.GetTime(time);
 	gWorkPeriod.mFirst.SetDate(time);
+
 	flags = mEndDate.GetTime(time);
 	gWorkPeriod.mLast.SetDate(time);
 	flags = mNoticeDate.GetTime(time);

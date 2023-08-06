@@ -342,6 +342,12 @@ int CMyTime::GetNDaysUntil(CMyTime &lastDay)
 	//CTimeSpan span = lastDay.mTime - mTime;
 	//return (int)span.GetDays() + 1;
 }
+double CMyTime::GetNWeeksUntil(CMyTime& lastDay)
+{
+	int nDays = GetNDaysUntil(lastDay);
+	double nWeeks = nDays / 7.0;
+	return nWeeks;
+}
 int CMyTime::GetNDaysBefore(CMyTime& dayAfter)
 {
 	return SafeGetDays(*this, dayAfter);
