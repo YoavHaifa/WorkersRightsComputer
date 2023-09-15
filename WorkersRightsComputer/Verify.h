@@ -64,7 +64,6 @@ protected:
 	int mnMissing;
 	bool mbSilentMode;
 	void CheckIfNoticeSet();
-	static bool umbOldTxtFiles;
 };
 
 class CVerifyOld : public CVerify

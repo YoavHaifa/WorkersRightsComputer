@@ -92,3 +92,7 @@ void CWorkSpan::AddUnpaidVacation(CVacationUsed& vacation)
 		fwprintf(mpfLog, L"\n");
 	}
 }
+void CWorkSpan::AddMaternityLeave(class CMaternityLeave& maternityLeave)
+{
+
+}

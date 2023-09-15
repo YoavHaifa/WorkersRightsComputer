@@ -9,6 +9,7 @@ public:
 
 	void Init(CMyTime &firstDay, CMyTime &dayAfter);
 	void AddUnpaidVacation(class CVacationUsed& vacation);
+	void AddMaternityLeave(class CMaternityLeave& maternityLeave);
 	bool ClipByWorkPeriod(void);
 	void ComputeDays(void);
 

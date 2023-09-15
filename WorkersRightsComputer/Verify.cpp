@@ -15,7 +15,6 @@ bool CVerify::umbBreakonDiff = false;
 FILE* CVerify::umpfReport = NULL;
 int CVerify::umiBatch = 0;
 bool CVerify::umbDisplayDiff = false;
-bool CVerify::umbOldTxtFiles = false;
 
 void CVerify::StartVerifyBatch(const wchar_t *zfName)
 {
@@ -36,7 +35,7 @@ DWORD WINAPI CVerify::StaticVerifyBatch(LPVOID)
 	umpfReport = MyFOpenWithErrorBox(sReportFileName, L"w", L"Log");
 
 	CFilesList list;
-	CUtils::ListFilesInDirRecursive(sPath, umbOldTxtFiles ? L"*.txt" : L"*.xml", list);
+	CUtils::ListFilesInDirRecursive(sPath, L"*.xml", list);
 
 	umiBatch = 0;
 	POSITION pos = list.GetHeadPosition();
@@ -50,10 +49,7 @@ DWORD WINAPI CVerify::StaticVerifyBatch(LPVOID)
 			if (umpfReport)
 				fprintf(umpfReport, "%d, ", umiBatch);
 			CVerify* pVerify = NULL;
-			if (umbOldTxtFiles)
-				pVerify = new CVerifyOld((const wchar_t *)*psfName, true);
-			else
-				pVerify = new CVerifyNew((const wchar_t *)*psfName, true);
+			pVerify = new CVerifyNew((const wchar_t *)*psfName, true);
 			bool bSame = pVerify->Verify();
 			pVerify->WriteSummary(pfLog);
 
@@ -102,12 +98,6 @@ CVerify::~CVerify()
 }
 bool CVerify::Verify()
 {
-	if (umbOldTxtFiles)
-	{
-		CRight::umbOldStyle = true;
-		gpPension->CorrectForOldStype();
-	}
-
 	if (!ReadSavedFile())
 		return false;
 

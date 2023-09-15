@@ -2,6 +2,8 @@
 #include "Recuperation.h"
 #include "WorkPeriod.h"
 #include "WorkYears.h"
+#include "YearlyRates.h"
+#include "MonthlyRates.h"
 
 
 CRecuperation::CRecuperation(void)
@@ -13,7 +15,9 @@ CRecuperation::CRecuperation(void)
 	miPrintOrder = 3;
 	Init();
 	mpSeniority = new CSeniority(L"Recuperation");
-	mpRates = new CYearlyRates(L"Recuperation", 1950);
+	//mpRates = new CYearlyRates(L"Recuperation", 1950);
+	//mpRates->SaveMonthlyXmlFile();
+	mpMonthlyRates = new CMonthlyRates(L"Recuperation", 1950);
 }
 bool CRecuperation::SetCheckRef(CButtonRef *pButton)
 {
@@ -98,10 +102,10 @@ bool CRecuperation::Compute(void)
 		mDueDays = lastYearFraction * intDaysPerYear;
 		LogLine(L"N Due Days for last year", mDueDays);
 
-		int rateYear = gWorkPeriod.mLast.mYear;
-		if(gWorkPeriod.mLast.mMonth < MONTH_OF_NEW_RATE)
-			rateYear--;
-		mRate = mpRates->RatePerYear(rateYear);
+		//int rateYear = gWorkPeriod.mLast.mYear;
+		//if(gWorkPeriod.mLast.mMonth < MONTH_OF_NEW_RATE)
+		//	rateYear--;
+		mRate = mpMonthlyRates->RatePerMonth(gWorkPeriod.mLast.mYear, gWorkPeriod.mLast.mMonth);
 
 		mnYearsBack = 0;
 		CString sText;

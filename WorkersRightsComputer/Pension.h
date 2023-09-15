@@ -19,7 +19,8 @@ public:
 	void OnYearEnd(void);
 
 	class CMonthlyRates *mpPensionRates;
-	class CYearlyRates *mpSeveranceRates;
+	//class CYearlyRates* mpSeveranceRates;
+	class CMonthlyRates* mpSeveranceMonthlyRates;
 
 	static const int N_MONTHS_BEFORE_PAY_FROM_2008 = 9;
 	static const int N_MONTHS_BEFORE_PAY_FROM_2009 = 6;
@@ -42,7 +43,6 @@ public:
 
 	bool UpdateStartDateForPension(void);
 	void WriteToLetter(class CHtmlWriter& html);
-	void CorrectForOldStype(void);
 };
 
 extern CPension *gpPension;

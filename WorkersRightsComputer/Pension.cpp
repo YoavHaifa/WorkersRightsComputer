@@ -16,8 +16,14 @@ CPension::CPension(void)
 	: CRight(L"Pension", L"פנסיה")
 {
 	miPrintOrder = 0;
-	mpPensionRates = new CMonthlyRates(L"Pension", 2008);
-	mpSeveranceRates = new CYearlyRates(L"Severance", 2008);
+	mpPensionRates = new CMonthlyRates(L"Pension", 2008); // Load from XML
+	//mpPensionRates->SaveMonthlyXmlFile();
+	//CMonthlyRates *pPensionRatesFromXML = new CMonthlyRates(L"Pension", 2008);
+	//delete pPensionRatesFromXML;
+
+	//mpSeveranceRates = new CYearlyRates(L"Severance", 2008);
+	//mpSeveranceRates->SaveMonthlyXmlFile();
+	mpSeveranceMonthlyRates = new CMonthlyRates(L"Severance", 2008);
 	gpPension = this;
 }
 CPension::~CPension(void)
@@ -149,7 +155,7 @@ void CPension::AddMonth(int year, int month, int nDays /* if 0 - full */, bool b
 	double sevRate = 0;
 	if (mpbEntitledOnlyToSeveranceFund->IsChecked())
 	{
-		sevRate = mpSeveranceRates->RatePerYear(year);
+		sevRate = mpSeveranceMonthlyRates->RatePerMonth(year, month);
 		severanceDue = monthlyPay * sevRate * part;
 		if (gFamilyPart.mbAskOnlyForFamilyPart)
 			severanceDue *= familyPart;
@@ -353,8 +359,4 @@ bool CPension::UpdateStartDateForPension()
 		return true;
 	}
 	return false;
-}
-void CPension::CorrectForOldStype(void)
-{
-	mpPensionRates->CorrectForOldStype();
 }

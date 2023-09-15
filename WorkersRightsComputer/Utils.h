@@ -18,6 +18,7 @@ public:
 	static bool umbInstallationError; 
 	static CString GetBaseDir(void);
 	static void ReportInstallationError(void);
+	static const CString& GetInputPath();
 	static FILE* OpenInputFile(const wchar_t* zName);
 	//static FILE* OpenLogFile(const char* zName);
 

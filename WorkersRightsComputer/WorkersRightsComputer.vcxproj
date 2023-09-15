@@ -247,7 +247,6 @@
     <ClInclude Include="WorkYears.h" />
     <ClInclude Include="XMLDump.h" />
     <ClInclude Include="XMLParse.h" />
-    <ClInclude Include="YearlyRates.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Additional.cpp" />
@@ -315,7 +314,6 @@
     <ClCompile Include="WorkYears.cpp" />
     <ClCompile Include="XMLDump.cpp" />
     <ClCompile Include="XMLParse.cpp" />
-    <ClCompile Include="YearlyRates.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="WorkersRightsComputer.rc" />
