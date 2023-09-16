@@ -216,16 +216,13 @@ int CUsedVacations::CountDaysOfUnpaidVacation(CMyTime& first, CMyTime& last)
 	}
 	return nDays;
 }
-void CUsedVacations::AddToWorkSpan(CWorkSpan& workSpan)
+void CUsedVacations::AddAllVacationsToWorkSpan(CWorkSpan& workSpan)
 {
 	POSITION pos = mVacationsUsed.GetHeadPosition();
 	while (pos)
 	{
 		CVacationUsed *pVac = mVacationsUsed.GetNext(pos);
-		if (pVac->mnUnPaid > 0)
-		{
-			pVac->AddToWorkSpan(workSpan);
-		}
+		pVac->AddToWorkSpan(workSpan);
 	}
 }
 void CUsedVacations::Log()

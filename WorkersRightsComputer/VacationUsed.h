@@ -27,6 +27,6 @@ public:
 	void SetPartiallyPaid(int nPaidDays);
 
 	int CountDaysOfUnpaidVacation(CMyTime& first, CMyTime& last);
-	void AddToWorkSpan(class CWorkSpan& workSpan);
+	virtual void AddToWorkSpan(class CWorkSpan& workSpan);
 };
 

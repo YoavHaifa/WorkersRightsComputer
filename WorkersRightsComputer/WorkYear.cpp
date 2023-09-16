@@ -91,7 +91,7 @@ int CWorkYear::GetNFullMonths(int *pnExtraDays, double* pExtraDaysFraction)
 		if (*pnExtraDays >= mDayAfter.mDay)
 			nDaysInFullMonth = 28;
 	}
-	*pExtraDaysFraction = (double)* pnExtraDays / nDaysInFullMonth;
+	*pExtraDaysFraction = (double)*pnExtraDays / (double)nDaysInFullMonth;
 	return nMonths;
 }
 bool CWorkYear::Contains(CHoliday& holiday)

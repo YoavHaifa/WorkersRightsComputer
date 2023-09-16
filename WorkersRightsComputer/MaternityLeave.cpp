@@ -2,6 +2,7 @@
 #include "MaternityLeave.h"
 #include "XMLDump.h"
 #include "Right.h"
+#include "WorkSpan.h"
 
 CMaternityLeave::CMaternityLeave(CMyTime firstDay, CMyTime lastDay,
 	int nPaidWeeks, bool bPaidWeeksDeservePension)
@@ -12,8 +13,11 @@ CMaternityLeave::CMaternityLeave(CMyTime firstDay, CMyTime lastDay,
 	mnWeeks = firstDay.GetNWeeksUntil(lastDay);
 	mbIsMaternityLeave = true;
 }
-
-void CMaternityLeave::SaveToXml(class CXMLDump& xmlDump)
+void CMaternityLeave::AddToWorkSpan(CWorkSpan& workSpan)
+{
+	workSpan.AddMaternityLeave(*this);
+}
+void CMaternityLeave::SaveToXml(CXMLDump& xmlDump)
 {
 	CVacationUsed::SaveToXml(xmlDump);
 

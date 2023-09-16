@@ -3,6 +3,7 @@
 #include "WorkPeriod.h"
 #include "UsedVacations.h"
 #include "VacationUsed.h"
+#include "MaternityLeave.h"
 #include "Utils.h"
 
 CWorkSpan::CWorkSpan(void)
@@ -34,8 +35,8 @@ void CWorkSpan::Init(CMyTime& firstDay, CMyTime& dayAfter)
 	mbLast = false;
 
 	// Add unpaid vacations
-	gUsedVacations.AddToWorkSpan(*this);
 	ClipByWorkPeriod();
+	gUsedVacations.AddAllVacationsToWorkSpan(*this);
 	ComputeDays();
 }
 bool CWorkSpan::ClipByWorkPeriod(void)
@@ -58,41 +59,44 @@ void CWorkSpan::ComputeDays(void)
 	mnAllCalendarDays = mFirstDay.GetNDaysBefore(mDayAfter);
 	mnPaidCalendarDays = mnAllCalendarDays - mnUnpaidVacationDays;
 }
-void CWorkSpan::AddUnpaidVacation(CVacationUsed& vacation)
+bool CWorkSpan::AddUnpaidVacation(CVacationUsed& vacation)
 {
-	static int count = 0;
-	count++;
+	if (mpfLog)
+	{
+		fwprintf(mpfLog, L"<AddUnpaidVacation>\n");
+		vacation.LongLog(mpfLog);
+	}
 
-	int nAllCalendarDays = 0;
-	if (mpfLog)
+	bool bClipped = false;
+	CMyTime firstUnpaidDay = vacation.mFirstDayUnpaid;
+	if (firstUnpaidDay < mFirstDay)
 	{
-		mDayAfter.LogLine(mpfLog, L"\n<AddUnpaidVacation> day after ");
-		fwprintf(mpfLog, L"<AddUnpaidVacation count %d> %d days\n", count, vacation.mnUnpaidCalendarDays);
-		nAllCalendarDays = mFirstDay.GetNDaysBefore(mDayAfter);
-		fwprintf(mpfLog, L"nAllCalendarDays %d\n", mnAllCalendarDays);
-		if (count == 3)
-			fwprintf(mpfLog, L"Beware:\n");
+		firstUnpaidDay = mFirstDay;
+		bClipped = true;
 	}
-	mDayAfter.AddDays(vacation.mnUnpaidCalendarDays);
-	mLastDay = mDayAfter.PrevDay();
-	mnUnpaidVacationDays += vacation.mnUnpaidCalendarDays;
-	if (mpfLog)
+	CMyTime lastUnpaidDay = vacation.mLastDay;
+	if (lastUnpaidDay > mLastDay)
 	{
-		fwprintf(mpfLog, L"<AddUnpaidVacation> %d days\n", vacation.mnUnpaidCalendarDays);
-		mDayAfter.LogLine(mpfLog, L"day after ");
-		mLastDay.LogLine(mpfLog, L"last day ");
-		int nNewAllCalendarDays = mFirstDay.GetNDaysBefore(mDayAfter);
-		fwprintf(mpfLog, L"nNewAllCalendarDays %d\n", nNewAllCalendarDays);
-		fwprintf(mpfLog, L"\n");
-		if (nNewAllCalendarDays != nAllCalendarDays + vacation.mnUnpaidCalendarDays)
-		{
-			fflush(mpfLog);
-			CUtils::MessBox(L"nNewAllCalendarDays != nAllCalendarDays + vacation.mnUnpaidCalendarDays", L"SW Error");
-		}
-		fwprintf(mpfLog, L"\n");
+		lastUnpaidDay = mLastDay;
+		bClipped = true;
 	}
+	int nUpaidDays = firstUnpaidDay.GetNDaysUntil(lastUnpaidDay);
+
+	if (nUpaidDays > 0)
+	{
+		mVacations.AddTail(&vacation);
+		mnUnpaidVacationDays += nUpaidDays;
+		if (mpfLog)
+			fwprintf(mpfLog, L"<AddUnpaidVacation> added %d unpaid --> %d (%s)\n",
+				nUpaidDays, mnUnpaidVacationDays, bClipped ? L"Clipped" : L"Whole");
+		return true;
+	}
+
+	if (mpfLog)
+		fwprintf(mpfLog, L"<AddUnpaidVacation> nothing added!\n");
+	return false;
 }
-void CWorkSpan::AddMaternityLeave(class CMaternityLeave& maternityLeave)
+void CWorkSpan::AddMaternityLeave(CMaternityLeave& maternityLeave)
 {
 
 }

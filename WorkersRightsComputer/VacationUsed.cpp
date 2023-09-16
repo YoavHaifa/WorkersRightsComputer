@@ -129,13 +129,18 @@ int CVacationUsed::CountDaysOfUnpaidVacation(CMyTime& first, CMyTime& last)
 }
 void CVacationUsed::AddToWorkSpan(CWorkSpan& workSpan)
 {
-	if (mnUnPaid < 1)
+	if (mnUnPaid < 1) 
+		// Paid vacation is just like any other work period
 		return;
 
-	if (mFirstDayUnpaid > workSpan.mDayAfter)
-		return;
-	if (mFirstDayUnpaid < workSpan.mFirstDay)
+	if (mFirstDayUnpaid > workSpan.mLastDay) 
+		// Relevant unpaid vacation is after span
 		return;
 
+	if (mLastDay < workSpan.mFirstDay)
+		// Relevant unpaid vacation is before span
+		return;
+
+	// Vacation is relevant for this span
 	workSpan.AddUnpaidVacation(*this);
 }

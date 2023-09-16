@@ -12,6 +12,8 @@ public:
 	virtual void ShortLog(FILE* pf);
 	virtual void LongLog(FILE* pf);
 
+	virtual void AddToWorkSpan(class CWorkSpan& workSpan);
+
 private:
 	int mnPaidWeeks;
 	double mnWeeks;

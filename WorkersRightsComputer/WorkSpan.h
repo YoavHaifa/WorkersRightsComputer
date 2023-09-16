@@ -8,7 +8,7 @@ public:
 	CWorkSpan(CMyTime& firstDay, CMyTime& dayAfter);
 
 	void Init(CMyTime &firstDay, CMyTime &dayAfter);
-	void AddUnpaidVacation(class CVacationUsed& vacation);
+	bool AddUnpaidVacation(class CVacationUsed& vacation);
 	void AddMaternityLeave(class CMaternityLeave& maternityLeave);
 	bool ClipByWorkPeriod(void);
 	void ComputeDays(void);
@@ -20,6 +20,8 @@ public:
 	int mnAllCalendarDays;
 	int mnPaidCalendarDays;
 	bool mbLast;
+
+	CList<class CVacationUsed*, class CVacationUsed*> mVacations;
 
 	// Debug
 	FILE* mpfLog;
