@@ -24,7 +24,7 @@ public:
 	void Log();
 	bool mbAdd14DaysUnpaidVacation4Severance;
 
-	void UpdateNextYearStart(class CMyTime &yearStart, class CMyTime &nextYearStart);
+	//void UpdateNextYearStart(class CMyTime &yearStart, class CMyTime &nextYearStart);
 	void WriteToLetter(class CHtmlWriter& html);
 	void WriteToLetterExtraSeverance(class CHtmlWriter& html);
 

@@ -188,6 +188,7 @@ void CUsedVacations::Compute()
 		pVac->Compute();
 	}
 }
+/*
 void CUsedVacations::UpdateNextYearStart(CMyTime &yearStart, CMyTime &nextYearStart)
 {
 	POSITION pos = mVacationsUsed.GetHeadPosition();
@@ -200,7 +201,7 @@ void CUsedVacations::UpdateNextYearStart(CMyTime &yearStart, CMyTime &nextYearSt
 				nextYearStart.AddDays(pVac->mnUnpaidCalendarDays);
 		}
 	}
-}
+}*/
 int CUsedVacations::CountDaysOfUnpaidVacation(CMyTime& first, CMyTime& last)
 {
 	int nDays = 0;

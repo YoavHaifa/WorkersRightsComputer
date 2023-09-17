@@ -1,7 +1,7 @@
 #pragma once
-#include "MyTime.h"
+#include "DaysSpan.h"
 
-class CVacationUsed
+class CVacationUsed : public CDaysSpan
 {
 public:
 	CVacationUsed(CMyTime &firstDay, CMyTime &lastDay);
@@ -14,18 +14,17 @@ public:
 
 	bool mbIsMaternityLeave;
 
-	CMyTime mFirstDay;
-	CMyTime mFirstDayUnpaid;
-	CMyTime mLastDay;
-	int mnDays;
+	CDaysSpan mUnpaidSpan;
+	//CMyTime mFirstDayUnpaid;
 	int mnWorkDays;
 	void Compute();
 	int mnPaid;
 	int mnUnPaid;
-	int mnUnpaidCalendarDays;
+	//int mnUnpaidCalendarDays;
 	int mnUnpaidUsedForSeverance;
 	void SetPartiallyPaid(int nPaidDays);
 
+	void FindUnpaidSpan();
 	int CountDaysOfUnpaidVacation(CMyTime& first, CMyTime& last);
 	virtual void AddToWorkSpan(class CWorkSpan& workSpan);
 };

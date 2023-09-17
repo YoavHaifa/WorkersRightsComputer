@@ -56,7 +56,6 @@ public:
 	CString GetDaysText();
 	int CountWorkingDays(CMyTime& first, CMyTime& last);
 	//int CountAllDaysWithoutUnpaidVacation(CMyTime& first, CMyTime& last);
-	void CountNWorkingDaysFrom(CMyTime &first, int nToSkip, CMyTime &dateAfter);
 	int CountAllDaysPerMonth(int year, int month);
 	int CountWorkingDaysPerMonth(int year, int month);
 	int CountDaysWorkedPerMonth(int year, int month);

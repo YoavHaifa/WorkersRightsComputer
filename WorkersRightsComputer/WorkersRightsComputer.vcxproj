@@ -190,6 +190,7 @@
     <ClInclude Include="Comments.h" />
     <ClInclude Include="CommentsDlg.h" />
     <ClInclude Include="Config.h" />
+    <ClInclude Include="DaysSpan.h" />
     <ClInclude Include="HolidaysDue.h" />
     <ClInclude Include="HolidaysDuePerYear.h" />
     <ClInclude Include="LetterSavedDlg.h" />
@@ -254,6 +255,7 @@
     <ClCompile Include="Comments.cpp" />
     <ClCompile Include="CommentsDlg.cpp" />
     <ClCompile Include="Config.cpp" />
+    <ClCompile Include="DaysSpan.cpp" />
     <ClCompile Include="HolidaysDue.cpp" />
     <ClCompile Include="HolidaysDuePerYear.cpp" />
     <ClCompile Include="LetterSavedDlg.cpp" />

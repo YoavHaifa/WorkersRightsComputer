@@ -48,12 +48,12 @@ void CWorkYear::InitInternals(CMyTime& firstDay)
 	if (mpfLog)
 	{
 		mLastDay.LogLine(mpfLog, L"last day %s");
-		fwprintf(mpfLog, L"mnAllCalendarDays %d\n", mnAllCalendarDays);
+		fwprintf(mpfLog, L"mnAllCalendarDays %d\n", mnDays);
 	}
 
 	if (mpfLog)
 	{
-		fwprintf(mpfLog, L"mnAllCalendarDays %d\n", mnAllCalendarDays);
+		fwprintf(mpfLog, L"mnAllCalendarDays %d\n", mnDays);
 		fwprintf(mpfLog, L"mnPaidCalendarDays %d\n", mnPaidCalendarDays);
 	}
 
@@ -125,7 +125,7 @@ bool CWorkYear::Contains(CMyTime& time)
 int CWorkYear::GetUnpaidVacationCalendarDaysForSeverance(void)
 {
 	mnUnpaidVacationCalendarDaysForSeverance = 0;
-	int unpaidCalendarDays = mnAllCalendarDays - mnPaidCalendarDays;
+	int unpaidCalendarDays = mnDays - mnPaidCalendarDays;
 	if (unpaidCalendarDays > 0)
 	{
 		int nToAdd = min(unpaidCalendarDays, MAX_14_UNPAID_VACATION_DAYS_FOR_SEVERANCE);
@@ -160,9 +160,9 @@ void CWorkYear::Log(FILE* pfLog)
 		fprintf(pfLog, ", Fraction %.3f", mFraction);
 
 	if (mnUnpaidVacationDays > 0)
-		fprintf(pfLog, ", Unpaid Vacation %d/%d Days", mnUnpaidVacationDays, mnAllCalendarDays);
+		fprintf(pfLog, ", Unpaid Vacation %d/%d Days", mnUnpaidVacationDays, mnDays);
 	else
-		fprintf(pfLog, ", %d Days", mnAllCalendarDays);
+		fprintf(pfLog, ", %d Days", mnDays);
 
 	if (mnUnpaidVacationCalendarDaysForSeverance > 0)
 		fprintf(pfLog, ", Severance extra %d Days", mnUnpaidVacationCalendarDaysForSeverance);

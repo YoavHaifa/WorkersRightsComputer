@@ -9,16 +9,12 @@
 
 
 CVacationUsed::CVacationUsed(CMyTime &firstDay, CMyTime &lastDay)
-	: mFirstDay(firstDay)
-	, mLastDay(lastDay)
-	, mnDays(0)
+	: CDaysSpan(firstDay, lastDay)
 	, mnPaid(0)
 	, mnUnPaid(0)
-	, mnUnpaidCalendarDays(0)
 	, mnUnpaidUsedForSeverance(0)
 	, mbIsMaternityLeave(false)
 {
-	mnDays = firstDay.GetNDaysUntil(mLastDay);
 }
 CVacationUsed::~CVacationUsed()
 {
@@ -63,11 +59,11 @@ void CVacationUsed::LongLog(FILE *pf)
 		mFirstDay.mDay, mFirstDay.mMonth, mFirstDay.mYear, mLastDay.mDay, mLastDay.mMonth, mLastDay.mYear);
 	fprintf(pf, "Work Days %2d / %2d - Paid %2d Unpaid %2d\n",
 		mnWorkDays, mnDays, mnPaid, mnUnPaid);
-	if (mFirstDayUnpaid.mbInitialized)
+	if (mUnpaidSpan.mFirstDay.mbInitialized)
 	{
 		fprintf(pf, "Unpaid %d/%d/%d - %d/%d/%d, Unpaid calendar days %d\n",
-			mFirstDayUnpaid.mDay, mFirstDayUnpaid.mMonth, mFirstDayUnpaid.mYear, 
-			mLastDay.mDay, mLastDay.mMonth, mLastDay.mYear, mnUnpaidCalendarDays);
+			mUnpaidSpan.mFirstDay.mDay, mUnpaidSpan.mFirstDay.mMonth, mUnpaidSpan.mFirstDay.mYear, 
+			mLastDay.mDay, mLastDay.mMonth, mLastDay.mYear, mUnpaidSpan.mnDays);
 	}
 	fprintf(pf, "\n");
 }
@@ -104,15 +100,30 @@ void CVacationUsed::SetPartiallyPaid(int nPaidDays)
 		nWorkDaysOffPerMonth = gWorkPeriod.CountWorkDaysToEndOfMonthFrom(vacMonth);
 	}
 
-	gWorkPeriod.CountNWorkingDaysFrom(mFirstDay, mnPaid, mFirstDayUnpaid);
-	CTimeSpan span = mLastDay.mTime - mFirstDayUnpaid.mTime;
-	mnUnpaidCalendarDays = (int)span.GetDays() + 1;
+	FindUnpaidSpan();
+	//CTimeSpan span = mLastDay.mTime - mUnpaidSpan.mFirstDay.mTime;
+	//mUnpaidSpan.mnDays = (int)span.GetDays() + 1;
+}
+void CVacationUsed::FindUnpaidSpan()
+{
+	int n = 0;
+	CMyTime check = mFirstDay;
+	while (n <= mnPaid)
+	{
+		if (check.IsWorkingDay())
+			n++;
+		check.AddDay();
+	}
+	while (!check.IsWorkingDay())
+		check.AddDay();
+
+	mUnpaidSpan.InitSpan(check, mLastDay);
 }
 int CVacationUsed::CountDaysOfUnpaidVacation(CMyTime& first, CMyTime& last)
 {
 	if (first > mLastDay)
 		return 0;
-	if (last < mFirstDayUnpaid)
+	if (last < mUnpaidSpan.mFirstDay)
 		return 0;
 
 	CMyTime dayAfter = last;
@@ -121,26 +132,19 @@ int CVacationUsed::CountDaysOfUnpaidVacation(CMyTime& first, CMyTime& last)
 	dayAfter.AddDay();
 
 	CMyTime firstToCount = first;
-	if (mFirstDayUnpaid > first)
-		firstToCount = mFirstDayUnpaid;
+	if (mUnpaidSpan.mFirstDay > first)
+		firstToCount = mUnpaidSpan.mFirstDay;
 
 	CTimeSpan span = dayAfter.Subtract(firstToCount);
 	return (int)span.GetDays();
 }
 void CVacationUsed::AddToWorkSpan(CWorkSpan& workSpan)
 {
-	if (mnUnPaid < 1) 
+	if (mnUnPaid < 1 || mUnpaidSpan.mnDays < 1) 
 		// Paid vacation is just like any other work period
 		return;
 
-	if (mFirstDayUnpaid > workSpan.mLastDay) 
-		// Relevant unpaid vacation is after span
-		return;
-
-	if (mLastDay < workSpan.mFirstDay)
-		// Relevant unpaid vacation is before span
-		return;
-
-	// Vacation is relevant for this span
-	workSpan.AddUnpaidVacation(*this);
+	if (workSpan.Contains(mUnpaidSpan.mFirstDay))
+		// Vacation should be added to this span
+		workSpan.AddUnpaidVacation(mUnpaidSpan);
 }

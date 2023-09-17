@@ -272,6 +272,7 @@ BOOL CWorkersRightsComputerDlg::OnInitDialog()
 	}
 
 	GotoDlgCtrl(GetDlgItem(IDC_EDIT_FIRST_NAME));
+	SetCheck(IDC_CHECK_CAREGIVER, true);
 	return FALSE;  // return TRUE  unless you set the focus to a control
 }
 void CWorkersRightsComputerDlg::OnLoad()

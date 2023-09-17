@@ -339,8 +339,6 @@ int CMyTime::GetNMonthsBefore(CMyTime& dayAfter, int* pnExtraDays)
 int CMyTime::GetNDaysUntil(CMyTime &lastDay)
 {
 	return SafeGetDays(*this, lastDay) + 1;
-	//CTimeSpan span = lastDay.mTime - mTime;
-	//return (int)span.GetDays() + 1;
 }
 double CMyTime::GetNWeeksUntil(CMyTime& lastDay)
 {
@@ -351,17 +349,6 @@ double CMyTime::GetNWeeksUntil(CMyTime& lastDay)
 int CMyTime::GetNDaysBefore(CMyTime& dayAfter)
 {
 	return SafeGetDays(*this, dayAfter);
-	/*
-	CTimeSpan span = dayAfter.mTime - mTime;
-	int nHours = (int)span.GetHours();
-	int nDays = (int)span.GetDays();
-	if (nHours != nDays * 24)
-	{
-		static int nDiff = 0;
-		nDiff++;
-	//	CUtils::MessBox(L"nHours != nDays * 24", L"SW Error???");
-	}
-	return nDays; */
 }
 bool CMyTime::IsWorkingDay()
 {

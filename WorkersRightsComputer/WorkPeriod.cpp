@@ -458,31 +458,6 @@ int CWorkPeriod::CountWorkingDays(CMyTime &first, CMyTime &last)
 	}
 	return n;
 }
-/*
-int CWorkPeriod::CountAllDaysWithoutUnpaidVacation(CMyTime& first, CMyTime& last)
-{
-	int n = 0;
-	CMyTime check = first;
-	while (check <= last)
-	{
-		if (!check.IsUnpaidVacation())
-			n++;
-		check.AddDay();
-	}
-	return n;
-} */
-void CWorkPeriod::CountNWorkingDaysFrom(CMyTime &first, int nToSkip, CMyTime &dateAfter)
-{
-	int n = 0;
-	CMyTime check = first;
-	while (n <= nToSkip)
-	{
-		if (check.IsWorkingDay())
-			n++;
-		check.AddDay();
-	}
-	dateAfter = check;
-}
 int CWorkPeriod::CountAllDaysPerMonth(int year, int month)
 {
 	int n = 0;

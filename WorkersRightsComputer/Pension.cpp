@@ -9,6 +9,7 @@
 #include "WorkYears.h"
 #include "UsedVacations.h"
 #include "WageTable.h"
+#include "WorkPeriod.h"
 
 CPension *gpPension = NULL;
 
@@ -351,7 +352,10 @@ bool CPension::UpdateStartDateForPension()
 	if (mStartDateForPension <= gWorkPeriod.mFirst)
 		return false;
 
-	CWorkSpan workBeforePension(gWorkPeriod.mFirst, mStartDateForPension);
+	CWorkSpan workBeforePension;
+	workBeforePension.InitSpan(gWorkPeriod.mFirst, mStartDateForPension.PrevDay());
+	gUsedVacations.AddAllVacationsToWorkSpan(workBeforePension);
+
 	if (workBeforePension.mDayAfter > mStartDateForPension)
 	{
 		mStartDateForPension = workBeforePension.mDayAfter;
