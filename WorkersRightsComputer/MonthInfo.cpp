@@ -77,16 +77,22 @@ bool CMonthInfo::IsPartial(void)
 {
 	return (mFraction < 1);
 }
-double CMonthInfo::GetCompanyRatio()
+double CMonthInfo::GetCompanyRatio(double* poCompanyHours)
 {
 	if (mHoursPerWeekPaidByCompany > 0)
+	{
+		if (poCompanyHours)
+			*poCompanyHours = mHoursPerWeekPaidByCompany;
 		return mHoursPerWeekPaidByCompany / mHoursPerWeek;
+	}
 
+	if (poCompanyHours)
+		*poCompanyHours = mRatioPaidByCompany * mHoursPerWeek;
 	return mRatioPaidByCompany;
 }
-double CMonthInfo::GetFamilyPart(void)
+double CMonthInfo::GetFamilyPart(double* poCompanyHours)
 {
-	return 1 - GetCompanyRatio();
+	return 1 - GetCompanyRatio(poCompanyHours);
 }
 void CMonthInfo::SetUnpaid(int nAnpaidDaysToAdd)
 {

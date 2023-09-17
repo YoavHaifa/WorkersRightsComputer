@@ -346,6 +346,7 @@ void CHtmlWriter::StartPensionTable(bool bPension, bool bSeverance)
 			WriteLTH_EH(L"Fund", L"פנסיה");
 		else
 			WriteLTH_EH(L"Fund", L"קרן פיצויים");
+		WriteLTH_EH(L"Company", L"חברה");
 		WriteLTH_EH(L"Family", L"מהמשפחה");
 	}
 	WriteLTH_EH(L"Due", L"מגיע");

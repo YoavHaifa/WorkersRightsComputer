@@ -3,7 +3,9 @@
 class CPensionReportPeriod
 {
 public:
-	CPensionReportPeriod(int year, int month, double monthlyPay, double part, double pensionRate, double severanceRate, double familyPart);
+	CPensionReportPeriod(int year, int month, double monthlyPay, double part, 
+		double pensionRate, double severanceRate, 
+		double companyHours, double familyPart);
 	~CPensionReportPeriod();
 
 	bool Is(double monthlyPay, double pensionRate, double severanceRate, double familyPart);
@@ -18,6 +20,7 @@ public:
 	double mMonthParts;
 	double mPensionRate;
 	double mSeveranceRate;
+	double mCompanyHours;
 	double mFamilyPart;
 	double mDuePension;
 	double mDueSeverance;
@@ -32,7 +35,9 @@ public:
 	~CPensionReport();
 
 	bool IsEmpty(void) { return mPeriods.IsEmpty(); }
-	void AddMonth(int year, int month, double monthlyPay, double part, double pensionRate, double severanceRate, double familyPart);
+	void AddMonth(int year, int month, double monthlyPay, double part, 
+		double pensionRate, double severanceRate, 
+		double companyHours, double familyPart);
 	void WriteToLetterOld(class CHtmlWriter& html);
 	void WriteToLetterPension(class CHtmlWriter& html);
 	void WriteToLetterSeverance(class CHtmlWriter& html);

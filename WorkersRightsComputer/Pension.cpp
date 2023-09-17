@@ -132,9 +132,10 @@ void CPension::AddMonth(int year, int month, int nDays /* if 0 - full */, bool b
 	double pensionDue = monthlyPay * penRate * part;
 
 	double familyPart = 0;
+	double companyHours = 0;
 	if (gFamilyPart.mbAskOnlyForFamilyPart)
 	{
-		familyPart = pInfo->GetFamilyPart();
+		familyPart = pInfo->GetFamilyPart(&companyHours);
 		pensionDue *= familyPart;
 	}
 	mPensionDue += pensionDue;
@@ -176,7 +177,7 @@ void CPension::AddMonth(int year, int month, int nDays /* if 0 - full */, bool b
 		OnYearEnd();
 	if (gFamilyPart.mbAskOnlyForFamilyPart)
 		mDueFromFamily += (pensionDue + severanceDue);
-	mReport.AddMonth(year, month, monthlyPay, part, penRate, sevRate, familyPart);
+	mReport.AddMonth(year, month, monthlyPay, part, penRate, sevRate, companyHours, familyPart);
 }
 bool CPension::DoCompute()
 {
@@ -326,6 +327,11 @@ void CPension::WriteToLetter(class CHtmlWriter& html)
 	html.StartParagraph();
 	html.WriteLineEH(L"Computation of due pension by month:", 
 		L"חישוב זכאות לפנסיה לפי חודשים:");
+
+	if (gFamilyPart.mbAskOnlyForFamilyPart)
+		html.WriteLineEH(
+			L"The family's share is the number of hours for a full-time job (43 until March 31, 2018, and 42 from then on) minus the number of hours paid by the company.", 
+			L"חלק המשפחה בהעסקה הוא מס' שעות למשרה מלאה (43 עד סוף מרץ 2018 ו-42 מאז ואילך) פחות מספר השעות ששילמה החברה.");
 
 	html.WriteEH(L"First day for pension: ", L"חישוב הפנסיה החל מתאריך: ");
 	html.WriteLineEH(mStartDateForPension.ToString(), mStartDateForPension.ToHebrewString());

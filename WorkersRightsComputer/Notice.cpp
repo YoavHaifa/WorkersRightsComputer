@@ -56,7 +56,7 @@ bool CNotice::Compute(void)
 		{
 			LogLine(L"Worked full month of notice period.");
 			msDue += L"Worked full month of notice period.";
-			return false;
+			return true;
 		}
 	}
 	else

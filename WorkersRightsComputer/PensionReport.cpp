@@ -5,7 +5,10 @@
 #include "FamilyPart.h"
 
 
-CPensionReportPeriod::CPensionReportPeriod(int year, int month, double monthlyPay, double part, double pensionRate, double severanceRate, double familyPart)
+CPensionReportPeriod::CPensionReportPeriod(int year, int month, 
+	double monthlyPay, double part, 
+	double pensionRate, double severanceRate, 
+	double companyHours, double familyPart)
 	: mFromYear(year)
 	, mFromMonth(month)
 	, mTillYear(year)
@@ -14,6 +17,7 @@ CPensionReportPeriod::CPensionReportPeriod(int year, int month, double monthlyPa
 	, mMonthParts(part)
 	, mPensionRate(pensionRate)
 	, mSeveranceRate(severanceRate)
+	, mCompanyHours(companyHours)
 	, mFamilyPart(familyPart)
 	, mDuePension(0)
 	, mDueSeverance(0)
@@ -76,6 +80,7 @@ void CPensionReportPeriod::WriteToLetter(CHtmlWriter& html, bool bPension)
 
 	if (gFamilyPart.mbAskOnlyForFamilyPart)
 	{
+		html.Write2Tab("%5.2f", mCompanyHours);
 		html.Write2Tab("%5.2f%%", mFamilyPart * 100);
 
 		mDueFromFamily = due * mFamilyPart;
@@ -104,57 +109,18 @@ void CPensionReport::Clear()
 	}
 	mpLast = NULL;
 }
-void CPensionReport::AddMonth(int year, int month, double monthlyPay, double part, double pensionRate, double severanceRate, double familyPart)
+void CPensionReport::AddMonth(int year, int month, double monthlyPay, double part, 
+	double pensionRate, double severanceRate, double companyHours, double familyPart)
 {
 	if (mpLast && mpLast->Is(monthlyPay, pensionRate, severanceRate, familyPart))
 		mpLast->Add(year, month, part);
 	else
 	{
-		mpLast = new CPensionReportPeriod(year, month, monthlyPay, part, pensionRate, severanceRate, familyPart);
+		mpLast = new CPensionReportPeriod(year, month, monthlyPay, part, 
+			pensionRate, severanceRate, companyHours, familyPart);
 		mPeriods.AddTail(mpLast);
 	}
 }
-/*
-void CPensionReport::WriteToLetterOld(CHtmlWriter& html)
-{
-	double sumPension = 0;
-	double sumSeverance = 0;
-	double sumFromFamily = 0;
-	html.StartPensionTable();
-	POSITION pos = mPeriods.GetHeadPosition();
-	while (pos)
-	{
-		html.StartTabLine();
-		CPensionReportPeriod* pPeriod = mPeriods.GetNext(pos);
-		pPeriod->WriteToLetter(html);
-		html.EndTabLine();
-		sumPension += pPeriod->mDuePension;
-		sumSeverance += pPeriod->mDueSeverance;
-		sumFromFamily += pPeriod->mDueFromFamily;
-	}
-	// Sum Line
-	html.StartTabLine();
-	html.Write2TabEH(L"Sum", L"סך הכל");
-	html.Write2Tab(" ");
-	html.Write2Tab(" ");
-	html.Write2Tab(" ");
-	html.Write2Tab(" ");
-	html.Write2Tab(" ");
-	html.Write2Tab(sumPension);
-	if (gpPension->mbSeverance)
-	{
-		html.Write2Tab(" ");
-		html.Write2Tab(sumSeverance);
-		html.Write2Tab(sumPension + sumSeverance);
-	}
-	if (gFamilyPart.mbAskOnlyForFamilyPart)
-	{
-		html.Write2Tab(" ");
-		html.Write2Tab(sumFromFamily);
-	}
-	html.EndTabLine();
-	html.EndPensionTable();
-} */
 void CPensionReport::WriteToLetterPension(CHtmlWriter& html)
 {
 	double sumPension = 0;
@@ -181,6 +147,7 @@ void CPensionReport::WriteToLetterPension(CHtmlWriter& html)
 	html.Write2Tab(sumPension);
 	if (gFamilyPart.mbAskOnlyForFamilyPart)
 	{
+		html.Write2Tab(" ");
 		html.Write2Tab(" ");
 		html.Write2Tab(sumFromFamily);
 	}

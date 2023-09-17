@@ -10,8 +10,8 @@ public:
 	void InitFirst();
 	void InitNext(CMonthInfo &prev);
 	bool IsPartial(void);
-	double GetCompanyRatio(void);
-	double GetFamilyPart(void);
+	double GetCompanyRatio(double *poCompanyHours = NULL);
+	double GetFamilyPart(double* poCompanyHours);
 
 	int mi;
 	bool mbLast;
