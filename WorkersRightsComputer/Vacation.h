@@ -16,11 +16,6 @@ public:
 	static const int SHORT_RULE_PER_CENT = 4;
 	static const int MAX_FULL_YEARS = 3;
 
-	//static const int N_MONTH_FOR_FULL_YEARLY_VACATION = 12; // Changed according to Iris, 6 August 2021 -
-	// No need for special rule to treat partial last year as full year (v1.1.1)
-	// Use config value instead - so that it can be set later without SW change
-	//static const int N_MONTH_FOR_FULL_YEARLY_VACATION = 10;
-
 	static const double MIN_FRACTION_FOR_ROUND_UP;
 
 	CEdit* mpPrevYearsBox;
@@ -49,7 +44,7 @@ public:
 	virtual bool Compute(void) override;
 	bool ComputeInternals();
 	bool ReducePaidDays();
-	bool ComputePerPeriod();
+	bool ComputeBackByMonth();
 	virtual CString GetDecriptionForLetter(void)override;
 	virtual CString GetDecriptionForLetterHebrew(void)override;
 	void PrepareString(void);
@@ -59,7 +54,7 @@ public:
 	void CountBackMonth(void);
 
 	bool GetGUIValue(CEdit* pEdit, double& oValue, CButtonRef* pButton);
-	void ComputePrevYears(void);
+	void GetNPrevYears(void);
 	bool ComputeByShortRule(void);
 };
 

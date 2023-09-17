@@ -188,20 +188,6 @@ void CUsedVacations::Compute()
 		pVac->Compute();
 	}
 }
-/*
-void CUsedVacations::UpdateNextYearStart(CMyTime &yearStart, CMyTime &nextYearStart)
-{
-	POSITION pos = mVacationsUsed.GetHeadPosition();
-	while (pos)
-	{
-		CVacationUsed *pVac = mVacationsUsed.GetNext(pos);
-		if (pVac->mnUnPaid > 0)
-		{
-			if (pVac->mFirstDayUnpaid >= yearStart && pVac->mFirstDayUnpaid < nextYearStart)
-				nextYearStart.AddDays(pVac->mnUnpaidCalendarDays);
-		}
-	}
-}*/
 int CUsedVacations::CountDaysOfUnpaidVacation(CMyTime& first, CMyTime& last)
 {
 	int nDays = 0;
@@ -210,7 +196,7 @@ int CUsedVacations::CountDaysOfUnpaidVacation(CMyTime& first, CMyTime& last)
 	while (pos)
 	{
 		CVacationUsed *pVac = mVacationsUsed.GetNext(pos);
-		if (pVac->mnUnPaid > 0)
+		if (pVac->mnUnPaidWorkDays > 0)
 		{
 			nDays += pVac->CountDaysOfUnpaidVacation(first, last);
 		}
@@ -273,15 +259,15 @@ void CUsedVacations::WriteToLetter(CHtmlWriter& html)
 		html.WriteEH(pVac->mLastDay.ToString(), pVac->mLastDay.ToHebrewString());
 
 		//fprintf(pf, "Work Days %2d / %2d - Paid %2d Unpaid %2d\n",
-		//	mnWorkDays, mnDays, mnPaid, mnUnPaid);
+		//	mnWorkDays, mnDays, mnPaidDays, mnUnPaidWorkDays);
 		html.WriteEH(L", work days ", L", ימי עבודה ");
 		html.WriteInt(pVac->mnWorkDays);
 		html.WriteEH(L", paid ", L", בתשלום ");
-		html.WriteInt(pVac->mnPaid);
+		html.WriteInt(pVac->mnPaidDays);
 		html.WriteEH(L", unpaid ", L", ללא תשלום ");
-		html.WriteInt(pVac->mnUnPaid);
-		nPaid += pVac->mnPaid;
-		nUnPaid += pVac->mnUnPaid;
+		html.WriteInt(pVac->mnUnPaidWorkDays);
+		nPaid += pVac->mnPaidDays;
+		nUnPaid += pVac->mnUnPaidWorkDays;
 
 		html.WriteLine(L"");
 	}

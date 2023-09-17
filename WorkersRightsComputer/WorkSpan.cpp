@@ -7,18 +7,39 @@
 #include "Utils.h"
 
 
-CWorkSpan::CWorkSpan(void)
+CWorkSpan::CWorkSpan()
 	: mnUnpaidVacationDays(0)
+	, mnPaidMaternityDays(0)
 	, mnPaidCalendarDays(0)
 	, mbLast(false)
 	, mpfLog(NULL)
 {
 }
+CWorkSpan::~CWorkSpan()
+{
+	Clear();
+}
+void CWorkSpan::Clear()
+{
+	while (!mUnpaidSpans.IsEmpty())
+	{
+		delete mUnpaidSpans.GetTail();
+		mUnpaidSpans.RemoveTail();
+	}
+
+	while (!mPaidMeternity.IsEmpty())
+	{
+		delete mPaidMeternity.GetTail();
+		mPaidMeternity.RemoveTail();
+	}
+}
 void CWorkSpan::Init(CMyTime& firstDay, CMyTime& dayAfter)
 {
+	Clear();
 	CDaysSpan::InitSpan(firstDay, dayAfter.PrevDay());
 
 	mnUnpaidVacationDays = 0;
+	mnPaidMaternityDays = 0;
 	mbLast = false;
 
 	// Add unpaid vacations
@@ -51,6 +72,9 @@ bool CWorkSpan::AddUnpaidVacation(CDaysSpan& unpaidSpan)
 
 	mUnpaidSpans.AddTail(new CDaysSpan(unpaidSpan));
 	mLastDay.AddDays(unpaidSpan.mnDays);
+	if (mLastDay > gWorkPeriod.mLast)
+		mLastDay = gWorkPeriod.mLast;
+
 	InitSpan(mFirstDay, mLastDay);
 	mnUnpaidVacationDays += unpaidSpan.mnDays;
 	if (mpfLog)
@@ -58,7 +82,12 @@ bool CWorkSpan::AddUnpaidVacation(CDaysSpan& unpaidSpan)
 			unpaidSpan.mnDays, mnUnpaidVacationDays);
 	return true;
 }
-void CWorkSpan::AddMaternityLeave(CMaternityLeave& maternityLeave)
+void CWorkSpan::AddPaidMaternityLeave(CDaysSpan& paidSpan)
 {
-
+	CDaysSpan common;
+	if (Intersect(paidSpan, common))
+	{
+		mPaidMeternity.AddTail(new CDaysSpan(common));
+		mnPaidMaternityDays += common.mnDays;
+	}
 }

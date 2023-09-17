@@ -4,6 +4,7 @@
 
 CDaysSpan::CDaysSpan()
 	: mnDays(0)
+	, mnWorkDays(0)
 {
 }
 CDaysSpan::CDaysSpan(CMyTime& firstDay, CMyTime& lastDay)
@@ -20,6 +21,7 @@ void CDaysSpan::InitSpan(CMyTime& firstDay, CMyTime& lastDay)
 	mLastDay = lastDay;
 	mDayAfter = mLastDay.NextDay();
 	mnDays = mFirstDay.GetNDaysBefore(mDayAfter);
+	mnWorkDays = gWorkPeriod.CountWorkingDays(mFirstDay, mLastDay);
 }
 bool CDaysSpan::ClipByWorkPeriodEnd()
 {
@@ -73,9 +75,13 @@ bool CDaysSpan::Intersect(CDaysSpan& other, CDaysSpan& oCommon)
 	oCommon.InitSpan(first, last);
 	return oCommon.mnDays > 0;
 }
-void CDaysSpan::Log(FILE* pf)
+void CDaysSpan::Log(FILE* pf, const char *zText)
 {
-	fprintf(pf, "%d/%d/%d - %d/%d/%d\n",
-		mFirstDay.mDay, mFirstDay.mMonth, mFirstDay.mYear, 
-		mLastDay.mDay, mLastDay.mMonth, mLastDay.mYear);
+	if (zText)
+		fprintf(pf, "%s: ", zText);
+
+	CString sFirst(mFirstDay.ToString());
+	CString sLast(mLastDay.ToString());
+	fwprintf(pf, L"%s - %s (work days %d/%d)\n",
+		(const wchar_t*)sFirst, (const wchar_t*)sLast, mnWorkDays, mnDays);
 }

@@ -93,7 +93,7 @@ void CWorkPeriod::Reset(void)
 
 bool CWorkPeriod::Compute(const wchar_t* zAt)
 {
-	CountWorkingDays();
+	ComputeWorkingDaysInMonth();
 
 	// Init for invalid work span
 	mnMonthsDetailed = 0;
@@ -186,7 +186,7 @@ void CWorkPeriod::SetWorkingDay(int iDay, double fraction)
 	maWorkingDays[iDay] = fraction;
 	Compute();
 }
-void CWorkPeriod::CountWorkingDays(void)
+void CWorkPeriod::ComputeWorkingDaysInMonth(void)
 {
 	mnWorkDaysPerWeek = 0;
 	for (int i = 0; i < N_WEEK_DAYS; i++)

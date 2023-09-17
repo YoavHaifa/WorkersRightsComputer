@@ -15,6 +15,10 @@ public:
 	virtual void AddToWorkSpan(class CWorkSpan& workSpan);
 
 private:
+	void Compute();
+
+	CDaysSpan mPaidSpan;
+
 	int mnPaidWeeks;
 	double mnWeeks;
 	bool mbPaidWeeksDeservePension;

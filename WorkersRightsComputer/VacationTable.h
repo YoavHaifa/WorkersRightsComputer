@@ -19,8 +19,10 @@ public:
 
 	double GetNDaysPerMonth(int seniority, double nDaysPerWeek, int year, int month);
 
-	bool InitFromFile(void);
-	bool PrintLog(void);
+	bool InitFromTextFile(void);
+	bool InitFromXmlFile(void);
+	void SaveXmlFile(void);
+	bool PrintLog(const char *zAt);
 
 	static const int MAX_VETEK = 30;
 

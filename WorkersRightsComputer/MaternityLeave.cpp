@@ -12,10 +12,25 @@ CMaternityLeave::CMaternityLeave(CMyTime firstDay, CMyTime lastDay,
 {
 	mnWeeks = firstDay.GetNWeeksUntil(lastDay);
 	mbIsMaternityLeave = true;
+	Compute();
+}
+void CMaternityLeave::Compute()
+{
+	mnPaidDays = min((int)(mnPaidWeeks * gWorkPeriod.mnWorkDaysPerWeek), mnWorkDays);
+	mnUnPaidWorkDays = mnWorkDays - mnPaidDays;
+	if (mnPaidDays < mnWorkDays)
+	{
+		FindUnpaidSpan();
+		mPaidSpan.InitSpan(mFirstDay, mUnpaidSpan.mFirstDay.PrevDay());
+	}
+	else
+		mPaidSpan.InitSpan(mFirstDay, mLastDay);
 }
 void CMaternityLeave::AddToWorkSpan(CWorkSpan& workSpan)
 {
-	workSpan.AddMaternityLeave(*this);
+	CVacationUsed::AddToWorkSpan(workSpan);
+	if (workSpan.Overlaps(mPaidSpan))
+		workSpan.AddPaidMaternityLeave(mPaidSpan);
 }
 void CMaternityLeave::SaveToXml(CXMLDump& xmlDump)
 {
@@ -51,6 +66,9 @@ void CMaternityLeave::ShortLog(FILE* pf)
 }
 void CMaternityLeave::LongLog(FILE* pf)
 {
+	fprintf(pf, " Maternity Leave - %d / %.2f weeks paid, Pension: %s\n", 
+		mnPaidWeeks, mnWeeks, mbPaidWeeksDeservePension ? "Yes" : "No");
 	CVacationUsed::LongLog(pf);
-
+	mPaidSpan.Log(pf, "Paid");
+	fprintf(pf, "\n");
 }

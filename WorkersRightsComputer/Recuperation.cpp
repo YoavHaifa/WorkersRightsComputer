@@ -87,7 +87,7 @@ bool CRecuperation::Compute(void)
 		mbValid = false;
 		msDue += L"0";
 		msDebug += L"Work Period too short";
-		return false;
+		return true;
 	}
 
 	double lastYearFraction = 0;

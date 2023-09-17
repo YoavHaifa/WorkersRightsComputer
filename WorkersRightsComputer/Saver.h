@@ -6,7 +6,7 @@ public:
 	~CSaver();
 
 	static void ResetAllInputs(bool bLoading);
-	void Save(const wchar_t *zfName = NULL);
+	bool Save(const wchar_t *zfName = NULL);
 	bool Restore(const wchar_t *zfName = NULL);
 
 private:

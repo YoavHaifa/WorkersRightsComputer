@@ -97,6 +97,8 @@ public:
 	void OnRadioPaidVacationForLastYearChange();
 	bool mbDisableComputations;
 	bool mbSaveInProcess;
+	bool mbSaveFailed;
+
 	//CEdit mEditPrevNYears;
 	static DWORD WINAPI StaticThreadFunc(LPVOID);
 	afx_msg void OnTestVerifybatch();

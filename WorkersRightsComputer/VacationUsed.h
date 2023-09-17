@@ -16,10 +16,9 @@ public:
 
 	CDaysSpan mUnpaidSpan;
 	//CMyTime mFirstDayUnpaid;
-	int mnWorkDays;
 	void Compute();
-	int mnPaid;
-	int mnUnPaid;
+	int mnPaidDays;
+	int mnUnPaidWorkDays;
 	//int mnUnpaidCalendarDays;
 	int mnUnpaidUsedForSeverance;
 	void SetPartiallyPaid(int nPaidDays);

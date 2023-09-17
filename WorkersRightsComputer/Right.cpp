@@ -95,6 +95,11 @@ bool CRight::ComputeEnvelop(void)
 		fwprintf(mpfWrite, L"%s\n\n", (const wchar_t *)sLine);
 
 	bool bOK = Compute();
+	if (!bOK)
+	{
+		static int unErrs = 0;
+		unErrs++;
+	}
 	if (mpfWrite)
 	{
 		fwprintf(mpfWrite, L"\n");

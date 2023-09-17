@@ -21,7 +21,7 @@ public:
 
 	int mn;
 	int mnMonthsInLastYear;
-	int mnDaysInLastYear;
+	int mnDaysInLastMonthOfLastYear;
 	double mDaysInLastYearAsFraction;
 	int mnFullWorkYears;
 	int mnPrevYears;

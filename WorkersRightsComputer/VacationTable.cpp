@@ -4,6 +4,8 @@
 #include "Right.h"
 #include "WorkPeriod.h"
 #include "VacationUsed.h"
+#include "XmlDump.h"
+#include "XmlParse.h"
 
 CVacationTable gVacationTable;
 
@@ -20,14 +22,9 @@ CVacationTable::CVacationTable()
 CVacationTable::~CVacationTable()
 {
 }
-bool CVacationTable::InitFromFile(void)
+bool CVacationTable::InitFromTextFile(void)
 {
-	// CString sDir = Directory::GetCurrentDirectory();
 	FILE* pfRead = CUtils::OpenInputFile(L"Vacation");
-
-	//CString sfName = L"..\\release\\Input\\Vacation.txt";
-
-	//FILE *pfRead = MyFOpenWithErrorBox(sfName, L"r", L"Vacation Data");
 	if (!pfRead)
 		return false;
 
@@ -60,17 +57,68 @@ bool CVacationTable::InitFromFile(void)
 
 		mn++;
 	}
-	PrintLog();
+	PrintLog("FromText");
 	return true;
 }
-bool CVacationTable::PrintLog(void)
+void CVacationTable::SaveXmlFile(void)
+{
+	CString sDirName(CUtils::GetInputPath());
+	CXMLDump dump(sDirName, L"VacationBySeniority", L"YearlyRates");
+
+	for (int i = 0; i < mn; i++)
+	{
+		CXMLDumpScope scope(L"rate_start", dump);
+		dump.Write(L"n_years", map[i]->mYears);
+		dump.Write(L"from_year", map[i]->mFromYear);
+		dump.Write(L"from_month", map[i]->mFromMonth);
+		dump.Write(L"six_days", map[i]->m6);
+		dump.Write(L"five_days", map[i]->m5);
+	}
+}
+bool CVacationTable::InitFromXmlFile(void)
+{
+	mn = 0;
+
+	CString sfName(CUtils::GetInputPath());
+	sfName += L"VacationBySeniority";
+	sfName += L".YearlyRates.xml";
+	CXMLParse parse(sfName, true /*bUnicode*/);
+	CXMLParseNode* pRoot = parse.GetRoot();
+	if (!pRoot)
+	{
+		CUtils::MessBox(parse.GetName(), L"Missing Input File");
+		return false;
+	}
+
+	bool bOK = true;
+	CXMLParseNode* pStart = pRoot->GetFirst(L"rate_start");
+	while (pStart)
+	{
+		map[mn] = new CVacationVetek;
+		pStart->GetValue(L"n_years", map[mn]->mYears);
+		pStart->GetValue(L"from_year", map[mn]->mFromYear);
+		pStart->GetValue(L"from_month", map[mn]->mFromMonth);
+		pStart->GetValue(L"six_days", map[mn]->m6);
+		pStart->GetValue(L"five_days", map[mn]->m5);
+
+		mn++;
+		pStart = pRoot->GetNext(L"rate_start", pStart);
+	}
+	PrintLog("FromXml");
+	return true;
+}
+bool CVacationTable::PrintLog(const char* zAt)
 {
 	if (mn < 1)
 		return false;
 
-	FILE *pfLog = CUtils::OpenLogFile(L"Rates_VacationTable");
+	CString sfName(L"VacationTable_YearlyRates_");
+	sfName += zAt;
+	FILE *pfLog = CUtils::OpenLogFile(sfName);
 	if (!pfLog)
 		return false;
+
+	fprintf(pfLog, "Seniority, six, five, from year, month\n");
 
 	for (int i = 0; i < mn; i++)
 	{
@@ -147,7 +195,7 @@ bool CVacationTable::ComputeNextVacation(CVacationUsed &vacation)
 {
 	if (!gWorkPeriod.IsValid())
 	{
-		vacation.mnPaid = 0;
+		vacation.mnPaidDays = 0;
 		return false;
 	}
 
@@ -199,14 +247,17 @@ bool CVacationTable::ComputeNextVacation(CVacationUsed &vacation)
 		}
 	}
 	gWorkPeriod.Debug(L"CVacationTable::ComputeNextVacation 7");
-	if (mDueVacationLeft > vacation.mnWorkDays)
-		vacation.mnPaid = vacation.mnWorkDays;
-	else
-		vacation.SetPartiallyPaid((int)mDueVacationLeft);
+	if (!vacation.mbIsMaternityLeave)
+	{
+		if (mDueVacationLeft >= vacation.mnWorkDays)
+			vacation.mnPaidDays = vacation.mnWorkDays;
+		else
+			vacation.SetPartiallyPaid((int)mDueVacationLeft);
 
-	gWorkPeriod.Debug(L"CVacationTable::ComputeNextVacation 9");
-	mDueVacationLeft -= vacation.mnPaid;
-	vacation.LongLog(mpfLog);
+		gWorkPeriod.Debug(L"CVacationTable::ComputeNextVacation 9");
+		mDueVacationLeft -= vacation.mnPaidDays;
+		vacation.LongLog(mpfLog);
+	}
 
 	mnVacationsComputed++;
 	fprintf(mpfLog, "Left Vacation %.2f\n", mDueVacationLeft);

@@ -16,11 +16,12 @@ public:
 	bool Contains(CMyTime& day);
 	bool Intersect(CDaysSpan& other, CDaysSpan& oCommon);
 
-	void Log(FILE* pf);
+	void Log(FILE* pf, const char* zText=NULL);
 
 	CMyTime mFirstDay;
 	CMyTime mLastDay;
 	CMyTime mDayAfter;
 	int mnDays;
+	int mnWorkDays;
 };
 

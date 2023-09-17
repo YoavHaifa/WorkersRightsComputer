@@ -14,7 +14,10 @@ CVacation::CVacation(void)
 	, mPayPerDay(0)
 {
 	miPrintOrder = 2;
-	gVacationTable.InitFromFile();
+	//gVacationTable.InitFromTextFile();
+	//gVacationTable.SaveXmlFile();
+	gVacationTable.InitFromXmlFile();
+
 }
 bool CVacation::SetCheckRef(CButtonRef *pButton)
 {
@@ -92,16 +95,15 @@ bool CVacation::ReducePaidDays()
 	}
 	return true;
 }
-bool CVacation::ComputePerPeriod(void)
+bool CVacation::ComputeBackByMonth(void)
 {
 	double restMonths = mnYearsForVacation * 12;
 	int seniority = mnSeniority;
 	int nMonthInSeniorityYear = 12;
 	double daysFraction = 0;
 
-	//if (gWorkYears.mnMonthsInLastYear < N_MONTH_FOR_FULL_YEARLY_VACATION)
 	if (gWorkYears.mnMonthsInLastYear < gConfig.mNMonthsForFullVacation)
-		{
+	{
 		restMonths += gWorkYears.mnMonthsInLastYear;
 		seniority ++;
 		nMonthInSeniorityYear = gWorkYears.mnMonthsInLastYear;
@@ -118,7 +120,8 @@ bool CVacation::ComputePerPeriod(void)
 
 	while (restMonths > 0)
 	{
-		double nDaysPerMonth = gVacationTable.GetNDaysPerMonth(seniority, gWorkPeriod.mnWorkDaysPerWeek, mCurYear, mCurMonth);
+		double nDaysPerMonth = gVacationTable.GetNDaysPerMonth(seniority, 
+			gWorkPeriod.mnWorkDaysPerWeek, mCurYear, mCurMonth);
 		LogLine(L"Month ", mCurMonth, L" due days", nDaysPerMonth);
 		sumYear += nDaysPerMonth;
 		CountBackMonth();
@@ -173,7 +176,6 @@ bool CVacation::ComputePerPeriod(void)
 		LogLine(L"n full days rounded down", nFullDays);
 	mnDueDays = nFullDays;
 
-
 	LogLine(L"n due days final", mnDueDays);
 
 	mDuePay = (int)(mnDueDays * mPayPerDay + 0.5);
@@ -202,18 +204,13 @@ bool CVacation::GetGUIValue(CEdit *pEdit, double &oValue, CButtonRef *pButton)
 	oValue = _wtof(sText);
 	return true;
 }
-void CVacation::ComputePrevYears(void)
+void CVacation::GetNPrevYears(void)
 {
 	LogLine(L"previous work years", gWorkYears.mnPrevYears);
 
 	// Check for request to previous years
-	//mnYearsOfUnpaidVacation = 0;
-	//CString sText;
-	//mpPrevYearsBox->GetWindowTextW(sText);
-	//if ((sText.GetLength() > 0) && mpbDemandForPreviousYears->IsChecked())
 	if (GetGUIValue(mpPrevYearsBox, mnYearsOfUnpaidVacation, mpbDemandForPreviousYears))
 	{
-		//mnYearsOfUnpaidVacation = _wtof(sText);
 		LogLine(L"Demand N Prev Years to Pay Vacation", mnYearsOfUnpaidVacation);
 		if (mnYearsOfUnpaidVacation > gWorkYears.mnPrevYears)
 		{
@@ -282,7 +279,7 @@ bool CVacation::ComputeInternals()
 		LogLine(L"Last Year Fraction is regarded full year, n full years =", mnYearsForVacation);
 	}
 
-	return ComputePerPeriod();
+	return ComputeBackByMonth();
 }
 bool CVacation::Compute(void)
 {
@@ -320,14 +317,14 @@ bool CVacation::Compute(void)
 		}
 	}
 
-	ComputePrevYears();
+	GetNPrevYears();
 
 	mPayPerDay = gWageTable.PayPerDayAtWorkEnd();
 	LogLine(L"Pay per day at work end", mPayPerDay);
 
 	if (gVacationTable.mn < 1)
 	{
-		msDue += L"Missing Vacation's File!";
+		msDue += L"Missing Vacation's Seniority Definitions!";
 		return false;
 	}
 

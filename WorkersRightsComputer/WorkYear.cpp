@@ -164,7 +164,32 @@ void CWorkYear::Log(FILE* pfLog)
 	else
 		fprintf(pfLog, ", %d Days", mnDays);
 
+	if (mnPaidMaternityDays > 0)
+		fprintf(pfLog, ", Paid Maternity %d Days", mnPaidMaternityDays);
+
 	if (mnUnpaidVacationCalendarDaysForSeverance > 0)
 		fprintf(pfLog, ", Severance extra %d Days", mnUnpaidVacationCalendarDaysForSeverance);
 	fprintf(pfLog, "\n");
+
+	if (!mUnpaidSpans.IsEmpty())
+	{
+		fprintf(pfLog, "Unpaid: ");
+		POSITION pos = mUnpaidSpans.GetHeadPosition();
+		while (pos)
+		{
+			CDaysSpan* pSpan = mUnpaidSpans.GetNext(pos);
+			pSpan->Log(pfLog);
+		}
+	}
+
+	if (!mPaidMeternity.IsEmpty())
+	{
+		fprintf(pfLog, "Paid Maternity: ");
+		POSITION pos = mPaidMeternity.GetHeadPosition();
+		while (pos)
+		{
+			CDaysSpan* pSpan = mPaidMeternity.GetNext(pos);
+			pSpan->Log(pfLog);
+		}
+	}
 }

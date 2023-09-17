@@ -337,8 +337,11 @@ void CWorkersRightsComputerDlg::OnOK()
 	CMyAskDlg dlg(L"Verify OK", L"Do you want save and to exit?");
 	if (dlg.Ask())
 	{
+		mbSaveFailed = false;
 		OnBnClickedButtonSave();
-		CDialogEx::OnOK();
+
+		if (!mbSaveFailed) // On save failure - stay in application
+			CDialogEx::OnOK();
 	}
 }
 
@@ -383,7 +386,7 @@ void CWorkersRightsComputerDlg::OnBnClickedButtonSave()
 		OnInputChange();
 		mbSaveInProcess = true;
 		CSaver saver;
-		saver.Save();
+		mbSaveFailed = !saver.Save();
 		mbSaveInProcess = false;
 	}
 }

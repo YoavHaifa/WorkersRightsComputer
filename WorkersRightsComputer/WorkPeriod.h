@@ -28,7 +28,7 @@ public:
 	static const int N_WEEK_DAYS = 7;
 	double maWorkingDays[N_WEEK_DAYS];
 	void SetWorkingDay(int iDay, double fraction);
-	void CountWorkingDays(void);
+	void ComputeWorkingDaysInMonth(void);
 
 	int mnMonthsDetailed;
 	bool mbNegative;
