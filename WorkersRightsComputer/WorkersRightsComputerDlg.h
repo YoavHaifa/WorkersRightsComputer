@@ -128,6 +128,8 @@ public:
 	afx_msg void OnBnClickedButtonPrevYearsHolidays();
 	afx_msg void OnBnClickedCheckCaregiver();
 	afx_msg void OnBnClickedButtonVacationsPrevYears();
+	afx_msg void OnEnChangeEditVacationYears();
+	afx_msg void OnEnChangeEditRecuperationYears();
 };
 
 extern CWorkersRightsComputerDlg *gpDlg;

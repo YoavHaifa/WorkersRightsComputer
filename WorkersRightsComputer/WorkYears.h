@@ -16,6 +16,7 @@ public:
 	CString PrepareSpanString(void);
 	bool WorkedAtLeastNMonths(int nMonths);
 	bool LastYearDoContains(class CHoliday& holiday);
+	bool HasFullYearWithNotice(CMyTime &lastDayOfNotice);
 
 	CWorkYear * GetByReverseIndex(int iFromLast);
 

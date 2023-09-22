@@ -49,7 +49,8 @@ public:
 	CString ToHebrewString();
 	bool mbInitialized;
 	CString GetShortString();
-	int GetNMonthsBefore(CMyTime& dayAfter, int *pnExtraDays = NULL);
+	int GetNMonthsUntil(CMyTime& lastDay, int* pnExtraDays = NULL);
+	int GetNMonthsBefore(CMyTime& dayAfter, int* pnExtraDays = NULL);
 	double GetNWeeksUntil(CMyTime& lastDay);
 	int GetNDaysUntil(CMyTime& lastDay);
 	int GetNDaysBefore(CMyTime& dayAfter);

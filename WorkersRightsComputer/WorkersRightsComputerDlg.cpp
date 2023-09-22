@@ -205,6 +205,8 @@ BEGIN_MESSAGE_MAP(CWorkersRightsComputerDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_PREV_YEARS_HOLIDAYS, &CWorkersRightsComputerDlg::OnBnClickedButtonPrevYearsHolidays)
 	ON_BN_CLICKED(IDC_CHECK_CAREGIVER, &CWorkersRightsComputerDlg::OnBnClickedCheckCaregiver)
 	ON_BN_CLICKED(IDC_BUTTON_VACATIONS_PREV_YEARS, &CWorkersRightsComputerDlg::OnBnClickedButtonVacationsPrevYears)
+	ON_EN_CHANGE(IDC_EDIT_VACATION_YEARS, &CWorkersRightsComputerDlg::OnEnChangeEditVacationYears)
+	ON_EN_CHANGE(IDC_EDIT_RECUPERATION_YEARS, &CWorkersRightsComputerDlg::OnEnChangeEditRecuperationYears)
 END_MESSAGE_MAP()
 
 
@@ -742,25 +744,15 @@ void CWorkersRightsComputerDlg::WriteEditorToLetter(CHtmlWriter& html)
 
 	html.WriteLineEH(sPrepared, sPreparedH);
 }
-//void CWorkersRightsComputerDlg::OnBnClickedCheckPaidVacation()
-//{
-//	OnInputChange();
-//}
-//void CWorkersRightsComputerDlg::OnBnClickedCheckPaidRecup()
-//{
-//	OnInputChange();
-//}
 void CWorkersRightsComputerDlg::OnBnClickedCheckLiveIn()
 {
 	gWorkPeriod.mbLiveIn = IsChecked(IDC_CHECK_LIVE_IN);
 	OnInputChange();
 }
-
 void CWorkersRightsComputerDlg::OnBnClickedCheckCaregiver()
 {
 	gWorkPeriod.mbCaregiver = IsChecked(IDC_CHECK_CAREGIVER);
 }
-
 void CWorkersRightsComputerDlg::OnBnClickedButtonPrevYearsHolidays()
 {
 	// Return "holidays" only if it is valid!
@@ -775,10 +767,16 @@ void CWorkersRightsComputerDlg::OnBnClickedButtonPrevYearsHolidays()
 	}
 	gHolidaysDue.UpdateMainDialog();
 }
-
 void CWorkersRightsComputerDlg::OnBnClickedButtonVacationsPrevYears()
 {
 	CPrevYearsVacationsDlg dlg;
 	dlg.DoModal();
 }
-
+void CWorkersRightsComputerDlg::OnEnChangeEditVacationYears()
+{
+	OnInputChange();
+}
+void CWorkersRightsComputerDlg::OnEnChangeEditRecuperationYears()
+{
+	OnInputChange();
+}

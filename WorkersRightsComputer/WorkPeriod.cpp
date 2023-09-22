@@ -645,3 +645,15 @@ double CWorkPeriod::ComputeFamilyPartLastMonths(int nMonthsWanted)
 		companyTotalRatio = sumCompanyRatio / sumFractions;
 	return 1 - companyTotalRatio;
 }
+bool CWorkPeriod::HasFullYearWithNotice()
+{
+	if (!mLastDayOfNotice.IsValid())
+	{
+		static int unErrors = 0;
+		if (!unErrors++)
+			CUtils::MessBox(L"<CWorkPeriod::HasFullYearWithNotice> notice not defned", L"SW Error");
+		return false;
+	}
+
+	return gWorkYears.HasFullYearWithNotice(mLastDayOfNotice);
+}

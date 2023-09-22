@@ -91,7 +91,8 @@ int CWorkYear::GetNFullMonths(int *pnExtraDays, double* pExtraDaysFraction)
 		if (*pnExtraDays >= mDayAfter.mDay)
 			nDaysInFullMonth = 28;
 	}
-	*pExtraDaysFraction = (double)*pnExtraDays / (double)nDaysInFullMonth;
+	if (pExtraDaysFraction)
+		*pExtraDaysFraction = (double)*pnExtraDays / (double)nDaysInFullMonth;
 	return nMonths;
 }
 bool CWorkYear::Contains(CHoliday& holiday)
@@ -146,6 +147,13 @@ int CWorkYear::GetUnpaidVacationCalendarDaysForSeverance(void)
 		}
 	}
 	return mnUnpaidVacationCalendarDaysForSeverance;
+}
+bool CWorkYear::HasFullYearUntil(CMyTime& lastDay)
+{
+	CMyTime first(mFirstDay);
+	first.AddDays(mnUnpaidVacationDays);
+	int nMonths = first.GetNMonthsUntil(lastDay);
+	return nMonths >= 12;
 }
 void CWorkYear::Log(FILE* pfLog)
 {

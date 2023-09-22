@@ -307,6 +307,11 @@ CString CMyTime::GetShortString()
 	CString s = mTime.Format(_T("%B %d, %Y"));
 	return s;
 }
+int CMyTime::GetNMonthsUntil(CMyTime& lastDay, int* pnExtraDays)
+{
+	CMyTime dayAfter = lastDay.NextDay();
+	return GetNMonthsBefore(dayAfter, pnExtraDays);
+}
 int CMyTime::GetNMonthsBefore(CMyTime& dayAfter, int* pnExtraDays)
 {
 	CMyTime countDays(*this);

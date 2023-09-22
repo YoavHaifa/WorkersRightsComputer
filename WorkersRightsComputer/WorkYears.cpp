@@ -166,3 +166,11 @@ CWorkYear* CWorkYears::GetByReverseIndex(int iFromLast)
 		return NULL;
 	return &maYears[mn - 1 - iFromLast];
 }
+bool CWorkYears::HasFullYearWithNotice(CMyTime& lastDayOfNotice)
+{
+	if (mn < 1)
+		return false;
+	if (mn > 1)
+		return true;
+	return maYears[0].HasFullYearUntil(lastDayOfNotice);
+}

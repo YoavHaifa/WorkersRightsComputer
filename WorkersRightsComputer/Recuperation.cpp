@@ -84,10 +84,15 @@ bool CRecuperation::Compute(void)
 
 	if (gWorkYears.mnFullWorkYears < MIN_YEARS_TO_START)
 	{
-		mbValid = false;
-		msDue += L"0";
-		msDebug += L"Work Period too short";
-		return true;
+		if (!gWorkPeriod.HasFullYearWithNotice())
+		{
+			mbValid = false;
+			msDue += L"0";
+			msDebug += L"Work Period too short";
+			return true;
+		}
+		else
+			LogLine(L"Work Period Has Full Year With Notice");
 	}
 
 	double lastYearFraction = 0;

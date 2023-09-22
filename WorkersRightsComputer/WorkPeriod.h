@@ -21,6 +21,7 @@ public:
 	CMyTime mFirst;
 	CMyTime mLast;
 	CMyTime mNotice;
+	CMyTime mLastDayOfNotice; // Valid only after notice was computed
 	CMyTime mLastYearStart;
 
 	CString mSpanString;
@@ -71,6 +72,8 @@ public:
 	double ComputeFamilyPart();
 	double ComputeFamilyPartLastMonths(int nMonths);
 	void WriteLastSalary(class CHtmlWriter& html);
+	void SetLastDayOfNotice(const CMyTime &lastDayOfNotice) { mLastDayOfNotice = lastDayOfNotice; }
+	bool HasFullYearWithNotice();
 
 private:
 	static const int MAX_MONTHS = 600;
