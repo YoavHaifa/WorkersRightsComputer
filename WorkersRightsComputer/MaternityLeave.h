@@ -12,7 +12,7 @@ public:
 	virtual void ShortLog(FILE* pf);
 	virtual void LongLog(FILE* pf);
 
-	virtual void AddToWorkSpan(class CWorkSpan& workSpan);
+	virtual void AddToWorkSpan(class CWorkSpan& workSpan) override;
 
 private:
 	void Compute();

@@ -31,6 +31,7 @@ public:
 	int CountDaysOfUnpaidVacation(CMyTime& first, CMyTime& last);
 	void AddAllVacationsToWorkSpan(class CWorkSpan &workSpan);
 	double GetSeveranceYearsForUnpaidVacation();
+	bool WasWorkDay(CMyTime day);
 
 	static bool umbPrintUnpaid;
 };

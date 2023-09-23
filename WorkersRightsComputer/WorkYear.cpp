@@ -57,7 +57,7 @@ void CWorkYear::InitInternals(CMyTime& firstDay)
 	if (mnPaidCalendarDays >= gConfig.umnDaysInNormalYear)
 	{
 		mFraction = 1;
-		if (mnPaidCalendarDays > 366)
+		if (mnPaidCalendarDays > gConfig.umnMaxDaysInYear)
 			CUtils::MessBox(L"<CWorkYear::InitInternals> mnPaidCalendarDays > 366", L"SW Error");
 	}
 	else
@@ -97,21 +97,21 @@ bool CWorkYear::Contains(CHoliday& holiday)
 {
 	if (holiday.mbAllYears)
 	{
-		CMyTime h(mFirstDay.mYear, holiday.mMonth, holiday.mDay);
-		while (h < mDayAfter)
+		CMyTime ht(mFirstDay.mYear, holiday.mMonth, holiday.mDay);
+		while (ht < mDayAfter)
 		{
-			if (Contains(h))
+			if (Contains(ht))
 			{
-				holiday.mYear = h.mYear;
+				holiday.mYear = ht.mYear;
 				return true;
 			}
-			h.AddYears(1);
+			ht.AddYears(1);
 		}
 		return false;
 	}
 
-	CMyTime h(holiday.mYear, holiday.mMonth, holiday.mDay);
-	return Contains(h);
+	CMyTime ht(holiday.mYear, holiday.mMonth, holiday.mDay);
+	return Contains(ht);
 }
 bool CWorkYear::Contains(CMyTime& time)
 {

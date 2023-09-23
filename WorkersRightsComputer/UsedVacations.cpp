@@ -212,6 +212,17 @@ void CUsedVacations::AddAllVacationsToWorkSpan(CWorkSpan& workSpan)
 		pVac->AddToWorkSpan(workSpan);
 	}
 }
+bool CUsedVacations::WasWorkDay(CMyTime day)
+{
+	POSITION pos = mVacationsUsed.GetHeadPosition();
+	while (pos)
+	{
+		CVacationUsed *pVac = mVacationsUsed.GetNext(pos);
+		if (pVac->Contains(day))
+			return false;
+	}
+	return true;
+}
 void CUsedVacations::Log()
 {
 	FILE *pfLog = CUtils::OpenLogFile(L"UsedVacations");
