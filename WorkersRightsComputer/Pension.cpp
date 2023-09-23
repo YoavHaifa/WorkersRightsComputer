@@ -133,9 +133,10 @@ void CPension::AddMonth(int year, int month, int nDays /* if 0 - full */, bool b
 
 	double familyPart = 0;
 	double companyHours = 0;
+	double companyRatio = 0;
 	if (gFamilyPart.mbAskOnlyForFamilyPart)
 	{
-		familyPart = pInfo->GetFamilyPart(&companyHours);
+		familyPart = pInfo->GetFamilyPart(&companyHours, &companyRatio);
 		pensionDue *= familyPart;
 	}
 	mPensionDue += pensionDue;
@@ -177,7 +178,7 @@ void CPension::AddMonth(int year, int month, int nDays /* if 0 - full */, bool b
 		OnYearEnd();
 	if (gFamilyPart.mbAskOnlyForFamilyPart)
 		mDueFromFamily += (pensionDue + severanceDue);
-	mReport.AddMonth(year, month, monthlyPay, part, penRate, sevRate, companyHours, familyPart);
+	mReport.AddMonth(year, month, monthlyPay, part, penRate, sevRate, familyPart, companyHours, companyRatio);
 }
 bool CPension::DoCompute()
 {

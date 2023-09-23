@@ -335,6 +335,11 @@ void CHtmlWriter::StartPensionTable(bool bPension, bool bSeverance)
 	WriteL(L"<tr>");
 	WriteLTH_EH(L"From", L"מ-");
 	WriteLTH_EH(L"Till", L"עד");
+	if (gFamilyPart.mbAskOnlyForFamilyPart)
+	{
+		WriteLTH_EH(L"Company\r\nhours", L"שעות\r\nחברה");
+	}
+
 	WriteLTH_EH(L"Salary", L"משכורת");
 	WriteLTH_EH(L"Months", L"חודשים");
 	WriteLTH_EH(L"Total", L"סך הכל");
@@ -346,7 +351,6 @@ void CHtmlWriter::StartPensionTable(bool bPension, bool bSeverance)
 			WriteLTH_EH(L"Fund", L"פנסיה");
 		else
 			WriteLTH_EH(L"Fund", L"קרן פיצויים");
-		WriteLTH_EH(L"Company", L"חברה");
 		WriteLTH_EH(L"Family", L"מהמשפחה");
 	}
 	WriteLTH_EH(L"Due", L"מגיע");

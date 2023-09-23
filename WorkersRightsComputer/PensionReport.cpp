@@ -8,7 +8,7 @@
 CPensionReportPeriod::CPensionReportPeriod(int year, int month, 
 	double monthlyPay, double part, 
 	double pensionRate, double severanceRate, 
-	double companyHours, double familyPart)
+	double familyPart, double companyHours, double companyRatio)
 	: mFromYear(year)
 	, mFromMonth(month)
 	, mTillYear(year)
@@ -17,8 +17,9 @@ CPensionReportPeriod::CPensionReportPeriod(int year, int month,
 	, mMonthParts(part)
 	, mPensionRate(pensionRate)
 	, mSeveranceRate(severanceRate)
-	, mCompanyHours(companyHours)
 	, mFamilyPart(familyPart)
+	, mCompanyHours(companyHours)
+	, mCompanyRatio(companyRatio)
 	, mDuePension(0)
 	, mDueSeverance(0)
 	, mDueFromFamily(0)
@@ -54,6 +55,16 @@ void CPensionReportPeriod::WriteToLetter(CHtmlWriter& html, bool bPension)
 	sprintf_s(zBuf, 256, "%2d/%4d", mTillMonth, mTillYear);
 	html.Write2Tab(zBuf);
 
+	if (gFamilyPart.mbAskOnlyForFamilyPart)
+	{
+		if (mCompanyHours > 0)
+			html.Write2Tab("%5.2f", mCompanyHours);
+		else if (mCompanyRatio > 0)
+			html.Write2Tab("%5.2f%%", mCompanyRatio * 100);
+		else
+			html.Write2Tab("%d", 0);
+	}
+
 	html.Write2Tab(mMonthlyPay);
 	html.Write2Tab("%5.3f", mMonthParts);
 
@@ -80,7 +91,6 @@ void CPensionReportPeriod::WriteToLetter(CHtmlWriter& html, bool bPension)
 
 	if (gFamilyPart.mbAskOnlyForFamilyPart)
 	{
-		html.Write2Tab("%5.2f", mCompanyHours);
 		html.Write2Tab("%5.2f%%", mFamilyPart * 100);
 
 		mDueFromFamily = due * mFamilyPart;
@@ -110,14 +120,14 @@ void CPensionReport::Clear()
 	mpLast = NULL;
 }
 void CPensionReport::AddMonth(int year, int month, double monthlyPay, double part, 
-	double pensionRate, double severanceRate, double companyHours, double familyPart)
+	double pensionRate, double severanceRate, double familyPart, double companyHours, double companyRatio)
 {
 	if (mpLast && mpLast->Is(monthlyPay, pensionRate, severanceRate, familyPart))
 		mpLast->Add(year, month, part);
 	else
 	{
 		mpLast = new CPensionReportPeriod(year, month, monthlyPay, part, 
-			pensionRate, severanceRate, companyHours, familyPart);
+			pensionRate, severanceRate, familyPart, companyHours, companyRatio);
 		mPeriods.AddTail(mpLast);
 	}
 }
@@ -140,6 +150,8 @@ void CPensionReport::WriteToLetterPension(CHtmlWriter& html)
 	html.StartTabLine();
 	html.Write2TabEH(L"Sum", L"סך הכל");
 	html.Write2Tab(" ");
+	if (gFamilyPart.mbAskOnlyForFamilyPart)
+		html.Write2Tab(" ");
 	html.Write2Tab(" ");
 	html.Write2Tab(" ");
 	html.Write2Tab(" ");
@@ -147,7 +159,6 @@ void CPensionReport::WriteToLetterPension(CHtmlWriter& html)
 	html.Write2Tab(sumPension);
 	if (gFamilyPart.mbAskOnlyForFamilyPart)
 	{
-		html.Write2Tab(" ");
 		html.Write2Tab(" ");
 		html.Write2Tab(sumFromFamily);
 	}
@@ -173,6 +184,8 @@ void CPensionReport::WriteToLetterSeverance(CHtmlWriter& html)
 	html.StartTabLine();
 	html.Write2TabEH(L"Sum", L"סך הכל");
 	html.Write2Tab(" ");
+	if (gFamilyPart.mbAskOnlyForFamilyPart)
+		html.Write2Tab(" ");
 	html.Write2Tab(" ");
 	html.Write2Tab(" ");
 	html.Write2Tab(" ");
