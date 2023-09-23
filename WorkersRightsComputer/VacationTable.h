@@ -18,6 +18,7 @@ public:
 	~CVacationTable();
 
 	double GetNDaysPerMonth(int seniority, double nDaysPerWeek, int year, int month);
+	double GetNDaysPerYear(int seniority, double nDaysPerWeek);
 
 	bool InitFromTextFile(void);
 	bool InitFromXmlFile(void);

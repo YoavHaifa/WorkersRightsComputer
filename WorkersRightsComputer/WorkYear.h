@@ -24,6 +24,7 @@ public:
 	bool HasFullYearUntil(CMyTime& lastDay);
 
 	int GetUnpaidVacationCalendarDaysForSeverance(void);
+	double GetVacationFraction();
 
 	void Log(FILE* pfLog);
 	int mDebug;

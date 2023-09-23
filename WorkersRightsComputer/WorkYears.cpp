@@ -2,6 +2,7 @@
 #include "WorkYears.h"
 #include "WorkYear.h"
 #include "WorkPeriod.h"
+#include "Config.h"
 #include "Utils.h"
 #include "Right.h"
 #include "UsedVacations.h"
@@ -55,7 +56,7 @@ void CWorkYears::Compute(void)
 		{
 			mnDaysForSeveranceAddedForUnpaidVacations += maYears[i].GetUnpaidVacationCalendarDaysForSeverance();
 		}
-		mYearsForSeverance += (double)mnDaysForSeveranceAddedForUnpaidVacations / 365.0;
+		mYearsForSeverance += (double)mnDaysForSeveranceAddedForUnpaidVacations / gConfig.umnDaysInNormalYear;
 	}
 
 	double partYearThreshold = (double)N_MIN_MONTHS_FOR_SPECIAL_CASE / 12 - 0.002;

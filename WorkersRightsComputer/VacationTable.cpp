@@ -140,6 +140,17 @@ bool CVacationTable::PrintLog(const char* zAt)
 	fclose(pfLog);
 	return true;
 }
+double CVacationTable::GetNDaysPerYear(int seniority, double nDaysPerWeek)
+{
+	// Yoav writes in 23 September 2023:
+	// After 2017 there was no change in vacation days for seniority
+	// This allows use to compute due vacation by years instead of months
+	// It was required for easy addition of maternity leave on yearly basis
+	int year = 2020;
+	int month = 1;
+	double nDaysPerMonth = GetNDaysPerMonth(seniority,nDaysPerWeek, year, month);
+	return nDaysPerMonth * 12;
+}
 double CVacationTable::GetNDaysPerMonth(int seniority, double nDaysPerWeek, int year, int month)
 {
 	if (mn < 1)

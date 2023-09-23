@@ -8,8 +8,7 @@
 
 const double CVacation::MIN_FRACTION_FOR_ROUND_UP = 0.9;
 
-
-CVacation::CVacation(void)
+CVacation::CVacation()
 	: CRight(L"Vacation", L"חופש")
 	, mPayPerDay(0)
 {
@@ -95,98 +94,6 @@ bool CVacation::ReducePaidDays()
 	}
 	return true;
 }
-bool CVacation::ComputeBackByMonth(void)
-{
-	double restMonths = mnYearsForVacation * 12;
-	int seniority = mnSeniority;
-	int nMonthInSeniorityYear = 12;
-	double daysFraction = 0;
-
-	if (gWorkYears.mnMonthsInLastYear < gConfig.mNMonthsForFullVacation)
-	{
-		restMonths += gWorkYears.mnMonthsInLastYear;
-		seniority ++;
-		nMonthInSeniorityYear = gWorkYears.mnMonthsInLastYear;
-		daysFraction = gWorkYears.mDaysInLastYearAsFraction;
-	}
-		
-	mCurYear = gWorkPeriod.mLast.mYear;
-	mCurMonth = gWorkPeriod.mLast.mMonth;
-	LogLine(L"mnYearsForVacation", mnYearsForVacation);
-	LogLine(L"seniority", seniority);
-	LogLine(L"Year", mCurYear);
-	int nMonthForYear = 0;
-	double sumYear = 0;
-
-	while (restMonths > 0)
-	{
-		double nDaysPerMonth = gVacationTable.GetNDaysPerMonth(seniority, 
-			gWorkPeriod.mnWorkDaysPerWeek, mCurYear, mCurMonth);
-		LogLine(L"Month ", mCurMonth, L" due days", nDaysPerMonth);
-		sumYear += nDaysPerMonth;
-		CountBackMonth();
-
-		if (restMonths >= 1)
-		{
-			mnDueDays += nDaysPerMonth;
-			restMonths -= 1;
-
-			if (daysFraction > 0)
-			{
-				LogLine(L"daysFraction ", daysFraction);
-				double daysFractionVacation = nDaysPerMonth * daysFraction;
-				LogLine(L"daysFractionVacation ", daysFractionVacation);
-				mnDueDays += daysFractionVacation;
-				sumYear += daysFractionVacation;
-				daysFraction = 0;
-			}
-		}
-		else
-		{
-			double daysPerPartPartMonth = nDaysPerMonth * restMonths;
-			LogLine(L"days due per part month", daysPerPartPartMonth);
-			mnDueDays += daysPerPartPartMonth;
-			restMonths = 0;
-		}
-		nMonthForYear++;
-		if (nMonthForYear == nMonthInSeniorityYear)
-		{
-			nMonthForYear = 0;
-			seniority--;
-			LogLine(L"==== days per year", sumYear);
-			sumYear = 0;
-			nMonthInSeniorityYear = 12;
-			LogLine(L"seniority", seniority);
-		}
-	}
-
-	if (!ReducePaidDays())
-		return false;
-
-	// Round Up or Down
-	LogLine(L"n due days with fraction", mnDueDays);
-	int nFullDays = (int)mnDueDays;
-	double dayFrac = mnDueDays - nFullDays;
-	if (dayFrac >= MIN_FRACTION_FOR_ROUND_UP)
-	{
-		nFullDays++;
-		LogLine(L"n full days rounded up", nFullDays);
-	}
-	else
-		LogLine(L"n full days rounded down", nFullDays);
-	mnDueDays = nFullDays;
-
-	LogLine(L"n due days final", mnDueDays);
-
-	mDuePay = (int)(mnDueDays * mPayPerDay + 0.5);
-	msDesc += ToString(mnDueDays);
-	msDescHebrew  += ToString(mnDueDays);
-	msDesc += L" days * ";
-	msDescHebrew += L" ימים * ";
-	msDesc += ToString(mPayPerDay);
-	msDescHebrew += ToString(mPayPerDay);
-	return true;
-}
 bool CVacation::GetGUIValue(CEdit *pEdit, double &oValue, CButtonRef *pButton)
 {
 	oValue = 0;
@@ -204,7 +111,7 @@ bool CVacation::GetGUIValue(CEdit *pEdit, double &oValue, CButtonRef *pButton)
 	oValue = _wtof(sText);
 	return true;
 }
-void CVacation::GetNPrevYears(void)
+void CVacation::GetNPrevYears()
 {
 	LogLine(L"previous work years", gWorkYears.mnPrevYears);
 
@@ -226,7 +133,7 @@ void CVacation::GetNPrevYears(void)
 		}
 	}
 }
-bool CVacation::ComputeByShortRule(void)
+bool CVacation::ComputeByShortRule()
 {
 	mbUseShortRule = true;
 	mnDueDays = gWorkYears.mnWorkingDays * SHORT_RULE_PER_CENT / 100;
@@ -272,16 +179,131 @@ bool CVacation::ComputeInternals()
 	mnSeniority = gWorkYears.mnPrevYears;
 	mnYearsForVacation = mnYearsOfUnpaidVacation;
 	LogLine(L"N Previous Years for vacation", mnYearsForVacation);
-	if (gWorkYears.mnMonthsInLastYear >= gConfig.mNMonthsForFullVacation)
+	
+	// Add last year
+	mnMonthsForVacation = mnYearsForVacation * 12 + gWorkYears.mnMonthsInLastYear;
+	mnSeniority++;
+	LogLine(L"N months for vacation", mnMonthsForVacation);
+
+	ComputeBackByMonth();
+	ComputeBackByYears();
+
+	if (!ReducePaidDays())
+		return false;
+
+	ComputeEpilogue();
+	return true;
+}
+void CVacation::ComputeEpilogue()
+{
+	// Round Up or Down
+	LogLine(L"n due days with fraction", mnDueDays);
+	int nFullDays = (int)mnDueDays;
+	double dayFrac = mnDueDays - nFullDays;
+	if (dayFrac >= MIN_FRACTION_FOR_ROUND_UP)
 	{
-		mnYearsForVacation++;
-		mnSeniority++;
-		LogLine(L"Last Year Fraction is regarded full year, n full years =", mnYearsForVacation);
+		nFullDays++;
+		LogLine(L"n full days rounded up", nFullDays);
+	}
+	else
+		LogLine(L"n full days rounded down", nFullDays);
+	mnDueDays = nFullDays;
+
+	LogLine(L"n due days final", mnDueDays);
+
+	mDuePay = (int)(mnDueDays * mPayPerDay + 0.5);
+	msDesc += ToString(mnDueDays);
+	msDescHebrew += ToString(mnDueDays);
+	msDesc += L" days * ";
+	msDescHebrew += L" ימים * ";
+	msDesc += ToString(mPayPerDay);
+	msDescHebrew += ToString(mPayPerDay);
+}
+void CVacation::ComputeBackByYears()
+{
+	LogLine(L"<ComputeBackByYears>");
+	mnSeniority = gWorkYears.mnPrevYears + 1;
+	mnYearsForVacation = mnYearsOfUnpaidVacation + 1;
+	LogLine(L"n years for vacation", mnYearsForVacation);
+
+	// Compute last year first
+	mnDueDays = 0;
+	for (int iFromLast = 0; iFromLast < mnYearsForVacation; iFromLast++)
+	{
+		CWorkYear *pYear = gWorkYears.GetByReverseIndex(iFromLast);
+		double vacationFraction = pYear->GetVacationFraction();
+		double nDaysPerYear = gVacationTable.GetNDaysPerYear(pYear->mSeniority, gWorkPeriod.mnWorkDaysPerWeek);
+		double nDueDaysPerYear = nDaysPerYear * vacationFraction;
+		mnDueDays += nDueDaysPerYear;
+
+		// Log computations
+		LogLine(L"Work Year", gWorkYears.mn - iFromLast);
+		LogLine(L"Seniority", pYear->mSeniority);
+		LogLine(L"Days due per year, by seniority", nDaysPerYear);
+		LogLine(L"VacationFraction", vacationFraction);
+		LogLine(L"Final nDueDaysPerYear", nDueDaysPerYear);
+		LogLine(L"==== Accumulated Vacation Days", mnDueDays);
+	}
+}
+void CVacation::ComputeBackByMonth()
+{
+	double restMonths = mnMonthsForVacation;
+	int seniority = mnSeniority;
+	int nMonthInSeniorityYear = gWorkYears.mnMonthsInLastYear;
+	double daysFraction = gWorkYears.mDaysInLastYearAsFraction;
+
+	mCurYear = gWorkPeriod.mLast.mYear;
+	mCurMonth = gWorkPeriod.mLast.mMonth;
+	LogLine(L"Year", mCurYear);
+	int nMonthForYear = 0;
+	double sumYear = 0;
+
+	while (restMonths > 0)
+	{
+		LogLine(L"seniority", seniority);
+
+		double nDaysPerMonth = gVacationTable.GetNDaysPerMonth(seniority,
+			gWorkPeriod.mnWorkDaysPerWeek, mCurYear, mCurMonth);
+		LogLine(L"Month ", mCurMonth, L" due days", nDaysPerMonth);
+		sumYear += nDaysPerMonth;
+		CountBackMonth();
+
+		if (restMonths >= 1)
+		{
+			mnDueDays += nDaysPerMonth;
+			restMonths -= 1;
+
+			if (daysFraction > 0)
+			{
+				LogLine(L"daysFraction ", daysFraction);
+				double daysFractionVacation = nDaysPerMonth * daysFraction;
+				LogLine(L"daysFractionVacation ", daysFractionVacation);
+				mnDueDays += daysFractionVacation;
+				sumYear += daysFractionVacation;
+				daysFraction = 0;
+			}
+		}
+		else
+		{
+			double daysPerPartPartMonth = nDaysPerMonth * restMonths;
+			LogLine(L"days due per part month", daysPerPartPartMonth);
+			mnDueDays += daysPerPartPartMonth;
+			restMonths = 0;
+		}
+		nMonthForYear++;
+		if (nMonthForYear == nMonthInSeniorityYear)
+		{
+			nMonthForYear = 0;
+			seniority--;
+			LogLine(L"==== days per year", sumYear);
+			sumYear = 0;
+			nMonthInSeniorityYear = 12;
+		}
 	}
 
-	return ComputeBackByMonth();
+	LogLine(L"<ComputeBackByMonth> Accumulated Vacation Days", mnDueDays);
 }
-bool CVacation::Compute(void)
+bool CVacation::Compute()
 {
 	LogLine(L"N work days per week", gWorkPeriod.mnWorkDaysPerWeek);
 	if (!mpbDemandForPreviousYears->IsChecked())
@@ -334,7 +356,7 @@ bool CVacation::Compute(void)
 	PrepareString();
 	return true;
 }
-void CVacation::PrepareString(void)
+void CVacation::PrepareString()
 {
 	if (mbUseShortRule)
 	{
@@ -370,15 +392,15 @@ void CVacation::PrepareString(void)
 	msDue += ToString(mDuePay);
 	//msDue += L" NIS";
 }
-CString CVacation::GetDecriptionForLetter(void)
+CString CVacation::GetDecriptionForLetter()
 {
 	return msDesc;
 }
-CString CVacation::GetDecriptionForLetterHebrew(void)
+CString CVacation::GetDecriptionForLetterHebrew()
 {
 	return msDescHebrew;
 }
-void CVacation::CountBackMonth(void)
+void CVacation::CountBackMonth()
 {
 	if (mCurMonth <= 1)
 	{

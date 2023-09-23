@@ -9,7 +9,7 @@ public:
 	CString msSaveRoot;
 
 	bool mb14DaysUnpaidVacation4SeveranceDefault;
-	int mNMonthsForFullVacation;
+	//int mNMonthsForFullVacation;
 	CString msFilledBy;
 	CString msFilledByHebrew;
 	CString msContactPhone;
@@ -17,6 +17,9 @@ public:
 	CString msContactEmail;
 	bool SaveState();
 	bool RestoreState();
+
+	static const int umnDaysInNormalYear = 365;
+	static const int umnMaxDaysInYear = 366;
 };
 
 extern CConfig gConfig;

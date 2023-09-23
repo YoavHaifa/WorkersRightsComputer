@@ -8,7 +8,6 @@ CConfig gConfig;
 
 CConfig::CConfig(void)
 	: mb14DaysUnpaidVacation4SeveranceDefault(false)
-	, mNMonthsForFullVacation(12)
 {
 }
 void CConfig::InitFromXml()
@@ -26,7 +25,7 @@ void CConfig::InitFromXml()
 	pRoot->GetValue(L"version", msVersion);
 	pRoot->GetValue(L"save_dir", msSaveRoot);
 	pRoot->GetValue(L"b_14_days_severance", mb14DaysUnpaidVacation4SeveranceDefault);
-	pRoot->GetValue(L"n_months_for_full_vacation", mNMonthsForFullVacation);
+	//pRoot->GetValue(L"n_months_for_full_vacation", mNMonthsForFullVacation);
 
 	RestoreState();
 }

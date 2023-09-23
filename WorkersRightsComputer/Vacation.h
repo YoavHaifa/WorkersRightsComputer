@@ -6,7 +6,7 @@
 class CVacation : public CRight
 {
 public:
-	CVacation(void);
+	CVacation();
 
 	virtual	bool SetCheckRef(CButtonRef *pButton) override;
 	virtual	bool SetEditRef(class CEditRef *pRef) override;
@@ -41,20 +41,22 @@ public:
 	CString msDescHebrew;
 
 	//int GetNDaysPerYear(int seniority, double nDaysPerWeek);
-	virtual bool Compute(void) override;
+	virtual bool Compute() override;
 	bool ComputeInternals();
 	bool ReducePaidDays();
-	bool ComputeBackByMonth();
-	virtual CString GetDecriptionForLetter(void)override;
-	virtual CString GetDecriptionForLetterHebrew(void)override;
-	void PrepareString(void);
+	void ComputeBackByMonth();
+	void ComputeBackByYears();
+	void ComputeEpilogue();
+	virtual CString GetDecriptionForLetter()override;
+	virtual CString GetDecriptionForLetterHebrew()override;
+	void PrepareString();
 
 	int mCurYear;
 	int mCurMonth;
-	void CountBackMonth(void);
+	void CountBackMonth();
 
 	bool GetGUIValue(CEdit* pEdit, double& oValue, CButtonRef* pButton);
-	void GetNPrevYears(void);
-	bool ComputeByShortRule(void);
+	void GetNPrevYears();
+	bool ComputeByShortRule();
 };
 

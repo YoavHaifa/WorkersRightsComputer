@@ -2,6 +2,7 @@
 #include "WorkYear.h"
 #include "WorkPeriod.h"
 #include "Utils.h"
+#include "Config.h"
 #include "Holidays.h"
 
 CWorkYear::CWorkYear(void)
@@ -49,16 +50,11 @@ void CWorkYear::InitInternals(CMyTime& firstDay)
 	{
 		mLastDay.LogLine(mpfLog, L"last day %s");
 		fwprintf(mpfLog, L"mnAllCalendarDays %d\n", mnDays);
-	}
-
-	if (mpfLog)
-	{
-		fwprintf(mpfLog, L"mnAllCalendarDays %d\n", mnDays);
 		fwprintf(mpfLog, L"mnPaidCalendarDays %d\n", mnPaidCalendarDays);
 	}
 
 	// Comput fraction
-	if (mnPaidCalendarDays >= 365)
+	if (mnPaidCalendarDays >= gConfig.umnDaysInNormalYear)
 	{
 		mFraction = 1;
 		if (mnPaidCalendarDays > 366)
@@ -66,9 +62,11 @@ void CWorkYear::InitInternals(CMyTime& firstDay)
 	}
 	else
 	{
-		mFraction = (double)mnPaidCalendarDays / 365.0;
+		mFraction = (double)mnPaidCalendarDays / gConfig.umnDaysInNormalYear;
 		if (!mbLast)
 		{
+			// All the years other than the last should be full years
+			// If there were unpaid vacations - the years end is postponed in intialization
 			static int countErrors = 0;
 			if (mpfLog)
 			{
@@ -154,6 +152,16 @@ bool CWorkYear::HasFullYearUntil(CMyTime& lastDay)
 	first.AddDays(mnUnpaidVacationDays);
 	int nMonths = first.GetNMonthsUntil(lastDay);
 	return nMonths >= 12;
+}
+double CWorkYear::GetVacationFraction()
+{
+	double daysForVacation = mnPaidCalendarDays - mnPaidMaternityDays;
+	double vacationFraction = 0;
+	if (mbLast)
+		vacationFraction = min(1.0, daysForVacation / gConfig.umnDaysInNormalYear);
+	else
+		vacationFraction = daysForVacation / mnPaidCalendarDays;
+	return vacationFraction;
 }
 void CWorkYear::Log(FILE* pfLog)
 {
