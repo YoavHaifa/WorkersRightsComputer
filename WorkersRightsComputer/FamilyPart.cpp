@@ -95,8 +95,11 @@ bool CFamilyPart::AddPeriod(CMyTime& startTime, CCompanyPartPeriod* pNewPeriod)
 			mbAskOnlyForFamilyPart = true;
 		}
 		CMyTime april18(2018, 4, 1);
-		CCompanyPartPeriod* pDummyPeriod = new CCompanyPartPeriod(april18.mTime, 0, 0, true);
-		mPeriods.AddTail(pDummyPeriod);
+		if (startTime < april18 && gWorkPeriod.mLast > april18)
+		{
+			CCompanyPartPeriod* pDummyPeriod = new CCompanyPartPeriod(april18.mTime, 0, 0, true);
+			mPeriods.AddTail(pDummyPeriod);
+		}
 		return true;
 	}
 	

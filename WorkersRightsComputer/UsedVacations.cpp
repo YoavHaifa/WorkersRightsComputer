@@ -209,7 +209,7 @@ void CUsedVacations::AddAllVacationsToWorkSpan(CWorkSpan& workSpan, bool bExtend
 	while (pos)
 	{
 		CVacationUsed *pVac = mVacationsUsed.GetNext(pos);
-		if (bExtendPeriodByPaidMaternity && pVac->mbIsMaternityLeave)
+		if (bExtendPeriodByPaidMaternity && pVac->mbIsMaternityLeave && workSpan.Contains(pVac->mFirstDay))
 			workSpan.AddUnpaidVacation(*pVac);
 		else
 			pVac->AddToWorkSpan(workSpan);
@@ -267,13 +267,15 @@ void CUsedVacations::WriteToLetter(CHtmlWriter& html)
 	while (pos)
 	{
 		CVacationUsed *pVac = mVacationsUsed.GetNext(pos);
-		html.WriteEH(L"Vacation: ", L"חופשה: ");
+		if (pVac->mbIsMaternityLeave)
+			html.WriteEH(L"Maternity Leave: ", L"חופשת לידה: ");
+		else
+			html.WriteEH(L"Vacation: ", L"חופשה: ");
+
 		html.WriteEH(pVac->mFirstDay.ToString(), pVac->mFirstDay.ToHebrewString());
 		html.Write(L" - ");
 		html.WriteEH(pVac->mLastDay.ToString(), pVac->mLastDay.ToHebrewString());
 
-		//fprintf(pf, "Work Days %2d / %2d - Paid %2d Unpaid %2d\n",
-		//	mnWorkDays, mnDays, mnPaidDays, mnUnPaidWorkDays);
 		html.WriteEH(L", work days ", L", ימי עבודה ");
 		html.WriteInt(pVac->mnWorkDays);
 		html.WriteEH(L", paid ", L", בתשלום ");
