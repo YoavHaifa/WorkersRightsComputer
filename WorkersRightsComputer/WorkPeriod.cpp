@@ -329,39 +329,6 @@ void CWorkPeriod::LoadFromXml(class CXMLParseNode* pRoot)
 
 	Compute(L"LoadFromXml2");
 }
-/*
-void CWorkPeriod::Restore(FILE *pfRead)
-{
-	mFirst.Read(pfRead);
-	mLast.Read(pfRead);
-	mNotice.Read(pfRead);
-	CString s = CUtils::ReadLine(pfRead);
-	if (s == "Days")
-	{
-		for (int iDay = 0; iDay < 7; iDay++)
-		{
-			int value = CUtils::ReadInt(pfRead);
-			SetWorkingDay(iDay, value);
-		}
-	}
-	s = CUtils::ReadLine(pfRead);
-	if (s == "MinWage")
-	{
-		gWage.SetMinWage();
-	}
-
-	InitDetailsForEachMonth();
-
-	s = CUtils::ReadLine(pfRead);
-	if (s == "Vacations")
-	{
-		gUsedVacations.Restore(pfRead);
-		s = CUtils::ReadLine(pfRead);
-	}
-	if (s == "FamilyPart")
-		gFamilyPart.Restore(pfRead);
-	gWorkPeriod.Compute();
-}*/
 CString CWorkPeriod::GetShortSummary()
 {
 	CString s(L"Work period: ");
@@ -372,6 +339,13 @@ CString CWorkPeriod::GetShortSummary()
 	s += CRight::ToString((int)mnWorkDaysPerWeek);
 	s += " work days/week";
 	return s;
+}
+void CWorkPeriod::ShortLog(FILE* pf)
+{
+	if (!pf)
+		return;
+	CString sPeriod = gWorkPeriod.GetShortSummary();
+	fwprintf(pf, L"%s\n\n", (const wchar_t*)sPeriod);
 }
 CString CWorkPeriod::GetTextSummary()
 {
@@ -566,9 +540,9 @@ void CWorkPeriod::Log(const wchar_t *zAt)
 
 	for (int i = 0; i < MAX_MONTHS; i++)
 	{
-		if (maMonths[i].mFraction < 1)
-			fwprintf(pfLog, L"%3d: %d/%02d - %0.2f\n", maMonths[i].mi, 
-				maMonths[i].mYear, maMonths[i].mMonth, maMonths[i].mFraction);
+		if (maMonths[i].IsPartial())
+			maMonths[i].LogFraction(pfLog);
+
 		if (maMonths[i].mbLast)
 			break;
 	}
@@ -613,8 +587,9 @@ double CWorkPeriod::ComputeFamilyPart()
 	for (int i = 0; i < MAX_MONTHS; i++)
 	{
 		double companyRatio = maMonths[i].GetCompanyRatio();
-		sumFractions += maMonths[i].mFraction;
-		sumCompanyRatio += companyRatio * maMonths[i].mFraction;
+		double monthFraction = maMonths[i].GetFraction();
+		sumFractions += monthFraction;
+		sumCompanyRatio += companyRatio * monthFraction;
 		if (maMonths[i].mbLast)
 			break;
 	}
@@ -633,7 +608,7 @@ double CWorkPeriod::ComputeFamilyPartLastMonths(int nMonthsWanted)
 	for (int iMonth = iLast; iMonth >= 0 && missingFraction > 0; iMonth--)
 	{
 		double companyRatio = maMonths[iMonth].GetCompanyRatio();
-		double fraction = min(maMonths[iMonth].mFraction, missingFraction);
+		double fraction = min(maMonths[iMonth].GetFraction(), missingFraction);
 
 		sumFractions += fraction;
 		missingFraction -= fraction;

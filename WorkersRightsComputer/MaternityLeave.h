@@ -13,6 +13,7 @@ public:
 	virtual void LongLog(FILE* pf);
 
 	virtual void AddToWorkSpan(class CWorkSpan& workSpan) override;
+	virtual void UpdateMonthlyInfo() override;
 
 private:
 	void Compute();

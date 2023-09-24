@@ -10,26 +10,35 @@ CMonthInfo::CMonthInfo()
 	, mnAllDays(0)
 	, mnAllWorkingDays(0)
 	, mnDaysUnpaidVacation(0)
+	, mnDaysNoPension(0)
 	, mnDaysWorked(0)
-	, mFraction(1)
+	, mnDaysWorkedForPension(0)
+	, mMonthFraction(1)
+	, mMonthFractionForPension(1)
 {
 }
 CMonthInfo::~CMonthInfo()
 {
 }
+void CMonthInfo::ComputeFractionBeforeVacations()
+{
+	mnAllWorkingDays = gWorkPeriod.CountWorkingDaysPerMonth(mYear, mMonth);
+	mnDaysWorked = gWorkPeriod.CountDaysWorkedPerMonth(mYear, mMonth);
+	mnDaysWorkedForPension = mnDaysWorked;
+	mMonthFraction = (double)mnDaysWorked / mnAllWorkingDays;
+	mMonthFractionForPension = mMonthFraction;
+}
 void CMonthInfo::InitFirst()
 {
 	Set(gWorkPeriod.mFirst.mTime);
 	mHoursPerWeek = gWorkPeriod.GetWorkingHoursInFullWeek(mYear, mMonth);
-	//SetDaysPerWeek();
 
 	mi = 0;
 	mSeniorityMonths = 0;
 	mnAllDays = gWorkPeriod.CountAllDaysPerMonth(mYear,mMonth);
-	mnAllWorkingDays = gWorkPeriod.CountWorkingDaysPerMonth(mYear,mMonth);
-	mnDaysWorked = gWorkPeriod.CountDaysWorkedPerMonth(mYear,mMonth);
-	mFraction = (double)mnDaysWorked / mnAllWorkingDays;
+	ComputeFractionBeforeVacations();
 	mnDaysUnpaidVacation = 0;
+	mnDaysNoPension = 0;
 	mbLast = MonthContains(gWorkPeriod.mLast);
 }
 void CMonthInfo::InitNext(CMonthInfo &prev)
@@ -37,7 +46,6 @@ void CMonthInfo::InitNext(CMonthInfo &prev)
 	Set(prev.mYear, prev.mMonth, 1);
 	AddMonth();
 	mHoursPerWeek = gWorkPeriod.GetWorkingHoursInFullWeek(mYear, mMonth);
-	//SetDaysPerWeek();
 
 	mi = prev.mi + 1;
 	if (mi == 1 && prev.IsPartial())
@@ -48,34 +56,24 @@ void CMonthInfo::InitNext(CMonthInfo &prev)
 	mnAllDays = gWorkPeriod.CountAllDaysPerMonth(mYear, mMonth);
 	if (MonthContains(gWorkPeriod.mLast))
 	{
-		mnAllWorkingDays = gWorkPeriod.CountWorkingDaysPerMonth(mYear,mMonth);
-		mnDaysWorked = gWorkPeriod.CountDaysWorkedPerMonth(mYear,mMonth);
-		mFraction = (double)mnDaysWorked / mnAllWorkingDays;
+		ComputeFractionBeforeVacations();
 		mbLast = true;
 	}
 	else
 	{
 		mnAllWorkingDays = 0;
 		mnDaysWorked = 0;
-		mFraction = 1;
+		mnDaysWorkedForPension = 0;
+		mMonthFraction = 1;
+		mMonthFractionForPension = 1;
 		mbLast = false;
 	}
 	mnDaysUnpaidVacation = 0;
+	mnDaysNoPension = 0;
 }
-/*
-void CMonthInfo::SetDaysPerWeek(void)
-{
-	mHoursPerWeek = gWorkPeriod.GetWorkingHoursInFullWeek(mYear, mMonth);
-	if (mYear < 2018)
-		mHoursPerWeek = 43;
-	else if (mYear == 2018 && mMonth < 4)
-		mHoursPerWeek = 43;
-	else
-		mHoursPerWeek = 42;
-} */
 bool CMonthInfo::IsPartial(void)
 {
-	return (mFraction < 1);
+	return (mMonthFraction < 1);
 }
 double CMonthInfo::GetCompanyRatio(double* poCompanyHours, double* poCompanyRatio)
 {
@@ -96,28 +94,65 @@ double CMonthInfo::GetFamilyPart(double* poCompanyHours, double* poCompanyRatio)
 {
 	return 1 - GetCompanyRatio(poCompanyHours, poCompanyRatio);
 }
-void CMonthInfo::SetUnpaid(int nAnpaidDaysToAdd)
+void CMonthInfo::LogFraction(FILE* pf)
 {
-	if (nAnpaidDaysToAdd < 1)
+	fwprintf(pf, L"%3d: %d/%02d - %0.2f (pension %0.2f)\n", mi,
+		mYear, mMonth, mMonthFraction, mMonthFractionForPension);
+}
+void CMonthInfo::SetUnpaid(int nUnpaidDaysToAdd)
+{
+	if (nUnpaidDaysToAdd < 1)
 		return;
 
 	if (mnAllWorkingDays == 0)
 	{
-		mnAllWorkingDays = gWorkPeriod.CountWorkingDaysPerMonth(mYear, mMonth);
-		mnDaysWorked = gWorkPeriod.CountDaysWorkedPerMonth(mYear, mMonth);
-		mnDaysUnpaidVacation = nAnpaidDaysToAdd;
+		ComputeFractionBeforeVacations();
+		mnDaysUnpaidVacation = nUnpaidDaysToAdd;
 	}
 	else
-		mnDaysUnpaidVacation += nAnpaidDaysToAdd;
-	mnDaysWorked -= nAnpaidDaysToAdd;
-		
-	mFraction = (double)mnDaysWorked / mnAllWorkingDays;
+		mnDaysUnpaidVacation += nUnpaidDaysToAdd;
+	mnDaysWorked -= nUnpaidDaysToAdd;
 
-	if (mFraction < 0)
+	mMonthFraction = (double)mnDaysWorked / mnAllWorkingDays;
+
+	if (mMonthFraction < 0)
 		CUtils::MessBox(L"<CMonthInfo::SetUnpaid> fraction < 0", L"SW Error");
 	if (mi > 0 && !mbLast)
 	{
 		if (mnDaysWorked + mnDaysUnpaidVacation != mnAllWorkingDays)
 			CUtils::MessBox(L"<CMonthInfo::SetUnpaid> Paid and unpaid days don't sum correctly", L"SW Error");
 	}
+}
+void CMonthInfo::SetNoPension(int nDaysToAdd)
+{
+	if (nDaysToAdd < 1)
+		return;
+
+	if (mnAllWorkingDays == 0)
+	{
+		ComputeFractionBeforeVacations();
+		mnDaysNoPension = nDaysToAdd;
+	}
+	else
+		mnDaysNoPension += nDaysToAdd;
+	mnDaysWorkedForPension -= nDaysToAdd;
+
+	mMonthFractionForPension = (double)mnDaysWorkedForPension / mnAllWorkingDays;
+
+	if (mMonthFractionForPension < 0)
+		CUtils::MessBox(L"<CMonthInfo::SetNoPension> FractionForPension < 0", L"SW Error");
+	if (mi > 0 && !mbLast)
+	{
+		if (mnDaysWorkedForPension + mnDaysNoPension != mnAllWorkingDays)
+			CUtils::MessBox(L"<CMonthInfo::SetNoPension> Pension and no pension days don't sum correctly", L"SW Error");
+	}
+}
+int CMonthInfo::GetNRelevantDays(bool bPension)
+{
+	if (mnAllWorkingDays == 0)
+		ComputeFractionBeforeVacations();
+
+	if (bPension)
+		return mnDaysWorkedForPension;
+	return mnDaysWorked;
 }

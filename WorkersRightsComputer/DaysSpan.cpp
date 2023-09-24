@@ -75,6 +75,35 @@ bool CDaysSpan::Intersect(CDaysSpan& other, CDaysSpan& oCommon)
 	oCommon.InitSpan(first, last);
 	return oCommon.mnDays > 0;
 }
+void CDaysSpan::UpdateMonthlyInfo4Unpaid(bool bNoPension)
+{
+	int nUnpaidToAssign = mnWorkDays;
+
+	// Update for relevant months in work period
+	CMyTime updateMonthStart(mFirstDay.mYear, mFirstDay.mMonth, 1);
+	CMonthInfo* pMonthInfo = gWorkPeriod.GetMonthInfoFor(mFirstDay);
+	int nRelevantWorkDaysPerMonth = pMonthInfo->GetNRelevantDays(bNoPension);
+	while (nUnpaidToAssign > 0)
+	{
+		if (nRelevantWorkDaysPerMonth > 0)
+		{
+			int nToAssign = min(nUnpaidToAssign, nRelevantWorkDaysPerMonth);
+			if (bNoPension)
+				pMonthInfo->SetNoPension(nToAssign);
+			else
+				pMonthInfo->SetUnpaid(nToAssign);
+
+			nUnpaidToAssign -= nToAssign;
+		}
+		if (nUnpaidToAssign < 1)
+			break;
+		if (pMonthInfo->mbLast)
+			break;
+		updateMonthStart.AddMonth();
+		pMonthInfo = gWorkPeriod.GetMonthInfoFor(updateMonthStart);
+		nRelevantWorkDaysPerMonth = pMonthInfo->GetNRelevantDays(bNoPension);
+	}
+}
 void CDaysSpan::Log(FILE* pf, const char *zText)
 {
 	if (zText)

@@ -15,16 +15,14 @@ public:
 	bool mbIsMaternityLeave;
 
 	CDaysSpan mUnpaidSpan;
-	//CMyTime mFirstDayUnpaid;
-	void Compute();
 	int mnPaidDays;
 	int mnUnPaidWorkDays;
-	//int mnUnpaidCalendarDays;
 	int mnUnpaidUsedForSeverance;
 	void SetPartiallyPaid(int nPaidDays);
 
 	void FindUnpaidSpan();
 	int CountDaysOfUnpaidVacation(CMyTime& first, CMyTime& last);
 	virtual void AddToWorkSpan(class CWorkSpan& workSpan);
+	virtual void UpdateMonthlyInfo();
 };
 

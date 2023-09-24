@@ -185,7 +185,7 @@ void CUsedVacations::Compute()
 	while (pos)
 	{
 		CVacationUsed *pVac = mVacationsUsed.GetNext(pos);
-		pVac->Compute();
+		gVacationTable.ComputeNextVacation(*pVac);
 	}
 }
 int CUsedVacations::CountDaysOfUnpaidVacation(CMyTime& first, CMyTime& last)
@@ -203,13 +203,16 @@ int CUsedVacations::CountDaysOfUnpaidVacation(CMyTime& first, CMyTime& last)
 	}
 	return nDays;
 }
-void CUsedVacations::AddAllVacationsToWorkSpan(CWorkSpan& workSpan)
+void CUsedVacations::AddAllVacationsToWorkSpan(CWorkSpan& workSpan, bool bExtendPeriodByPaidMaternity)
 {
 	POSITION pos = mVacationsUsed.GetHeadPosition();
 	while (pos)
 	{
 		CVacationUsed *pVac = mVacationsUsed.GetNext(pos);
-		pVac->AddToWorkSpan(workSpan);
+		if (bExtendPeriodByPaidMaternity && pVac->mbIsMaternityLeave)
+			workSpan.AddUnpaidVacation(*pVac);
+		else
+			pVac->AddToWorkSpan(workSpan);
 	}
 }
 bool CUsedVacations::WasWorkDay(CMyTime day)

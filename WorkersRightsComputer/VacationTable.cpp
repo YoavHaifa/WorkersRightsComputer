@@ -13,12 +13,7 @@ CVacationTable::CVacationTable()
 	: mnVacationsComputed(0)
 	, mpfLog(0)
 {
-	// ALLOW_DAD
-	//if (InitFromFile())
-	//	PrintLog();
 }
-
-
 CVacationTable::~CVacationTable()
 {
 }
@@ -196,12 +191,10 @@ bool CVacationTable::StartComputingForUsedVacations()
 		return false;
 
 	mDueVacationLeft = 0;
-	mNextComputeFrom = gWorkPeriod.mFirst;
+	mNextMonthToComputeFrom = gWorkPeriod.mFirst;
 
 	return true;
 }
-
-
 bool CVacationTable::ComputeNextVacation(CVacationUsed &vacation)
 {
 	if (!gWorkPeriod.IsValid())
@@ -212,40 +205,40 @@ bool CVacationTable::ComputeNextVacation(CVacationUsed &vacation)
 
 	gWorkPeriod.Debug(L"CVacationTable::ComputeNextVacation");
 	mpfLog = CUtils::OpenLogFile(L"ComputeVacations", mnVacationsComputed > 0);
-	if (mpfLog && mnVacationsComputed == 0)
-	{
-		CString sPeriod = gWorkPeriod.GetShortSummary();
-		fwprintf(mpfLog, L"%s\n\n", (const wchar_t *)sPeriod);
-	}
+	if (mnVacationsComputed == 0)
+		gWorkPeriod.ShortLog(mpfLog);
 	if (mpfLog)
 	{ 
 		fprintf(mpfLog, "<ComputeNextVacation> %d\n", mnVacationsComputed);
 		vacation.ShortLog(mpfLog);
 	}
 
-	if (!mNextComputeFrom.IsOnPrevMonthsTo(vacation.mFirstDay))
+	if (!mNextMonthToComputeFrom.IsOnPrevMonthsTo(vacation.mFirstDay))
 	{
 		if (mpfLog)
 			fprintf(mpfLog, "No new month to compute vacation - due vacation %.2f", mDueVacationLeft);
 	}
 	else
 	{
+		// Compute due paid vacation 
 		gWorkPeriod.Debug(L"CVacationTable::ComputeNextVacation 1");
-		while (mNextComputeFrom.IsOnPrevMonthsTo(vacation.mFirstDay))
+		while (mNextMonthToComputeFrom.IsOnPrevMonthsTo(vacation.mFirstDay))
 		{
 			if (mpfLog)
-				fprintf(mpfLog, "%2d/%4d - ", mNextComputeFrom.mMonth, mNextComputeFrom.mYear);
-			CMonthInfo *pMonthInfo = gWorkPeriod.GetMonthInfoFor(mNextComputeFrom);
+				fprintf(mpfLog, "%2d/%4d - ", mNextMonthToComputeFrom.mMonth, mNextMonthToComputeFrom.mYear);
+			CMonthInfo *pMonthInfo = gWorkPeriod.GetMonthInfoFor(mNextMonthToComputeFrom);
 			double duePerMonth = GetNDaysPerMonth(pMonthInfo->mSeniorityMonths / 12,
-				gWorkPeriod.mnWorkDaysPerWeek, mNextComputeFrom.mYear, mNextComputeFrom.mMonth);
+				gWorkPeriod.mnWorkDaysPerWeek, mNextMonthToComputeFrom.mYear, mNextMonthToComputeFrom.mMonth);
 
 			gWorkPeriod.Debug(L"CVacationTable::ComputeNextVacation 3");
 			if (pMonthInfo->IsPartial())
 			{
-				double dueFrac = duePerMonth * pMonthInfo->mFraction;
+				double monthFraction = pMonthInfo->GetFraction();
+				double dueFrac = duePerMonth * monthFraction;
 				mDueVacationLeft += dueFrac;
 				if (mpfLog)
-					fprintf(mpfLog, "due %.2f * fraction %.2f --> %.2f --> %.2f\n", duePerMonth, pMonthInfo->mFraction, dueFrac, mDueVacationLeft);
+					fprintf(mpfLog, "due %.2f * fraction %.2f --> %.2f --> %.2f\n", 
+						duePerMonth, monthFraction, dueFrac, mDueVacationLeft);
 			}
 			else
 			{
@@ -254,7 +247,7 @@ bool CVacationTable::ComputeNextVacation(CVacationUsed &vacation)
 					fprintf(mpfLog, "due %.2f --> %.2f\n", duePerMonth, mDueVacationLeft);
 			}
 			gWorkPeriod.Debug(L"CVacationTable::ComputeNextVacation 5");
-			mNextComputeFrom.AddMonth();
+			mNextMonthToComputeFrom.AddMonth();
 		}
 	}
 	gWorkPeriod.Debug(L"CVacationTable::ComputeNextVacation 7");
@@ -265,15 +258,19 @@ bool CVacationTable::ComputeNextVacation(CVacationUsed &vacation)
 		else
 			vacation.SetPartiallyPaid((int)mDueVacationLeft);
 
-		gWorkPeriod.Debug(L"CVacationTable::ComputeNextVacation 9");
 		mDueVacationLeft -= vacation.mnPaidDays;
-		vacation.LongLog(mpfLog);
 	}
+	vacation.UpdateMonthlyInfo();
 
+	gWorkPeriod.Debug(L"CVacationTable::ComputeNextVacation 9");
+	vacation.LongLog(mpfLog);
 	mnVacationsComputed++;
-	fprintf(mpfLog, "Left Vacation %.2f\n", mDueVacationLeft);
-	fprintf(mpfLog, "\n");
-	fclose(mpfLog);
+	if (mpfLog)
+	{
+		fprintf(mpfLog, "Left Vacation %.2f\n", mDueVacationLeft);
+		fprintf(mpfLog, "\n");
+		fclose(mpfLog);
+	}
 	gWorkPeriod.Debug(L"CVacationTable::ComputeNextVacation END");
 	return true;
 }

@@ -16,6 +16,8 @@ public:
 	bool Contains(CMyTime& day);
 	bool Intersect(CDaysSpan& other, CDaysSpan& oCommon);
 
+	void UpdateMonthlyInfo4Unpaid(bool bNoPension);
+
 	void Log(FILE* pf, const char* zText=NULL);
 
 	CMyTime mFirstDay;

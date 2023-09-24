@@ -31,7 +31,7 @@ public:
 	CVacationVetek * map[MAX_VETEK];
 
 	bool StartComputingForUsedVacations();
-	CMyTime mNextComputeFrom;
+	CMyTime mNextMonthToComputeFrom;
 	double mDueVacationLeft;
 	int mnVacationsComputed;
 	FILE *mpfLog;

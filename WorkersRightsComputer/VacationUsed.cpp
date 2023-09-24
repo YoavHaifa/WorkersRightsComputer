@@ -40,12 +40,10 @@ CString CVacationUsed::GetText()
 	}
 	return s;
 }
-void CVacationUsed::Compute()
-{
-	gVacationTable.ComputeNextVacation(*this);
-}
 void CVacationUsed::ShortLog(FILE *pf, bool bNewLine)
 {
+	if (!pf)
+		return;
 	fprintf(pf, "%d/%d/%d - %d/%d/%d",
 		mFirstDay.mDay, mFirstDay.mMonth, mFirstDay.mYear, mLastDay.mDay, mLastDay.mMonth, mLastDay.mYear);
 	if (bNewLine)
@@ -53,6 +51,9 @@ void CVacationUsed::ShortLog(FILE *pf, bool bNewLine)
 }
 void CVacationUsed::LongLog(FILE *pf)
 {
+	if (!pf)
+		return;
+
 	CDaysSpan::Log(pf);
 	//fprintf(pf, "%d/%d/%d - %d/%d/%d\n",
 	//	mFirstDay.mDay, mFirstDay.mMonth, mFirstDay.mYear, mLastDay.mDay, mLastDay.mMonth, mLastDay.mYear);
@@ -72,12 +73,14 @@ void CVacationUsed::SetPartiallyPaid(int nPaidDays)
 {
 	mnPaidDays = nPaidDays;
 	mnUnPaidWorkDays = mnWorkDays - mnPaidDays;
+
+	/*
 	int nUnpaidToAssign = mnUnPaidWorkDays;
 	int nPaidToAssigned = mnPaidDays;
 
 	// Update for relevant month in work period
 	CMyTime vacMonth(mFirstDay.mYear,mFirstDay.mMonth,1);
-	CMonthInfo *pInfo = gWorkPeriod.GetMonthInfoFor(mFirstDay);
+	CMonthInfo *pMonthInfo = gWorkPeriod.GetMonthInfoFor(mFirstDay);
 	int nWorkDaysOffPerMonth = gWorkPeriod.CountWorkDaysToEndOfMonthFrom(mFirstDay);
 	while (nUnpaidToAssign > 0)
 	{
@@ -92,16 +95,21 @@ void CVacationUsed::SetPartiallyPaid(int nPaidDays)
 			int nToAssign = min(nUnpaidToAssign, nWorkDaysOffPerMonth);
 			nUnpaidToAssign -= nToAssign;
 			nWorkDaysOffPerMonth -= nToAssign;
-			pInfo->SetUnpaid(nToAssign);
+			pMonthInfo->SetUnpaid(nToAssign);
 		}
 		if (nUnpaidToAssign < 1)
 			break;
 		vacMonth.AddMonth();
-		pInfo = gWorkPeriod.GetMonthInfoFor(vacMonth);
+		pMonthInfo = gWorkPeriod.GetMonthInfoFor(vacMonth);
 		nWorkDaysOffPerMonth = gWorkPeriod.CountWorkDaysToEndOfMonthFrom(vacMonth);
-	}
+	}*/
 
 	FindUnpaidSpan();
+}
+void CVacationUsed::UpdateMonthlyInfo()
+{
+	mUnpaidSpan.UpdateMonthlyInfo4Unpaid(false); // Unpaid
+	mUnpaidSpan.UpdateMonthlyInfo4Unpaid(true); // No pension
 }
 void CVacationUsed::FindUnpaidSpan()
 {

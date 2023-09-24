@@ -15,15 +15,11 @@ CPension *gpPension = NULL;
 
 CPension::CPension(void)
 	: CRight(L"Pension", L"פנסיה")
+	, mbEntitledOnlyToSeveranceFund(false)
+	, mbHadActivePensionBefore(false)
 {
 	miPrintOrder = 0;
 	mpPensionRates = new CMonthlyRates(L"Pension", 2008); // Load from XML
-	//mpPensionRates->SaveMonthlyXmlFile();
-	//CMonthlyRates *pPensionRatesFromXML = new CMonthlyRates(L"Pension", 2008);
-	//delete pPensionRatesFromXML;
-
-	//mpSeveranceRates = new CYearlyRates(L"Severance", 2008);
-	//mpSeveranceRates->SaveMonthlyXmlFile();
 	mpSeveranceMonthlyRates = new CMonthlyRates(L"Severance", 2008);
 	gpPension = this;
 }
@@ -55,6 +51,9 @@ bool CPension::Compute(void)
 		CUtils::MessBox(L"Connection to GUI not initialized", L"SW Error");
 		return false;
 	}
+	mbEntitledOnlyToSeveranceFund = mpbEntitledOnlyToSeveranceFund->IsChecked();
+	mbHadActivePensionBefore = mpbHadActivePensionBefore->IsChecked();
+
 	mDuePay = 0;
 	mSeveranceDue = 0;
 	mPensionDue = 0;
@@ -62,55 +61,44 @@ bool CPension::Compute(void)
 	mPensionPerYear = 0;
 	mSeverancePerYear = 0;
 
-	if (mpbEntitledOnlyToSeveranceFund->IsChecked())
-		LogLine (L"+++ Entitled To Severance Fund");
+	if (mbEntitledOnlyToSeveranceFund)
+		LogLine (L"+++ Entitled ONLY To Severance Fund");
 	else
-		LogLine(L"--- Not Entitled To Severance Fund");
+		LogLine(L"--- Not Entitled ONLY To Severance Fund");
 
-	if (mpbHadActivePensionBefore->IsChecked())
+	if (mbHadActivePensionBefore)
 		LogLine(L"+++ Had Active Pension Before");
 	else
 		LogLine(L"--- No Active Pension Before");
 
 	LogLine(L"");
 	LogLine(L"Started work at", gWorkPeriod.mFirst.ToString());
-	//CString s = L"Started work at ";
-	//s += gWorkPeriod.mFirst.ToString();
-	//LogLine(s);
 	LogLine(L"Last day at work", gWorkPeriod.mLast.ToString());
-	//s = L"Last day at work ";
-	//s += gWorkPeriod.mLast.ToString();
-	//LogLine(s);
 	LogLine(L"");
 
 	bool bOK = DoCompute();
 
-	if (mpbEntitledOnlyToSeveranceFund->IsChecked())
+	if (mbEntitledOnlyToSeveranceFund)
 	{
 		mbSeverance = true;
-		CString sLog = L"Pension Due ";
-		sLog += ToString(mPensionDue);
-		LogLine(sLog);
-		sLog = L"Severance Due ";
-		sLog += ToString(mSeveranceDue);
-		LogLine(sLog);
+		LogLine(L"Pension Due", mPensionDue);
+		LogLine(L"Severance Due", mSeveranceDue);
 
 		msDue += L" Total Due ";
-		msDue += ToString(mDuePay);
 	}
 	else
-	{
 		msDue += L" Due ";
-		msDue += ToString(mDuePay);
-	}
-
+	msDue += ToString(mDuePay);
 	return bOK;
 }
-void CPension::AddMonth(int year, int month, int nDays /* if 0 - full */, bool bFirst)
+void CPension::PensionAddMonth(CMyTime& yearAndMonth, int nDays /* if 0 - full */, bool bFirst)
 {
+	int year = yearAndMonth.mYear;
+	int month = yearAndMonth.mMonth;
 	double part = 1;
 	CMonthInfo* pInfo = gWorkPeriod.GetMonthInfoFor(year, month);
-	if (umbOldStyle || bFirst)
+	double monthFraction = pInfo->GetFractionForPension();
+	if (bFirst)
 	{
 		if (nDays > 0)
 		{
@@ -119,11 +107,11 @@ void CPension::AddMonth(int year, int month, int nDays /* if 0 - full */, bool b
 				part = 1;
 		}
 		if (bFirst)
-			part = min(part, pInfo->mFraction);
+			part = min(part, monthFraction);
 	}
 	if (part == 1)
 	{
-		part = pInfo->mFraction;
+		part = monthFraction;
 	}
 
 	double monthlyPay = gWageTable.ComputeMonthlyPay(year, month);
@@ -156,7 +144,7 @@ void CPension::AddMonth(int year, int month, int nDays /* if 0 - full */, bool b
 
 	double severanceDue = 0;
 	double sevRate = 0;
-	if (mpbEntitledOnlyToSeveranceFund->IsChecked())
+	if (mbEntitledOnlyToSeveranceFund)
 	{
 		sevRate = mpSeveranceMonthlyRates->RatePerMonth(year, month);
 		severanceDue = monthlyPay * sevRate * part;
@@ -180,11 +168,9 @@ void CPension::AddMonth(int year, int month, int nDays /* if 0 - full */, bool b
 		mDueFromFamily += (pensionDue + severanceDue);
 	mReport.AddMonth(year, month, monthlyPay, part, penRate, sevRate, familyPart, companyHours, companyRatio);
 }
-bool CPension::DoCompute()
+bool CPension::CheckForDateToStartPension()
 {
-	mReport.Clear();
-
-	if (mpbHadActivePensionBefore->IsChecked())
+	if (mbHadActivePensionBefore)
 	{
 		if (!gWorkYears.WorkedAtLeastNMonths(N_MONTHS_BEFORE_PAY_CONTINUITY))
 		{
@@ -206,7 +192,7 @@ bool CPension::DoCompute()
 		else if (startDateForPension9.mYear > 2008)
 			mStartDateForPension = startDateForPension9;
 		else
-			mStartDateForPension.Set(2009,1,1);
+			mStartDateForPension.Set(2009, 1, 1);
 
 		if (mStartDateForPension > gWorkPeriod.mLast)
 		{
@@ -218,16 +204,22 @@ bool CPension::DoCompute()
 
 	if (mStartDateForPension.mYear < YEAR_TO_START)
 	{
-		mStartDateForPension.Set(YEAR_TO_START, 1,  1);
+		mStartDateForPension.Set(YEAR_TO_START, 1, 1);
 		msDebug += L" Period before 2008 skipped";
 	}
 	if (mStartDateForPension.mYear >= YEAR_TO_START_CHECKING_VACATIONS)
-		UpdateStartDateForPension();
+		UpdateStartDateForPensionForVacations();
 
-	CString sDate = L"First day for pension ";
-	sDate += mStartDateForPension.ToString();
-	LogLine(sDate);
+	LogLine(L"First day for pension", mStartDateForPension);
 	LogLine(L"");
+	return true;
+}
+bool CPension::DoCompute()
+{
+	mReport.Clear();
+
+	if (!CheckForDateToStartPension())
+		return false;
 
 	// Compute first part-month
 	bool bFirstIsLast = false;
@@ -237,8 +229,14 @@ bool CPension::DoCompute()
 	{
 		nDaysInFirstMonth = gWorkPeriod.mLast.mDay - mStartDateForPension.mDay + 1;
 		bFirstIsLast = true;
+		if (nDaysInFirstMonth < 1)
+		{
+			msDue += L"Period Too Short";
+			msDebug += L"Too short for pension pay";
+			return false;
+		}
 	}
-	AddMonth(mStartDateForPension.mYear, mStartDateForPension.mMonth, nDaysInFirstMonth, true);
+	PensionAddMonth(mStartDateForPension, nDaysInFirstMonth, true);
 
 	if (!bFirstIsLast)
 	{
@@ -247,12 +245,12 @@ bool CPension::DoCompute()
 		while ((countMonths.mYear < gWorkPeriod.mLast.mYear)
 			|| (countMonths.mYear == gWorkPeriod.mLast.mYear &&  countMonths.mMonth < gWorkPeriod.mLast.mMonth))
 		{
-			AddMonth(countMonths.mYear, countMonths.mMonth, 0);
+			PensionAddMonth(countMonths, 0);
 			countMonths.AddMonth();
 		}
 
 		// Compute Last Month
-		AddMonth(countMonths.mYear, countMonths.mMonth, gWorkPeriod.mLast.mDay);
+		PensionAddMonth(countMonths, gWorkPeriod.mLast.mDay);
 		if (countMonths.mMonth < 12)
 			OnYearEnd();
 	}
@@ -264,7 +262,7 @@ void CPension::OnYearEnd(void)
 {
 	CString s = L"Total per year: Pension ";
 	s += ToString(mPensionPerYear);
-	if (mpbEntitledOnlyToSeveranceFund->IsChecked())
+	if (mbEntitledOnlyToSeveranceFund)
 	{
 		s += L", Severance ";
 		s += ToString(mSeverancePerYear);
@@ -354,19 +352,19 @@ void CPension::WriteToLetter(class CHtmlWriter& html)
 		html.EndParagraph();
 	}
 }
-bool CPension::UpdateStartDateForPension()
+bool CPension::UpdateStartDateForPensionForVacations()
 {
 	if (mStartDateForPension <= gWorkPeriod.mFirst)
 		return false;
 
 	CWorkSpan workBeforePension;
 	workBeforePension.InitSpan(gWorkPeriod.mFirst, mStartDateForPension.PrevDay());
-	gUsedVacations.AddAllVacationsToWorkSpan(workBeforePension);
+	gUsedVacations.AddAllVacationsToWorkSpan(workBeforePension, true /*bExtendPeriodByPaidMaternity*/);
 
 	if (workBeforePension.mDayAfter > mStartDateForPension)
 	{
 		mStartDateForPension = workBeforePension.mDayAfter;
-		LogLine(L"Start day for pension updated due to vacations", mStartDateForPension);
+		LogLine(L"Start day for pension updated due to vacations and/or maternity", mStartDateForPension);
 		return true;
 	}
 	return false;

@@ -90,21 +90,6 @@ double CWageTable::ComputeMonthlyPay(int year, int month)
 		return 0;
 	int iYear = year - YEAR0;
 	return maWage[iYear][month - 1];
-
-	/*
-	for (int i = 0; i < mn; i++)
-	{
-		if (
-			(map[i]->mYear < year)
-			||
-			((map[i]->mYear == year) && (map[i]->mMonth <= month))
-			)
-		{
-			return map[i]->mWage;
-		}
-	}
-
-	return (map[mn - 1]->mWage);*/
 }
 bool CWageTable::Prepare(const wchar_t* zAt)
 {

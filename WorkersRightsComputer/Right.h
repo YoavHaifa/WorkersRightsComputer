@@ -76,7 +76,6 @@ public:
 	void Save(FILE *pfWrite);
 	void SaveToXml(class CXMLDump& xmlDump);
 
-	static bool umbOldStyle;
 	CString msName;
 	CString msNameHebrew;
 	bool mbValid;

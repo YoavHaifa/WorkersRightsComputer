@@ -32,6 +32,15 @@ void CMaternityLeave::AddToWorkSpan(CWorkSpan& workSpan)
 	if (workSpan.Overlaps(mPaidSpan))
 		workSpan.AddPaidMaternityLeave(mPaidSpan);
 }
+void CMaternityLeave::UpdateMonthlyInfo()
+{
+	UpdateMonthlyInfo4Unpaid(false); // All is "Unpaid" - not working days
+
+	if (mbPaidWeeksDeservePension)
+		mUnpaidSpan.UpdateMonthlyInfo4Unpaid(true); // No pension only for unpaid
+	else
+		UpdateMonthlyInfo4Unpaid(true); // All is no pension
+}
 void CMaternityLeave::SaveToXml(CXMLDump& xmlDump)
 {
 	CVacationUsed::SaveToXml(xmlDump);

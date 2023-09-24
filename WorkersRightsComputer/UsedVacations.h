@@ -29,7 +29,7 @@ public:
 	void WriteToLetterExtraSeverance(class CHtmlWriter& html);
 
 	int CountDaysOfUnpaidVacation(CMyTime& first, CMyTime& last);
-	void AddAllVacationsToWorkSpan(class CWorkSpan &workSpan);
+	void AddAllVacationsToWorkSpan(class CWorkSpan &workSpan, bool bExtendPeriodByPaidMaternity = false);
 	double GetSeveranceYearsForUnpaidVacation();
 	bool WasWorkDay(CMyTime day);
 

@@ -103,7 +103,6 @@ bool CVerify::Verify()
 
 	gpDlg->OnInputChange();
 	mbAllSame = VerifyResults();
-	CRight::umbOldStyle = false;
 	return mbAllSame;
 }
 void CVerify::ReadTime(FILE *pfRead, int i)

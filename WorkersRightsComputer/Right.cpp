@@ -6,7 +6,6 @@
 
 CString CRight::umsSaveDir = L"";
 CString CRight::umsName = L"__";
-bool CRight::umbOldStyle = false;
 
 CRight::CRight(const wchar_t *zName, const wchar_t *zHebrewName)
 	: msName(zName)

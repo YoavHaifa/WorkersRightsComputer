@@ -54,6 +54,7 @@ public:
 	//void Restore(FILE *pfRead);
 	CString GetTextSummary();
 	CString GetShortSummary();
+	void ShortLog(FILE* pf);
 	CString GetDaysText();
 	int CountWorkingDays(CMyTime& first, CMyTime& last);
 	//int CountAllDaysWithoutUnpaidVacation(CMyTime& first, CMyTime& last);
