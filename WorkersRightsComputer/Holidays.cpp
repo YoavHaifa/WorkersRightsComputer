@@ -375,6 +375,9 @@ int CHolidays::AddPay4PrevYear(int iPrev)
 	int nDue = gHolidaysDue.GetNDuePrevYear(iPrev);
 
 	CWorkYear* pYear = gWorkYears.GetByReverseIndex(iPrev);
+	if (pYear == NULL)
+		return 0;
+
 	int nWorkedHolidays = GetNWorkedHolidays(pYear);
 
 	LogLine(L"prev year", iPrev);

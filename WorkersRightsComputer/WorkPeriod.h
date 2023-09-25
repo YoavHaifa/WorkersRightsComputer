@@ -5,13 +5,13 @@
 class CWorkPeriod
 {
 public:
-	CWorkPeriod(void);
+	CWorkPeriod();
 
 	bool LastYearContains(class CHoliday &holiday);
-	void Reset(void);
+	void Reset();
 	void WriteToLetter(class CHtmlWriter &html);
-	CString GetPeriodForLetter(void);
-	CString GetPeriodForLetterHebrew(void);
+	CString GetPeriodForLetter();
+	CString GetPeriodForLetterHebrew();
 
 	bool IsValid(bool bMustDefineDays = true);
 	bool Compute(const wchar_t *zAt = NULL);
@@ -29,7 +29,7 @@ public:
 	static const int N_WEEK_DAYS = 7;
 	double maWorkingDays[N_WEEK_DAYS];
 	void SetWorkingDay(int iDay, double fraction);
-	void ComputeWorkingDaysInMonth(void);
+	void ComputeWorkingDays();
 
 	int mnMonthsDetailed;
 	bool mbNegative;

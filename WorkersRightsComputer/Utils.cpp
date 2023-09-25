@@ -29,9 +29,9 @@ CString CUtils::GetBaseDir(void)
 		usBaseDir.Replace(L"WorkersRightsComputer\\WorkersRightsComputer", L"WorkersRightsComputer\\WorkersRights_v\\");
 		usBaseDir.Replace(L"WorkersRightsComputer\\x64\\Debug", L"WorkersRightsComputer\\WorkersRights_v\\");
 		usBaseDir.Replace(L"WorkersRightsComputer\\x64\\Release", L"WorkersRightsComputer\\WorkersRights_v\\");
-		if (usBaseDir.Right(5) == L"Debug")
+		if (usBaseDir.Right(5).MakeLower() == L"debug")
 			usBaseDir = usBaseDir.Left(usBaseDir.GetLength() - 5);
-		if (usBaseDir.Right(7) == L"Release")
+		if (usBaseDir.Right(7).MakeLower() == L"release")
 			usBaseDir = usBaseDir.Left(usBaseDir.GetLength() - 7);
 	}
 	return usBaseDir;

@@ -39,7 +39,6 @@ void CVacationsDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_CHECK_MATERNITY_PENSION, mDeservesPension);
 }
 
-
 BEGIN_MESSAGE_MAP(CVacationsDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_VAC_ADD, &CVacationsDlg::OnBnClickedButtonVacAdd)
 	ON_BN_CLICKED(IDC_BUTTON_VAC_CLEAR_LAST, &CVacationsDlg::OnBnClickedButtonVacClearLast)

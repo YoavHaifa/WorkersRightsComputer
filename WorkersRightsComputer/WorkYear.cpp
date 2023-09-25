@@ -43,6 +43,16 @@ void CWorkYear::InitInternals(CMyTime& firstDay)
 
 	CMyTime dayAfter(firstDay.mYear+1, firstDay.mMonth, firstDay.mDay);
 	Init(firstDay, dayAfter);
+	if (mLastDay > gWorkPeriod.mLast)
+	{
+		CUtils::MessBox(L"<CWorkYear::InitInternals> last day of year beyond work period - corrected", L"SW Warning");
+		mLastDay = gWorkPeriod.mLast;
+	}
+	if (mLastDay == gWorkPeriod.mLast)
+	{
+		mLastDay.LogLine(mpfLog, L"<InitInternals> reached last day in work period");
+		mbLast = true;
+	}
 
 	mFraction = 1;
 	mnUnpaidVacationCalendarDaysForSeverance = 0;
@@ -53,7 +63,7 @@ void CWorkYear::InitInternals(CMyTime& firstDay)
 		fwprintf(mpfLog, L"mnPaidCalendarDays %d\n", mnPaidCalendarDays);
 	}
 
-	// Comput fraction
+	// Compute fraction
 	if (mnPaidCalendarDays >= gConfig.umnDaysInNormalYear)
 	{
 		mFraction = 1;

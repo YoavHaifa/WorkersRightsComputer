@@ -10,12 +10,13 @@ CMaternityLeave::CMaternityLeave(CMyTime firstDay, CMyTime lastDay,
 	, mnPaidWeeks(nPaidWeeks)
 	, mbPaidWeeksDeservePension(bPaidWeeksDeservePension)
 {
-	mnWeeks = firstDay.GetNWeeksUntil(lastDay);
 	mbIsMaternityLeave = true;
 	Compute();
 }
 void CMaternityLeave::Compute()
 {
+	mnWeeks = mFirstDay.GetNWeeksUntil(mLastDay);
+
 	mnPaidDays = min((int)(mnPaidWeeks * gWorkPeriod.mnWorkDaysPerWeek), mnWorkDays);
 	mnUnPaidWorkDays = mnWorkDays - mnPaidDays;
 	if (mnPaidDays < mnWorkDays)
@@ -37,7 +38,10 @@ void CMaternityLeave::UpdateMonthlyInfo()
 	UpdateMonthlyInfo4Unpaid(false); // All is "Unpaid" - not working days
 
 	if (mbPaidWeeksDeservePension)
-		mUnpaidSpan.UpdateMonthlyInfo4Unpaid(true); // No pension only for unpaid
+	{
+		if (mUnpaidSpan.mnDays > 0)
+			mUnpaidSpan.UpdateMonthlyInfo4Unpaid(true); // No pension only for unpaid
+	}
 	else
 		UpdateMonthlyInfo4Unpaid(true); // All is no pension
 }

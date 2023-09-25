@@ -108,8 +108,11 @@ void CVacationUsed::SetPartiallyPaid(int nPaidDays)
 }
 void CVacationUsed::UpdateMonthlyInfo()
 {
-	mUnpaidSpan.UpdateMonthlyInfo4Unpaid(false); // Unpaid
-	mUnpaidSpan.UpdateMonthlyInfo4Unpaid(true); // No pension
+	if (mUnpaidSpan.mnDays > 0)
+	{
+		mUnpaidSpan.UpdateMonthlyInfo4Unpaid(false); // Unpaid
+		mUnpaidSpan.UpdateMonthlyInfo4Unpaid(true); // No pension
+	}
 }
 void CVacationUsed::FindUnpaidSpan()
 {

@@ -25,5 +25,9 @@ public:
 
 	int mnDaysPaidAfterNotice;
 	CMyTime mLastDayOfNotice;
+
+	double mFamilyRatio;
+	CString msFamilyRatio;
+	static const int umn3MonthsForFamilyPart = 3;
 };
 

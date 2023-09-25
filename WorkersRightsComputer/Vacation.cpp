@@ -231,6 +231,9 @@ void CVacation::ComputeBackByYears()
 	for (int iFromLast = 0; iFromLast < mnYearsForVacation; iFromLast++)
 	{
 		CWorkYear *pYear = gWorkYears.GetByReverseIndex(iFromLast);
+		if (pYear == NULL)
+			break;
+
 		double vacationFraction = pYear->GetVacationFraction();
 		double nDaysPerYear = gVacationTable.GetNDaysPerYear(pYear->mSeniority, gWorkPeriod.mnWorkDaysPerWeek);
 		double nDueDaysPerYear = nDaysPerYear * vacationFraction;

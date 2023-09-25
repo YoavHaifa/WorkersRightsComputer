@@ -80,10 +80,12 @@ public:
 	bool AddPeriodPC(CTime startTime, double perCentByCompany); // By Percent
 	double GetRatio() { return mRatio; }
 	void SetRatio(double ratio);
+	static CString Ratio2S(double ratio);
 	const wchar_t * GetSRatio() { return msRatio; }
 
 	bool mbAskOnlyForFamilyPart;
 	bool mbDefined;
+	bool mbLoadingFromXml;
 
 	CList<CCompanyPartPeriod *, CCompanyPartPeriod *> mPeriods;
 	CString GetFullText();

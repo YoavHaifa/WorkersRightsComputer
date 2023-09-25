@@ -13,6 +13,7 @@ CFamilyPart::CFamilyPart()
 	, mRatio(0)
 	, msRatio(_T("0"))
 	, mbDefined(false)
+	, mbLoadingFromXml(false)
 {
 }
 CFamilyPart::~CFamilyPart()
@@ -62,24 +63,24 @@ void CFamilyPart::ClearLast(void)
 }
 bool CFamilyPart::CheckStartTime(CMyTime& startTime)
 {
-	if (mPeriods.IsEmpty())
+	if (mPeriods.IsEmpty() && !mbLoadingFromXml)
 	{
 		if (startTime.mMonth != gWorkPeriod.mFirst.mMonth || startTime.mYear != gWorkPeriod.mFirst.mYear)
 		{
-			CUtils::MessBox(L"First period must startTime from first day of work", L"Input Error");
+			CUtils::MessBox(L"<CFamilyPart::CheckStartTime> First period must start from first day of work", L"Input Error");
 			return false;
 		}
 	}
 	if ((startTime.mYear < gWorkPeriod.mFirst.mYear)
 		|| (startTime.mYear == gWorkPeriod.mFirst.mYear && startTime.mMonth < gWorkPeriod.mFirst.mMonth))
 	{
-		CUtils::MessBox(L"Period starts before first day of work", L"Input Error");
+		CUtils::MessBox(L"<CFamilyPart::CheckStartTime> Period starts before first day of work", L"Input Error");
 		return false;
 	}
 	if ((startTime.mYear > gWorkPeriod.mLast.mYear)
 		|| (startTime.mYear == gWorkPeriod.mLast.mYear && startTime.mMonth > gWorkPeriod.mLast.mMonth))
 	{
-		CUtils::MessBox(L"Period starts after last day of work", L"Input Error");
+		CUtils::MessBox(L"<CFamilyPart::CheckStartTime> Period starts after last day of work", L"Input Error");
 		return false;
 	}
 	return true;
@@ -226,6 +227,7 @@ void CFamilyPart::LoadFromXml(class CXMLParseNode* pRoot)
 	if (!pMain)
 		return;
 
+	mbLoadingFromXml = true;
 	CXMLParseNode* pPeriod = pMain->GetFirst(L"Period");
 	while (pPeriod)
 	{
@@ -245,6 +247,7 @@ void CFamilyPart::LoadFromXml(class CXMLParseNode* pRoot)
 		pPeriod = pMain->GetNext(L"Period", pPeriod);
 	}
 	pMain->GetValue(L"bAskOnlyForFamilyPart", mbAskOnlyForFamilyPart);
+	mbLoadingFromXml = false;
 }
 void CFamilyPart::Save(FILE *pfSave)
 {
@@ -290,19 +293,32 @@ void CFamilyPart::Restore(FILE *pfRead)
 }*/
 void CFamilyPart::WriteToLetter(CHtmlWriter &writer)
 {
+	bool bOld = false;
+	bool bNew = true;
 	writer.StartParagraph();
 	if (mbDefined && mbAskOnlyForFamilyPart)
 	{
 		writer.WriteLEH(L"This computation only relates to the part that is due from the employing family. ",
 			L"חישוב זה מתייחס רק לחלק התשלום המגיע מהמשפחה המעסיקה.");
-		writer.StartBold();
-		writer.WriteLEH(L"Family Part is ", L"חלקה של המשפחה הוא ");
-		//wchar_t zBuf[128];
-		//swprintf_s(zBuf, 128, L"%5.2f%%", mRatio * 100);
-		writer.WriteL(msRatio);
-		writer.EndBold();
-		writer.WriteLineEH(L" from the payment for severance, pension and advance notice.", 
-			L"מהתשלום עבור פיצויי פיטורים, תגמולי מעסיק והודעה מוקדמת. ");
+		if (bOld)
+		{
+			writer.StartBold();
+			writer.WriteLEH(L"Family Part is ", L"חלקה של המשפחה הוא ");
+			writer.WriteL(msRatio);
+			writer.EndBold();
+			writer.WriteLineEH(L" from the payment for severance, pension and advance notice.", 
+				L"מהתשלום עבור פיצויי פיטורים, תגמולי מעסיק והודעה מוקדמת. ");
+		}
+		if (bNew)
+		{
+			writer.WriteLEH(L"According to the law, the family and the company are ", 
+				L"בהתאם להוראות הממונה על עובדים זרים במשרד התעסוקה, המשפחה והחברה הינן ");
+			writer.StartBold();
+			writer.WriteLEH(L"\"simultaneous employers,\" ", L"מעסיקות במקביל,");
+			writer.EndBold();
+			writer.WriteLEH(L"and each is responsible for their part of the job and the payment of the rights arising from it.",
+				L" וכל אחת אחראית על חלק המשרה שלה ועל תשלום הזכויות הנובעות ממנו.");
+		}
 	}
 	else
 	{
@@ -314,7 +330,11 @@ void CFamilyPart::WriteToLetter(CHtmlWriter &writer)
 void CFamilyPart::SetRatio(double ratio)
 {
 	mRatio = ratio;
+	msRatio = Ratio2S(mRatio);
+}
+CString CFamilyPart::Ratio2S(double ratio)
+{
 	wchar_t zBuf[128];
-	swprintf_s(zBuf, 128, L"%5.2f%%", mRatio * 100);
-	msRatio = zBuf;
+	swprintf_s(zBuf, 128, L"%5.2f%%", ratio * 100);
+	return CString(zBuf);
 }

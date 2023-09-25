@@ -25,7 +25,7 @@ const wchar_t *uasDaysNames[7] =
 	L"Saturday"
 };
 
-CWorkPeriod::CWorkPeriod(void)
+CWorkPeriod::CWorkPeriod()
 	: mbSkipNotice(false)
 	, mbLiveIn(true)
 	, mbCaregiver(false)
@@ -73,7 +73,7 @@ int CWorkPeriod::GetWorkingHoursInFullWeek(int year, int month)
 		return 43;
 	return 42;
 }
-void CWorkPeriod::Reset(void)
+void CWorkPeriod::Reset()
 {
 	mFirst.Reset();
 	mLast.Reset();
@@ -93,7 +93,7 @@ void CWorkPeriod::Reset(void)
 
 bool CWorkPeriod::Compute(const wchar_t* zAt)
 {
-	ComputeWorkingDaysInMonth();
+	ComputeWorkingDays();
 
 	// Init for invalid work span
 	mnMonthsDetailed = 0;
@@ -124,7 +124,7 @@ bool CWorkPeriod::Compute(const wchar_t* zAt)
 	InitDetailsForEachMonth();
 
 	gUsedVacations.Compute();
-	gWorkYears.Compute();
+	gWorkYears.DivideWorkPeriodToWorkYears();
 	mSpanString = gWorkYears.PrepareSpanString();
 
 	gFamilyPart.Compute();
@@ -186,7 +186,7 @@ void CWorkPeriod::SetWorkingDay(int iDay, double fraction)
 	maWorkingDays[iDay] = fraction;
 	Compute();
 }
-void CWorkPeriod::ComputeWorkingDaysInMonth(void)
+void CWorkPeriod::ComputeWorkingDays()
 {
 	mnWorkDaysPerWeek = 0;
 	for (int i = 0; i < N_WEEK_DAYS; i++)
@@ -243,14 +243,14 @@ void CWorkPeriod::WriteLastSalary(class CHtmlWriter& html)
 	//html.WritePara(s);
 	html.EndParagraph();
 }
-CString CWorkPeriod::GetPeriodForLetter(void)
+CString CWorkPeriod::GetPeriodForLetter()
 {
 	CString s(mFirst.ToString());
 	s += " - ";
 	s += mLast.ToString();
 	return s;
 }
-CString CWorkPeriod::GetPeriodForLetterHebrew(void)
+CString CWorkPeriod::GetPeriodForLetterHebrew()
 {
 	CString s(mFirst.ToHebrewString());
 	s += " - ";
@@ -303,6 +303,7 @@ void CWorkPeriod::LoadFromXml(class CXMLParseNode* pRoot)
 			pDays->GetValue(uasDaysNames[iDay], maWorkingDays[iDay]);
 		}
 	}
+	ComputeWorkingDays();
 
 	gWage.LoadFromXml(pWorkPeriodNode);
 
@@ -321,10 +322,12 @@ void CWorkPeriod::LoadFromXml(class CXMLParseNode* pRoot)
 		pWorkPeriodNode->GetValue(L"HoursPerWeek", mHoursPerWeek);
 	}*/
 
-	Compute(L"LoadFromXml1");
 
 	gUsedVacations.LoadFromXml(pWorkPeriodNode);
+
 	gFamilyPart.LoadFromXml(pWorkPeriodNode);
+	Compute(L"LoadFromXml1");
+
 	gHolidaysDue.LoadFromXml(pWorkPeriodNode, pRoot);
 
 	Compute(L"LoadFromXml2");
@@ -360,6 +363,12 @@ CString CWorkPeriod::GetTextSummary()
 
 	s += "\r\n";
 	s += gWorkPeriod.mSpanString;
+	if (!gUsedVacations.IsEmpty())
+	{
+		s += " (";
+		s += gUsedVacations.GetVacationsShortText();
+		s += ")";
+	}
 	if (!gWage.IsAllMin())
 	{
 		s += " (";

@@ -19,7 +19,7 @@ void CWorkYears::Clear(void)
 {
 	mn = 0;
 }
-void CWorkYears::Compute(void)
+void CWorkYears::DivideWorkPeriodToWorkYears(void)
 {
 	mn = 0;
 	mnFullWorkYears = 0;
@@ -165,7 +165,13 @@ CWorkYear* CWorkYears::GetByReverseIndex(int iFromLast)
 {
 	if (iFromLast > mn - 1)
 		return NULL;
-	return &maYears[mn - 1 - iFromLast];
+	int i = mn - 1 - iFromLast;
+	if (i < 0)
+	{
+		CUtils::MessBox(L"<CWorkYears::GetByReverseIndex> index < 0", L"SW Error");
+		return NULL;
+	}
+	return &maYears[i];
 }
 bool CWorkYears::HasFullYearWithNotice(CMyTime& lastDayOfNotice)
 {

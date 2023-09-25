@@ -7,6 +7,7 @@
 
 CNotice::CNotice()
 	: CRight(L"Notice", L"הודעה מוקדמת")
+	, mFamilyRatio(1)
 {
 	miPrintOrder = 5;
 }
@@ -202,10 +203,13 @@ bool CNotice::Compute()
 
 	if (gFamilyPart.mbAskOnlyForFamilyPart)
 	{
-		double familyRatio = gWorkPeriod.ComputeFamilyPartLastMonths(3);
-		LogLine(L"Family part - average last 3 month", familyRatio);
-		mDuePay = mDuePay * familyRatio;
-		msDue += L" =FamilyPart(ByLast3Months)=> ";
+		mFamilyRatio = gWorkPeriod.ComputeFamilyPartLastMonths(umn3MonthsForFamilyPart);
+		msFamilyRatio = CFamilyPart::Ratio2S(mFamilyRatio);
+		LogLine(L"Family part - average last 3 month", mFamilyRatio);
+		mDuePay = mDuePay * mFamilyRatio;
+		msDue += L" = Family Part ";
+		msDue += msFamilyRatio;
+		msDue += L" (Last 3 Months) => ";
 		msDue += ToString(mDuePay);
 	}
 
@@ -228,8 +232,8 @@ CString CNotice::GetDecriptionForLetter()
 
 	if (gFamilyPart.mbAskOnlyForFamilyPart)
 	{
-		s += ", Family Part ";
-		s += gFamilyPart.GetSRatio();
+		s += ", Family Part (last 3 month) ";
+		s += msFamilyRatio;
 	}
 	return s;
 }
@@ -249,8 +253,8 @@ CString CNotice::GetDecriptionForLetterHebrew()
 	}
 	if (gFamilyPart.mbAskOnlyForFamilyPart)
 	{
-		s += L", חלק המשפחה ";
-		s += gFamilyPart.GetSRatio();
+		s += L",חלק המשפחה (3 חודשים אחרונים)  ";
+		s += msFamilyRatio;
 	}
 	return s;
 }

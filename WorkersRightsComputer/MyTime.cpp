@@ -124,6 +124,9 @@ void CMyTime::Log(FILE* pf)
 }
 void CMyTime::LogLine(FILE* pf, const wchar_t* zText)
 {
+	if (!pf)
+		return;
+
 	CString s(ToString());
 	if (mHour != 0)
 		fwprintf(pf, L"%s %s (hour %d)\n", zText, (const wchar_t *)s, mHour);

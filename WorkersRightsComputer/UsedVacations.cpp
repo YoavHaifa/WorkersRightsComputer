@@ -209,7 +209,7 @@ void CUsedVacations::AddAllVacationsToWorkSpan(CWorkSpan& workSpan, bool bExtend
 	while (pos)
 	{
 		CVacationUsed *pVac = mVacationsUsed.GetNext(pos);
-		if (bExtendPeriodByPaidMaternity && pVac->mbIsMaternityLeave && workSpan.Contains(pVac->mFirstDay))
+		if (pVac->mbIsMaternityLeave && bExtendPeriodByPaidMaternity && workSpan.Contains(pVac->mFirstDay))
 			workSpan.AddUnpaidVacation(*pVac);
 		else
 			pVac->AddToWorkSpan(workSpan);
@@ -263,12 +263,16 @@ void CUsedVacations::WriteToLetter(CHtmlWriter& html)
 
 	int nPaid = 0;
 	int nUnPaid = 0;
+	int nMaternity = 0;
 	POSITION pos = mVacationsUsed.GetHeadPosition();
 	while (pos)
 	{
 		CVacationUsed *pVac = mVacationsUsed.GetNext(pos);
 		if (pVac->mbIsMaternityLeave)
+		{
 			html.WriteEH(L"Maternity Leave: ", L"חופשת לידה: ");
+			nMaternity++;
+		}
 		else
 			html.WriteEH(L"Vacation: ", L"חופשה: ");
 
@@ -291,20 +295,33 @@ void CUsedVacations::WriteToLetter(CHtmlWriter& html)
 
 	// Sum of vacations
 	html.StartParagraph();
-	html.WriteLineEH(L"According to the law, days of paid vacation are included while computing social rights like severance and pension.",
-		L"לפי חוק חופשה שנתית, ימי חופשה בתשלום באים בחשבון לצורך חישוב זכויות סוציאליות כגון פיצויי פיטורים והפרשות לפנסיה. ");
-	html.WriteEH(L"In this computation ", L"בחישוב זה הוכללו ");
-	html.WriteInt(nPaid);
-	html.WriteLineEH(L" days of paid vacation were included.", L" ימי חופשה בתשלום.");
-	if (umbPrintUnpaid)
+	if (nMaternity)
 	{
-		html.WriteEH(L"In this computation ", L"בחישוב זה קוזזו ");
-		html.WriteInt(nUnPaid);
-		html.WriteLineEH(L" days of unpaid vacation were offset.", L" ימי חופשה ללא תשלום. ");
+		html.WriteLEH(L"According to the law:", L"לפי החוק והפסיקה: ");
+		html.WriteLine(L"");
+		html.WriteLEH(L"Paid maternity leave is included while computing seniority for severance and recuperation.",
+			L"תקופת חופשת לידה בתשלום באה בחשבון לצורך חישוב ותק לפיצויי פיטורים ודמי הבראה.");
+		html.WriteLine(L"");
+		html.WriteLEH(L"Paid vacation days are normal working days and are entitled to full social rights.",
+			L"ימי חופשה בתשלום הינם ימי עבודה רגילים ומזכים במלוא הזכויות הסוציאליות.");
 	}
-	html.EndParagraph();
+	else
+	{
+		html.WriteLineEH(L"According to the law, days of paid vacation are included while computing social rights like severance, recuperation and pension.",
+			L"לפי חוק חופשה שנתית, ימי חופשה בתשלום באים בחשבון לצורך חישוב זכויות סוציאליות כגון פיצויי פיטורים, גמי הבראה והפרשות לפנסיה. ");
+		html.WriteEH(L"In this computation ", L"בחישוב זה הוכללו ");
+		html.WriteInt(nPaid);
+		html.WriteLineEH(L" days of paid vacation were included.", L" ימי חופשה בתשלום.");
+		if (umbPrintUnpaid)
+		{
+			html.WriteEH(L"In this computation ", L"בחישוב זה קוזזו ");
+			html.WriteInt(nUnPaid);
+			html.WriteLineEH(L" days of unpaid vacation were offset.", L" ימי חופשה ללא תשלום. ");
+		}
+	}
 	if (gWorkYears.mnDaysForSeveranceAddedForUnpaidVacations)
 		WriteToLetterExtraSeverance(html);
+	html.EndParagraph();
 }
 void CUsedVacations::WriteToLetterExtraSeverance(class CHtmlWriter& html)
 {

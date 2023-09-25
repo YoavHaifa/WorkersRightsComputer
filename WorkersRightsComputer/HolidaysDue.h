@@ -40,7 +40,7 @@ private:
 	void UpdateSum(CMyDialogEx* pDlg = NULL);
 
 	int mn;
-	CList <class CHolidaysDuePerYear*, CHolidaysDuePerYear*> mHolidaysPerYer;
+	CList <class CHolidaysDuePerYear*, CHolidaysDuePerYear*> mHolidaysPerYears;
 	CHolidaysDuePerYear mSum;
 	CHolidaysDuePerYear mSumPrev;
 	CHolidaysDuePerYear* mpLastYear;

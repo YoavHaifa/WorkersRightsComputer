@@ -6,7 +6,7 @@ class CWorkYears
 public:
 	CWorkYears(void);
 
-	void Compute(void);
+	void DivideWorkPeriodToWorkYears(void);
 	void Clear(void);
 	void Log();
 

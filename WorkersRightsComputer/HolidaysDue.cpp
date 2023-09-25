@@ -20,32 +20,32 @@ CHolidaysDue::CHolidaysDue()
 	, mbDefinedBySpecialDialog(false)
 	, mbPeriodAndHolidaysDefined(false)
 {
-	mHolidaysPerYer.AddTail(new CHolidaysDuePerYear(IDC_STATIC_PY,
+	mHolidaysPerYears.AddTail(new CHolidaysDuePerYear(IDC_STATIC_PY,
 		IDC_EDIT_HOLIDAYS_PREVY_WORK, IDC_EDIT_HOLIDAYS_PREVY_PAID, 
 		IDC_EDIT_HOLIDAYS_PREVY_FROM, IDC_EDIT_HOLIDAYS_PREVY_DUE));
-	mHolidaysPerYer.AddTail(new CHolidaysDuePerYear(IDC_STATIC_PY1,
+	mHolidaysPerYears.AddTail(new CHolidaysDuePerYear(IDC_STATIC_PY1,
 		IDC_EDIT_HOLIDAYS_PREVY_WORK1, IDC_EDIT_HOLIDAYS_PREVY_PAID1, 
 		IDC_EDIT_HOLIDAYS_PREVY_FROM1, IDC_EDIT_HOLIDAYS_PREVY_DUE1));
-	mHolidaysPerYer.AddTail(new CHolidaysDuePerYear(IDC_STATIC_PY2,
+	mHolidaysPerYears.AddTail(new CHolidaysDuePerYear(IDC_STATIC_PY2,
 		IDC_EDIT_HOLIDAYS_PREVY_WORK2, IDC_EDIT_HOLIDAYS_PREVY_PAID2, 
 		IDC_EDIT_HOLIDAYS_PREVY_FROM2, IDC_EDIT_HOLIDAYS_PREVY_DUE2));
-	mHolidaysPerYer.AddTail(new CHolidaysDuePerYear(IDC_STATIC_PY3,
+	mHolidaysPerYears.AddTail(new CHolidaysDuePerYear(IDC_STATIC_PY3,
 		IDC_EDIT_HOLIDAYS_PREVY_WORK3, IDC_EDIT_HOLIDAYS_PREVY_PAID3, 
 		IDC_EDIT_HOLIDAYS_PREVY_FROM3, IDC_EDIT_HOLIDAYS_PREVY_DUE3));
-	mHolidaysPerYer.AddTail(new CHolidaysDuePerYear(IDC_STATIC_PY4,
+	mHolidaysPerYears.AddTail(new CHolidaysDuePerYear(IDC_STATIC_PY4,
 		IDC_EDIT_HOLIDAYS_PREVY_WORK4, IDC_EDIT_HOLIDAYS_PREVY_PAID4, 
 		IDC_EDIT_HOLIDAYS_PREVY_FROM4, IDC_EDIT_HOLIDAYS_PREVY_DUE4));
-	mHolidaysPerYer.AddTail(new CHolidaysDuePerYear(IDC_STATIC_PY5,
+	mHolidaysPerYears.AddTail(new CHolidaysDuePerYear(IDC_STATIC_PY5,
 		IDC_EDIT_HOLIDAYS_PREVY_WORK5, IDC_EDIT_HOLIDAYS_PREVY_PAID5, 
 		IDC_EDIT_HOLIDAYS_PREVY_FROM5, IDC_EDIT_HOLIDAYS_PREVY_DUE5));
-	mHolidaysPerYer.AddTail(new CHolidaysDuePerYear(IDC_STATIC_PY6,
+	mHolidaysPerYears.AddTail(new CHolidaysDuePerYear(IDC_STATIC_PY6,
 		IDC_EDIT_HOLIDAYS_PREVY_WORK6, IDC_EDIT_HOLIDAYS_PREVY_PAID6, 
 		IDC_EDIT_HOLIDAYS_PREVY_FROM6, IDC_EDIT_HOLIDAYS_PREVY_DUE6));
-	mHolidaysPerYer.AddTail(new CHolidaysDuePerYear(IDC_STATIC_PY7,
+	mHolidaysPerYears.AddTail(new CHolidaysDuePerYear(IDC_STATIC_PY7,
 		IDC_EDIT_HOLIDAYS_PREVY_WORK7, IDC_EDIT_HOLIDAYS_PREVY_PAID7, 
 		IDC_EDIT_HOLIDAYS_PREVY_FROM7, IDC_EDIT_HOLIDAYS_PREVY_DUE7));
 
-	mpLastYear = mHolidaysPerYer.GetHead();
+	mpLastYear = mHolidaysPerYears.GetHead();
 
 	maMainDlgFields[0] = IDC_STATIC_HOLIDAY_LAST;
 	maMainDlgFields[1] = IDC_EDIT_HOLIDAYS_PREVY_WORK;
@@ -94,10 +94,10 @@ void CHolidaysDue::Reset()
 	mbPeriodAndHolidaysDefined = false;
 	msHolidaysSelection = "";
 
-	POSITION pos = mHolidaysPerYer.GetHeadPosition();
+	POSITION pos = mHolidaysPerYears.GetHeadPosition();
 	while (pos)
 	{
-		CHolidaysDuePerYear* pYear = mHolidaysPerYer.GetNext(pos);
+		CHolidaysDuePerYear* pYear = mHolidaysPerYears.GetNext(pos);
 		pYear->Zero();
 	}
 	UpdateSum();
@@ -157,10 +157,10 @@ void CHolidaysDue::SetYearsByWorkPeriod()
 {
 	mn = 0;
 	int iFromLast = 0;
-	POSITION pos = mHolidaysPerYer.GetHeadPosition();
+	POSITION pos = mHolidaysPerYears.GetHeadPosition();
 	while (pos)
 	{
-		CHolidaysDuePerYear* pYear = mHolidaysPerYer.GetNext(pos);
+		CHolidaysDuePerYear* pYear = mHolidaysPerYears.GetNext(pos);
 		CWorkYear* pWorkYear = gWorkYears.GetByReverseIndex(iFromLast);
 		if (pWorkYear)
 		{
@@ -184,10 +184,10 @@ void CHolidaysDue::SetYearsByWorkPeriod()
 }
 void CHolidaysDue::InitDialog(CMyDialogEx* pDlg)
 {
-	POSITION pos = mHolidaysPerYer.GetHeadPosition();
+	POSITION pos = mHolidaysPerYears.GetHeadPosition();
 	while (pos)
 	{
-		CHolidaysDuePerYear* pYear = mHolidaysPerYer.GetNext(pos);
+		CHolidaysDuePerYear* pYear = mHolidaysPerYears.GetNext(pos);
 		pYear->UpdateGui(pDlg);
 	}
 	UpdateSum(pDlg);
@@ -200,10 +200,10 @@ void CHolidaysDue::OnGuiChange(int iYear, CMyDialogEx* pDlg)
 		return;
 	umbHandlingChange = true;
 
-	POSITION pos = mHolidaysPerYer.GetHeadPosition();
+	POSITION pos = mHolidaysPerYears.GetHeadPosition();
 	while (pos)
 	{
-		CHolidaysDuePerYear* pYear = mHolidaysPerYer.GetNext(pos);
+		CHolidaysDuePerYear* pYear = mHolidaysPerYears.GetNext(pos);
 		if (pYear->mId == iYear)
 		{
 			pYear->OnGuiChange(pDlg);
@@ -218,10 +218,10 @@ void CHolidaysDue::UpdateSum(CMyDialogEx* pDlg)
 	mSum.Zero();
 	mSumPrev.Zero();
 	int i = 0;
-	POSITION pos = mHolidaysPerYer.GetHeadPosition();
+	POSITION pos = mHolidaysPerYears.GetHeadPosition();
 	while (pos)
 	{
-		CHolidaysDuePerYear* pYear = mHolidaysPerYer.GetNext(pos);
+		CHolidaysDuePerYear* pYear = mHolidaysPerYears.GetNext(pos);
 		mSum.Add(*pYear);
 		if (i > 0 && pYear->mbRelevant)
 			mSumPrev.Add(*pYear);
@@ -236,10 +236,10 @@ void CHolidaysDue::SaveToXml(CXMLDump& xmlDump)
 
 	xmlDump.Write(L"bDefinedBySpecialDialog", mbDefinedBySpecialDialog);
 
-	POSITION pos = mHolidaysPerYer.GetHeadPosition();
+	POSITION pos = mHolidaysPerYears.GetHeadPosition();
 	while (pos)
 	{
-		CHolidaysDuePerYear* pYear = mHolidaysPerYer.GetNext(pos);
+		CHolidaysDuePerYear* pYear = mHolidaysPerYears.GetNext(pos);
 		pYear->SaveToXml(xmlDump);
 	}
 }
@@ -257,10 +257,10 @@ void CHolidaysDue::LoadFromXml(CXMLParseNode* pWorkPeriod, CXMLParseNode* pRoot)
 		pHolidaysDueNode->GetValue(L"bDefinedBySpecialDialog", mbDefinedBySpecialDialog);
 
 		CXMLParseNode* pYearNode = pHolidaysDueNode->GetFirst(L"Year");
-		POSITION pos = mHolidaysPerYer.GetHeadPosition();
+		POSITION pos = mHolidaysPerYears.GetHeadPosition();
 		while (pYearNode && pos)
 		{
-			CHolidaysDuePerYear* pYear = mHolidaysPerYer.GetNext(pos);
+			CHolidaysDuePerYear* pYear = mHolidaysPerYears.GetNext(pos);
 			pYear->LoadFromXml(pYearNode);
 
 			pYearNode = pHolidaysDueNode->GetNext(L"Year", pYearNode);
@@ -285,24 +285,24 @@ void CHolidaysDue::LoadFromOldXml(CXMLParseNode* pRoot)
 	// Init previous years
 	int nPrevWorked = 0;
 	int nPrevPaid = 0;
-	int nYears = 0;
+	int nPrevYears = 0;
 	pMainDlgNode->GetValue(L"PrevYearWork", nPrevWorked);
 	pMainDlgNode->GetValue(L"PrevYearPaid", nPrevPaid);
-	pMainDlgNode->GetValue(L"PrevNYear", nYears);
+	pMainDlgNode->GetValue(L"PrevNYear", nPrevYears);
 	if (nPrevWorked > nPrevPaid)
-		mbDefinedBySpecialDialog = true;
-
-	if (nYears == 0)
-		nYears = 1;
-
-	POSITION pos = mHolidaysPerYer.GetHeadPosition();
-	mHolidaysPerYer.GetNext(pos); // Skip first (which is "last year")
-	int i = 1;
-	while (pos && nYears > 0)
 	{
-		CHolidaysDuePerYear* pYear = mHolidaysPerYer.GetNext(pos);
-		pYear->SetValues(nLastWorked, nLastPaid);
-		nYears--;
+		mbDefinedBySpecialDialog = true;
+		if (nPrevYears == 0)
+			nPrevYears = 1;
+	}
+
+	POSITION pos = mHolidaysPerYears.GetHeadPosition();
+	mHolidaysPerYears.GetNext(pos); // Skip first (which is "last year")
+	while (pos && nPrevYears > 0)
+	{
+		CHolidaysDuePerYear* pYear = mHolidaysPerYears.GetNext(pos);
+		pYear->SetValues(nPrevWorked, nPrevPaid);
+		nPrevYears--;
 	}
 }
 int CHolidaysDue::GetNDueLastYear()
@@ -324,10 +324,10 @@ int CHolidaysDue::GetNPrevYears()
 int CHolidaysDue::GetNDuePrevYear(int iWanted)
 {
 	int i = 0;
-	POSITION pos = mHolidaysPerYer.GetHeadPosition();
+	POSITION pos = mHolidaysPerYears.GetHeadPosition();
 	while (pos)
 	{
-		CHolidaysDuePerYear* pYear = mHolidaysPerYer.GetNext(pos);
+		CHolidaysDuePerYear* pYear = mHolidaysPerYears.GetNext(pos);
 		if (i == iWanted && pYear->mbRelevant)
 			return pYear->GetDue();
 		i++;
