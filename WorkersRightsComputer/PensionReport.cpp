@@ -5,15 +5,11 @@
 #include "FamilyPart.h"
 
 
-CPensionReportPeriod::CPensionReportPeriod(int year, int month, 
+CPensionReportPeriod::CPensionReportPeriod(const CMyTime& date,
 	double monthlyPay, double part, 
 	double pensionRate, double severanceRate, 
 	double familyPart, double companyHours, double companyRatio)
-	: mFromYear(year)
-	, mFromMonth(month)
-	, mTillYear(year)
-	, mTillMonth(month)
-	, mMonthlyPay(monthlyPay)
+	: mMonthlyPay(monthlyPay)
 	, mMonthParts(part)
 	, mPensionRate(pensionRate)
 	, mSeveranceRate(severanceRate)
@@ -24,6 +20,7 @@ CPensionReportPeriod::CPensionReportPeriod(int year, int month,
 	, mDueSeverance(0)
 	, mDueFromFamily(0)
 {
+	SetMonth(date);
 }
 CPensionReportPeriod::~CPensionReportPeriod()
 {
@@ -41,18 +38,18 @@ bool CPensionReportPeriod::Is(double monthlyPay, double pensionRate, double seve
 
 	return true;
 }
-void CPensionReportPeriod::Add(int year, int month, double part)
+void CPensionReportPeriod::Add(const CMyTime& date, double part)
 {
-	mTillYear = year;
-	mTillMonth = month;
+	CMyTime lastDay(date.LastDayOfMonth());
+	InitDaysSpan(mFirstDay, lastDay);
 	mMonthParts += part;
 }
 void CPensionReportPeriod::WriteToLetter(CHtmlWriter& html, bool bPension)
 {
 	char zBuf[256];
-	sprintf_s(zBuf, 256, "%2d/%4d", mFromMonth, mFromYear);
+	sprintf_s(zBuf, 256, "%2d/%4d", mFirstDay.mMonth, mFirstDay.mYear);
 	html.Write2Tab(zBuf);
-	sprintf_s(zBuf, 256, "%2d/%4d", mTillMonth, mTillYear);
+	sprintf_s(zBuf, 256, "%2d/%4d", mLastDay.mMonth, mLastDay.mYear);
 	html.Write2Tab(zBuf);
 
 	if (gFamilyPart.mbAskOnlyForFamilyPart)
@@ -119,14 +116,14 @@ void CPensionReport::Clear()
 	}
 	mpLast = NULL;
 }
-void CPensionReport::AddMonth(int year, int month, double monthlyPay, double part, 
+void CPensionReport::AddMonth(const CMyTime& date, double monthlyPay, double part,
 	double pensionRate, double severanceRate, double familyPart, double companyHours, double companyRatio)
 {
 	if (mpLast && mpLast->Is(monthlyPay, pensionRate, severanceRate, familyPart))
-		mpLast->Add(year, month, part);
+		mpLast->Add(date, part);
 	else
 	{
-		mpLast = new CPensionReportPeriod(year, month, monthlyPay, part, 
+		mpLast = new CPensionReportPeriod(date, monthlyPay, part,
 			pensionRate, severanceRate, familyPart, companyHours, companyRatio);
 		mPeriods.AddTail(mpLast);
 	}

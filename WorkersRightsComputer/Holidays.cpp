@@ -137,7 +137,6 @@ bool CHolidays::InitFromFileInternals(FILE *pfRead, FILE *pfLog)
 		map[i] = new CHoliday(sLine);
 
 		// Read Year
-
 		int year = 0;
 		sLine = CUtils::ReadLine(pfRead);
 		if (pfLog)
@@ -148,22 +147,20 @@ bool CHolidays::InitFromFileInternals(FILE *pfRead, FILE *pfLog)
 			CUtils::MessBox(L"Holiday year defined as <*> - currently not supported", L"Input Error");
 			return false;
 		}
-		else
+
+		if (!TryConvertInt(sLine, L"year", year))
 		{
-			if (!TryConvertInt(sLine, L"year", year))
-			{
-				CUtils::MessBox(L"Failed to read year as number", L"Input Error");
-				return false;
-			}
-			if (year < 1980 || year > 2050)
-			{
-				wchar_t zBuf[256];
-				swprintf_s(zBuf, 256, L"<Reading holidays from file> Bad value for year: %d", year);
-				CUtils::MessBox(zBuf, L"Input Error");
-				return false;
-			}
-			map[i]->mYear = year;
+			CUtils::MessBox(L"Failed to read year as number", L"Input Error");
+			return false;
 		}
+		if (year < 1980 || year > 2050)
+		{
+			wchar_t zBuf[256];
+			swprintf_s(zBuf, 256, L"<Reading holidays from file> Bad value for year: %d", year);
+			CUtils::MessBox(zBuf, L"Input Error");
+			return false;
+		}
+		map[i]->mYear = year;
 
 		// Read Month
 		int month = 0;
@@ -196,12 +193,6 @@ bool CHolidays::InitFromFileInternals(FILE *pfRead, FILE *pfLog)
 			return false;
 		}
 		map[i]->mDay = day;
-
-		if (year)
-		{
-			CMyTime time(year, month, day);
-			map[i]->mTime = time;
-		}
 
 		mn++;
 	}
@@ -391,7 +382,7 @@ int CHolidays::AddPay4PrevYear(int iPrev)
 	if (nDue > 0)
 	{
 		CMyTime payDate = gWorkYears.GetPrevYearEnd(iPrev);
-		double payPerDay = gWageTable.ComputeHolidayPrice(payDate.mYear, payDate.mMonth);
+		double payPerDay = gWageTable.ComputeHolidayPrice(payDate);
 		double payPerYear = payPerDay * nDue;
 		RememberPayParDay(payPerDay);
 		LogLine(L"pay per day in prev year", payPerDay);
@@ -460,12 +451,7 @@ bool CHolidays::InitDefinition()
 		return true;
 
 	msSelection = sWantedSet;
-	if (msSelection.IsEmpty())
-	{
-		msDue = L"Holidays not defined";
-		return false;
-	}
-	if (msSelection == "-")
+	if (msSelection.IsEmpty() || (msSelection == "-"))
 	{
 		msDue = L"Holidays not defined";
 		return false;
@@ -482,7 +468,7 @@ bool CHolidays::Compute(void)
 	mMaxPayPerDay = 0;
 
 	if (!InitDefinition())
-		return false;
+		return true;
 
 	mnInLastYear = NInLastYear();
 	// TEMP - This edit box role is not clear -
@@ -548,6 +534,6 @@ bool CHolidays::ComputeHolidayPrice(CHoliday& holiday)
 	//if (mRateSetByUser > 0)
 	//	holiday.mPrice = mRateSetByUser;
 	//else
-	holiday.mPrice = gWageTable.ComputeHolidayPrice(holiday.mYear, holiday.mMonth);
+	holiday.mPrice = gWageTable.ComputeHolidayPrice(holiday);
 	return true;
 }

@@ -279,4 +279,5 @@ void CAllRights::SaveToXml(CXMLDump& xmlDump)
 		CRight* pRight = mRights.GetNext(pos);
 		pRight->SaveToXml(xmlDump);
 	}
+	xmlDump.Write(L"ToatDue", mSumDue);
 }

@@ -35,8 +35,8 @@ public:
 	bool mbNegative;
 	double mnWorkDaysPerWeek;
 	double mnDaysInMonthForDailySalary;
-	int GetWorkingHoursInFullMonth(int year, int month);
-	int GetWorkingHoursInFullWeek(int year, int month);
+	int GetWorkingHoursInFullMonth(CMyTime date);
+	int GetWorkingHoursInFullWeek(CMyTime date);
 	bool mbSkipNotice;
 
 	// Special mode for caregivers
@@ -57,13 +57,10 @@ public:
 	void ShortLog(FILE* pf);
 	CString GetDaysText();
 	int CountWorkingDays(CMyTime& first, CMyTime& last);
-	//int CountAllDaysWithoutUnpaidVacation(CMyTime& first, CMyTime& last);
-	int CountAllDaysPerMonth(int year, int month);
-	int CountWorkingDaysPerMonth(int year, int month);
-	int CountDaysWorkedPerMonth(int year, int month);
+	int CountWorkingDaysPerMonth(CMyTime& dayInMonth);
+	int CountDaysWorkedPerMonth(const CMyTime& date);
 	void InitDetailsForEachMonth();
 	CMonthInfo *GetMonthInfoFor(CMyTime &date);
-	CMonthInfo *GetMonthInfoFor(int year, int month);
 	void Debug(const wchar_t *zAt);
 	void Log(const wchar_t *zAt);
 

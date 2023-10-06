@@ -36,6 +36,7 @@ protected:
 	static bool umbDisplayDiff;
 
 	static DWORD WINAPI StaticVerifyBatch(LPVOID);
+	static void OpenBatchReport(const CString& sPath);
 
 	CString msfName;
 	virtual bool ReadSavedFile() = 0;

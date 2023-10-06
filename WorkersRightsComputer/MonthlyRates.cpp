@@ -12,15 +12,14 @@ CMonthlyRates::CMonthlyRates(const wchar_t *zName, int firstYear)
 {
 	InitFromXmlFile();
 }
-double CMonthlyRates::RatePerMonth(int year, int month)
+double CMonthlyRates::RatePerMonth(const CMyTime& date)
 {
 	if (!mbValid)
 		return 0;
-	int iYear = year - mFirstYear;
-	if (month < 1)
+	int iYear = date.mYear - mFirstYear;
+	if (date.mMonth < 1)
 		return 0;
-	month = month - 1;
-	return ma[iYear * 12 + month];
+	return ma[iYear * 12 + date.mMonth - 1];
 }
 bool CMonthlyRates::PrintLog(const wchar_t* zAt)
 {

@@ -123,7 +123,7 @@ void CHolidaysDue::SetSavedWorkPeriod()
 	SetYearsByWorkPeriod();
 }
 bool CHolidaysDue::VerifyWorkPeriod(CMyDialogEx* pMainDlg)
-{ // Return "false" if no change
+{
 	CHolidays* pHolidays = gAllRights.GetHolidays();
 	if (!pHolidays)
 		return false;

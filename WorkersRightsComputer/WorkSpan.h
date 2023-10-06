@@ -6,9 +6,10 @@ class CWorkSpan : public CDaysSpan
 public:
 	CWorkSpan();
 	~CWorkSpan();
-	//CWorkSpan(CMyTime& firstDay, CMyTime& dayAfter);
 
-	void Init(CMyTime& firstDay, CMyTime& dayAfter);
+	void InitWorkSpan(CMyTime& firstDay, CMyTime& dayAfter);
+	void InitWorkSpanWithVacations(CMyTime& firstDay, CMyTime& dayAfter);
+
 	bool AddUnpaidVacation(CDaysSpan& unpaidSpan);
 	void AddPaidMaternityLeave(CDaysSpan& paidSpan);
 	bool ClipByWorkPeriod();
@@ -23,6 +24,7 @@ public:
 	CList<CDaysSpan*, CDaysSpan*> mUnpaidSpans;
 	CList<CDaysSpan*, CDaysSpan*> mPaidMeternity;
 
+protected:
 	// Debug
 	FILE* mpfLog;
 };

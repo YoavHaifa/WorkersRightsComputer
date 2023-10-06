@@ -4,6 +4,7 @@
 #include "WorkYears.h"
 #include "FamilyPart.h"
 #include "WageTable.h"
+#include "Config.h"
 
 CNotice::CNotice()
 	: CRight(L"Notice", L"הודעה מוקדמת")
@@ -203,7 +204,11 @@ bool CNotice::Compute()
 
 	if (gFamilyPart.mbAskOnlyForFamilyPart)
 	{
-		mFamilyRatio = gWorkPeriod.ComputeFamilyPartLastMonths(umn3MonthsForFamilyPart);
+		if (gConfig.mbBackwardCompatibilityMode)
+			mFamilyRatio = gWorkPeriod.ComputeFamilyPart();
+		else
+			mFamilyRatio = gWorkPeriod.ComputeFamilyPartLastMonths(umn3MonthsForFamilyPart);
+
 		msFamilyRatio = CFamilyPart::Ratio2S(mFamilyRatio);
 		LogLine(L"Family part - average last 3 month", mFamilyRatio);
 		mDuePay = mDuePay * mFamilyRatio;

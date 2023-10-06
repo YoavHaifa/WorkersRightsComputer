@@ -9,7 +9,7 @@ public:
 	//void SaveMonthlyXmlFile();
 	bool InitFromXmlFile();
 	bool PrintLog(const wchar_t* zAt);
-	double RatePerMonth(int year, int month);
+	double RatePerMonth(const class CMyTime &date);
 
 	CString msName;
 

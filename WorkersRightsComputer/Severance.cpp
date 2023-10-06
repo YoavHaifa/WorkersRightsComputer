@@ -38,7 +38,7 @@ bool CSeverance::Compute(void)
 	}
 
 	mnYears = gWorkYears.mYearsForSeverance;
-	mPayPerYear = gWageTable.ComputeMonthlyPay(gWorkPeriod.mLast.mYear, gWorkPeriod.mLast.mMonth);
+	mPayPerYear = gWageTable.ComputeMonthlyPay(gWorkPeriod.mLast);
 	if (mnYears < MIN_PERIOD)
 	{
 		//double partYearThreshold = (double)N_MIN_MONTHS_FOR_SPECIAL_CASE / 12 - 0.002;

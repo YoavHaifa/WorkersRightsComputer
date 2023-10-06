@@ -336,7 +336,7 @@ void CWorkersRightsComputerDlg::OnOK()
 	if (!VerifyThatNotInSave())
 		return;
 		
-	CMyAskDlg dlg(L"Verify OK", L"Do you want save and to exit?");
+	CMyAskDlg dlg(L"Verify OK", L"Do you want to save and to exit?");
 	if (dlg.Ask())
 	{
 		mbSaveFailed = false;

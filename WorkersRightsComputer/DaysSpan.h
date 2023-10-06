@@ -8,7 +8,10 @@ public:
 	CDaysSpan(CMyTime& firstDay, CMyTime& lastDay);
 	CDaysSpan(CDaysSpan& other);
 
-	void InitSpan(CMyTime& firstDay, CMyTime& lastDay);
+	void InitDaysSpan(CMyTime& firstDay, CMyTime& lastDay);
+	//void InitDaysSpanWithVacations(CMyTime& firstDay, CMyTime& lastDay);
+	void SetMonth(const CMyTime &date);
+
 	bool ClipByWorkPeriodEnd();
 
 	bool Overlaps(CDaysSpan& other);

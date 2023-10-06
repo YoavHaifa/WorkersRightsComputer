@@ -105,6 +105,7 @@ void CSaver::SaveToXml(void)
 
 	gAllRights.SaveToXml(xmlDump);
 	xmlDump.Write(L"software_version", gConfig.msVersion);
+	xmlDump.Write(L"i_software_version", gConfig.miVersion);
 
 	xmlDump.Close();
 }

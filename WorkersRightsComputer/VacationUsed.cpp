@@ -130,7 +130,7 @@ void CVacationUsed::FindUnpaidSpan()
 			check.AddDay();
 	}
 
-	mUnpaidSpan.InitSpan(check, mLastDay);
+	mUnpaidSpan.InitDaysSpan(check, mLastDay);
 }
 int CVacationUsed::CountDaysOfUnpaidVacation(CMyTime& first, CMyTime& last)
 {

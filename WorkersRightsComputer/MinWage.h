@@ -21,8 +21,8 @@ public:
 
 	bool InitFromFile(void);
 	void PrintLog(void);
-	double ComputeMonthlyPay(int year, int month);
-	double GetMonthlyWage(const class CMyTime& time);
+	double ComputeMonthlyPay(const class CMyTime& date);
+	double GetMonthlyWage(const class CMyTime& date);
 
 	int mn;
 	CLevel **map;

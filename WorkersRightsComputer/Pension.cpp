@@ -91,12 +91,12 @@ bool CPension::Compute(void)
 	msDue += ToString(mDuePay);
 	return bOK;
 }
-void CPension::PensionAddMonth(CMyTime& yearAndMonth, int nDays /* if 0 - full */, bool bFirst)
+void CPension::PensionAddMonth(CMyTime& date, int nDays /* if 0 - full */, bool bFirst)
 {
-	int year = yearAndMonth.mYear;
-	int month = yearAndMonth.mMonth;
+	//int year = yearAndMonth.mYear;
+	//int month = yearAndMonth.mMonth;
 	double part = 1;
-	CMonthInfo* pInfo = gWorkPeriod.GetMonthInfoFor(year, month);
+	CMonthInfo* pInfo = gWorkPeriod.GetMonthInfoFor(date);
 	double monthFraction = pInfo->GetFractionForPension();
 	if (bFirst)
 	{
@@ -114,9 +114,9 @@ void CPension::PensionAddMonth(CMyTime& yearAndMonth, int nDays /* if 0 - full *
 		part = monthFraction;
 	}
 
-	double monthlyPay = gWageTable.ComputeMonthlyPay(year, month);
+	double monthlyPay = gWageTable.ComputeMonthlyPay(date);
 
-	double penRate = mpPensionRates->RatePerMonth(year, month);
+	double penRate = mpPensionRates->RatePerMonth(date);
 	double pensionDue = monthlyPay * penRate * part;
 
 	double familyPart = 0;
@@ -130,9 +130,9 @@ void CPension::PensionAddMonth(CMyTime& yearAndMonth, int nDays /* if 0 - full *
 	mPensionDue += pensionDue;
 	mPensionPerYear += pensionDue;
 
-	CString sLine = ToString(year);
+	CString sLine = ToString(date.mYear);
 	sLine += L" ";
-	sLine += ToString(month);
+	sLine += ToString(date.mMonth);
 	sLine += L": ";
 	sLine += ToString(part, 3);
 	sLine += L" ";
@@ -146,7 +146,7 @@ void CPension::PensionAddMonth(CMyTime& yearAndMonth, int nDays /* if 0 - full *
 	double sevRate = 0;
 	if (mbEntitledOnlyToSeveranceFund)
 	{
-		sevRate = mpSeveranceMonthlyRates->RatePerMonth(year, month);
+		sevRate = mpSeveranceMonthlyRates->RatePerMonth(date);
 		severanceDue = monthlyPay * sevRate * part;
 		if (gFamilyPart.mbAskOnlyForFamilyPart)
 			severanceDue *= familyPart;
@@ -162,11 +162,11 @@ void CPension::PensionAddMonth(CMyTime& yearAndMonth, int nDays /* if 0 - full *
 		sLine += ToString(all);
 	}
 	LogLine(sLine);
-	if (month == 12)
+	if (date.mMonth == 12)
 		OnYearEnd();
 	if (gFamilyPart.mbAskOnlyForFamilyPart)
 		mDueFromFamily += (pensionDue + severanceDue);
-	mReport.AddMonth(year, month, monthlyPay, part, penRate, sevRate, familyPart, companyHours, companyRatio);
+	mReport.AddMonth(date, monthlyPay, part, penRate, sevRate, familyPart, companyHours, companyRatio);
 }
 bool CPension::CheckForDateToStartPension()
 {
@@ -358,7 +358,7 @@ bool CPension::UpdateStartDateForPensionForVacations()
 		return false;
 
 	CWorkSpan workBeforePension;
-	workBeforePension.InitSpan(gWorkPeriod.mFirst, mStartDateForPension.PrevDay());
+	workBeforePension.InitDaysSpan(gWorkPeriod.mFirst, mStartDateForPension.PrevDay());
 	gUsedVacations.AddAllVacationsToWorkSpan(workBeforePension, true /*bExtendPeriodByPaidMaternity*/);
 
 	if (workBeforePension.mDayAfter > mStartDateForPension)

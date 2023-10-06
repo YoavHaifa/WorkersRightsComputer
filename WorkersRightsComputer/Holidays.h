@@ -1,8 +1,9 @@
 #pragma once
 
 #include "right.h"
+#include "MyTime.h"
 
-class CHoliday
+class CHoliday : public CMyTime
 {
 public:
 	CHoliday(const wchar_t *zName)
@@ -12,14 +13,10 @@ public:
 	{
 	}
 	CString msName;
-	int mYear;
-	int mMonth;
-	int mDay;
 	bool mbAllYears;
 	bool mbInLastYear;
 	bool mbInLastYearPaySum;
 	double mPrice;
-	CMyTime mTime;
 	void Log(FILE*pf);
 };
 

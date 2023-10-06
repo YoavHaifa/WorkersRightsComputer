@@ -8,6 +8,7 @@
 #include "FilesList.h"
 #include "Pension.h"
 #include "Saver.h"
+#include "Config.h"
 #include "XmlParse.h"
 
 CString CVerify::umsfName;
@@ -21,6 +22,22 @@ void CVerify::StartVerifyBatch(const wchar_t *zfName)
 	umsfName = zfName;
 	CUtils::CreateThread(StaticVerifyBatch, NULL);
 }
+void CVerify::OpenBatchReport(const CString& sPath)
+{
+	CString sReportFileName(sPath + L"VerifyBatchReport.csv");
+	umpfReport = MyFOpenWithErrorBox(sReportFileName, L"w", L"Log");
+
+	// Write report title
+	fprintf(umpfReport, "i, ");
+
+	POSITION pos = gAllRights.mRights.GetHeadPosition();
+	while (pos)
+	{
+		CRight* pRight = gAllRights.mRights.GetNext(pos);
+		fwprintf(umpfReport, L"%s, diff, ", (const wchar_t *)pRight->msName);
+	}
+	fprintf(umpfReport, "\n");
+}
 DWORD WINAPI CVerify::StaticVerifyBatch(LPVOID)
 {
 	CString sPath = CFileName::GetPath(umsfName);
@@ -31,8 +48,8 @@ DWORD WINAPI CVerify::StaticVerifyBatch(LPVOID)
 	if (!pfLog)
 		return 0;
 
-	CString sReportFileName(sPath + L"VerifyBatchReport.csv");
-	umpfReport = MyFOpenWithErrorBox(sReportFileName, L"w", L"Log");
+	gConfig.mbBackwardCompatibilityMode = true;
+	OpenBatchReport(sPath);
 
 	CFilesList list;
 	CUtils::ListFilesInDirRecursive(sPath, L"*.xml", list);
@@ -71,6 +88,7 @@ DWORD WINAPI CVerify::StaticVerifyBatch(LPVOID)
 		fclose(umpfReport);
 		umpfReport = NULL;
 	}
+	gConfig.mbBackwardCompatibilityMode = false;
 	CUtils::OpenTextFile(sLogFileName);
 	return 0;
 }
@@ -256,7 +274,7 @@ bool CVerify::VerifyResults()
 				oldSum += pResult->mDue;
 				bFound = true;
 				if (umpfReport)
-					fwprintf(umpfReport, L"%s, %.2f, ", (const wchar_t *)pResult->msName, pRight->mDuePay);
+					fwprintf(umpfReport, L"%.2f, ", pRight->mDuePay);
 				if ((pRight->mDuePay >= (pResult->mDue - 0.2)) && (pRight->mDuePay <= (pResult->mDue + 0.2)))
 				{
 					s += L" Same";
@@ -272,7 +290,7 @@ bool CVerify::VerifyResults()
 					if (umpfReport)
 					{
 						double diff = pRight->mDuePay - pResult->mDue;
-						fprintf(umpfReport, "%d, ", (int)diff);
+						fprintf(umpfReport, "%.2f, ", diff);
 					}
 				}
 				break;

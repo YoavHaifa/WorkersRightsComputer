@@ -1,7 +1,7 @@
 #pragma once
-#include "MyTime.h"
+#include "WorkSpan.h"
 
-class CMonthInfo : public CMyTime
+class CMonthInfo : public CWorkSpan
 {
 public:
 	CMonthInfo();
@@ -12,15 +12,15 @@ public:
 	bool IsPartial(void);
 	double GetCompanyRatio(double *poCompanyHours = NULL, double* poCompanyRatio = NULL);
 	double GetFamilyPart(double* poCompanyHours, double* poCompanyRatio);
+	void Log(FILE* pf);
 	void LogFraction(FILE* pf);
 	double GetFraction() { return mMonthFraction; }
 	double GetFractionForPension() { return mMonthFractionForPension; }
 
 	int mi;
+	bool mbInitializedBeforeVacation;
 	bool mbLast;
 	int mSeniorityMonths;
-	int mnAllDays;
-	int mnAllWorkingDays;
 	int mnDaysUnpaidVacation;
 	int mnDaysNoPension;
 	int mnDaysWorked;
@@ -30,9 +30,11 @@ public:
 	double mRatioPaidByCompany;
 	void SetUnpaid(int nAnpaidDaysToAdd);
 	void SetNoPension(int nDaysToAdd);
-	int GetNRelevantDays(bool bPension);
+	int GetNRelevantDaysIn(CDaysSpan &span, bool bPension);
 
 private:
+	bool Debug(const wchar_t* zAt);
+
 	double mMonthFraction;
 	double mMonthFractionForPension;
 	void ComputeFractionBeforeVacations();

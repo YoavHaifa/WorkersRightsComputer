@@ -57,19 +57,19 @@ bool CWorkPeriod::IsValid(bool bMustDefineDays)
 
 	return true;
 }
-int CWorkPeriod::GetWorkingHoursInFullMonth(int year, int month)
+int CWorkPeriod::GetWorkingHoursInFullMonth(CMyTime date)
 {
-	if (year < 2018)
+	if (date.mYear < 2018)
 		return 186;
-	if (year == 2018 && month < 4)
+	if (date.mYear == 2018 && date.mMonth < 4)
 		return 186;
 	return 182;
 }
-int CWorkPeriod::GetWorkingHoursInFullWeek(int year, int month)
+int CWorkPeriod::GetWorkingHoursInFullWeek(CMyTime date)
 {
-	if (year < 2018)
+	if (date.mYear < 2018)
 		return 43;
-	if (year == 2018 && month < 4)
+	if (date.mYear == 2018 && date.mMonth < 4)
 		return 43;
 	return 42;
 }
@@ -429,6 +429,12 @@ CString CWorkPeriod::GetDaysText()
 	s += sDays;
 	return s;
 }
+int CWorkPeriod::CountWorkingDaysPerMonth(CMyTime& dayInMonth)
+{
+	CMyTime firstDay(dayInMonth.FirstDayOfMonth());
+	CMyTime lastDay(dayInMonth.LastDayOfMonth());
+	return CountWorkingDays(firstDay, lastDay);
+}
 int CWorkPeriod::CountWorkingDays(CMyTime &first, CMyTime &last)
 {
 	int n = 0;
@@ -441,6 +447,7 @@ int CWorkPeriod::CountWorkingDays(CMyTime &first, CMyTime &last)
 	}
 	return n;
 }
+/*
 int CWorkPeriod::CountAllDaysPerMonth(int year, int month)
 {
 	int n = 0;
@@ -451,7 +458,8 @@ int CWorkPeriod::CountAllDaysPerMonth(int year, int month)
 		date.AddDay();
 	}
 	return n;
-}
+}*/
+/*
 int CWorkPeriod::CountWorkingDaysPerMonth(int year, int month)
 {
 	int n = 0;
@@ -463,19 +471,22 @@ int CWorkPeriod::CountWorkingDaysPerMonth(int year, int month)
 		date.AddDay();
 	}
 	return n;
-}
-int CWorkPeriod::CountDaysWorkedPerMonth(int year, int month)
+}*/
+int CWorkPeriod::CountDaysWorkedPerMonth(const CMyTime& date)
 {
 	int n = 0;
-	CMyTime date(year, month, 1);
-	while (date.mMonth == month)
+	CMyTime check(date);
+	check.mDay = 1;
+	int month = date.mMonth;
+
+	while (check.mMonth == month)
 	{
-		if ((date >= mFirst) && (date <= mLast))
+		if ((check >= mFirst) && (check <= mLast))
 		{
-			if (date.IsWorkingDay())
+			if (check.IsWorkingDay())
 				n++;
 		}
-		date.AddDay();
+		check.AddDay();
 	}
 	return n;
 }
@@ -493,13 +504,10 @@ void CWorkPeriod::InitDetailsForEachMonth()
 
 CMonthInfo *CWorkPeriod::GetMonthInfoFor(CMyTime &date)
 {
-	return GetMonthInfoFor(date.mYear, date.mMonth);
-}
-CMonthInfo *CWorkPeriod::GetMonthInfoFor(int year, int month)
-{
 	for (int i = 0; i < MAX_MONTHS; i++)
 	{
-		if ((maMonths[i].mYear == year) && (maMonths[i].mMonth == month))
+		//if ((maMonths[i].mYear == year) && (maMonths[i].mMonth == month))
+		if (maMonths[i].Contains(date))
 		{
 			return &maMonths[i];
 		}
@@ -520,7 +528,7 @@ void CWorkPeriod::Debug(const wchar_t *zAt)
 
 	for (int i = 1; i < MAX_MONTHS; i++)
 	{
-		if ((maMonths[i].mYear == maMonths[i - 1].mYear) && (maMonths[i].mMonth == maMonths[i - 1].mMonth))
+		if (maMonths[i].mFirstDay == maMonths[i - 1].mFirstDay)
 		{
 			CUtils::MessBox(L"<CWorkPeriod::Debug> error", zAt);
 			return;
@@ -538,19 +546,19 @@ void CWorkPeriod::Log(const wchar_t *zAt)
 	if (!pfLog)
 		return;
 
-	CString s(mFirst.ToString());
-	fwprintf(pfLog, L"First Day %s\n", (const wchar_t *)s);
-	s = mLast.ToString();
-	fwprintf(pfLog, L"Last Day %s\n", (const wchar_t *)s);
-	s = mNotice.ToString();
-	fwprintf(pfLog, L"Notice Day %s\n", (const wchar_t *)s);
+	mFirst.LogLine(pfLog, L"First Day");
+	mLast.LogLine(pfLog, L"Last Day");
+	mNotice.LogLine(pfLog, L"Notice Day");
+	fprintf(pfLog, "\n");
 
+	fprintf(pfLog, "Work Days per week: %.2f\n", mnWorkDaysPerWeek);
+	for (int i = 0; i < 7; i++)
+		fprintf(pfLog, "%d: %s\n", i + 1, maWorkingDays[i] ? "Yes" : "No");;
 	fprintf(pfLog, "\n");
 
 	for (int i = 0; i < MAX_MONTHS; i++)
 	{
-		if (maMonths[i].IsPartial())
-			maMonths[i].LogFraction(pfLog);
+		maMonths[i].Log(pfLog);
 
 		if (maMonths[i].mbLast)
 			break;
@@ -571,16 +579,16 @@ bool CWorkPeriod::IncludesMonthButNotFirst(int year, int month)
 }
 void CWorkPeriod::SetWeekDaysPaidByCompany(class CCompanyPartPeriod *pFrom, class CCompanyPartPeriod *pUntil)
 {
-	if (!maMonths[0].mbInitialized)
+	if (!maMonths[0].mbInitializedBeforeVacation)
 	{
 		CUtils::MessBox(L"<SetWeekDaysPaidByCompany> Months array not initialized", L"SW Error");
 		return;
 	}
 	for (int i = 0; i < MAX_MONTHS; i++)
 	{
-		if (maMonths[i].IsMonthBefore(pFrom->mFrom))
+		if (maMonths[i].mLastDay.IsMonthBefore(pFrom->mFrom))
 			continue;
-		if (pUntil && !maMonths[i].IsMonthBefore(pUntil->mFrom))
+		if (pUntil && !maMonths[i].mLastDay.IsMonthBefore(pUntil->mFrom))
 			return;
 		maMonths[i].mHoursPerWeekPaidByCompany = pFrom->mCompanyHoursPerWeek;
 		maMonths[i].mRatioPaidByCompany = pFrom->mCompanyPart;

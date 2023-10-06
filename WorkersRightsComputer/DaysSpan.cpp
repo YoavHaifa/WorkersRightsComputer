@@ -9,13 +9,13 @@ CDaysSpan::CDaysSpan()
 }
 CDaysSpan::CDaysSpan(CMyTime& firstDay, CMyTime& lastDay)
 {
-	InitSpan(firstDay, lastDay);
+	InitDaysSpan(firstDay, lastDay);
 }
 CDaysSpan::CDaysSpan(CDaysSpan& other)
 {
-	InitSpan(other.mFirstDay, other.mLastDay);
+	InitDaysSpan(other.mFirstDay, other.mLastDay);
 }
-void CDaysSpan::InitSpan(CMyTime& firstDay, CMyTime& lastDay)
+void CDaysSpan::InitDaysSpan(CMyTime& firstDay, CMyTime& lastDay)
 {
 	mFirstDay = firstDay;
 	mLastDay = lastDay;
@@ -23,11 +23,20 @@ void CDaysSpan::InitSpan(CMyTime& firstDay, CMyTime& lastDay)
 	mnDays = mFirstDay.GetNDaysBefore(mDayAfter);
 	mnWorkDays = gWorkPeriod.CountWorkingDays(mFirstDay, mLastDay);
 }
+void CDaysSpan::SetMonth(const CMyTime& date)
+{
+	mFirstDay = date;
+	mFirstDay.mDay = 1;
+
+	mDayAfter = mFirstDay.NextMonth();
+	mLastDay = mDayAfter.PrevDay();
+	InitDaysSpan(mFirstDay, mLastDay);
+}
 bool CDaysSpan::ClipByWorkPeriodEnd()
 {
 	if (mDayAfter > gWorkPeriod.mLast)
 	{
-		InitSpan(mFirstDay, gWorkPeriod.mLast);
+		InitDaysSpan(mFirstDay, gWorkPeriod.mLast);
 		return true;
 	}
 	return false;
@@ -72,7 +81,7 @@ bool CDaysSpan::Intersect(CDaysSpan& other, CDaysSpan& oCommon)
 	CMyTime last = mLastDay;
 	if (mLastDay > other.mLastDay)
 		last = other.mLastDay;
-	oCommon.InitSpan(first, last);
+	oCommon.InitDaysSpan(first, last);
 	return oCommon.mnDays > 0;
 }
 void CDaysSpan::UpdateMonthlyInfo4Unpaid(bool bNoPension)
@@ -81,27 +90,27 @@ void CDaysSpan::UpdateMonthlyInfo4Unpaid(bool bNoPension)
 
 	// Update for relevant months in work period
 	CMyTime updateMonthStart(mFirstDay.mYear, mFirstDay.mMonth, 1);
-	CMonthInfo* pMonthInfo = gWorkPeriod.GetMonthInfoFor(mFirstDay);
-	int nRelevantWorkDaysPerMonth = pMonthInfo->GetNRelevantDays(bNoPension);
 	while (nUnpaidToAssign > 0)
 	{
-		if (nRelevantWorkDaysPerMonth > 0)
+		CMonthInfo* pMonthInfo = gWorkPeriod.GetMonthInfoFor(updateMonthStart);
+		CDaysSpan common;
+		if (Intersect(*pMonthInfo, common))
 		{
-			int nToAssign = min(nUnpaidToAssign, nRelevantWorkDaysPerMonth);
-			if (bNoPension)
-				pMonthInfo->SetNoPension(nToAssign);
-			else
-				pMonthInfo->SetUnpaid(nToAssign);
+			int nRelevantWorkDaysPerMonth = pMonthInfo->GetNRelevantDaysIn(common, bNoPension);
+			if (nRelevantWorkDaysPerMonth > 0)
+			{
+				int nToAssign = min(nUnpaidToAssign, nRelevantWorkDaysPerMonth);
+				if (bNoPension)
+					pMonthInfo->SetNoPension(nToAssign);
+				else
+					pMonthInfo->SetUnpaid(nToAssign);
 
-			nUnpaidToAssign -= nToAssign;
+				nUnpaidToAssign -= nToAssign;
+			}
 		}
-		if (nUnpaidToAssign < 1)
-			break;
 		if (pMonthInfo->mbLast)
 			break;
 		updateMonthStart.AddMonth();
-		pMonthInfo = gWorkPeriod.GetMonthInfoFor(updateMonthStart);
-		nRelevantWorkDaysPerMonth = pMonthInfo->GetNRelevantDays(bNoPension);
 	}
 }
 void CDaysSpan::Log(FILE* pf, const char *zText)

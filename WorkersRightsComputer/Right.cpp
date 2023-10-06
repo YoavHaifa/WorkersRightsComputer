@@ -168,6 +168,13 @@ void CRight::LogLine(const wchar_t *zText, double value)
 	s += ToString(value);
 	WriteLine(s);
 }
+void CRight::LogLine(const wchar_t* zText, double value, int nDigits)
+{
+	CString s(zText);
+	s += " ";
+	s += ToString(value, nDigits);
+	WriteLine(s);
+}
 void CRight::LogLine(const wchar_t *zText, __int64 value)
 {
 	CString s(zText);

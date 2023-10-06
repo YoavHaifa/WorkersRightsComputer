@@ -10,7 +10,7 @@ public:
 		, mCompanyHoursPerWeek(nHours)
 		, mbDummyForApril18(bDummy)
 	{
-		mHoursPerWeek = gWorkPeriod.GetWorkingHoursInFullWeek(mFrom.mYear, mFrom.mMonth);
+		mHoursPerWeek = gWorkPeriod.GetWorkingHoursInFullWeek(mFrom);
 		//if (mFrom.mYear < 2018 || (mFrom.mYear == 2018 && mFrom.mMonth < 4))
 		//	mHoursPerWeek = 43;
 		//else

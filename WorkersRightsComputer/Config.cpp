@@ -8,6 +8,9 @@ CConfig gConfig;
 
 CConfig::CConfig(void)
 	: mb14DaysUnpaidVacation4SeveranceDefault(false)
+	, miVersion(133)
+	, miLegacyVersion(0)
+	, mbBackwardCompatibilityMode(false)
 {
 }
 void CConfig::InitFromXml()

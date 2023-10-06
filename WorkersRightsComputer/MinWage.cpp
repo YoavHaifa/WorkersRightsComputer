@@ -60,7 +60,7 @@ void CMinWage::PrintLog(void)
 	}
 	fclose(pfWrite);
 }
-double CMinWage::ComputeMonthlyPay(int year, int month)
+double CMinWage::ComputeMonthlyPay(const CMyTime &date)
 {
 	if (mn < 1)
 		return 0;
@@ -68,9 +68,9 @@ double CMinWage::ComputeMonthlyPay(int year, int month)
 	for (int i = 0; i < mn; i++)
 	{
 		if (
-			(map[i]->mYear < year)
+			(map[i]->mYear < date.mYear)
 			||
-			((map[i]->mYear == year) && (map[i]->mMonth <= month))
+			((map[i]->mYear == date.mYear) && (map[i]->mMonth <= date.mMonth))
 			)
 		{
 			return map[i]->mWage;
@@ -81,5 +81,5 @@ double CMinWage::ComputeMonthlyPay(int year, int month)
 }
 double CMinWage::GetMonthlyWage(const CMyTime& time)
 {
-	return ComputeMonthlyPay(time.mYear, time.mMonth);
+	return ComputeMonthlyPay(time);
 }

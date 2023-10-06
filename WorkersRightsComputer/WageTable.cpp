@@ -34,26 +34,26 @@ bool CWageTable::IsValid(void)
 	}
 	return bValid;
 }
-double CWageTable::ComputeHolidayPrice(int year, int month)
+double CWageTable::ComputeHolidayPrice(const CMyTime& date)
 {
-	double baseWage = ComputeHolidayPriceBaseWage(year, month);
+	double baseWage = ComputeHolidayPriceBaseWage(date);
 
 	double extraHour = 0;
 	gWorkPeriod.mbExtraHolidayHoursForLiveInApplied = false;
 	if (gWorkPeriod.mbLiveIn)
 	{
-		if (year > 2016 || (year == 2016 && month > 6))
+		if (date.mYear > 2016 || (date.mYear == 2016 && date.mMonth > 6))
 		{
-			extraHour = baseWage / gWorkPeriod.GetWorkingHoursInFullMonth(year, month);
+			extraHour = baseWage / gWorkPeriod.GetWorkingHoursInFullMonth(date);
 			gWorkPeriod.mbExtraHolidayHoursForLiveInApplied = true;
 		}
 	}
 	return (baseWage / gWorkPeriod.mnDaysInMonthForDailySalary + extraHour) * 1.5;
 }
-double CWageTable::ComputeHolidayPriceBaseWage(int year, int month)
+double CWageTable::ComputeHolidayPriceBaseWage(const CMyTime& date)
 {
-	int iYear = year - YEAR0;
-	return maWage[iYear][month - 1];
+	int iYear = date.mYear - YEAR0;
+	return maWage[iYear][date.mMonth - 1];
 	/*
 	for (int i = 0; i < mn; i++)
 	{
@@ -74,7 +74,7 @@ double CWageTable::PayPerMonthAtWorkEnd(void)
 	if (mn < 1)
 		return 0;
 
-	return ComputeMonthlyPay(gWorkPeriod.mLast.mYear, gWorkPeriod.mLast.mMonth);
+	return ComputeMonthlyPay(gWorkPeriod.mLast);
 }
 double CWageTable::PayPerDayAtWorkEnd(void)
 {
@@ -84,12 +84,12 @@ double CWageTable::PayPerDayAtWorkEnd(void)
 	double payPerMonth = PayPerMonthAtWorkEnd();
 	return (payPerMonth / gWorkPeriod.mnDaysInMonthForDailySalary);
 }
-double CWageTable::ComputeMonthlyPay(int year, int month)
+double CWageTable::ComputeMonthlyPay(const CMyTime &date)
 {
 	if (mn < 1)
 		return 0;
-	int iYear = year - YEAR0;
-	return maWage[iYear][month - 1];
+	int iYear = date.mYear - YEAR0;
+	return maWage[iYear][date.mMonth - 1];
 }
 bool CWageTable::Prepare(const wchar_t* zAt)
 {

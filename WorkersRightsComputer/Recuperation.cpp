@@ -4,6 +4,7 @@
 #include "WorkYears.h"
 #include "YearlyRates.h"
 #include "MonthlyRates.h"
+#include "Config.h"
 
 
 CRecuperation::CRecuperation(void)
@@ -101,16 +102,23 @@ bool CRecuperation::Compute(void)
 	else
 	{
 		lastYearFraction = gWorkYears.GetLastYearAsFraction();
-		LogLine(L"Last Year Fraction", lastYearFraction);
+		LogLine(L"Last Year Fraction", lastYearFraction, 3);
+		LogLine(L"Last Year Seniority", gWorkYears.mn);
 
 		int intDaysPerYear = mpSeniority->ma[gWorkYears.mn];
+		LogLine(L"Days per year", intDaysPerYear);
 		mDueDays = lastYearFraction * intDaysPerYear;
-		LogLine(L"N Due Days for last year", mDueDays);
+		LogLine(L"N Due Days for last year", mDueDays, 3);
 
 		//int rateYear = gWorkPeriod.mLast.mYear;
 		//if(gWorkPeriod.mLast.mMonth < MONTH_OF_NEW_RATE)
 		//	rateYear--;
-		mRate = mpMonthlyRates->RatePerMonth(gWorkPeriod.mLast.mYear, gWorkPeriod.mLast.mMonth);
+		mRate = mpMonthlyRates->RatePerMonth(gWorkPeriod.mLast);
+		if (gConfig.mbBackwardCompatibilityMode && (mRate == 418.0))
+		{
+			LogLine(L"===>>> gConfig.mbBackwardCompatibilityMode, mRate set from 418 to 378");
+			mRate = 378.0;
+		}
 
 		mnYearsBack = 0;
 		CString sText;

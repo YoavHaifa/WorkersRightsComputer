@@ -22,10 +22,10 @@ void CMaternityLeave::Compute()
 	if (mnPaidDays < mnWorkDays)
 	{
 		FindUnpaidSpan();
-		mPaidSpan.InitSpan(mFirstDay, mUnpaidSpan.mFirstDay.PrevDay());
+		mPaidSpan.InitDaysSpan(mFirstDay, mUnpaidSpan.mFirstDay.PrevDay());
 	}
 	else
-		mPaidSpan.InitSpan(mFirstDay, mLastDay);
+		mPaidSpan.InitDaysSpan(mFirstDay, mLastDay);
 }
 void CMaternityLeave::AddToWorkSpan(CWorkSpan& workSpan)
 {

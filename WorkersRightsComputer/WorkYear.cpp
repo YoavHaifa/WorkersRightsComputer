@@ -42,7 +42,7 @@ void CWorkYear::InitInternals(CMyTime& firstDay)
 		mFirstDay.LogLine(mpfLog, L"<InitInternals> mFirstDay ");
 
 	CMyTime dayAfter(firstDay.mYear+1, firstDay.mMonth, firstDay.mDay);
-	Init(firstDay, dayAfter);
+	InitWorkSpanWithVacations(firstDay, dayAfter);
 	if (mLastDay > gWorkPeriod.mLast)
 	{
 		CUtils::MessBox(L"<CWorkYear::InitInternals> last day of year beyond work period - corrected", L"SW Warning");
