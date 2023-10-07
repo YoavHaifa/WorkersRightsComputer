@@ -52,8 +52,13 @@ bool CNotice::ComputeForLessThanAYear()
 	if (dueDays < mDueNoticeDays)
 	{
 		dueDays++;
-		mDueNoticeDays = dueDays;
-		LogLine(L"Rounded up by half day, n days due", dueDays);
+		if (!gConfig.mbBackwardCompatibilityMode || gConfig.miLegacyVersion >= 133)
+		{
+			mDueNoticeDays = dueDays;
+			LogLine(L"Rounded up by half day, n days due", dueDays);
+		}
+		else
+			mbAvoidRoundingLastHalfDay = true;
 	}
 	mLastDayOfNotice.AddDays(dueDays);
 	gWorkPeriod.SetLastDayOfNotice(mLastDayOfNotice);
@@ -113,6 +118,14 @@ void CNotice::CountWorkDaysToPay()
 			break;
 		}
 	}
+	if (mbAvoidRoundingLastHalfDay)
+	{
+		if (mDueWorkDaysToPay > 0.5)
+		{
+			mDueWorkDaysToPay -= 0.5;
+			LogLine(L"Reduce 0.5 rounded-up day for backward compatibility", mDueWorkDaysToPay);
+		}
+	}
 
 	LogLine(L"");
 	if (mDueWorkDaysToPay > gWorkPeriod.mnDaysInMonthForDailySalary)
@@ -134,6 +147,7 @@ bool CNotice::Compute()
 {
 	mDuePay = 0;
 	mbValid = false;
+	mbAvoidRoundingLastHalfDay = false;
 	gWorkPeriod.SetLastDayOfNotice(gWorkPeriod.mLast); // No Notice yet
 
 	if (gWorkPeriod.mbSkipNotice)
@@ -204,17 +218,26 @@ bool CNotice::Compute()
 
 	if (gFamilyPart.mbAskOnlyForFamilyPart)
 	{
-		if (gConfig.mbBackwardCompatibilityMode)
+		bool bLast3Month = false;
+		if (gConfig.mbBackwardCompatibilityMode && gConfig.miLegacyVersion < 133)
+		{
 			mFamilyRatio = gWorkPeriod.ComputeFamilyPart();
+			LogLine(L"Family part (whole period, backward compatibility mode)", mFamilyRatio);
+		}
 		else
+		{
+			bLast3Month = true;
 			mFamilyRatio = gWorkPeriod.ComputeFamilyPartLastMonths(umn3MonthsForFamilyPart);
+			LogLine(L"Family part - average last 3 month", mFamilyRatio);
+		}
 
 		msFamilyRatio = CFamilyPart::Ratio2S(mFamilyRatio);
-		LogLine(L"Family part - average last 3 month", mFamilyRatio);
 		mDuePay = mDuePay * mFamilyRatio;
 		msDue += L" = Family Part ";
 		msDue += msFamilyRatio;
-		msDue += L" (Last 3 Months) => ";
+		if (bLast3Month)
+			msDue += L" (Last 3 Months)";
+		msDue += L" ==> ";
 		msDue += ToString(mDuePay);
 	}
 

@@ -25,6 +25,7 @@ CHolidays::CHolidays(void)
 	, mpNDaysPaidPrevYearsBox(NULL)
 	, mpPrevYearsFromBox(NULL)
 	, mpPrevNYearsBox(NULL)
+	, mbCheckForWorkedHolodays(false)
 {
 	miPrintOrder = 4;
 
@@ -369,15 +370,19 @@ int CHolidays::AddPay4PrevYear(int iPrev)
 	if (pYear == NULL)
 		return 0;
 
-	int nWorkedHolidays = GetNWorkedHolidays(pYear);
 
 	LogLine(L"prev year", iPrev);
 	LogLine(L"n days due", nDue);
-	LogLine(L"n worked holidays per this year", nWorkedHolidays);
-	if (nWorkedHolidays < nDue)
+
+	if (mbCheckForWorkedHolodays)
 	{
-		nDue = nWorkedHolidays;
-		LogLine(L"n days due and worked", nDue);
+		int nWorkedHolidays = GetNWorkedHolidays(pYear);
+		LogLine(L"n worked holidays per this year", nWorkedHolidays);
+		if (nWorkedHolidays < nDue)
+		{
+			nDue = nWorkedHolidays;
+			LogLine(L"n days due and worked", nDue);
+		}
 	}
 	if (nDue > 0)
 	{

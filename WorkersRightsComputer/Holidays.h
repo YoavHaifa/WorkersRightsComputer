@@ -62,6 +62,8 @@ private:
 	double mnDaysToPay;
 	double mMinPayPerDay;
 	double mMaxPayPerDay;
+	bool mbCheckForWorkedHolodays;
+
 	void RememberPayParDay(double value);
 	bool ComputeHolidayPrice(class CHoliday& holiday);
 

@@ -25,6 +25,7 @@ public:
 
 	int mnDaysPaidAfterNotice;
 	CMyTime mLastDayOfNotice;
+	bool mbAvoidRoundingLastHalfDay;
 
 	double mFamilyRatio;
 	CString msFamilyRatio;
