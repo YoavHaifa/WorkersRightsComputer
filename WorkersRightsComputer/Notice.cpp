@@ -154,7 +154,7 @@ bool CNotice::Compute()
 	{
 		LogLine(L"Do not demand notice!");
 		msDue += L"Notice was not demanded.";
-		return false;
+		return true;
 	}
 	if (!gWorkPeriod.mNotice.mbInitialized)
 	{

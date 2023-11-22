@@ -298,26 +298,36 @@ void CFamilyPart::WriteToLetter(CHtmlWriter &writer)
 	writer.StartParagraph();
 	if (mbDefined && mbAskOnlyForFamilyPart)
 	{
-		writer.WriteLEH(L"This computation only relates to the part that is due from the employing family. ",
-			L"חישוב זה מתייחס רק לחלק התשלום המגיע מהמשפחה המעסיקה.");
-		if (bOld)
+		if (mRatio >= 1)
 		{
-			writer.StartBold();
-			writer.WriteLEH(L"Family Part is ", L"חלקה של המשפחה הוא ");
-			writer.WriteL(msRatio);
-			writer.EndBold();
-			writer.WriteLineEH(L" from the payment for severance, pension and advance notice.", 
-				L"מהתשלום עבור פיצויי פיטורים, תגמולי מעסיק והודעה מוקדמת. ");
+			writer.WriteLEH(
+				L"Private employment - the full amounts due at the end of the employment will be paid by the family. ",
+				L"העסקה פרטית – מלוא הסכומים המגיעים עם סיום ההעסקה ישולמו על ידי המשפחה.");
 		}
-		if (bNew)
+		else
 		{
-			writer.WriteLEH(L"According to the law, the family and the company are ", 
-				L"בהתאם להוראות הממונה על עובדים זרים במשרד התעסוקה, המשפחה והחברה הינן ");
-			writer.StartBold();
-			writer.WriteLEH(L"\"simultaneous employers,\" ", L"מעסיקות במקביל,");
-			writer.EndBold();
-			writer.WriteLEH(L"and each is responsible for their part of the job and the payment of the rights arising from it.",
-				L" וכל אחת אחראית על חלק המשרה שלה ועל תשלום הזכויות הנובעות ממנו.");
+			writer.WriteLEH(L"This computation only relates to the part that is due from the employing family. ",
+				L"חישוב זה מתייחס רק לחלק התשלום המגיע מהמשפחה המעסיקה.");
+			if (bOld)
+			{
+				writer.StartBold();
+				writer.WriteLEH(L"Family Part is ", L"חלקה של המשפחה הוא ");
+				writer.WriteL(msRatio);
+				writer.EndBold();
+				writer.WriteLineEH(L" from the payment for severance, pension and advance notice.",
+					L"מהתשלום עבור פיצויי פיטורים, תגמולי מעסיק והודעה מוקדמת. ");
+			}
+			if (bNew)
+			{
+				writer.WriteLEH(L"According to the law, the family and the company are ",
+					L"בהתאם להוראות הממונה על עובדים זרים במשרד התעסוקה, המשפחה והחברה הינן ");
+				writer.StartBold();
+				writer.WriteLEH(L"\"simultaneous employers,\" ", L"מעסיקות במקביל,");
+				writer.EndBold();
+				writer.WriteLEH(L"and each is responsible for their part of the job and the payment of the rights arising from it.",
+					L" וכל אחת אחראית על חלק המשרה שלה ועל תשלום הזכויות הנובעות ממנו.");
+			}
+
 		}
 	}
 	else
