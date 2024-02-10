@@ -5,6 +5,9 @@
 #include "Utils.h"
 #include "WorkYears.h"
 #include "WorkersRightsComputerDlg.h"
+#include "HolidaysDue.h"
+#include "UsedVacations.h"
+
 
 void CHoliday::Log(FILE *pf)
 {
@@ -22,12 +25,9 @@ CHolidays::CHolidays(void)
 	, mpNDaysPaidPrevYearsBox(NULL)
 	, mpPrevYearsFromBox(NULL)
 	, mpPrevNYearsBox(NULL)
-	, mpPayRatePerHolidayBox(NULL)
-	, mRateSetByUser(0)
+	, mbCheckForWorkedHolodays(false)
 {
 	miPrintOrder = 4;
-	mnWorkedLastYear = -1;
-	mnPaidLastYear = -1;
 
 	for (int i = 0; i < MAX_HOLIDAYS_DEFINED; i++)
 		map[i] = NULL;
@@ -69,11 +69,12 @@ bool CHolidays::SetEditRef(class CEditRef *pRef)
 		mpPrevNYearsBox = &pRef->mEdit;
 		return true;
 	}
+	/*
 	if (pRef->msName == "PayRatePerHoliday")
 	{
 		mpPayRatePerHolidayBox = &pRef->mEdit;
 		return true;
-	}
+	}*/
 
 	return false;
 }
@@ -137,32 +138,30 @@ bool CHolidays::InitFromFileInternals(FILE *pfRead, FILE *pfLog)
 		map[i] = new CHoliday(sLine);
 
 		// Read Year
-
+		int year = 0;
 		sLine = CUtils::ReadLine(pfRead);
 		if (pfLog)
 			fwprintf(pfLog, L"%s\n", (const wchar_t *)sLine);
 		if (sLine == L"*")
 		{
 			map[i]->mbAllYears = true;
+			CUtils::MessBox(L"Holiday year defined as <*> - currently not supported", L"Input Error");
+			return false;
 		}
-		else
-		{
-			int year = 0;
-			if (!TryConvertInt(sLine, L"year", year))
-			{
-				CUtils::MessBox(L"Failed to read year as number", L"Input Error");
-				return false;
 
-			}
-			if (year < 1980 || year > 2050)
-			{
-				wchar_t zBuf[256];
-				swprintf_s(zBuf, 256, L"<Reading holidays from file> Bad value for year: %d", year);
-				CUtils::MessBox(zBuf, L"Input Error");
-				return false;
-			}
-			map[i]->mYear = year;
+		if (!TryConvertInt(sLine, L"year", year))
+		{
+			CUtils::MessBox(L"Failed to read year as number", L"Input Error");
+			return false;
 		}
+		if (year < 1980 || year > 2050)
+		{
+			wchar_t zBuf[256];
+			swprintf_s(zBuf, 256, L"<Reading holidays from file> Bad value for year: %d", year);
+			CUtils::MessBox(zBuf, L"Input Error");
+			return false;
+		}
+		map[i]->mYear = year;
 
 		// Read Month
 		int month = 0;
@@ -293,11 +292,6 @@ int CHolidays::NInLastYear(void)
 
 void CHolidays::ComputePayLastYear(void)
 {
-	if (mnWorkedLastYear < 0 || mnPaidLastYear < 0)
-	{
-		return;
-	}
-
 	for (int i = 0; i < mn; i++)
 	{
 		map[i]->mbInLastYearPaySum = false;
@@ -307,9 +301,13 @@ void CHolidays::ComputePayLastYear(void)
 		}
 	}
 
-	int nToSum = mnWorkedLastYear - mnPaidLastYear;
+	int nToSum = gHolidaysDue.GetNDueLastYear();
+	LogLine(L"n days due in last year", nToSum);
 	if (nToSum > MAX_HOLIDAYS_PER_YEAR)
+	{
 		nToSum = MAX_HOLIDAYS_PER_YEAR;
+		LogLine(L"n days due in last year reduced to max allowed", nToSum);
+	}
 	if (nToSum < 1)
 	{
 		msDebug = "Holiday Pay - None";
@@ -329,10 +327,13 @@ void CHolidays::ComputePayLastYear(void)
 		{
 			if (map[i]->mbInLastYear && !map[i]->mbInLastYearPaySum)
 			{
-				if (map[i]->mPrice > bestPay)
+				if (gUsedVacations.WasWorkDay(map[i]->mTime))
 				{
-					bestPay = map[i]->mPrice;
-					iBest = i;
+					if (map[i]->mPrice > bestPay)
+					{
+						bestPay = map[i]->mPrice;
+						iBest = i;
+					}
 				}
 			}
 		}
@@ -361,57 +362,77 @@ void CHolidays::ComputePayLastYear(void)
 	msDue += ToString(nSummed);
 	msDue += L" days ";
 }
-void CHolidays::ComputePayPrevYears(void)
+int CHolidays::AddPay4PrevYear(int iPrev)
 {
-	//msw->WriteLine("ComputePayPrevYears");
+	int nDue = gHolidaysDue.GetNDuePrevYear(iPrev);
 
-	int nWorked = SafeGetIntFromTextBox(*mpNDaysWorkedPrevYearsBox);
-	int nPaid = SafeGetIntFromTextBox(*mpNDaysPaidPrevYearsBox);
-	double nYears = SafeGetDoubleFromTextBox(*mpPrevNYearsBox);
-	int nDaysPerYear = nWorked - nPaid;
+	CWorkYear* pYear = gWorkYears.GetByReverseIndex(iPrev);
+	if (pYear == NULL)
+		return 0;
 
-	LogLine(L"nWorked", nWorked);
-	LogLine(L"nPaid", nPaid);
-	LogLine(L"nYears", nYears);
-	LogLine(L"nDaysPerYear to pay", nDaysPerYear);
-	if (nDaysPerYear < 1)
+
+	LogLine(L"prev year", iPrev);
+	LogLine(L"n days due", nDue);
+
+	if (mbCheckForWorkedHolodays)
 	{
-		//msw->WriteLine("No Need to compute Prev Years");
-		return;
+		int nWorkedHolidays = GetNWorkedHolidays(pYear);
+		LogLine(L"n worked holidays per this year", nWorkedHolidays);
+		if (nWorkedHolidays < nDue)
+		{
+			nDue = nWorkedHolidays;
+			LogLine(L"n days due and worked", nDue);
+		}
 	}
-
-	int iPrev = 1;
-	double rest = nYears;
-	while (rest > 0)
+	if (nDue > 0)
 	{
-		CMyTime payDate = gWorkYears.GetPrevYearEnd(iPrev++);
-		double payPerDay;
-		if (mRateSetByUser > 0)
-			payPerDay = mRateSetByUser;
-		else
-			payPerDay = gWageTable.ComputeHolidayPrice(payDate.mYear, payDate.mMonth);
-		double payPerYear = payPerDay * nDaysPerYear;
+		CMyTime payDate = gWorkYears.GetPrevYearEnd(iPrev);
+		double payPerDay = gWageTable.ComputeHolidayPrice(payDate);
+		double payPerYear = payPerDay * nDue;
 		RememberPayParDay(payPerDay);
 		LogLine(L"pay per day in prev year", payPerDay);
-		if (rest >= 1)
-		{
-			mnDaysToPay += nDaysPerYear;
-			rest -= 1;
-		}
-		else
-		{
-			mnDaysToPay += nDaysPerYear * rest;
-			payPerYear *= rest;
-			rest = 0;
-		}
+		mnDaysToPay += nDue;
 		LogLine(L"pay per year", payPerYear);
 		mDuePay += payPerYear;
+	}
+	return nDue;
+}
+int CHolidays::GetNWorkedHolidays(CWorkYear* pYear)
+{
+	int n = 0;
+	for (int i = 0; i < mn; i++)
+	{
+		if (pYear->Contains(*map[i]))
+		{
+			if (gUsedVacations.WasWorkDay(map[i]->mTime))
+				n++;
+		}
+	}
+	return n;
+}
+void CHolidays::ComputePayPrevYears()
+{
+	int nPrevYears = gHolidaysDue.GetNPrevYears() - 1; // excluding last year
+	LogLine(L"nPrevYears with holidays", nPrevYears);
+	if (nPrevYears < 1)
+		return;
+
+	int nYearsWithHolidays = 0;
+	int nDays = 0;
+	for (int iPrev = 1; iPrev <= nPrevYears; iPrev++)
+	{
+		int nDaysAdded = AddPay4PrevYear(iPrev);
+		nDays += nDaysAdded;
+		if (nDaysAdded > 0)
+			nYearsWithHolidays++;
 	}
 
 	// msw->WriteLine("");
 	msDue += L" + ";
-	msDue += ToString(nYears);
-	msDue += L" years ";
+	msDue += ToString(nYearsWithHolidays);
+	msDue += L" years, ";
+	msDue += ToString(nDays);
+	msDue += L" days ";
 }
 void CHolidays::RememberPayParDay(double value)
 {
@@ -428,19 +449,14 @@ void CHolidays::RememberPayParDay(double value)
 			mMinPayPerDay = value;
 	}
 }
-bool CHolidays::Compute(void)
+bool CHolidays::InitDefinition()
 {
-	mnDaysToPay = 0;
-	mMinPayPerDay = 0;
-	mMaxPayPerDay = 0;
+	CString sWantedSet(gpDlg->GetHolidaysSet());
+	if (mbValid && msSelection == sWantedSet)
+		return true;
 
-	msSelection = gpDlg->GetHolidaysSet();
-	if (msSelection.IsEmpty())
-	{
-		msDue = L"Holidays not defined";
-		return false;
-	}
-	if (msSelection == "-")
+	msSelection = sWantedSet;
+	if (msSelection.IsEmpty() || (msSelection == "-"))
 	{
 		msDue = L"Holidays not defined";
 		return false;
@@ -448,11 +464,16 @@ bool CHolidays::Compute(void)
 	if (!InitFromFile(msSelection))
 		return false;
 
-	mRateSetByUser = SafeGetDoubleFromTextBox(*mpPayRatePerHolidayBox);
-	if (mRateSetByUser < 0)
-		mRateSetByUser = 0;
-	if (mRateSetByUser > 0)
-		LogLine(L"Pay rate per holiday set by user", mRateSetByUser);
+	return true;
+}
+bool CHolidays::Compute(void)
+{
+	mnDaysToPay = 0;
+	mMinPayPerDay = 0;
+	mMaxPayPerDay = 0;
+
+	if (!InitDefinition())
+		return true;
 
 	mnInLastYear = NInLastYear();
 	// TEMP - This edit box role is not clear -
@@ -460,11 +481,11 @@ bool CHolidays::Compute(void)
 	mpNDaysInLastYearBox->SetWindowText (ToString(mnInLastYear));
 	LogLine(L"n days in last year", mnInLastYear);
 
-	if (GetIntFromEditBox(mpNDaysPaidLastYearBox, L"mpNDaysPaidLastYearBox", mnPaidLastYear))
-		LogLine(L"n paid last year", mnPaidLastYear);
+	//if (GetIntFromEditBox(mpNDaysPaidLastYearBox, L"mpNDaysPaidLastYearBox", mnPaidLastYear))
+	//	LogLine(L"n paid last year", mnPaidLastYear);
 
-	if (GetIntFromEditBox(mpNDaysWorkedLastYearBox, L"mpNDaysWorkedLastYearBox", mnWorkedLastYear))
-		LogLine(L"n worked last year", mnWorkedLastYear);
+	//if (GetIntFromEditBox(mpNDaysWorkedLastYearBox, L"mpNDaysWorkedLastYearBox", mnWorkedLastYear))
+	//	LogLine(L"n worked last year", mnWorkedLastYear);
 
 	ComputePayLastYear();
 	ComputePayPrevYears();
@@ -515,9 +536,9 @@ CString CHolidays::GetDecriptionForLetterHebrew(void)
 }
 bool CHolidays::ComputeHolidayPrice(CHoliday& holiday)
 {
-	if (mRateSetByUser > 0)
-		holiday.mPrice = mRateSetByUser;
-	else
-		holiday.mPrice = gWageTable.ComputeHolidayPrice(holiday.mYear, holiday.mMonth);
+	//if (mRateSetByUser > 0)
+	//	holiday.mPrice = mRateSetByUser;
+	//else
+	holiday.mPrice = gWageTable.ComputeHolidayPrice(holiday);
 	return true;
 }

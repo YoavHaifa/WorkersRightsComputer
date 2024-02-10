@@ -2,12 +2,14 @@
 #include "Verify.h"
 #include "Utils.h"
 #include "Right.h"
+#include "RightResult.h"
 #include "WorkersRightsComputerDlg.h"
 #include "WorkPeriod.h"
 #include "AllRights.h"
 #include "FilesList.h"
 #include "Pension.h"
 #include "Saver.h"
+#include "Config.h"
 #include "XmlParse.h"
 
 CString CVerify::umsfName;
@@ -15,12 +17,27 @@ bool CVerify::umbBreakonDiff = false;
 FILE* CVerify::umpfReport = NULL;
 int CVerify::umiBatch = 0;
 bool CVerify::umbDisplayDiff = false;
-bool CVerify::umbOldTxtFiles = false;
 
 void CVerify::StartVerifyBatch(const wchar_t *zfName)
 {
 	umsfName = zfName;
 	CUtils::CreateThread(StaticVerifyBatch, NULL);
+}
+void CVerify::OpenBatchReport(const CString& sPath)
+{
+	CString sReportFileName(sPath + L"VerifyBatchReport.csv");
+	umpfReport = MyFOpenWithErrorBox(sReportFileName, L"w", L"Log");
+
+	// Write report title
+	fprintf(umpfReport, "i, ");
+
+	POSITION pos = gAllRights.mRights.GetHeadPosition();
+	while (pos)
+	{
+		CRight* pRight = gAllRights.mRights.GetNext(pos);
+		fwprintf(umpfReport, L"%s, diff, ", (const wchar_t *)pRight->msName);
+	}
+	fprintf(umpfReport, "\n");
 }
 DWORD WINAPI CVerify::StaticVerifyBatch(LPVOID)
 {
@@ -32,11 +49,11 @@ DWORD WINAPI CVerify::StaticVerifyBatch(LPVOID)
 	if (!pfLog)
 		return 0;
 
-	CString sReportFileName(sPath + L"VerifyBatchReport.csv");
-	umpfReport = MyFOpenWithErrorBox(sReportFileName, L"w", L"Log");
+	gConfig.mbBackwardCompatibilityMode = true;
+	OpenBatchReport(sPath);
 
 	CFilesList list;
-	CUtils::ListFilesInDirRecursive(sPath, umbOldTxtFiles ? L"*.txt" : L"*.xml", list);
+	CUtils::ListFilesInDirRecursive(sPath, L"*.xml", list);
 
 	umiBatch = 0;
 	POSITION pos = list.GetHeadPosition();
@@ -44,16 +61,13 @@ DWORD WINAPI CVerify::StaticVerifyBatch(LPVOID)
 	{
 		CString *psfName = list.GetNext(pos);
 		CString sPrivate = CFileName::GetPrivate((const wchar_t *)*psfName);
-		if (sPrivate == L"Save.txt" || sPrivate.Right(8) == "save.xml")
+		if (sPrivate.Right(8) == "save.xml")
 		{
 			umiBatch++;
 			if (umpfReport)
 				fprintf(umpfReport, "%d, ", umiBatch);
 			CVerify* pVerify = NULL;
-			if (umbOldTxtFiles)
-				pVerify = new CVerifyOld((const wchar_t *)*psfName, true);
-			else
-				pVerify = new CVerifyNew((const wchar_t *)*psfName, true);
+			pVerify = new CVerify((const wchar_t *)*psfName, true);
 			bool bSame = pVerify->Verify();
 			pVerify->WriteSummary(pfLog);
 
@@ -75,6 +89,7 @@ DWORD WINAPI CVerify::StaticVerifyBatch(LPVOID)
 		fclose(umpfReport);
 		umpfReport = NULL;
 	}
+	gConfig.mbBackwardCompatibilityMode = false;
 	CUtils::OpenTextFile(sLogFileName);
 	return 0;
 }
@@ -102,18 +117,11 @@ CVerify::~CVerify()
 }
 bool CVerify::Verify()
 {
-	if (umbOldTxtFiles)
-	{
-		CRight::umbOldStyle = true;
-		gpPension->CorrectForOldStype();
-	}
-
 	if (!ReadSavedFile())
 		return false;
 
 	gpDlg->OnInputChange();
 	mbAllSame = VerifyResults();
-	CRight::umbOldStyle = false;
 	return mbAllSame;
 }
 void CVerify::ReadTime(FILE *pfRead, int i)
@@ -149,83 +157,6 @@ void CVerify::ReadTime(FILE *pfRead, int i)
 		CUtils::MessBox(L"<CVerify::ReadTime> bad time index", L"SW Error");
 	}
 	mnTimesDefined++;
-}
-int CVerify::ReadResults(FILE *pfRead)
-{
-	Clear();
-	CString sLine = CUtils::ReadLine(pfRead);
-	while (sLine != L"<CRights::Save>")
-	{
-		if (sLine.IsEmpty())
-			return 0;
-		sLine = CUtils::ReadLine(pfRead);
-	}
-
-	sLine = CUtils::ReadLine(pfRead);
-	while (!sLine.IsEmpty() && sLine != L"end")
-	{
-		CRightResult *pResult = new CRightResult(pfRead, sLine);
-		if (pResult->msName.IsEmpty())
-		{
-			delete pResult;
-			break;
-		}
-		else
-			mResults.AddTail(pResult);
-		sLine = CUtils::ReadLine(pfRead);
-	}
-	return (int)mResults.GetSize();
-}
-CRightResult::CRightResult(FILE *pfRead, const wchar_t *zName)
-	: msName(zName)
-	, mDue(0)
-{
-	CString sLine = CUtils::ReadLine(pfRead);
-	if (msName == "Additional")
-	{
-		int nNumeric = 0;
-		int iNumeric = sLine.GetLength();
-		while (iNumeric > 0)
-		{
-			wchar_t sCheck = sLine[iNumeric - 1];
-			if (isdigit(sCheck) || sCheck == '.')
-			{
-				iNumeric--;
-				nNumeric++;
-			}
-			else
-				break;
-		}
-		if (nNumeric > 0)
-		{
-			CString sSum = sLine.Right(nNumeric);
-			mDue = _wtof(sSum);
-		}
-	}
-	else
-	{
-		int iArrow = 0;
-		if (msName == "Pension")
-			iArrow = sLine.Find(L"Due");
-		else
-			iArrow = sLine.Find(L"==>");
-
-		if (iArrow > 0)
-		{
-			CString sRest = sLine.Right(sLine.GetLength() - (iArrow + 4));
-			mDue = _wtof(sRest);
-		}
-	}
-	while (sLine != L"*")
-	{
-		sLine = CUtils::ReadLine(pfRead);
-	}
-}
-CRightResult::CRightResult(CXMLParseNode* pNode)
-	: msName(pNode->msName)
-	, mDue(0)
-{
-	pNode->GetValue(L"Due", mDue);
 }
 void CVerify::Clear()
 {
@@ -264,26 +195,37 @@ bool CVerify::VerifyResults()
 			CRightResult *pResult = mResults.GetNext(posRes);
 			if (pResult->msName == pRight->msName)
 			{
-				oldSum += pResult->mDue;
+				double due = pRight->mDuePay;
+				double oldDue = pResult->SelectOldDue(due);
+
+				oldSum += oldDue;
 				bFound = true;
 				if (umpfReport)
-					fwprintf(umpfReport, L"%s, %.2f, ", (const wchar_t *)pResult->msName, pRight->mDuePay);
-				if ((pRight->mDuePay >= (pResult->mDue - 0.2)) && (pRight->mDuePay <= (pResult->mDue + 0.2)))
+					fwprintf(umpfReport, L"%.2f, ", due);
+				if ((due >= (oldDue - 0.2)) && (due <= (oldDue + 0.2)))
 				{
 					s += L" Same";
 					mnSame++;
 					if (umpfReport)
-						fprintf(umpfReport, "0, ");
+					{
+						if (pResult->mbUseLog)
+							fprintf(umpfReport, "0*, ");
+						else
+							fprintf(umpfReport, "0, ");
+					}
 				}
 				else
 				{
 					s += L" Diff, old =  ";
-					s += CRight::ToString(pResult->mDue);
+					s += CRight::ToString(oldDue);
 					mnDiff++;
 					if (umpfReport)
 					{
-						double diff = pRight->mDuePay - pResult->mDue;
-						fprintf(umpfReport, "%d, ", (int)diff);
+						double diff = due - oldDue;
+						if (pResult->mbUseLog)
+							fprintf(umpfReport, "%.2f*, ", diff);
+						else
+							fprintf(umpfReport, "%.2f, ", diff);
 					}
 				}
 				break;
@@ -550,171 +492,61 @@ void CVerify::WriteSummary(FILE *pf)
 	gpDlg->DisplaySummary(s);
 }
 
-//===================================================================================
-
-CVerifyOld::CVerifyOld(const wchar_t* zfName, bool bSilent)
-	: CVerify(zfName, bSilent)
+void CVerify::IdentifyLegacyVersion(CXMLParseNode* pRoot)
 {
-}
-CVerifyOld::~CVerifyOld()
-{
-}
-bool CVerifyOld::ReadSavedFile()
-{
-	FILE* pfRead = MyFOpenWithErrorBox(msfName, L"r", L"Old Saved File");
-	if (!pfRead)
-		return false;
-
-	mnTimesDefined = 0;
-	gpDlg->OnBnClickedButtonReset();
-	gpDlg->mbDisableComputations = true;
-	int nEditsRead = 0;
-	int nCheckRead = 0;
-	int nChecked = 0;
-
-	// Read Text Boxes
-	bool bEndFound = false;
-	CString sKey = CUtils::ReadLine(pfRead);
-	while (!sKey.IsEmpty() && sKey != L"end" && !bEndFound)
+	// Identify legacy version
+	int iVersion = 0;
+	if (pRoot->GetValue(L"i_software_version", iVersion))
 	{
-		// Look for known boxes old names
-		POSITION pos = gpDlg->mEditBoxes.GetHeadPosition();
-		while (pos)
+		gConfig.miLegacyVersion = iVersion;
+	}
+	else
+	{
+		CString sSWVersion;
+		if (pRoot->GetValue(L"software_version", sSWVersion))
 		{
-			CEditRef* pRef = gpDlg->mEditBoxes.GetNext(pos);
-			if (pRef->msOldName == sKey)
-			{
-				nEditsRead++;
-				CString sValue = CUtils::ReadNextLine(pfRead);
-				pRef->mEdit.SetWindowTextW(sValue);
-				if (pRef->msOldName == L"textBox1")
-					msFirstName = sValue;
-				else if (pRef->msOldName == L"textBox2")
-					msFamilyName = sValue;
-				if (mpfLog)
-					fwprintf(mpfLog, L"<Read> Set %s %s to %s\n", (const wchar_t*)pRef->msName,
-					(const wchar_t*)pRef->msOldName, (const wchar_t*)sValue);
-				if (sValue.Left(3) == L"end")
-					bEndFound = true;
-			}
+			if (sSWVersion.Find(L"v1.3.3") >= 0)
+				gConfig.miLegacyVersion = 133;
+			else if (sSWVersion.Find(L"v1.3.2") >= 0)
+				gConfig.miLegacyVersion = 132;
+			else
+				gConfig.miLegacyVersion = 131;
 		}
-		if (!bEndFound)
-			sKey = CUtils::ReadLine(pfRead);
 	}
 
-	// Read Work Period
-	sKey = CUtils::ReadLine(pfRead);
-	while (!sKey.IsEmpty() && sKey != L"end")
-	{
-		if (sKey == L"dateTimePicker1")
-			ReadTime(pfRead, 1);
-		else if (sKey == L"dateTimePicker2")
-			ReadTime(pfRead, 2);
-		else if (sKey == L"dateTimePicker3")
-			ReadTime(pfRead, 3);
-		sKey = CUtils::ReadLine(pfRead);
-	}
-
-	// Read Checkboxes
-	sKey = CUtils::ReadLine(pfRead);
-	while (!sKey.IsEmpty() && sKey != L"end")
-	{
-		// Look for known boxes old names
-		bool bFound = false;
-		POSITION pos = gpDlg->mButtons.GetHeadPosition();
-		while (pos)
-		{
-			CButtonRef* pRef = gpDlg->mButtons.GetNext(pos);
-			if (pRef->msOldName == sKey)
-			{
-				nCheckRead++;
-				int value = CUtils::ReadInt(pfRead);
-				if (value)
-				{
-					pRef->mButton.SetCheck(BST_CHECKED);
-					nChecked++;
-				}
-				bFound = true;
-				break;
-			}
-		}
-		if (!bFound)
-		{
-			if (sKey.Left(8) == L"checkBox")
-			{
-				CString sRest = sKey.Right(sKey.GetLength() - 8);
-				int iDay = _wtoi(sRest);
-				if (iDay >= 4 && iDay <= 10)
-				{
-					nCheckRead++;
-					int value = CUtils::ReadInt(pfRead);
-					if (value)
-					{
-						nChecked++;
-						gWorkPeriod.SetWorkingDay(iDay - 4, 1);
-					}
-				}
-			}
-		}
-		sKey = CUtils::ReadLine(pfRead);
-	}
-	int nResults = ReadResults(pfRead);
-
-	CString s(CRight::ToString(nEditsRead));
-	s += L" edit boxes,  ";
-	s += CRight::ToString(mnTimesDefined);
-	s += L" times,  ";
-	s += CRight::ToString(nChecked);
-	s += L" / ";
-	s += CRight::ToString(nCheckRead);
-	s += L" checked, nResults ";
-	s += CRight::ToString(nResults);
-
-	CString sHolidays = SelectHolidays();
-	gpDlg->mComboHolidays.SetWindowTextW(sHolidays);
-	s += L"\r\nHolidays: ";
-	s += sHolidays;
-
-	if (!mbSilentMode)
-		CUtils::MessBox(s, L"Old Save Read");
-
-	CheckIfNoticeSet();
-	gpDlg->mbDisableComputations = false;
-	if (pfRead)
-		fclose(pfRead);
-	return true;
 }
-
-//===================================================================================
-
-CVerifyNew::CVerifyNew(const wchar_t* zfName, bool bSilent)
-	: CVerify(zfName, bSilent)
+bool CVerify::ReadSavedFile()
 {
-}
-
-CVerifyNew::~CVerifyNew()
-{
-}
-bool CVerifyNew::ReadSavedFile()
-{
-	CSaver saver;
-	if (!saver.Restore(msfName))
-		return false;
-
 	CXMLParse XMLParse(msfName, true);
 	CXMLParseNode* pRoot = XMLParse.GetRoot();
 	if (!pRoot)
+		return false;
+	IdentifyLegacyVersion(pRoot);
+
+	CSaver saver;
+	if (!saver.Restore(msfName))
 		return false;
 
 	CXMLParseNode* pRights = pRoot->GetFirst(L"AllRightsAsComputed");
 	if (!pRights)
 		return false;
 
+	CString sLogDir(CFileName::GetPath(msfName));
+	sLogDir += "\\Log";
+	CFilesList logFiles;
+	CUtils::ListFilesInDir(sLogDir, L"log", logFiles);
+
 	POSITION pos = pRights->GetHeadPosition();
 	while (pos)
 	{
-		CXMLParseNode* pRight = pRights->GetNext(pos);
-		CRightResult* pResult = new CRightResult(pRight);
+		CXMLParseNode* pRightNode = pRights->GetNext(pos);
+		CRightResult* pResult = new CRightResult(pRightNode);
+		if (pResult->msName == "Vacation" || pResult->msName == "Recuperation")
+		{
+			CString sfLogName;
+			if (logFiles.Find(pResult->msName, sfLogName))
+				pResult->ReadLog(sfLogName);
+		}
 		mResults.AddTail(pResult);
 	}
 

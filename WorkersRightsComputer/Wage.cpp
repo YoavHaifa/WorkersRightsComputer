@@ -16,6 +16,16 @@ CWage::CWage()
 {
 	SetMinWage();
 }
+bool CWage::IsValid()
+{
+	if (!mpFirst || !mpLast)
+		return false;
+
+	if (mPeriods.IsEmpty())
+		return false;
+
+	return mpFirst->IsValid();
+}
 void CWage::Clear()
 {
 	while (!mPeriods.IsEmpty())
@@ -156,7 +166,8 @@ void CWage::LoadFromXml(CXMLParseNode* pMain)
 		SetMinWage();
 	}
 
-	gWageTable.Prepare(L"LoadFromXml");
+	if (IsValid())
+		gWageTable.Prepare(L"LoadFromXml");
 }
 double CWage::GetMonthlyWage()
 {

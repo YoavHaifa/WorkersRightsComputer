@@ -18,9 +18,12 @@ public:
 	~CVacationTable();
 
 	double GetNDaysPerMonth(int seniority, double nDaysPerWeek, int year, int month);
+	double GetNDaysPerYear(int seniority, double nDaysPerWeek);
 
-	bool InitFromFile(void);
-	bool PrintLog(void);
+	bool InitFromTextFile(void);
+	bool InitFromXmlFile(void);
+	void SaveXmlFile(void);
+	bool PrintLog(const char *zAt);
 
 	static const int MAX_VETEK = 30;
 
@@ -28,7 +31,7 @@ public:
 	CVacationVetek * map[MAX_VETEK];
 
 	bool StartComputingForUsedVacations();
-	CMyTime mNextComputeFrom;
+	CMyTime mNextMonthToComputeFrom;
 	double mDueVacationLeft;
 	int mnVacationsComputed;
 	FILE *mpfLog;

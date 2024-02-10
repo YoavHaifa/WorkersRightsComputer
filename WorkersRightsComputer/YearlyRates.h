@@ -4,7 +4,8 @@ class CYearlyRates
 {
 public:
 	CYearlyRates(const wchar_t *zName, int firstYear);
-	bool InitFromFile(void);
+	bool InitFromTextFile(void);
+	void SaveMonthlyXmlFile(void);
 	bool PrintLog(void);
 	double RatePerYear(int year);
 
@@ -16,5 +17,10 @@ public:
 	bool mbValid;
 	double ma[MAX_RATES];
 	bool mabDefined[MAX_RATES];
+
+	// Remember definitions for convert to monthly rates
+	int mnDefs;
+	int maDefYear[MAX_RATES];
+	double maDefRate[MAX_RATES];
 };
 

@@ -27,6 +27,7 @@ public:
 // Implementation
 
 	DECLARE_MESSAGE_MAP()
+
 };
 
 extern CWorkersRightsComputerApp theApp;

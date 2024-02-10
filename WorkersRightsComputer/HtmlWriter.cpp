@@ -1,6 +1,7 @@
 ﻿#include "stdafx.h"
 #include "HtmlWriter.h"
 #include "Utils.h"
+#include "Config.h"
 #include "Person.h"
 #include "MyTime.h"
 #include "AllRights.h"
@@ -9,6 +10,7 @@
 #include "UsedVacations.h"
 #include "WorkersRightsComputerDlg.h"
 #include "Pension.h"
+#include "LetterSavedDlg.h"
 
 CString CHtmlWriter::umsHtmlDir;
 
@@ -40,7 +42,7 @@ bool CHtmlWriter::CopyLogo(const wchar_t* zfName)
 	CopyFile(sLogoSrc, sLogoTarget, FALSE);
 	return true;
 }
-int CHtmlWriter::WriteLetterFromTemplate(const wchar_t* zfName)
+bool CHtmlWriter::WriteLetterFromTemplate(const wchar_t* zfName)
 {
 	CopyLogo(zfName);
 
@@ -48,8 +50,11 @@ int CHtmlWriter::WriteLetterFromTemplate(const wchar_t* zfName)
 
 	msfName = zfName;
 	mpfWrite = MyFOpenWithErrorBox(msfName, L"w, ccs=UNICODE", L"HTML Unicode");
+	if (!mpfWrite)
+		return false;
 
-	OpenHebrewLetter();
+	if (!OpenHebrewLetter())
+		return false;
 
 	CString s;
 	int n = 0;
@@ -71,8 +76,13 @@ int CHtmlWriter::WriteLetterFromTemplate(const wchar_t* zfName)
 		}
 		ch = (wchar_t)getwc(mpfRead);
 	}
-	CUtils::MessBox(msfName, L"Letter Saved");
-	return n;
+	CLetterSavedDlg dlg;
+	dlg.SetFileName(msfName);
+	dlg.DoModal();
+
+	//CUtils::MessBox(msfName, L"Letter Saved");
+
+	return n > 0;
 }
 void CHtmlWriter::ReplaceTemplateVariable(void)
 {
@@ -106,7 +116,24 @@ void CHtmlWriter::ReplaceTemplateVariable(void)
 		mbHeb = true;
 	}
 	else if (sToken == L"headerAddress")
-		WriteParaLTR(L"iris.bar@kavlaoved.org.il - טל. 04-8643350 פקס 04-8644238 דואל");
+	{
+		CString s, sHebrew;
+		s.Format(L"Email: %s, Tel: %s, Fax: %s", gConfig.msContactEmail,
+			gConfig.msContactPhone, gConfig.msContactFax);
+		sHebrew = L"דואל";
+		sHebrew += ": ";
+		sHebrew += gConfig.msContactEmail;
+		sHebrew += ", ";
+		sHebrew += L"טלפון";
+		sHebrew += ": ";
+		sHebrew += gConfig.msContactPhone;
+		sHebrew += ", ";
+		sHebrew += L"פקס";
+		sHebrew += ": ";
+		sHebrew += gConfig.msContactFax;
+		WriteParaLTR(s, sHebrew);
+		//WriteParaLTR(L"iris.bar@kavlaoved.org.il - טל. 04-8643350 פקס 04-8644238 דואל");
+	}
 	else if (sToken == L"startLetter")
 		gWorker.StartLetter(*this);
 	else if (sToken == L"workPeriod")
@@ -200,12 +227,13 @@ void CHtmlWriter::WritePara(const wchar_t* zText)
 	if (mbHeb)
 		fwprintf(mpfHebrewWrite, L"<p> %s </p>\n", zText);
 }
-void CHtmlWriter::WriteParaLTR(const wchar_t* zText)
+void CHtmlWriter::WriteParaLTR(const wchar_t* zText, const wchar_t* zHebrewText)
 {
 	if (mbEng)
 		fwprintf(mpfWrite, L"<p> %s </p>\n", zText);
 	if (mbHeb)
-		fwprintf(mpfHebrewWrite, L"<p dir=""ltr""> %s </p>\n", zText);
+		fwprintf(mpfHebrewWrite, L"<p> %s </p>\n", zHebrewText);
+	//fwprintf(mpfHebrewWrite, L"<p dir=""ltr""> %s </p>\n", zHebrewText);
 }
 void CHtmlWriter::WriteLine(const wchar_t *zText)
 {
@@ -307,6 +335,11 @@ void CHtmlWriter::StartPensionTable(bool bPension, bool bSeverance)
 	WriteL(L"<tr>");
 	WriteLTH_EH(L"From", L"מ-");
 	WriteLTH_EH(L"Till", L"עד");
+	if (gFamilyPart.mbAskOnlyForFamilyPart)
+	{
+		WriteLTH_EH(L"Company\r\nhours", L"שעות\r\nחברה");
+	}
+
 	WriteLTH_EH(L"Salary", L"משכורת");
 	WriteLTH_EH(L"Months", L"חודשים");
 	WriteLTH_EH(L"Total", L"סך הכל");
@@ -370,7 +403,7 @@ bool CHtmlWriter::OpenHebrewLetter()
 	msfHebrewName = msfName;
 	msfHebrewName.Replace(L"english", L"hebrew");
 	mpfHebrewWrite = MyFOpenWithErrorBox(msfHebrewName, L"w, ccs=UNICODE", L"HTML Unicode");
-	return true;
+	return mpfHebrewWrite != NULL;
 }
 void CHtmlWriter::WriteItemToHtmlTable(CString sItem, CString sItemHebrew, bool bInvertDirection)
 {

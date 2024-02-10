@@ -49,6 +49,7 @@ public:
 	virtual	bool SetCheckRef(CButtonRef * /*pButton*/) { return false; }
 	virtual	bool SetEditRef(CEditRef * /*pRef*/) { return false; }
 
+	virtual bool MissingInput(CString &iosText);
 	virtual bool HasLegalValue();
 	virtual bool HasLegalRealValue();
 	virtual bool PrintToLetter();
@@ -62,7 +63,8 @@ public:
 	void LogLine(const wchar_t* zText, CString s);
 	void LogLine(const wchar_t *zText, int value);
 	void LogLine(const wchar_t *zText, int ivalue, const wchar_t *zText2, double dvalue);
-	void LogLine(const wchar_t *zText, double value);
+	void LogLine(const wchar_t* zText, double value);
+	void LogLine(const wchar_t* zText, double value, int nDigits);
 	void LogLine(const wchar_t *zText, __int64 value);
 	void LogLineSpan(const wchar_t *zText, CMyTime &start, CMyTime &end);
 	void LogLine(const wchar_t *zText, CTime value);
@@ -75,7 +77,6 @@ public:
 	void Save(FILE *pfWrite);
 	void SaveToXml(class CXMLDump& xmlDump);
 
-	static bool umbOldStyle;
 	CString msName;
 	CString msNameHebrew;
 	bool mbValid;

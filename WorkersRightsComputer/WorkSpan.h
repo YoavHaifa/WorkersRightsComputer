@@ -1,25 +1,30 @@
 #pragma once
-#include "MyTime.h"
+#include "DaysSpan.h"
 
-class CWorkSpan
+class CWorkSpan : public CDaysSpan
 {
 public:
-	CWorkSpan(void);
-	CWorkSpan(CMyTime& firstDay, CMyTime& dayAfter);
+	CWorkSpan();
+	~CWorkSpan();
 
-	void Init(CMyTime &firstDay, CMyTime &dayAfter);
-	void AddUnpaidVacation(class CVacationUsed& vacation);
-	bool ClipByWorkPeriod(void);
-	void ComputeDays(void);
+	void InitWorkSpan(CMyTime& firstDay, CMyTime& dayAfter);
+	void InitWorkSpanWithVacations(CMyTime& firstDay, CMyTime& dayAfter);
 
-	CMyTime mFirstDay;
-	CMyTime mLastDay;
-	CMyTime mDayAfter;
+	bool AddUnpaidVacation(CDaysSpan& unpaidSpan);
+	void AddPaidMaternityLeave(CDaysSpan& paidSpan);
+	bool ClipByWorkPeriod();
+	void ComputeDays();
+	void Clear();
+
 	int mnUnpaidVacationDays;
-	int mnAllCalendarDays;
+	int mnPaidMaternityDays;
 	int mnPaidCalendarDays;
 	bool mbLast;
 
+	CList<CDaysSpan*, CDaysSpan*> mUnpaidSpans;
+	CList<CDaysSpan*, CDaysSpan*> mPaidMeternity;
+
+protected:
 	// Debug
 	FILE* mpfLog;
 };

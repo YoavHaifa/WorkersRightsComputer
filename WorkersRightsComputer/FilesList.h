@@ -39,6 +39,8 @@ public:
 	static void SetValuesPrintFormat(const wchar_t *zFormat);
 	void DeleteAllFilesAndClearList(FILE *pfLog = NULL);
 
+	bool Find(const wchar_t*zwText, CString &osfName);
+
 private:
 	CString msListName;
 	static CString umsDefaultSaveDir;

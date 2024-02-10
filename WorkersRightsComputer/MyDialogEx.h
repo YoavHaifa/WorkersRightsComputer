@@ -13,12 +13,14 @@ public:
 	void SetParameter(int id, int value);
 	void SetParameter(int id, float value);
 	void SetParameter(int id, double value);
+	void SetParameter(int id, CString& sText);
 
 	bool GetParameter(int id, int &oValue);
 	bool GetParameter(int id, int &oValue, int minValue, int maxValue);
 	bool GetParameter(int id, float &oValue, float minValue, float maxValue);
 	bool GetParameter(int id, double &oValue, double minValue, double maxValue);
-	void GetParameter(int id, bool &bFlag);
+	void GetParameter(int id, bool& bFlag);
+	bool GetParameter(int id, CString& sText);
 
 	bool IsChecked(int id);
 	void SetCheck(int id, bool bCheck);
@@ -37,6 +39,8 @@ public:
 	bool Disable(int id);
 	bool ClearAndDisable(int id);
 	bool SetAndEnable(int id, const wchar_t* zText);
+	bool SetInvisible(int id);
+	bool SetVisible(int id, bool flag = true);
 
 private:
 	//void OnUserCrash(CString &sText);

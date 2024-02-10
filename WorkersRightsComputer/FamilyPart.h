@@ -10,7 +10,7 @@ public:
 		, mCompanyHoursPerWeek(nHours)
 		, mbDummyForApril18(bDummy)
 	{
-		mHoursPerWeek = gWorkPeriod.GetWorkingHoursInFullWeek(mFrom.mYear, mFrom.mMonth);
+		mHoursPerWeek = gWorkPeriod.GetWorkingHoursInFullWeek(mFrom);
 		//if (mFrom.mYear < 2018 || (mFrom.mYear == 2018 && mFrom.mMonth < 4))
 		//	mHoursPerWeek = 43;
 		//else
@@ -80,10 +80,12 @@ public:
 	bool AddPeriodPC(CTime startTime, double perCentByCompany); // By Percent
 	double GetRatio() { return mRatio; }
 	void SetRatio(double ratio);
+	static CString Ratio2S(double ratio);
 	const wchar_t * GetSRatio() { return msRatio; }
 
 	bool mbAskOnlyForFamilyPart;
 	bool mbDefined;
+	bool mbLoadingFromXml;
 
 	CList<CCompanyPartPeriod *, CCompanyPartPeriod *> mPeriods;
 	CString GetFullText();
@@ -93,7 +95,7 @@ public:
 	void LoadFromXml(class CXMLParseNode* pRoot);
 
 	void Save(FILE *pfSave);
-	void Restore(FILE *pfRead);
+	//void Restore(FILE *pfRead);
 	void WriteToLetter(class CHtmlWriter &writer);
 
 private:

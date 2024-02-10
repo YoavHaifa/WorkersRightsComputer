@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "WorkersRightsComputer.h"
 #include "WorkersRightsComputerDlg.h"
+#include "Utils.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -51,7 +52,6 @@ BOOL CWorkersRightsComputerApp::InitInstance()
 
 	CWinApp::InitInstance();
 
-
 	AfxEnableControlContainer();
 
 	// Create the shell manager, in case the dialog contains
@@ -72,6 +72,10 @@ BOOL CWorkersRightsComputerApp::InitInstance()
 
 	CWorkersRightsComputerDlg dlg;
 	m_pMainWnd = &dlg;
+
+	CString sCommandLine = GetCommandLine();
+	CUtils::ReadCommandLine(sCommandLine, dlg.msStartFile);
+
 	INT_PTR nResponse = dlg.DoModal();
 	if (nResponse == IDOK)
 	{

@@ -6,7 +6,6 @@
 
 CString CRight::umsSaveDir = L"";
 CString CRight::umsName = L"__";
-bool CRight::umbOldStyle = false;
 
 CRight::CRight(const wchar_t *zName, const wchar_t *zHebrewName)
 	: msName(zName)
@@ -95,6 +94,11 @@ bool CRight::ComputeEnvelop(void)
 		fwprintf(mpfWrite, L"%s\n\n", (const wchar_t *)sLine);
 
 	bool bOK = Compute();
+	if (!bOK)
+	{
+		static int unErrs = 0;
+		unErrs++;
+	}
 	if (mpfWrite)
 	{
 		fwprintf(mpfWrite, L"\n");
@@ -113,6 +117,10 @@ bool CRight::ComputeEnvelop(void)
 	}
 
 	return bOK;
+}
+bool CRight::MissingInput(CString& /*iosText*/)
+{
+	return false;
 }
 bool CRight::HasLegalValue()
 {
@@ -158,6 +166,13 @@ void CRight::LogLine(const wchar_t *zText, double value)
 	CString s(zText);
 	s += " ";
 	s += ToString(value);
+	WriteLine(s);
+}
+void CRight::LogLine(const wchar_t* zText, double value, int nDigits)
+{
+	CString s(zText);
+	s += " ";
+	s += ToString(value, nDigits);
 	WriteLine(s);
 }
 void CRight::LogLine(const wchar_t *zText, __int64 value)
@@ -274,6 +289,9 @@ bool CRight::TryReadInt(FILE *pfRead, const wchar_t *zText, int &value)
 }
 bool CRight::TryConvertInt(const wchar_t *zSource, const wchar_t *zText, int &value)
 {
+	while (zSource[0] == ' ')
+		zSource++;
+
 	if (!isdigit(zSource[0]))
 	{
 		CString s(L"Convert Integer Error: <");

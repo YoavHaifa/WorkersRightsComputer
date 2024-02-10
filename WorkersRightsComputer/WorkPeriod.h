@@ -5,13 +5,13 @@
 class CWorkPeriod
 {
 public:
-	CWorkPeriod(void);
+	CWorkPeriod();
 
 	bool LastYearContains(class CHoliday &holiday);
-	void Reset(void);
+	void Reset();
 	void WriteToLetter(class CHtmlWriter &html);
-	CString GetPeriodForLetter(void);
-	CString GetPeriodForLetterHebrew(void);
+	CString GetPeriodForLetter();
+	CString GetPeriodForLetterHebrew();
 
 	bool IsValid(bool bMustDefineDays = true);
 	bool Compute(const wchar_t *zAt = NULL);
@@ -21,6 +21,7 @@ public:
 	CMyTime mFirst;
 	CMyTime mLast;
 	CMyTime mNotice;
+	CMyTime mLastDayOfNotice; // Valid only after notice was computed
 	CMyTime mLastYearStart;
 
 	CString mSpanString;
@@ -28,15 +29,18 @@ public:
 	static const int N_WEEK_DAYS = 7;
 	double maWorkingDays[N_WEEK_DAYS];
 	void SetWorkingDay(int iDay, double fraction);
-	void CountWorkingDays(void);
+	void ComputeWorkingDays();
 
 	int mnMonthsDetailed;
 	bool mbNegative;
 	double mnWorkDaysPerWeek;
 	double mnDaysInMonthForDailySalary;
-	int GetWorkingHoursInFullMonth(int year, int month);
-	int GetWorkingHoursInFullWeek(int year, int month);
+	int GetWorkingHoursInFullMonth(CMyTime date);
+	int GetWorkingHoursInFullWeek(CMyTime date);
 	bool mbSkipNotice;
+
+	// Special mode for caregivers
+	bool mbCaregiver;
 
 	// Special extra hours for "live in" caregivers
 	bool mbLiveIn;
@@ -44,31 +48,30 @@ public:
 
 	int CountDaysToEndOfMonth(CMyTime &date);
 	int CountWorkDaysToEndOfMonthFrom(CMyTime &firstDate);
-	void Save(FILE *pfSave);
 	void SaveToXml(class CXMLDump &xmlDump);
 	void LoadFromXml(class CXMLParseNode* pRoot);
 
-	void Restore(FILE *pfRead);
+	//void Restore(FILE *pfRead);
 	CString GetTextSummary();
 	CString GetShortSummary();
+	void ShortLog(FILE* pf);
 	CString GetDaysText();
 	int CountWorkingDays(CMyTime& first, CMyTime& last);
-	//int CountAllDaysWithoutUnpaidVacation(CMyTime& first, CMyTime& last);
-	void CountNWorkingDaysFrom(CMyTime &first, int nToSkip, CMyTime &dateAfter);
-	int CountAllDaysPerMonth(int year, int month);
-	int CountWorkingDaysPerMonth(int year, int month);
-	int CountDaysWorkedPerMonth(int year, int month);
+	int CountWorkingDaysPerMonth(CMyTime& dayInMonth);
+	int CountDaysWorkedPerMonth(const CMyTime& date);
 	void InitDetailsForEachMonth();
 	CMonthInfo *GetMonthInfoFor(CMyTime &date);
-	CMonthInfo *GetMonthInfoFor(int year, int month);
 	void Debug(const wchar_t *zAt);
 	void Log(const wchar_t *zAt);
 
 	bool IncludesMonthButNotFirst(int year, int month);
 
 	void SetWeekDaysPaidByCompany(class CCompanyPartPeriod *pFrom, class CCompanyPartPeriod *pUntil);
-	double ComputeFamilyPart(void);
+	double ComputeFamilyPart();
+	double ComputeFamilyPartLastMonths(int nMonths);
 	void WriteLastSalary(class CHtmlWriter& html);
+	void SetLastDayOfNotice(const CMyTime &lastDayOfNotice) { mLastDayOfNotice = lastDayOfNotice; }
+	bool HasFullYearWithNotice();
 
 private:
 	static const int MAX_MONTHS = 600;

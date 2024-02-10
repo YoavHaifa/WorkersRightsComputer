@@ -5,7 +5,7 @@ public:
 	CHtmlWriter();
 	~CHtmlWriter();
 	bool CopyLogo(const wchar_t* zfName);
-	int WriteLetterFromTemplate(const wchar_t* zfName);
+	bool WriteLetterFromTemplate(const wchar_t* zfName);
 	FILE* mpfWrite;
 	FILE* mpfHebrewWrite;
 	FILE *mpfRead;
@@ -18,7 +18,7 @@ public:
 	void WriteLTH_EH(const wchar_t* zText, const wchar_t* zHebrewText);
 	void WriteLEH(const wchar_t* zText, const wchar_t* zHebrewText);
 	void WritePara(const wchar_t* zText);
-	void WriteParaLTR(const wchar_t* zText);
+	void WriteParaLTR(const wchar_t* zText, const wchar_t* zHebrewText);
 	void WriteLine(const wchar_t* zText);
 	void WriteLineEH(const wchar_t* zText, const wchar_t* zHebrewText);
 	void WriteLineEH(const wchar_t* zText, const wchar_t* zHebrewText, const wchar_t* zExtraText);

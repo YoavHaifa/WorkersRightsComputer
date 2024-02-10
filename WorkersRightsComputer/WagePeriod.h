@@ -18,6 +18,7 @@ public:
 	CWagePeriod(const CWagePeriod &other);
 	CWagePeriod(class CXMLParseNode* pNode);
 
+	bool IsValid();
 	void Copy(const CWagePeriod &other);
 
 	bool Is(EWageMode eMode)const { return meMode == eMode; }
@@ -56,5 +57,6 @@ private:
 	double mMonthlyWage;
 	double mHourlyWage;
 	double mnHoursPerMonth;
+	double mMonthlyBonus;
 };
 

@@ -6,12 +6,13 @@ public:
 	CUsedVacations();
 	~CUsedVacations();
 
-	void AddVacation(class CVacationUsed *pVacationUsed);
-	void Save(FILE *pfSave);
+	void AddVacation(class CMyTime &firstDay, CMyTime &lastDay, 
+		bool bMaternity, int nMaternityPaidWeeks, bool bMaternityPension);
+	//void Save(FILE *pfSave);
 	void SaveToXml(class CXMLDump &xmlDump);
 	void LoadFromXml(class CXMLParseNode* pRoot);
 
-	void Restore(FILE *pfRead);
+	//void Restore(FILE *pfRead);
 	bool IsEmpty(void) { return mVacationsUsed.IsEmpty(); }
 
 	CList<class CVacationUsed*, class CVacationUsed*> mVacationsUsed;
@@ -23,13 +24,14 @@ public:
 	void Log();
 	bool mbAdd14DaysUnpaidVacation4Severance;
 
-	void UpdateNextYearStart(class CMyTime &yearStart, class CMyTime &nextYearStart);
+	//void UpdateNextYearStart(class CMyTime &yearStart, class CMyTime &nextYearStart);
 	void WriteToLetter(class CHtmlWriter& html);
 	void WriteToLetterExtraSeverance(class CHtmlWriter& html);
 
 	int CountDaysOfUnpaidVacation(CMyTime& first, CMyTime& last);
-	void AddToWorkSpan(class CWorkSpan &workSpan);
+	void AddAllVacationsToWorkSpan(class CWorkSpan &workSpan, bool bExtendPeriodByPaidMaternity = false);
 	double GetSeveranceYearsForUnpaidVacation();
+	bool WasWorkDay(CMyTime day);
 
 	static bool umbPrintUnpaid;
 };

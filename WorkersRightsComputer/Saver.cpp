@@ -12,6 +12,8 @@
 #include "Config.h"
 #include "Person.h"
 #include "FileName.h"
+#include "Comments.h"
+#include "HolidaysDue.h"
 
 
 CSaver::CSaver()
@@ -26,14 +28,15 @@ CSaver::~CSaver()
 	if (mpfRead)
 		fclose(mpfRead);
 }
-void CSaver::ResetAllInputs(void)
+void CSaver::ResetAllInputs(bool bLoading)
 {
 	if (gpDlg)
-		gpDlg->ResetAllInputs();
+		gpDlg->ResetAllInputs(bLoading);
 	gWorkPeriod.Reset();
 	CPerson::ClearContacts();
+	gComments.Clear();
 }
-void CSaver::Save(const wchar_t *zfName)
+bool CSaver::Save(const wchar_t *zfName)
 {
 	if (zfName)
 		msfName = zfName;
@@ -42,18 +45,26 @@ void CSaver::Save(const wchar_t *zfName)
 		msfName = CUtils::GetBaseDir();
 		msfName += "Save";
 		if (!CUtils::VerifyDirectory(msfName))
-			return;
+			return false;
 		msfName += L"\\Last.xml";
 		gUsedVacations.Log();
 	}
 
 	SaveToXml();
 
-	WriteLetter();
+	if (gAllRights.mbComputedOK)
+	{
+		WriteLetter();
+		return true;
+	}
+
+	CString s(L"Last Computation Failed, Letter Not Saved.\r\n");
+	s += gAllRights.msError;
+	CUtils::MessBox(s, L"Warning");
+	return false;
 }
 bool CSaver::Restore(const wchar_t* zfName)
 {
-	ResetAllInputs();
 	if (zfName)
 		msfName = zfName;
 	else
@@ -64,7 +75,16 @@ bool CSaver::Restore(const wchar_t* zfName)
 
 	CFileName fName(msfName);
 	if (fName.IsOfType(L"xml"))
-		return LoadFromXmlFile();
+	{
+		ResetAllInputs(true /*bLoading*/);
+		bool bOK = LoadFromXmlFile();
+
+		gHolidaysDue.UpdateMainDialog();
+		gComments.OnLoad();
+		gpDlg->OnLoad();
+
+		return bOK;
+	}
 
 	CUtils::MessBox(L"Saved file should be XML", L"Input Error");
 	return false;
@@ -80,11 +100,12 @@ void CSaver::SaveToXml(void)
 	gpDlg->SaveToXml(xmlDump);
 
 	gWorkPeriod.SaveToXml(xmlDump);
-
 	CPerson::SaveContactsToXml(xmlDump);
+	gComments.SaveToXml(xmlDump);
 
 	gAllRights.SaveToXml(xmlDump);
 	xmlDump.Write(L"software_version", gConfig.msVersion);
+	xmlDump.Write(L"i_software_version", gConfig.miVersion);
 
 	xmlDump.Close();
 }
@@ -175,8 +196,9 @@ bool CSaver::LoadFromXmlFile()
 	}
 	gWorkPeriod.LoadFromXml(pRoot);
 	CPerson::LoadContactsFromXml(pRoot);
+	gComments.LoadFromXml(pRoot);
 
 	gpDlg->mbDisableComputations = false;
-	gpDlg->OnInputChange();
+	gpDlg->OnInputChange(true);
 	return true;
 }

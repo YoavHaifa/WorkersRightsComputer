@@ -527,7 +527,8 @@ CXMLParse::CXMLParse(void)
 , meNextType (XML_UNDEF)
 {
 }
-CXMLParse::CXMLParse(const wchar_t *zDir, const wchar_t *zName, const wchar_t *zRoot)
+CXMLParse::CXMLParse(const wchar_t *zDir, const wchar_t *zName, const wchar_t *zRoot, 
+	bool bUnicode, bool bOptional)
 : msName(zName)
 , mpf(NULL)
 , mpMemoryToParse(NULL)
@@ -542,7 +543,7 @@ CXMLParse::CXMLParse(const wchar_t *zDir, const wchar_t *zName, const wchar_t *z
 	CFileName fName(zName);
 	fName.ChangePath(zDir);
 	fName.AddMetaTypeAndType(zRoot, L"xml");
-	OpenFile(fName);
+	OpenFile(fName, 0, bUnicode, bOptional);
 }
 CXMLParse::CXMLParse(const wchar_t* zfName, int offset)
 	: msName(zfName)
@@ -598,7 +599,7 @@ CXMLParse::~CXMLParse(void)
     if (mpRoot)
         delete mpRoot;
 }
-bool CXMLParse::OpenFile(const wchar_t *zfName, int offset, bool bUnicode)
+bool CXMLParse::OpenFile(const wchar_t *zfName, int offset, bool bUnicode, bool bOptional)
 {
 	mnCharsRead = 0;
 	msName = zfName;
@@ -606,7 +607,12 @@ bool CXMLParse::OpenFile(const wchar_t *zfName, int offset, bool bUnicode)
         delete mpRoot;
 	mpRoot = NULL;
 	if (bUnicode)
-		mpf = MyFOpenWithErrorBox(msName, L"r, ccs=UNICODE", L"for restoring");
+	{
+		if (bOptional)
+			mpf = MyFOpen(msName, L"r, ccs=UNICODE");
+		else
+			mpf = MyFOpenWithErrorBox(msName, L"r, ccs=UNICODE", L"for restoring");
+	}
 	else
 		mpf = MyFOpen (msName, L"r");
     if (!mpf)

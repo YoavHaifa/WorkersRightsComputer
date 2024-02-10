@@ -10,6 +10,7 @@
 #include "XMLParse.h"
 #include "WorkYears.h"
 #include "Wage.h"
+#include "HolidaysDue.h"
 
 CWorkPeriod gWorkPeriod;
 
@@ -24,9 +25,10 @@ const wchar_t *uasDaysNames[7] =
 	L"Saturday"
 };
 
-CWorkPeriod::CWorkPeriod(void)
+CWorkPeriod::CWorkPeriod()
 	: mbSkipNotice(false)
 	, mbLiveIn(true)
+	, mbCaregiver(false)
 	, mbExtraHolidayHoursForLiveInApplied(false)
 {
 	Reset();
@@ -55,23 +57,23 @@ bool CWorkPeriod::IsValid(bool bMustDefineDays)
 
 	return true;
 }
-int CWorkPeriod::GetWorkingHoursInFullMonth(int year, int month)
+int CWorkPeriod::GetWorkingHoursInFullMonth(CMyTime date)
 {
-	if (year < 2018)
+	if (date.mYear < 2018)
 		return 186;
-	if (year == 2018 && month < 4)
+	if (date.mYear == 2018 && date.mMonth < 4)
 		return 186;
 	return 182;
 }
-int CWorkPeriod::GetWorkingHoursInFullWeek(int year, int month)
+int CWorkPeriod::GetWorkingHoursInFullWeek(CMyTime date)
 {
-	if (year < 2018)
+	if (date.mYear < 2018)
 		return 43;
-	if (year == 2018 && month < 4)
+	if (date.mYear == 2018 && date.mMonth < 4)
 		return 43;
 	return 42;
 }
-void CWorkPeriod::Reset(void)
+void CWorkPeriod::Reset()
 {
 	mFirst.Reset();
 	mLast.Reset();
@@ -84,13 +86,14 @@ void CWorkPeriod::Reset(void)
 	gUsedVacations.ClearAllVacations();
 	gWorkYears.Clear();
 	gFamilyPart.Clear();
+	gHolidaysDue.Reset();
 
 	mbSkipNotice = false;
 }
 
 bool CWorkPeriod::Compute(const wchar_t* zAt)
 {
-	CountWorkingDays();
+	ComputeWorkingDays();
 
 	// Init for invalid work span
 	mnMonthsDetailed = 0;
@@ -121,7 +124,7 @@ bool CWorkPeriod::Compute(const wchar_t* zAt)
 	InitDetailsForEachMonth();
 
 	gUsedVacations.Compute();
-	gWorkYears.Compute();
+	gWorkYears.DivideWorkPeriodToWorkYears();
 	mSpanString = gWorkYears.PrepareSpanString();
 
 	gFamilyPart.Compute();
@@ -183,7 +186,7 @@ void CWorkPeriod::SetWorkingDay(int iDay, double fraction)
 	maWorkingDays[iDay] = fraction;
 	Compute();
 }
-void CWorkPeriod::CountWorkingDays(void)
+void CWorkPeriod::ComputeWorkingDays()
 {
 	mnWorkDaysPerWeek = 0;
 	for (int i = 0; i < N_WEEK_DAYS; i++)
@@ -240,14 +243,14 @@ void CWorkPeriod::WriteLastSalary(class CHtmlWriter& html)
 	//html.WritePara(s);
 	html.EndParagraph();
 }
-CString CWorkPeriod::GetPeriodForLetter(void)
+CString CWorkPeriod::GetPeriodForLetter()
 {
 	CString s(mFirst.ToString());
 	s += " - ";
 	s += mLast.ToString();
 	return s;
 }
-CString CWorkPeriod::GetPeriodForLetterHebrew(void)
+CString CWorkPeriod::GetPeriodForLetterHebrew()
 {
 	CString s(mFirst.ToHebrewString());
 	s += " - ";
@@ -263,6 +266,7 @@ void CWorkPeriod::SaveToXml(CXMLDump &xmlDump)
 	xmlDump.Write(L"notice", mNotice);
 	xmlDump.Write(L"b_skip_notice", mbSkipNotice);
 	xmlDump.Write(L"b_live_in", mbLiveIn);
+	xmlDump.Write(L"b_caregiver", mbCaregiver);
 	xmlDump.Write(L"b_extra_holiday_hours_for_live_in_applied", mbExtraHolidayHoursForLiveInApplied);
 
 	{
@@ -276,20 +280,22 @@ void CWorkPeriod::SaveToXml(CXMLDump &xmlDump)
 
 	gUsedVacations.SaveToXml(xmlDump);
 	gFamilyPart.SaveToXml(xmlDump);
+	gHolidaysDue.SaveToXml(xmlDump);
 }
 void CWorkPeriod::LoadFromXml(class CXMLParseNode* pRoot)
 {
-	CXMLParseNode* pMain = pRoot->GetFirst(L"WorkPeriod");
-	if (!pMain)
+	CXMLParseNode* pWorkPeriodNode = pRoot->GetFirst(L"WorkPeriod");
+	if (!pWorkPeriodNode)
 		return;
 
-	pMain->GetValue(L"first", mFirst);
-	pMain->GetValue(L"last", mLast);
-	pMain->GetValue(L"notice", mNotice);
-	pMain->GetValue(L"b_skip_notice", mbSkipNotice);
-	pMain->GetValue(L"b_live_in", mbLiveIn);
+	pWorkPeriodNode->GetValue(L"first", mFirst);
+	pWorkPeriodNode->GetValue(L"last", mLast);
+	pWorkPeriodNode->GetValue(L"notice", mNotice);
+	pWorkPeriodNode->GetValue(L"b_skip_notice", mbSkipNotice);
+	pWorkPeriodNode->GetValue(L"b_live_in", mbLiveIn);
+	pWorkPeriodNode->GetValue(L"b_caregiver", mbCaregiver);
 
-	CXMLParseNode* pDays = pMain->GetFirst(L"Days");
+	CXMLParseNode* pDays = pWorkPeriodNode->GetFirst(L"Days");
 	if (pDays)
 	{
 		for (int iDay = 0; iDay < 7; iDay++)
@@ -297,62 +303,34 @@ void CWorkPeriod::LoadFromXml(class CXMLParseNode* pRoot)
 			pDays->GetValue(uasDaysNames[iDay], maWorkingDays[iDay]);
 		}
 	}
+	ComputeWorkingDays();
 
-	gWage.LoadFromXml(pMain);
+	gWage.LoadFromXml(pWorkPeriodNode);
 
 	/*
 	bool bHourly = false;
-	if (pMain->GetValue(L"bMinWage", mbMinWage))
+	if (pWorkPeriodNode->GetValue(L"bMinWage", mbMinWage))
 	{
 	}
-	else if (pMain->GetValue(L"bMonthlyWage", mbMonthlyWage))
+	else if (pWorkPeriodNode->GetValue(L"bMonthlyWage", mbMonthlyWage))
 	{
-		pMain->GetValue(L"MonthlyWage", mMonthlyWage);
+		pWorkPeriodNode->GetValue(L"MonthlyWage", mMonthlyWage);
 	}
-	else if (pMain->GetValue(L"bHourlyWage", bHourly))
+	else if (pWorkPeriodNode->GetValue(L"bHourlyWage", bHourly))
 	{
-		pMain->GetValue(L"HourlyWage", mHourlyWage);
-		pMain->GetValue(L"HoursPerWeek", mHoursPerWeek);
+		pWorkPeriodNode->GetValue(L"HourlyWage", mHourlyWage);
+		pWorkPeriodNode->GetValue(L"HoursPerWeek", mHoursPerWeek);
 	}*/
 
+
+	gUsedVacations.LoadFromXml(pWorkPeriodNode);
+
+	gFamilyPart.LoadFromXml(pWorkPeriodNode);
 	Compute(L"LoadFromXml1");
 
-	gUsedVacations.LoadFromXml(pMain);
-	gFamilyPart.LoadFromXml(pMain);
+	gHolidaysDue.LoadFromXml(pWorkPeriodNode, pRoot);
 
 	Compute(L"LoadFromXml2");
-}
-void CWorkPeriod::Restore(FILE *pfRead)
-{
-	mFirst.Read(pfRead);
-	mLast.Read(pfRead);
-	mNotice.Read(pfRead);
-	CString s = CUtils::ReadLine(pfRead);
-	if (s == "Days")
-	{
-		for (int iDay = 0; iDay < 7; iDay++)
-		{
-			int value = CUtils::ReadInt(pfRead);
-			SetWorkingDay(iDay, value);
-		}
-	}
-	s = CUtils::ReadLine(pfRead);
-	if (s == "MinWage")
-	{
-		gWage.SetMinWage();
-	}
-
-	InitDetailsForEachMonth();
-
-	s = CUtils::ReadLine(pfRead);
-	if (s == "Vacations")
-	{
-		gUsedVacations.Restore(pfRead);
-		s = CUtils::ReadLine(pfRead);
-	}
-	if (s == "FamilyPart")
-		gFamilyPart.Restore(pfRead);
-	gWorkPeriod.Compute();
 }
 CString CWorkPeriod::GetShortSummary()
 {
@@ -364,6 +342,13 @@ CString CWorkPeriod::GetShortSummary()
 	s += CRight::ToString((int)mnWorkDaysPerWeek);
 	s += " work days/week";
 	return s;
+}
+void CWorkPeriod::ShortLog(FILE* pf)
+{
+	if (!pf)
+		return;
+	CString sPeriod = gWorkPeriod.GetShortSummary();
+	fwprintf(pf, L"%s\n\n", (const wchar_t*)sPeriod);
 }
 CString CWorkPeriod::GetTextSummary()
 {
@@ -378,6 +363,12 @@ CString CWorkPeriod::GetTextSummary()
 
 	s += "\r\n";
 	s += gWorkPeriod.mSpanString;
+	if (!gUsedVacations.IsEmpty())
+	{
+		s += " (";
+		s += gUsedVacations.GetVacationsShortText();
+		s += ")";
+	}
 	if (!gWage.IsAllMin())
 	{
 		s += " (";
@@ -438,6 +429,12 @@ CString CWorkPeriod::GetDaysText()
 	s += sDays;
 	return s;
 }
+int CWorkPeriod::CountWorkingDaysPerMonth(CMyTime& dayInMonth)
+{
+	CMyTime firstDay(dayInMonth.FirstDayOfMonth());
+	CMyTime lastDay(dayInMonth.LastDayOfMonth());
+	return CountWorkingDays(firstDay, lastDay);
+}
 int CWorkPeriod::CountWorkingDays(CMyTime &first, CMyTime &last)
 {
 	int n = 0;
@@ -451,30 +448,6 @@ int CWorkPeriod::CountWorkingDays(CMyTime &first, CMyTime &last)
 	return n;
 }
 /*
-int CWorkPeriod::CountAllDaysWithoutUnpaidVacation(CMyTime& first, CMyTime& last)
-{
-	int n = 0;
-	CMyTime check = first;
-	while (check <= last)
-	{
-		if (!check.IsUnpaidVacation())
-			n++;
-		check.AddDay();
-	}
-	return n;
-} */
-void CWorkPeriod::CountNWorkingDaysFrom(CMyTime &first, int nToSkip, CMyTime &dateAfter)
-{
-	int n = 0;
-	CMyTime check = first;
-	while (n <= nToSkip)
-	{
-		if (check.IsWorkingDay())
-			n++;
-		check.AddDay();
-	}
-	dateAfter = check;
-}
 int CWorkPeriod::CountAllDaysPerMonth(int year, int month)
 {
 	int n = 0;
@@ -485,7 +458,8 @@ int CWorkPeriod::CountAllDaysPerMonth(int year, int month)
 		date.AddDay();
 	}
 	return n;
-}
+}*/
+/*
 int CWorkPeriod::CountWorkingDaysPerMonth(int year, int month)
 {
 	int n = 0;
@@ -497,19 +471,22 @@ int CWorkPeriod::CountWorkingDaysPerMonth(int year, int month)
 		date.AddDay();
 	}
 	return n;
-}
-int CWorkPeriod::CountDaysWorkedPerMonth(int year, int month)
+}*/
+int CWorkPeriod::CountDaysWorkedPerMonth(const CMyTime& date)
 {
 	int n = 0;
-	CMyTime date(year, month, 1);
-	while (date.mMonth == month)
+	CMyTime check(date);
+	check.mDay = 1;
+	int month = date.mMonth;
+
+	while (check.mMonth == month)
 	{
-		if ((date >= mFirst) && (date <= mLast))
+		if ((check >= mFirst) && (check <= mLast))
 		{
-			if (date.IsWorkingDay())
+			if (check.IsWorkingDay())
 				n++;
 		}
-		date.AddDay();
+		check.AddDay();
 	}
 	return n;
 }
@@ -527,13 +504,10 @@ void CWorkPeriod::InitDetailsForEachMonth()
 
 CMonthInfo *CWorkPeriod::GetMonthInfoFor(CMyTime &date)
 {
-	return GetMonthInfoFor(date.mYear, date.mMonth);
-}
-CMonthInfo *CWorkPeriod::GetMonthInfoFor(int year, int month)
-{
 	for (int i = 0; i < MAX_MONTHS; i++)
 	{
-		if ((maMonths[i].mYear == year) && (maMonths[i].mMonth == month))
+		//if ((maMonths[i].mYear == year) && (maMonths[i].mMonth == month))
+		if (maMonths[i].Contains(date))
 		{
 			return &maMonths[i];
 		}
@@ -554,7 +528,7 @@ void CWorkPeriod::Debug(const wchar_t *zAt)
 
 	for (int i = 1; i < MAX_MONTHS; i++)
 	{
-		if ((maMonths[i].mYear == maMonths[i - 1].mYear) && (maMonths[i].mMonth == maMonths[i - 1].mMonth))
+		if (maMonths[i].mFirstDay == maMonths[i - 1].mFirstDay)
 		{
 			CUtils::MessBox(L"<CWorkPeriod::Debug> error", zAt);
 			return;
@@ -572,20 +546,20 @@ void CWorkPeriod::Log(const wchar_t *zAt)
 	if (!pfLog)
 		return;
 
-	CString s(mFirst.ToString());
-	fwprintf(pfLog, L"First Day %s\n", (const wchar_t *)s);
-	s = mLast.ToString();
-	fwprintf(pfLog, L"Last Day %s\n", (const wchar_t *)s);
-	s = mNotice.ToString();
-	fwprintf(pfLog, L"Notice Day %s\n", (const wchar_t *)s);
+	mFirst.LogLine(pfLog, L"First Day");
+	mLast.LogLine(pfLog, L"Last Day");
+	mNotice.LogLine(pfLog, L"Notice Day");
+	fprintf(pfLog, "\n");
 
+	fprintf(pfLog, "Work Days per week: %.2f\n", mnWorkDaysPerWeek);
+	for (int i = 0; i < 7; i++)
+		fprintf(pfLog, "%d: %s\n", i + 1, maWorkingDays[i] ? "Yes" : "No");;
 	fprintf(pfLog, "\n");
 
 	for (int i = 0; i < MAX_MONTHS; i++)
 	{
-		if (maMonths[i].mFraction < 1)
-			fwprintf(pfLog, L"%3d: %d/%02d - %0.2f\n", maMonths[i].mi, 
-				maMonths[i].mYear, maMonths[i].mMonth, maMonths[i].mFraction);
+		maMonths[i].Log(pfLog);
+
 		if (maMonths[i].mbLast)
 			break;
 	}
@@ -605,16 +579,16 @@ bool CWorkPeriod::IncludesMonthButNotFirst(int year, int month)
 }
 void CWorkPeriod::SetWeekDaysPaidByCompany(class CCompanyPartPeriod *pFrom, class CCompanyPartPeriod *pUntil)
 {
-	if (!maMonths[0].mbInitialized)
+	if (!maMonths[0].mbInitializedBeforeVacation)
 	{
 		CUtils::MessBox(L"<SetWeekDaysPaidByCompany> Months array not initialized", L"SW Error");
 		return;
 	}
 	for (int i = 0; i < MAX_MONTHS; i++)
 	{
-		if (maMonths[i].IsMonthBefore(pFrom->mFrom))
+		if (maMonths[i].mLastDay.IsMonthBefore(pFrom->mFrom))
 			continue;
-		if (pUntil && !maMonths[i].IsMonthBefore(pUntil->mFrom))
+		if (pUntil && !maMonths[i].mLastDay.IsMonthBefore(pUntil->mFrom))
 			return;
 		maMonths[i].mHoursPerWeekPaidByCompany = pFrom->mCompanyHoursPerWeek;
 		maMonths[i].mRatioPaidByCompany = pFrom->mCompanyPart;
@@ -622,7 +596,7 @@ void CWorkPeriod::SetWeekDaysPaidByCompany(class CCompanyPartPeriod *pFrom, clas
 			return;
 	}
 }
-double CWorkPeriod::ComputeFamilyPart(void)
+double CWorkPeriod::ComputeFamilyPart()
 {
 	double sumFractions = 0;
 	double sumCompanyRatio = 0;
@@ -630,12 +604,48 @@ double CWorkPeriod::ComputeFamilyPart(void)
 	for (int i = 0; i < MAX_MONTHS; i++)
 	{
 		double companyRatio = maMonths[i].GetCompanyRatio();
-		sumFractions += maMonths[i].mFraction;
-		sumCompanyRatio += companyRatio * maMonths[i].mFraction;
+		double monthFraction = maMonths[i].GetFraction();
+		sumFractions += monthFraction;
+		sumCompanyRatio += companyRatio * monthFraction;
 		if (maMonths[i].mbLast)
 			break;
 	}
 
 	double companyTotalRatio = sumCompanyRatio / sumFractions;
 	return 1 - companyTotalRatio;
+}
+double CWorkPeriod::ComputeFamilyPartLastMonths(int nMonthsWanted)
+{
+	double sumFractions = 0;
+	double sumCompanyRatio = 0;
+
+	double missingFraction = nMonthsWanted;
+	int iLast = mnMonthsDetailed - 1;
+
+	for (int iMonth = iLast; iMonth >= 0 && missingFraction > 0; iMonth--)
+	{
+		double companyRatio = maMonths[iMonth].GetCompanyRatio();
+		double fraction = min(maMonths[iMonth].GetFraction(), missingFraction);
+
+		sumFractions += fraction;
+		missingFraction -= fraction;
+		sumCompanyRatio += companyRatio * fraction;
+	}
+
+	double companyTotalRatio = 0;
+	if (sumFractions > 0)
+		companyTotalRatio = sumCompanyRatio / sumFractions;
+	return 1 - companyTotalRatio;
+}
+bool CWorkPeriod::HasFullYearWithNotice()
+{
+	if (!mLastDayOfNotice.IsValid())
+	{
+		static int unErrors = 0;
+		if (!unErrors++)
+			CUtils::MessBox(L"<CWorkPeriod::HasFullYearWithNotice> notice not defned", L"SW Error");
+		return false;
+	}
+
+	return gWorkYears.HasFullYearWithNotice(mLastDayOfNotice);
 }

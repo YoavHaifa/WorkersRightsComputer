@@ -191,7 +191,11 @@ void CXMLDump::Write(const wchar_t * zName, double value)
 	if (!mpf)
 		return;
 	Ident();
-	fwprintf(mpf, L"<%s> %f </%s>\n", zName, value, zName);
+	int iValue = (int)value;
+	if ((double)iValue == value)
+		fwprintf(mpf, L"<%s> %d </%s>\n", zName, iValue, zName);
+	else
+		fwprintf(mpf, L"<%s> %f </%s>\n", zName, value, zName);
 	if (umbDebug)
 		fflush(mpf);
 }

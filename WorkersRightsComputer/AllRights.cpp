@@ -16,11 +16,13 @@
 #include "HtmlWriter.h"
 #include "Person.h"
 #include "XMLDump.h"
+#include "MinWage.h"
 
 CAllRights gAllRights;
 
 CAllRights::CAllRights()
 	: mpHolidays(NULL)
+	, mbComputedOK(false)
 {
 }
 CAllRights::~CAllRights()
@@ -29,6 +31,8 @@ CAllRights::~CAllRights()
 bool CAllRights::Init()
 {
 	Clear();
+
+	gMinWage.InitFromFile();
 
 	mRights.AddTail(new CSeverance);
 	mRights.AddTail(new CNotice);
@@ -55,6 +59,8 @@ void CAllRights::Clear(void)
 		mRights.RemoveTail();
 	}
 	mpHolidays = NULL;
+	mbComputedOK = false;
+	msError = L"";
 }
 bool CAllRights::SetCheckRef(CButtonRef *pButton)
 {
@@ -103,17 +109,34 @@ bool CAllRights::Compute(void)
 	if (bInCompute)
 		return false;
 	bInCompute = true;
-	bool bOK = true;
 
 	iComputing = iCompute;
-	bOK = ComputeInternal();
+	mbComputedOK = ComputeInternal();
 
 	bInCompute = false;
-	return bOK;
+	return mbComputedOK;
+}
+bool CAllRights::AllInputDefined()
+{
+	CString sMissing(L"Missing Input:\r\n");
+	POSITION pos = mRights.GetHeadPosition();
+	while (pos)
+	{
+		CRight* pRight = mRights.GetNext(pos);
+		if (pRight->MissingInput(sMissing))
+		{
+			if (gpDlg)
+				gpDlg->DisplaySummary(sMissing);
+			msError = sMissing;
+			return false;
+		}
+	}
+	return true;
 }
 bool CAllRights::ComputeInternal()
 {
-	//double totalDue = 0;
+	if (!AllInputDefined())
+		return false;
 
 	bool bOK = true;
 	POSITION pos = mRights.GetHeadPosition();
@@ -127,17 +150,20 @@ bool CAllRights::ComputeInternal()
 	{
 		if (gpDlg)
 			gpDlg->DisplaySummary(L"Please define work period");
+		msError = L"Work Period not well defined";
 		return false;
 	}
 
 	if (!gWageTable.Prepare(L"AllRights_Compute"))
 	{
-		CUtils::MessBox(L"Failed to prepare Wage Table!", L"SW Error");
+		msError = L"Failed to prepare Wage Table!";
+		CUtils::MessBox(msError, L"SW Error");
 		return false;
 	}
 	if (!gWageTable.IsValid())
 	{
-		CUtils::MessBox(L"Wage Table not initialized!", L"SW Error");
+		msError = L"Wage Table not initialized!";
+		CUtils::MessBox(msError, L"SW Error");
 		return false;
 	}
 
@@ -146,7 +172,13 @@ bool CAllRights::ComputeInternal()
 	while (pos)
 	{
 		CRight *pRight = mRights.GetNext(pos);
-		pRight->ComputeEnvelop();
+		if (!pRight->ComputeEnvelop())
+		{
+			msError = pRight->msName;
+			msError += " Error: ";
+			msError += pRight->msDue;
+			bOK = false;
+		}
 	}
 
 	FILE *pfWrite = CUtils::OpenLogFile(L"Total");
@@ -212,12 +244,19 @@ void CAllRights::WriteTotalLineToHtmlTable(CHtmlWriter &html)
 
 	html.WriteL(L"</tr>");
 }
-
+CHolidays* CAllRights::GetHolidays()
+{
+	if (!mpHolidays)
+		return NULL;
+	if (!mpHolidays->InitDefinition())
+		return NULL;
+	return mpHolidays;
+}
 CString CAllRights::GetHolidaysSelection()
 {
 	if (!mpHolidays)
 		return CString();
-	return mpHolidays->msSelection;
+	return mpHolidays->GetSelection();
 }
 void CAllRights::Save(FILE *pfWrite)
 {
@@ -240,4 +279,5 @@ void CAllRights::SaveToXml(CXMLDump& xmlDump)
 		CRight* pRight = mRights.GetNext(pos);
 		pRight->SaveToXml(xmlDump);
 	}
+	xmlDump.Write(L"ToatDue", mSumDue);
 }

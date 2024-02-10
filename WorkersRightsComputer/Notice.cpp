@@ -4,26 +4,157 @@
 #include "WorkYears.h"
 #include "FamilyPart.h"
 #include "WageTable.h"
+#include "Config.h"
 
-CNotice::CNotice(void)
+CNotice::CNotice()
 	: CRight(L"Notice", L"הודעה מוקדמת")
+	, mFamilyRatio(1)
 {
 	miPrintOrder = 5;
-	mbDemandFullMonthAnyway = false;
 }
-CNotice::~CNotice(void)
+CNotice::~CNotice()
 {
 }
-bool CNotice::Compute(void) 
+bool CNotice::ComputeDemandFullMonth()
+{
+	mbDemandFullMonth = true;
+	if (gWorkYears.mnFullWorkYears >= 1)
+		LogLine(L"At least one full year worked");
+	else
+		LogLine(L"Demand full month for less than one full year worked");
+
+	mLastDayOfNotice.AddMonth();
+	gWorkPeriod.SetLastDayOfNotice(mLastDayOfNotice);
+	LogLine(L"Last Day of Notice", mLastDayOfNotice);
+	if (mLastDayOfNotice <= gWorkPeriod.mLast)
+	{
+		LogLine(L"Worked full month of notice period.");
+		msDue += L"Worked full month of notice period.";
+		return false;
+	}
+	return true;
+}
+bool CNotice::ComputeForLessThanAYear()
+{
+	mbDemandFullMonth = false;
+	if (gWorkYears.mnMonthsInLastYear < 7)
+	{
+		mDueNoticeDays = gWorkYears.mnMonthsInLastYear;
+		LogLine(L"Less than 7 months, demand day per month", mDueNoticeDays);
+	}
+	else
+	{
+		int extraMonths = gWorkYears.mnMonthsInLastYear - 6;
+		mDueNoticeDays = 6 + extraMonths * 2.5;
+		LogLine(L"More than half year, demand days", mDueNoticeDays);
+	}
+	int dueDays = (int)mDueNoticeDays;
+	if (dueDays < mDueNoticeDays)
+	{
+		dueDays++;
+		if (!gConfig.mbBackwardCompatibilityMode || gConfig.miLegacyVersion >= 133)
+		{
+			mDueNoticeDays = dueDays;
+			LogLine(L"Rounded up by half day, n days due", dueDays);
+		}
+		else
+			mbAvoidRoundingLastHalfDay = true;
+	}
+	mLastDayOfNotice.AddDays(dueDays);
+	gWorkPeriod.SetLastDayOfNotice(mLastDayOfNotice);
+	LogLine(L"Last Day of Notice", mLastDayOfNotice);
+
+	if (mLastDayOfNotice <= gWorkPeriod.mLast)
+	{
+		LogLine(L"Worked all of notice period.");
+		msDue += L"Worked all of notice period.";
+		return false;
+	}
+	msDue += ToString(mDueNoticeDays);
+	msDue += L" days ";
+	return true;
+}
+void CNotice::CheckForPaidDaysAfterNotice()
+{
+	mnDaysPaidAfterNotice = 0;
+	CMyTime checkDate(gWorkPeriod.mNotice.NextDay());
+	LogLine(L"Check From", checkDate);
+	while (checkDate <= gWorkPeriod.mLast)
+	{
+		if (checkDate.IsWorkingDay())
+		{
+			mnDaysPaidAfterNotice++;
+			LogLine(L"Worked", checkDate.mTime, L"Paid", mnDaysPaidAfterNotice);
+		}
+		checkDate.AddDay();
+	}
+
+	LogLine(L"n days paid after notice", mnDaysPaidAfterNotice);
+	LogLine(L"");
+	if (mnDaysPaidAfterNotice > 0)
+	{
+		msDebug += L" (Days paid after notice ";
+		msDebug += ToString(mnDaysPaidAfterNotice);
+		msDebug += L") ";
+	}
+}
+void CNotice::CountWorkDaysToPay()
+{
+	int nDaysChecked = 0;
+	CMyTime checkDate(gWorkPeriod.mLast.NextDay());
+	while (checkDate <= mLastDayOfNotice)
+	{
+		if (checkDate.IsWorkingDay())
+		{
+			mDueWorkDaysToPay++;
+			LogLine(L"Add Day", checkDate.mTime, L"=", mDueWorkDaysToPay);
+		}
+		checkDate.AddDay();
+		nDaysChecked++;
+
+		if (mDueWorkDaysToPay + mnDaysPaidAfterNotice >= gWorkPeriod.mnDaysInMonthForDailySalary)
+		{
+			LogLine(L"No more days in salary's month", gWorkPeriod.mnDaysInMonthForDailySalary);
+			break;
+		}
+	}
+	if (mbAvoidRoundingLastHalfDay)
+	{
+		if (mDueWorkDaysToPay > 0.5)
+		{
+			mDueWorkDaysToPay -= 0.5;
+			LogLine(L"Reduce 0.5 rounded-up day for backward compatibility", mDueWorkDaysToPay);
+		}
+	}
+
+	LogLine(L"");
+	if (mDueWorkDaysToPay > gWorkPeriod.mnDaysInMonthForDailySalary)
+	{
+		mDueWorkDaysToPay = gWorkPeriod.mnDaysInMonthForDailySalary;
+		msDebug += L" (Full Month)";
+		LogLine(L"n due days was > n days in salary month", gWorkPeriod.mnDaysInMonthForDailySalary);
+	}
+	int nWeeksChecked = (nDaysChecked + gWorkPeriod.N_WEEK_DAYS - 1) / gWorkPeriod.N_WEEK_DAYS;
+	if (mDueWorkDaysToPay > (gWorkPeriod.N_WEEK_DAYS - 1)* nWeeksChecked)
+	{
+		mDueWorkDaysToPay = (gWorkPeriod.N_WEEK_DAYS - 1) * nWeeksChecked;
+		msDebug += L" (No more than 6 days per week)";
+		LogLine(L"n weeks checked", nWeeksChecked);
+		LogLine(L"n due days < (gWorkPeriod.N_WEEK_DAYS - 1) * nWeeksChecked", mDueWorkDaysToPay);
+	}
+}
+bool CNotice::Compute() 
 {
 	mDuePay = 0;
 	mbValid = false;
+	mbAvoidRoundingLastHalfDay = false;
+	gWorkPeriod.SetLastDayOfNotice(gWorkPeriod.mLast); // No Notice yet
 
 	if (gWorkPeriod.mbSkipNotice)
 	{
 		LogLine(L"Do not demand notice!");
 		msDue += L"Notice was not demanded.";
-		return false;
+		return true;
 	}
 	if (!gWorkPeriod.mNotice.mbInitialized)
 	{
@@ -40,157 +171,46 @@ bool CNotice::Compute(void)
 	// and what is the last day to which he is entitled to be paid
 	mDueNoticeDays = 0;
 	mLastDayOfNotice = gWorkPeriod.mNotice;
-	bool bHalfDayDue = false;
 
-	if (gWorkYears.mnFullWorkYears >= 1 || mbDemandFullMonthAnyway)
+	if (gWorkYears.mnFullWorkYears >= 1)
 	{
-		mbDemandFullMonth = true;
-		if (gWorkYears.mnFullWorkYears >= 1)
-			LogLine(L"At least one full year worked");
-		else
-			LogLine(L"Demand full month for less than one full year worked");
-
-		mLastDayOfNotice.AddMonth();
-		LogLine(L"Last Day of Notice", mLastDayOfNotice);
-		if (mLastDayOfNotice <= gWorkPeriod.mLast)
-		{
-			LogLine(L"Worked full month of notice period.");
-			msDue += L"Worked full month of notice period.";
-			return false;
-		}
+		if (!ComputeDemandFullMonth())
+			return true;
 	}
 	else
 	{
-		mbDemandFullMonth = false;
-		if (gWorkYears.mnMonthsInLastYear < 7)
-		{
-			mDueNoticeDays = gWorkYears.mnMonthsInLastYear;
-			LogLine(L"Less than 7 months, demand day per month", mDueNoticeDays);
-		}
-		else
-		{
-			int extraMonths = gWorkYears.mnMonthsInLastYear - 6;
-			mDueNoticeDays = 6 + extraMonths * 2.5;
-			LogLine(L"More than half year, demand days", mDueNoticeDays);
-		}
-		int dueDays = (int)mDueNoticeDays;
-		if (dueDays < mDueNoticeDays)
-		{
-			dueDays++;
-			bHalfDayDue = true;
-			LogLine(L"Half day due, n days", dueDays);
-		}
-		mLastDayOfNotice.AddDays(dueDays);
-		msDue += ToString(mDueNoticeDays);
-		msDue += L" days ";
+		if (!ComputeForLessThanAYear())
+			return true;
 	}
 
 	LogLine(L"n days in month for salary", gWorkPeriod.mnDaysInMonthForDailySalary);
 	LogLine(L"");
 
 	// Count paid work days from notice until last
-	mDueWorkDayToPay = 0;
-	mnDaysPaidAfterNotice = 0;
-	CMyTime checkDate (gWorkPeriod.mNotice.NextDay());
-	LogLine(L"Check From", checkDate);
-	while (checkDate <= gWorkPeriod.mLast)
-	{
-		if (gWorkPeriod.maWorkingDays[checkDate.mDayOfWeek - 1] > 0)
-		{
-			mnDaysPaidAfterNotice++;
-			LogLine(L"Worked", checkDate.mTime, L"Paid", mnDaysPaidAfterNotice);
-		}
-		checkDate.AddDay();
-	}
+	CheckForPaidDaysAfterNotice();
 
-	LogLine(L"n days paid after notice", mnDaysPaidAfterNotice);
-	LogLine(L"");
-	if (mnDaysPaidAfterNotice > 0)
-	{
-		msDebug += L" (Days paid after notice ";
-		msDebug += ToString(mnDaysPaidAfterNotice);
-		msDebug += L") ";
-	}
-
+	mDueWorkDaysToPay = 0;
 	if (mbDemandFullMonth && (mnDaysPaidAfterNotice == 0))
 	{
 		double payPerMonth = gWageTable.PayPerMonthAtWorkEnd();
 		msDebug += L"Pay per month ";
 		msDebug += ToString(payPerMonth);
-		/*
-		if (mnDaysPaidAfterNotice > 0)
-		{
-			double fraction = (gWorkPeriod.mnDaysInMonthForDailySalary - mnDaysPaidAfterNotice) / gWorkPeriod.mnDaysInMonthForDailySalary;
-			if (fraction > 1)
-				fraction = 1;
-			if (fraction < 0)
-				fraction = 0;
-			msDue += L"Month * Fraction ";
-			msDue += ToString(fraction);
-			mDuePay = payPerMonth * fraction;
-		}
-		else */
 		msDue += L"Full Month";
 		mDuePay = payPerMonth;
 	}
 	else
 	{
-		int nDaysChecked = 0;
-		while (checkDate <= mLastDayOfNotice)
-		{
-			int dayOf = checkDate.mDayOfWeek - 1;
-			if (gWorkPeriod.maWorkingDays[dayOf] > 0)
-			{
-				mDueWorkDayToPay++;
+		CountWorkDaysToPay();
 
-				if (checkDate.mTime == mLastDayOfNotice.mTime)
-				{
-					if (bHalfDayDue)
-					{
-						mDueWorkDayToPay -= 0.5;
-						LogLine(L"Add Last Half Day", checkDate.mTime, L"=", mDueWorkDayToPay);
-					}
-					else
-						LogLine(L"Add Last Day", checkDate.mTime, L"=", mDueWorkDayToPay);
-				}
-				else
-					LogLine(L"Add Day", checkDate.mTime, L"=", mDueWorkDayToPay);
-			}
-			checkDate.AddDay();
-			nDaysChecked++;
-
-			if (mDueWorkDayToPay + mnDaysPaidAfterNotice >= gWorkPeriod.mnDaysInMonthForDailySalary)
-			{
-				LogLine(L"No more days in salary's month", gWorkPeriod.mnDaysInMonthForDailySalary);
-				break;
-			}
-		}
-		LogLine(L"");
-
-		if (mDueWorkDayToPay > gWorkPeriod.mnDaysInMonthForDailySalary)
-		{
-			mDueWorkDayToPay = gWorkPeriod.mnDaysInMonthForDailySalary;
-			msDebug += L" (Full Month)";
-			LogLine(L"n due days < n days in salary month", gWorkPeriod.mnDaysInMonthForDailySalary);
-		}
-		int nWeeksChecked = (nDaysChecked + gWorkPeriod.N_WEEK_DAYS - 1) / gWorkPeriod.N_WEEK_DAYS;
-		if (mDueWorkDayToPay > (gWorkPeriod.N_WEEK_DAYS - 1) * nWeeksChecked)
-		{
-			mDueWorkDayToPay = (gWorkPeriod.N_WEEK_DAYS - 1) * nWeeksChecked;
-			msDebug += L" (No more than 6 days per week)";
-			LogLine(L"n weeks checked", nWeeksChecked);
-			LogLine(L"n due days < (gWorkPeriod.N_WEEK_DAYS - 1) * nWeeksChecked", mDueWorkDayToPay);
-		}
-
-		msDue += L" - extra "; // mDuePay.ToString("F2");
-		msDue += ToString(mDueWorkDayToPay);
+		msDue += L" - extra ";
+		msDue += ToString(mDueWorkDaysToPay);
 		msDue += L" days ";
 		mPayPerDay = gWageTable.PayPerDayAtWorkEnd();
 		LogLine(L"Pay per day at work end", mPayPerDay);
 
 		msDue += L" * ";
 		msDue += ToString(mPayPerDay);
-		mDuePay = mDueWorkDayToPay * mPayPerDay;
+		mDuePay = mDueWorkDaysToPay * mPayPerDay;
 	}
 	msDue += L" ==> ";
 	msDue += ToString(mDuePay);
@@ -198,14 +218,32 @@ bool CNotice::Compute(void)
 
 	if (gFamilyPart.mbAskOnlyForFamilyPart)
 	{
-		mDuePay = mDuePay * gFamilyPart.GetRatio();
-		msDue += L" =FamilyPart=> ";
+		bool bLast3Month = false;
+		if (gConfig.mbBackwardCompatibilityMode && gConfig.miLegacyVersion < 133)
+		{
+			mFamilyRatio = gWorkPeriod.ComputeFamilyPart();
+			LogLine(L"Family part (whole period, backward compatibility mode)", mFamilyRatio);
+		}
+		else
+		{
+			bLast3Month = true;
+			mFamilyRatio = gWorkPeriod.ComputeFamilyPartLastMonths(umn3MonthsForFamilyPart);
+			LogLine(L"Family part - average last 3 month", mFamilyRatio);
+		}
+
+		msFamilyRatio = CFamilyPart::Ratio2S(mFamilyRatio);
+		mDuePay = mDuePay * mFamilyRatio;
+		msDue += L" = Family Part ";
+		msDue += msFamilyRatio;
+		if (bLast3Month)
+			msDue += L" (Last 3 Months)";
+		msDue += L" ==> ";
 		msDue += ToString(mDuePay);
 	}
 
 	return true;
 }
-CString CNotice::GetDecriptionForLetter(void)
+CString CNotice::GetDecriptionForLetter()
 {
 	CString s;
 
@@ -215,19 +253,19 @@ CString CNotice::GetDecriptionForLetter(void)
 	}
 	else
 	{
-		s += ToString(mDueWorkDayToPay);
+		s += ToString(mDueWorkDaysToPay);
 		s += L" days * ";
 		s += ToString(mPayPerDay);
 	}
 
 	if (gFamilyPart.mbAskOnlyForFamilyPart)
 	{
-		s += ", Family Part ";
-		s += gFamilyPart.GetSRatio();
+		s += ", Family Part (last 3 month) ";
+		s += msFamilyRatio;
 	}
 	return s;
 }
-CString CNotice::GetDecriptionForLetterHebrew(void)
+CString CNotice::GetDecriptionForLetterHebrew()
 {
 	CString s;
 
@@ -237,14 +275,14 @@ CString CNotice::GetDecriptionForLetterHebrew(void)
 	}
 	else
 	{
-		s += ToString(mDueWorkDayToPay);
+		s += ToString(mDueWorkDaysToPay);
 		s += L" ימים * ";
 		s += ToString(mPayPerDay);
 	}
 	if (gFamilyPart.mbAskOnlyForFamilyPart)
 	{
-		s += L", חלק המשפחה ";
-		s += gFamilyPart.GetSRatio();
+		s += L",חלק המשפחה (3 חודשים אחרונים)  ";
+		s += msFamilyRatio;
 	}
 	return s;
 }

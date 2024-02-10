@@ -17,7 +17,7 @@ CWagePeriodsDlg* CWagePeriodsDlg::umpDlg = NULL;
 IMPLEMENT_DYNAMIC(CWagePeriodsDlg, CDialogEx)
 
 CWagePeriodsDlg::CWagePeriodsDlg(CWnd* pParent /*=nullptr*/)
-	: CMyDialogEx(IDD_DIALOG_WAGE_PERIODS, pParent)
+	: CWageDefBaseDlg(IDD_DIALOG_WAGE_PERIODS, pParent)
 {
 
 }
@@ -44,7 +44,7 @@ END_MESSAGE_MAP()
 
 BOOL CWagePeriodsDlg::OnInitDialog()
 {
-	CDialogEx::OnInitDialog();
+	CWageDefBaseDlg::OnInitDialog();
 
 	SetCheck(IDC_CHECK_WAGE_PERIODS_FULL_MONTHS, true);
 

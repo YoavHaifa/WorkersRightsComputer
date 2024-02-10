@@ -2,34 +2,36 @@
 #include "MonthlyRates.h"
 #include "Utils.h"
 #include "Right.h"
-
+#include "XMLParse.h"
+#include "XMLDump.h"
 
 CMonthlyRates::CMonthlyRates(const wchar_t *zName, int firstYear)
 	: msName(zName)
 	, mFirstYear(firstYear)
 	, mbValid(false)
 {
-	InitFromFile();
-	PrintLog();
+	InitFromXmlFile();
 }
-double CMonthlyRates::RatePerMonth(int year, int month)
+double CMonthlyRates::RatePerMonth(const CMyTime& date)
 {
 	if (!mbValid)
 		return 0;
-	int iYear = year - mFirstYear;
-	if (month < 1)
+	int iYear = date.mYear - mFirstYear;
+	if (date.mMonth < 1)
 		return 0;
-	month = month - 1;
-	return ma[iYear * 12 + month];
+	return ma[iYear * 12 + date.mMonth - 1];
 }
-bool CMonthlyRates::PrintLog(void)
+bool CMonthlyRates::PrintLog(const wchar_t* zAt)
 {
 	if (!mbValid)
 		return false;
 
 	double lastPrinted = 0;
+	CString sfName(msName);
+	sfName += L"_Rates_";
+	sfName += zAt;
 
-	FILE *pfWrite = CUtils::OpenLogFile(msName + L"Rates");
+	FILE *pfWrite = CUtils::OpenLogFile(sfName);
 	for (int i = 0; i < MAX_RATES; i++)
 	{
 		if (ma[i] != lastPrinted)
@@ -53,14 +55,23 @@ bool CMonthlyRates::PrintLog(void)
 	fclose(pfWrite);
 	return true;
 }
-bool CMonthlyRates::InitFromFile(void)
+/*
+void CMonthlyRates::SaveMonthlyXmlFile()
 {
-	/*
-	CString sfName = L"..\\release\\Input\\Rates";
-	sfName += msName;
-	sfName += L".txt";
+	CString sDirName(CUtils::GetInputPath());
+	CXMLDump dump(sDirName, msName, L"MonthlyRates");
 
-	FILE *pfRead = MyFOpenWithErrorBox(sfName, L"r", L"input rates"); */
+	for (int i = 0; i < mnDefs; i++)
+	{
+		CXMLDumpScope scope(L"rate_start", dump);
+		dump.Write(L"year", maDefYear[i]);
+		dump.Write(L"month", maDefMonth[i]);
+		dump.Write(L"rate", maDefRate[i]);
+	}
+}*/
+/*
+bool CMonthlyRates::InitFromTextFile(void)
+{
 	CString sfName = L"Rates";
 	sfName += msName;
 	FILE* pfRead = CUtils::OpenInputFile(sfName);
@@ -74,15 +85,16 @@ bool CMonthlyRates::InitFromFile(void)
 		mabDefined[i] = false;
 	}
 
-	//int iLastIndex = 0;
-	//double iLastValue = 0;
+	mnDefs = 0;
 	CString sLine;
 	sLine = CUtils::ReadLine(pfRead);
 	while (sLine.Left(3) != L"end")
 	{
 		int year = _wtoi(sLine);
-		year -= mFirstYear;
-		if (year < 0)
+		maDefYear[mnDefs] = year;
+
+		int iYear = year - mFirstYear;
+		if (iYear < 0)
 		{
 			CUtils::MessBox(L"Rate Year Too Early", L"Input Error");
 			break;
@@ -92,10 +104,10 @@ bool CMonthlyRates::InitFromFile(void)
 		if (sLine.Left(3) == L"end")
 			break;
 		int month = _wtoi(sLine);
-		month -= 1;
-		if (month < 0)
+		maDefMonth[mnDefs] = month;
+		if (month < 1 || month > 12)
 		{
-			CUtils::MessBox(L"Rate Month Too Small", L"Input Error");
+			CUtils::MessBox(L"Wrong Rate Month (should be 1 - 12)", L"Input Error");
 			break;
 		}
 
@@ -103,8 +115,9 @@ bool CMonthlyRates::InitFromFile(void)
 		if (sLine.Left(3) == L"end")
 			break;
 		double value = _wtof(sLine);
+		maDefRate[mnDefs] = value;
 		
-		int index = year * 12 + month;
+		int index = iYear * 12 + (month - 1);
 		if (index < MAX_RATES)
 		{
 			for (int iFill = index; iFill < MAX_RATES; iFill++)
@@ -112,32 +125,68 @@ bool CMonthlyRates::InitFromFile(void)
 				ma[iFill] = value;
 			}
 			mabDefined[index] = true;
-			//if (index > iLastIndex)
-			//{
-			//	iLastIndex = index;
-			//	iLastValue = value;
-			//}
 		}
+		mnDefs++;
 		sLine = CUtils::ReadLine(pfRead);
 	}
 	fclose(pfRead);
 
-	//// Fill Rest
-	//for (int iFill = MAX_RATES - 1; iFill > 0 && !mabDefined[iFill]; iFill--)
-	//{
-	//	ma[iFill] = iLastValue;
-	//}
 	mbValid = true;
+	PrintLog(L"FromText");
 	return true;
-}
-void CMonthlyRates::CorrectForOldStype(void)
+}*/
+bool CMonthlyRates::InitFromXmlFile(void)
 {
-	if (!mbValid)
-		return;
+	CString sfName(CUtils::GetInputPath());
+	sfName += msName;
+	sfName += L".MonthlyRates.xml";
+	CXMLParse parse(sfName, true /*bUnicode*/);
+	CXMLParseNode* pRoot = parse.GetRoot();
+	if (!pRoot)
+	{
+		CUtils::MessBox(parse.GetName(), L"Missing Input File");
+		return false;
+	}
 
 	for (int i = 0; i < MAX_RATES; i++)
 	{
-		if (ma[i] == 0.0333)
-			ma[i] = 0.033;
+		ma[i] = 0;
+		mabDefined[i] = false;
 	}
+
+	bool bOK = true;
+	CXMLParseNode* pStart = pRoot->GetFirst(L"rate_start");
+	while (pStart)
+	{
+		int year = 0;
+		int month = 0;
+		double rate = 0;
+		if ((pStart->GetValue(L"year", year))
+			&& (pStart->GetValue(L"month", month))
+			&& (pStart->GetValue(L"rate", rate)))
+		{
+			int iYear = year - mFirstYear;
+			int index = iYear * 12 + (month - 1);
+			if (index < MAX_RATES)
+			{
+				for (int iFill = index; iFill < MAX_RATES; iFill++)
+				{
+					ma[iFill] = rate;
+				}
+				mabDefined[index] = true;
+			}
+		}
+		else
+		{
+			CUtils::MessBox(parse.GetName(), L"Input Error");
+			CUtils::MessBox(L"Missing Monthly Rate Details", L"Input Error");
+			bOK = false;
+			break;
+		}
+		pStart = pRoot->GetNext(L"rate_start", pStart);
+	}
+
+	mbValid = bOK;
+	PrintLog(L"FromXML");
+	return bOK;
 }

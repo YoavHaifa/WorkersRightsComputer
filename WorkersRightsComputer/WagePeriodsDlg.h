@@ -1,12 +1,13 @@
 #pragma once
-#include "MyDialogEx.h"
+//#include "MyDialogEx.h"
 #include "MyTime.h"
 #include "WagePeriod.h"
+#include "WageDefBaseDlg.h"
 
 
 // CWagePeriods dialog
 
-class CWagePeriodsDlg : public CMyDialogEx
+class CWagePeriodsDlg : public CWageDefBaseDlg
 {
 	DECLARE_DYNAMIC(CWagePeriodsDlg)
 

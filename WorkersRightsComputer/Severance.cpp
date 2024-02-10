@@ -34,11 +34,11 @@ bool CSeverance::Compute(void)
 	{
 		mDuePay = 0;
 		msDue += L"Entitle ONLY to Severance Fund - None here";
-		return false;
+		return true;
 	}
 
 	mnYears = gWorkYears.mYearsForSeverance;
-	mPayPerYear = gWageTable.ComputeMonthlyPay(gWorkPeriod.mLast.mYear, gWorkPeriod.mLast.mMonth);
+	mPayPerYear = gWageTable.ComputeMonthlyPay(gWorkPeriod.mLast);
 	if (mnYears < MIN_PERIOD)
 	{
 		//double partYearThreshold = (double)N_MIN_MONTHS_FOR_SPECIAL_CASE / 12 - 0.002;
@@ -57,7 +57,7 @@ bool CSeverance::Compute(void)
 		{
 			mDuePay = 0;
 			msDue += L"None - Period too short";
-			return false;
+			return true;
 		}
 	}
 	else

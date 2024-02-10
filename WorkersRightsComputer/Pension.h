@@ -14,12 +14,9 @@ public:
 	virtual CString GetDecriptionForLetter(void)override;
 	virtual CString GetDecriptionForLetterHebrew(void)override;
 
-	bool DoCompute(void);
-	void AddMonth(int year, int month, int nDays /* if 0 - full */, bool bFirst = false);
-	void OnYearEnd(void);
-
 	class CMonthlyRates *mpPensionRates;
-	class CYearlyRates *mpSeveranceRates;
+	//class CYearlyRates* mpSeveranceRates;
+	class CMonthlyRates* mpSeveranceMonthlyRates;
 
 	static const int N_MONTHS_BEFORE_PAY_FROM_2008 = 9;
 	static const int N_MONTHS_BEFORE_PAY_FROM_2009 = 6;
@@ -38,11 +35,18 @@ public:
 	double mSeveranceDue;
 	double mDueFromFamily;
 	bool mbSeverance;
+	bool mbEntitledOnlyToSeveranceFund;
+	bool mbHadActivePensionBefore;
 	CPensionReport mReport;
 
-	bool UpdateStartDateForPension(void);
+	bool UpdateStartDateForPensionForVacations(void);
 	void WriteToLetter(class CHtmlWriter& html);
-	void CorrectForOldStype(void);
+
+private:
+	bool DoCompute(void);
+	bool CheckForDateToStartPension();
+	void PensionAddMonth(CMyTime &yearAndMonth, int nDays /* if 0 - full */, bool bFirst = false);
+	void OnYearEnd(void);
 };
 
 extern CPension *gpPension;

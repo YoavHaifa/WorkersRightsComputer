@@ -1,3 +1,71 @@
+TiharII
+2023
+11
+17
+Tihar I
+2023
+11
+15
+Laxmi Puja (Tihar)
+2023
+11
+14
+Ekadashi
+2023
+10
+25
+Dahsami
+2023
+10
+24
+Nawami
+2023
+10
+23
+Astami
+2022
+10
+22
+Dashain Festival Phoolpati Phulpat
+2023
+10
+21
+Constitution Day
+2023
+9
+11
+Janai Purnima Rakshya Bandhan
+2023
+8
+30
+Republic Day 
+2023
+5
+29
+Buddha Jayanti(Buddha Day
+2023
+5
+5
+International Workers Day
+2023
+5
+1
+Nepali New Year
+2023
+4
+14
+International Womens Day/Nari Shivaratri
+2023
+3
+8
+Maha Shivaratri
+2023
+2
+18
+Martyrs Memorial Day
+2023
+1
+30
 Tihar II
 2022
 10
@@ -10,10 +78,22 @@ Laxmi Puja (Tihar)
 2022
 10
 24
-Ekadashi 
+Ekadashi
 2022
 10
-2
+6
+Dahsami
+2022
+10
+5
+Nawami
+2022
+10
+4
+Astami
+2022
+10
+3
 Dashain Festival Phoolpati Phulpat
 2022
 10
@@ -22,44 +102,36 @@ Constitution Day
 2022
 9
 11
-Shree Krishna Kanmasthami Garura Parba
-2021
-8
-30
 Janai Purnima Rakshya Bandhan
-2021
+2022
 8
-21
-Buddha Jayanti(Buddha Day
-2021
+11
+Republic Day 
+2022
 5
 29
+Buddha Jayanti(Buddha Day
+2022
+5
+26
 International Workers Day
-2021
+2022
 5
 1
 Nepali New Year
-2021
+2022
 4
 14
-Ghyalpo Losar
-2021
-4
-11
-Maha Shivaratri
-2021
-2
-11
-International Womens Day
-2021
+International Womens Day/Nari Shivaratri
+2022
 3
 8
-Prajatantra Diwas
-2021
-2
-19
+Maha Shivaratri
+2022
+3
+1
 Martyrs Memorial Day
-2021
+2022
 1
 30
 Kojagrat Purnima
@@ -87,30 +159,30 @@ Janai Purnima Rakshya Bandhan
 8
 11
 Republic Day
-2022
+2021
 5
 29
 Buddha Jayanti(Buddha Day)
-2022
+2021
 5
 16
 International Workers Day
-2022
+2021
 5
 1
 International Womens Day / Nari Dibas
-2022
+2021
 3
 8
 Maha Shivaratri
-2022
+2021
 3
 1
 Martyrs Memorial Day
-2022
+2021
 1
 30
-Tihar Festival Gai Tihar Lakshmi Puja
+Tihar Festival 
 2020
 11
 11

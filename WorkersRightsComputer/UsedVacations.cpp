@@ -4,6 +4,7 @@
 #include "Utils.h"
 #include "VacationsDlg.h"
 #include "VacationUsed.h"
+#include "MaternityLeave.h"
 #include "VacationTable.h"
 #include "XMLDump.h"
 #include "HtmlWriter.h"
@@ -23,8 +24,15 @@ CUsedVacations::~CUsedVacations()
 {
 	ClearAllVacations();
 }
-void CUsedVacations::AddVacation(class CVacationUsed *pNewVacation)
+void CUsedVacations::AddVacation(CMyTime& firstDay, CMyTime& lastDay,
+	bool bMaternity, int nMaternityPaidWeeks, bool bMaternityPension)
 {
+	CVacationUsed* pNewVacation = NULL;
+	if (bMaternity)
+		pNewVacation = new CMaternityLeave(firstDay, lastDay, nMaternityPaidWeeks, bMaternityPension);
+	else
+		pNewVacation = new CVacationUsed(firstDay, lastDay);
+
 	bool bCopyRest = false;
 	CVacationUsed *pPrevVac = NULL;
 	POSITION pos = mVacationsUsed.GetHeadPosition();
@@ -130,12 +138,11 @@ void CUsedVacations::SaveToXml(CXMLDump &xmlDump)
 	{
 		CVacationUsed *pVac = mVacationsUsed.GetNext(pos);
 		CXMLDumpScope scope1(L"Vacation", xmlDump);
-		xmlDump.Write(L"FirstDay", pVac->mFirstDay);
-		xmlDump.Write(L"LastDay", pVac->mLastDay);
+		pVac->SaveToXml(xmlDump);
 	}
 	xmlDump.Write(L"bAdd14DaysUnpaidVacation4Severance", mbAdd14DaysUnpaidVacation4Severance);
 }
-void CUsedVacations::LoadFromXml(class CXMLParseNode* pRoot)
+void CUsedVacations::LoadFromXml(CXMLParseNode* pRoot)
 {
 	CXMLParseNode* pMain = pRoot->GetFirst(L"UsedVacations");
 	if (!pMain)
@@ -150,54 +157,20 @@ void CUsedVacations::LoadFromXml(class CXMLParseNode* pRoot)
 		{
 			if (pVacation->GetValue(L"LastDay", last))
 			{
-				CVacationUsed* pVac = new CVacationUsed(first, last);
-				AddVacation(pVac);
+				bool bMaternity = false;
+				bool bMaternityPension = false;
+				int nMaternityPaidWeeks = 0;
+				if (pVacation->GetValue(L"b_maternity", bMaternity) && bMaternity)
+				{
+					pVacation->GetValue(L"n_maternity_paid_weeks", nMaternityPaidWeeks);
+					pVacation->GetValue(L"b_maternity_pension", bMaternityPension);
+				}
+				AddVacation(first, last, bMaternity, nMaternityPaidWeeks, bMaternityPension);
 			}
 		}
 		pVacation = pMain->GetNext(L"Vacation", pVacation);
 	}
 	pMain->GetValue(L"bAdd14DaysUnpaidVacation4Severance", mbAdd14DaysUnpaidVacation4Severance);
-}
-void CUsedVacations::Save(FILE *pfSave)
-{
-	if (mVacationsUsed.GetSize() < 1)
-		return;
-
-	fwprintf(pfSave, L"Vacations\n");
-
-	POSITION pos = mVacationsUsed.GetHeadPosition();
-	while (pos)
-	{
-		CVacationUsed *pVac = mVacationsUsed.GetNext(pos);
-		fwprintf(pfSave, L"Vacation\n");
-		pVac->mFirstDay.Write(pfSave);
-		pVac->mLastDay.Write(pfSave);
-	}
-	if (mbAdd14DaysUnpaidVacation4Severance)
-		fprintf(pfSave, "mbAdd14DaysUnpaidVacation4Severance\n");
-
-	fwprintf(pfSave, L"EndVacations\n");
-}
-void CUsedVacations::Restore(FILE *pfRead)
-{
-	ClearAllVacations();
-	CString s = CUtils::ReadLine(pfRead);
-	while (s == "Vacation")
-	{
-		CMyTime mFirst;
-		CMyTime mLast;
-		mFirst.Read(pfRead);
-		mLast.Read(pfRead);
-		CVacationUsed *pVac = new CVacationUsed(mFirst, mLast);
-		AddVacation(pVac);
-		s = CUtils::ReadLine(pfRead);
-	}
-	if (s == "mbAdd14DaysUnpaidVacation4Severance")
-	{
-		mbAdd14DaysUnpaidVacation4Severance = true;
-		s = CUtils::ReadLine(pfRead);
-	}
-	Compute();
 }
 void CUsedVacations::Compute()
 {
@@ -212,20 +185,7 @@ void CUsedVacations::Compute()
 	while (pos)
 	{
 		CVacationUsed *pVac = mVacationsUsed.GetNext(pos);
-		pVac->Compute();
-	}
-}
-void CUsedVacations::UpdateNextYearStart(CMyTime &yearStart, CMyTime &nextYearStart)
-{
-	POSITION pos = mVacationsUsed.GetHeadPosition();
-	while (pos)
-	{
-		CVacationUsed *pVac = mVacationsUsed.GetNext(pos);
-		if (pVac->mnUnPaid > 0)
-		{
-			if (pVac->mFirstDayUnpaid >= yearStart && pVac->mFirstDayUnpaid < nextYearStart)
-				nextYearStart.AddDays(pVac->mnUnpaidCalendarDays);
-		}
+		gVacationTable.ComputeNextVacation(*pVac);
 	}
 }
 int CUsedVacations::CountDaysOfUnpaidVacation(CMyTime& first, CMyTime& last)
@@ -236,24 +196,35 @@ int CUsedVacations::CountDaysOfUnpaidVacation(CMyTime& first, CMyTime& last)
 	while (pos)
 	{
 		CVacationUsed *pVac = mVacationsUsed.GetNext(pos);
-		if (pVac->mnUnPaid > 0)
+		if (pVac->mnUnPaidWorkDays > 0)
 		{
 			nDays += pVac->CountDaysOfUnpaidVacation(first, last);
 		}
 	}
 	return nDays;
 }
-void CUsedVacations::AddToWorkSpan(CWorkSpan& workSpan)
+void CUsedVacations::AddAllVacationsToWorkSpan(CWorkSpan& workSpan, bool bExtendPeriodByPaidMaternity)
 {
 	POSITION pos = mVacationsUsed.GetHeadPosition();
 	while (pos)
 	{
 		CVacationUsed *pVac = mVacationsUsed.GetNext(pos);
-		if (pVac->mnUnPaid > 0)
-		{
+		if (pVac->mbIsMaternityLeave && bExtendPeriodByPaidMaternity && workSpan.Contains(pVac->mFirstDay))
+			workSpan.AddUnpaidVacation(*pVac);
+		else
 			pVac->AddToWorkSpan(workSpan);
-		}
 	}
+}
+bool CUsedVacations::WasWorkDay(CMyTime day)
+{
+	POSITION pos = mVacationsUsed.GetHeadPosition();
+	while (pos)
+	{
+		CVacationUsed *pVac = mVacationsUsed.GetNext(pos);
+		if (pVac->Contains(day))
+			return false;
+	}
+	return true;
 }
 void CUsedVacations::Log()
 {
@@ -292,25 +263,31 @@ void CUsedVacations::WriteToLetter(CHtmlWriter& html)
 
 	int nPaid = 0;
 	int nUnPaid = 0;
+	int nMaternity = 0;
 	POSITION pos = mVacationsUsed.GetHeadPosition();
 	while (pos)
 	{
 		CVacationUsed *pVac = mVacationsUsed.GetNext(pos);
-		html.WriteEH(L"Vacation: ", L"חופשה: ");
+		if (pVac->mbIsMaternityLeave)
+		{
+			html.WriteEH(L"Maternity Leave: ", L"חופשת לידה: ");
+			nMaternity++;
+		}
+		else
+			html.WriteEH(L"Vacation: ", L"חופשה: ");
+
 		html.WriteEH(pVac->mFirstDay.ToString(), pVac->mFirstDay.ToHebrewString());
 		html.Write(L" - ");
 		html.WriteEH(pVac->mLastDay.ToString(), pVac->mLastDay.ToHebrewString());
 
-		//fprintf(pf, "Work Days %2d / %2d - Paid %2d Unpaid %2d\n",
-		//	mnWorkDays, mnDays, mnPaid, mnUnPaid);
 		html.WriteEH(L", work days ", L", ימי עבודה ");
 		html.WriteInt(pVac->mnWorkDays);
 		html.WriteEH(L", paid ", L", בתשלום ");
-		html.WriteInt(pVac->mnPaid);
+		html.WriteInt(pVac->mnPaidDays);
 		html.WriteEH(L", unpaid ", L", ללא תשלום ");
-		html.WriteInt(pVac->mnUnPaid);
-		nPaid += pVac->mnPaid;
-		nUnPaid += pVac->mnUnPaid;
+		html.WriteInt(pVac->mnUnPaidWorkDays);
+		nPaid += pVac->mnPaidDays;
+		nUnPaid += pVac->mnUnPaidWorkDays;
 
 		html.WriteLine(L"");
 	}
@@ -318,20 +295,33 @@ void CUsedVacations::WriteToLetter(CHtmlWriter& html)
 
 	// Sum of vacations
 	html.StartParagraph();
-	html.WriteLineEH(L"According to the law, days of paid vacation are included while computing social rights like severance and pension.",
-		L"לפי חוק חופשה שנתית, ימי חופשה בתשלום באים בחשבון לצורך חישוב זכויות סוציאליות כגון פיצויי פיטורים והפרשות לפנסיה. ");
-	html.WriteEH(L"In this computation ", L"בחישוב זה הוכללו ");
-	html.WriteInt(nPaid);
-	html.WriteLineEH(L" days of paid vacation were included.", L" ימי חופשה בתשלום.");
-	if (umbPrintUnpaid)
+	if (nMaternity)
 	{
-		html.WriteEH(L"In this computation ", L"בחישוב זה קוזזו ");
-		html.WriteInt(nUnPaid);
-		html.WriteLineEH(L" days of unpaid vacation were offset.", L" ימי חופשה ללא תשלום. ");
+		html.WriteLEH(L"According to the law:", L"לפי החוק והפסיקה: ");
+		html.WriteLine(L"");
+		html.WriteLEH(L"Paid maternity leave is included while computing seniority for severance and recuperation.",
+			L"תקופת חופשת לידה בתשלום באה בחשבון לצורך חישוב ותק לפיצויי פיטורים ודמי הבראה.");
+		html.WriteLine(L"");
+		html.WriteLEH(L"Paid vacation days are normal working days and are entitled to full social rights.",
+			L"ימי חופשה בתשלום הינם ימי עבודה רגילים ומזכים במלוא הזכויות הסוציאליות.");
 	}
-	html.EndParagraph();
+	else
+	{
+		html.WriteLineEH(L"According to the law, days of paid vacation are included while computing social rights like severance, recuperation and pension.",
+			L"לפי חוק חופשה שנתית, ימי חופשה בתשלום באים בחשבון לצורך חישוב זכויות סוציאליות כגון פיצויי פיטורים, גמי הבראה והפרשות לפנסיה. ");
+		html.WriteEH(L"In this computation ", L"בחישוב זה הוכללו ");
+		html.WriteInt(nPaid);
+		html.WriteLineEH(L" days of paid vacation were included.", L" ימי חופשה בתשלום.");
+		if (umbPrintUnpaid)
+		{
+			html.WriteEH(L"In this computation ", L"בחישוב זה קוזזו ");
+			html.WriteInt(nUnPaid);
+			html.WriteLineEH(L" days of unpaid vacation were offset.", L" ימי חופשה ללא תשלום. ");
+		}
+	}
 	if (gWorkYears.mnDaysForSeveranceAddedForUnpaidVacations)
 		WriteToLetterExtraSeverance(html);
+	html.EndParagraph();
 }
 void CUsedVacations::WriteToLetterExtraSeverance(class CHtmlWriter& html)
 {

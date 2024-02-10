@@ -87,13 +87,14 @@ public:
     } EXmlElementType;
 
     CXMLParse(void);
-    CXMLParse(const wchar_t *zDir, const wchar_t *zName, const wchar_t *zRoot);
+    CXMLParse(const wchar_t *zDir, const wchar_t *zName, const wchar_t *zRoot, 
+		bool bUnicode, bool bOptional = false);
 	CXMLParse(const wchar_t* zfName, int offset = 0);
 	CXMLParse(const wchar_t* zfName, bool bUnicode);
 	CXMLParse(const wchar_t *zName, const wchar_t *pMemory, int len);
     ~CXMLParse(void);
 
-	bool OpenFile(const wchar_t *zfName, int offset = 0, bool bUnicode = false);
+	bool OpenFile(const wchar_t *zfName, int offset = 0, bool bUnicode = false, bool bOptional=false);
 	void SetNew(const wchar_t *zfName);
 
 protected:

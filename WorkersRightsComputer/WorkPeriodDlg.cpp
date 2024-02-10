@@ -17,13 +17,10 @@
 #include "WagePeriodsDlg.h"
 #include "Wage.h"
 
-
-// CWorkPeriodDlg dialog
-
 IMPLEMENT_DYNAMIC(CWorkPeriodDlg, CDialogEx)
 
 CWorkPeriodDlg::CWorkPeriodDlg(CWnd* pParent /*=nullptr*/)
-	: CMyDialogEx(IDD_DIALOG_WORK_PERIOD, pParent)
+	: CWageDefBaseDlg(IDD_DIALOG_WORK_PERIOD, pParent)
 {
 	mapCheckDays[0] = &mCheckSunday;
 	mapCheckDays[1] = &mCheckMonday;
@@ -86,6 +83,7 @@ BEGIN_MESSAGE_MAP(CWorkPeriodDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_EDIT_WAGE, &CWorkPeriodDlg::OnBnClickedButtonEditWage)
 	ON_BN_CLICKED(IDC_RADIO_DIFF_WAGES, &CWorkPeriodDlg::OnBnClickedRadioDiffWages)
 	ON_BN_CLICKED(IDC_BUTTON_SET_WAGE, &CWorkPeriodDlg::OnBnClickedButtonSetWage)
+	ON_BN_CLICKED(IDC_CHECK_MONTHLY_BONUS, &CWorkPeriodDlg::OnBnClickedCheckMonthlyBonus)
 END_MESSAGE_MAP()
 
 void CWorkPeriodDlg::SetWageGui()
@@ -123,10 +121,10 @@ void CWorkPeriodDlg::SetWageGui()
 		Disable(IDC_BUTTON_SET_WAGE);
 	}
 }
-
 BOOL CWorkPeriodDlg::OnInitDialog()
 {
-	CDialogEx::OnInitDialog();
+	CWageDefBaseDlg::OnInitDialog();
+
 	mMonthlySalary.EnableWindow(FALSE);
 	mHourlySalary.EnableWindow(FALSE);
 	mHoursPerWeek.EnableWindow(FALSE);
@@ -136,15 +134,28 @@ BOOL CWorkPeriodDlg::OnInitDialog()
 		mStartDate.SetTime(&gWorkPeriod.mFirst.mTime);
 		mbStartSet = true;
 	}
+	else
+	{
+		SetInvisible(IDC_DATETIMEPICKER_END);
+		SetInvisible(IDC_DATETIMEPICKER_NOTICE);
+	}
+
 	if (gWorkPeriod.mLast.mbInitialized)
 	{
 		mbEndSet = true;
 		mEndDate.SetTime(&gWorkPeriod.mLast.mTime);
+		SetVisible(IDC_DATETIMEPICKER_END);
 	}
+	else
+	{
+		SetInvisible(IDC_DATETIMEPICKER_NOTICE);
+	}
+
 	if (gWorkPeriod.mNotice.mbInitialized)
 	{
 		mbNoticeSet = true;
 		mNoticeDate.SetTime(&gWorkPeriod.mNotice.mTime);
+		SetVisible(IDC_DATETIMEPICKER_NOTICE);
 	}
 	SetCheck(IDC_CHECK_NO_NOTICE, gWorkPeriod.mbSkipNotice);
 
@@ -163,13 +174,13 @@ BOOL CWorkPeriodDlg::OnInitDialog()
 }
 // CWorkPeriodDlg message handlers
 
-
 void CWorkPeriodDlg::OnDtnDatetimechangeDatetimepickerStart(NMHDR * /*pNMHDR*/, LRESULT *pResult)
 {
 	//LPNMDATETIMECHANGE pDTChange = reinterpret_cast<LPNMDATETIMECHANGE>(pNMHDR);
 	mbStartSet = true;
 	UpdateText();
 	*pResult = 0;
+	SetVisible(IDC_DATETIMEPICKER_END);
 }
 
 void CWorkPeriodDlg::OnDtnDatetimechangeDatetimepickerEnd(NMHDR * /*pNMHDR*/, LRESULT *pResult)
@@ -178,6 +189,13 @@ void CWorkPeriodDlg::OnDtnDatetimechangeDatetimepickerEnd(NMHDR * /*pNMHDR*/, LR
 	mbEndSet = true;
 	UpdateText();
 	*pResult = 0;
+	SetVisible(IDC_DATETIMEPICKER_NOTICE);
+	if (!mbNoticeSet)
+	{
+		CTime time;
+		mEndDate.GetTime(time);
+		mNoticeDate.SetTime(&time);
+	}
 }
 
 void CWorkPeriodDlg::OnDtnDatetimechangeDatetimepickerNotice(NMHDR * /*pNMHDR*/, LRESULT *pResult)
@@ -339,6 +357,7 @@ bool CWorkPeriodDlg::UpdateDataFromDialog(void)
 	CTime time;
 	DWORD flags = mStartDate.GetTime(time);
 	gWorkPeriod.mFirst.SetDate(time);
+
 	flags = mEndDate.GetTime(time);
 	gWorkPeriod.mLast.SetDate(time);
 	flags = mNoticeDate.GetTime(time);
@@ -557,4 +576,11 @@ bool CWorkPeriodDlg::SetWageForWholePeriod()
 		return false;
 	}
 	return true;
+}
+
+void CWorkPeriodDlg::OnBnClickedCheckMonthlyBonus()
+{
+	bool bMonthly = IsChecked(IDC_CHECK_MONTHLY_BONUS);
+	SetVisible(IDC_STATIC_MONTHLY_BONUS_TEXT, bMonthly);
+	SetVisible(IDC_EDIT_MONTHLY_BONUS, bMonthly);
 }

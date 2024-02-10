@@ -47,6 +47,14 @@ void CMyDialogEx::SetParameter(int id, double value)
         pWnd->SetWindowText(zBuf);
     }
 }
+void CMyDialogEx::SetParameter(int id, CString& sText)
+{
+    CWnd *pWnd = GetDlgItem(id);
+    if (pWnd)
+    {
+        pWnd->SetWindowText(sText);
+    }
+}
 void CMyDialogEx::SetParameter(int id, bool bFlag)
 {
 	CButton *pButton=(CButton *)GetDlgItem(id);
@@ -126,6 +134,15 @@ void CMyDialogEx::GetParameter(int id, bool &bFlag)
 	    int ChkState=pButton->GetCheck();
 		bFlag = ChkState == BST_CHECKED;
 	}
+}
+bool CMyDialogEx::GetParameter(int id, CString& sText)
+{
+	CWnd* pWnd = GetDlgItem(id);
+	if (!pWnd)
+		return false;
+	
+	pWnd->GetWindowText(sText);
+	return true;
 }
 bool CMyDialogEx::IsChecked(int id)
 {
@@ -261,6 +278,25 @@ bool CMyDialogEx::SetAndEnable(int id, const wchar_t* zText)
 		return false;
 	pWnd->SetWindowText(zText);
 	pWnd->EnableWindow(true);
+	return true;
+}
+bool CMyDialogEx::SetInvisible(int id)
+{
+	CWnd* pWnd = GetDlgItem(id);
+	if (!pWnd)
+		return false;
+	pWnd->ShowWindow(SW_HIDE);
+	return true;
+}
+bool CMyDialogEx::SetVisible(int id, bool flag)
+{
+	if (!flag)
+		return SetInvisible(id);
+
+	CWnd* pWnd = GetDlgItem(id);
+	if (!pWnd)
+		return false;
+	pWnd->ShowWindow(SW_SHOW);
 	return true;
 }
 /*

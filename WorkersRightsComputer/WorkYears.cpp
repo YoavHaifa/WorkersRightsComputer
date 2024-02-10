@@ -2,6 +2,7 @@
 #include "WorkYears.h"
 #include "WorkYear.h"
 #include "WorkPeriod.h"
+#include "Config.h"
 #include "Utils.h"
 #include "Right.h"
 #include "UsedVacations.h"
@@ -18,7 +19,7 @@ void CWorkYears::Clear(void)
 {
 	mn = 0;
 }
-void CWorkYears::Compute(void)
+void CWorkYears::DivideWorkPeriodToWorkYears(void)
 {
 	mn = 0;
 	mnFullWorkYears = 0;
@@ -55,13 +56,13 @@ void CWorkYears::Compute(void)
 		{
 			mnDaysForSeveranceAddedForUnpaidVacations += maYears[i].GetUnpaidVacationCalendarDaysForSeverance();
 		}
-		mYearsForSeverance += (double)mnDaysForSeveranceAddedForUnpaidVacations / 365.0;
+		mYearsForSeverance += (double)mnDaysForSeveranceAddedForUnpaidVacations / gConfig.umnDaysInNormalYear;
 	}
 
 	double partYearThreshold = (double)N_MIN_MONTHS_FOR_SPECIAL_CASE / 12 - 0.002;
 	mbAllowPartYearSeverance = mYearsForSeverance >= partYearThreshold;
 
-	mnMonthsInLastYear = maYears[mn - 1].GetNFullMonths(&mnDaysInLastYear, &mDaysInLastYearAsFraction);
+	mnMonthsInLastYear = maYears[mn - 1].GetNFullMonths(&mnDaysInLastMonthOfLastYear, &mDaysInLastYearAsFraction);
 	ComputeWorkDays(); // WARNING: This procedure dont take into account vacations (as yet)!
 }
 CMyTime& CWorkYears::GetLastYearStart(void)
@@ -96,7 +97,7 @@ CString CWorkYears::PrepareSpanString(void)
 
 	sSpanString += CRight::ToString(mnMonthsInLastYear);
 	sSpanString += " months ";
-	sSpanString += CRight::ToString(mnDaysInLastYear);
+	sSpanString += CRight::ToString(mnDaysInLastMonthOfLastYear);
 	sSpanString += " days";
 
 	if (mnFullWorkYears < 1)
@@ -124,12 +125,12 @@ void CWorkYears::Log()
 		{
 			maYears[i].Log(pfLog);
 		}
-		fprintf(pfLog, "mnMonthsInLastYear    %d\n", mnMonthsInLastYear);
-		fprintf(pfLog, "mnDaysInLastYear      %d\n", mnDaysInLastYear);
-		fprintf(pfLog, "mDaysInLastAsFraction %.2f\n", mDaysInLastYearAsFraction);
-		fprintf(pfLog, "mnFullWorkYears       %d\n", mnFullWorkYears);
-		fprintf(pfLog, "mnWorkingDays         %d\n", mnWorkingDays);
-		fprintf(pfLog, "mYearsForSeverance    %.3f\n", mYearsForSeverance);
+		fprintf(pfLog, "mnMonthsInLastYear          %d\n", mnMonthsInLastYear);
+		fprintf(pfLog, "mnDaysInLastMonthOfLastYear %d\n", mnDaysInLastMonthOfLastYear);
+		fprintf(pfLog, "mDaysInLastMonthAsFraction  %.2f\n", mDaysInLastYearAsFraction);
+		fprintf(pfLog, "mnFullWorkYears             %d\n", mnFullWorkYears);
+		fprintf(pfLog, "mnWorkingDays               %d\n", mnWorkingDays);
+		fprintf(pfLog, "mYearsForSeverance          %.3f\n", mYearsForSeverance);
 	}
 	fclose(pfLog);
 }
@@ -159,4 +160,24 @@ bool CWorkYears::WorkedAtLeastNMonths(int nMonths)
 bool CWorkYears::LastYearDoContains(class CHoliday& holiday)
 {
 	return maYears[mn-1].Contains(holiday);
+}
+CWorkYear* CWorkYears::GetByReverseIndex(int iFromLast)
+{
+	if (iFromLast > mn - 1)
+		return NULL;
+	int i = mn - 1 - iFromLast;
+	if (i < 0)
+	{
+		CUtils::MessBox(L"<CWorkYears::GetByReverseIndex> index < 0", L"SW Error");
+		return NULL;
+	}
+	return &maYears[i];
+}
+bool CWorkYears::HasFullYearWithNotice(CMyTime& lastDayOfNotice)
+{
+	if (mn < 1)
+		return false;
+	if (mn > 1)
+		return true;
+	return maYears[0].HasFullYearUntil(lastDayOfNotice);
 }

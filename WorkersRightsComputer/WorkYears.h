@@ -6,7 +6,7 @@ class CWorkYears
 public:
 	CWorkYears(void);
 
-	void Compute(void);
+	void DivideWorkPeriodToWorkYears(void);
 	void Clear(void);
 	void Log();
 
@@ -16,10 +16,13 @@ public:
 	CString PrepareSpanString(void);
 	bool WorkedAtLeastNMonths(int nMonths);
 	bool LastYearDoContains(class CHoliday& holiday);
+	bool HasFullYearWithNotice(CMyTime &lastDayOfNotice);
+
+	CWorkYear * GetByReverseIndex(int iFromLast);
 
 	int mn;
 	int mnMonthsInLastYear;
-	int mnDaysInLastYear;
+	int mnDaysInLastMonthOfLastYear;
 	double mDaysInLastYearAsFraction;
 	int mnFullWorkYears;
 	int mnPrevYears;

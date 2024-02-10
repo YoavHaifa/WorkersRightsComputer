@@ -1,13 +1,5 @@
 #pragma once
 
-class CRightResult
-{
-public:
-	CRightResult(FILE* pf, const wchar_t* zName);
-	CRightResult(class CXMLParseNode* pNode);
-	CString msName;
-	double mDue;
-};
 
 class CHolidaysDef
 {
@@ -36,17 +28,19 @@ protected:
 	static bool umbDisplayDiff;
 
 	static DWORD WINAPI StaticVerifyBatch(LPVOID);
+	static void OpenBatchReport(const CString& sPath);
 
 	CString msfName;
-	virtual bool ReadSavedFile() = 0;
+	void IdentifyLegacyVersion(class CXMLParseNode* pRoot);
+	bool ReadSavedFile();
 	void ReadTime(FILE *pfRead, int i);
-	CList<CRightResult *, CRightResult *> mResults;
+	CList<class CRightResult *, class CRightResult *> mResults;
 	CList<CHolidaysDef *, CHolidaysDef *> mHolidaysDefs;
 	CList<CString *, CString *> mUsedHolidays;
 
 	int mnTimesDefined;
 	FILE *mpfLog;
-	int ReadResults(FILE *pfRead);
+	//int ReadResults(FILE *pfRead);
 	void Clear();
 	bool VerifyResults();
 	void ReadHolidaysDefinitions();
@@ -64,24 +58,4 @@ protected:
 	int mnMissing;
 	bool mbSilentMode;
 	void CheckIfNoticeSet();
-	static bool umbOldTxtFiles;
 };
-
-class CVerifyOld : public CVerify
-{
-public:
-	CVerifyOld(const wchar_t* zfName, bool bSilent = false);
-	~CVerifyOld();
-
-	virtual bool ReadSavedFile();
-};
-
-class CVerifyNew : public CVerify
-{
-public:
-	CVerifyNew(const wchar_t* zfName, bool bSilent = false);
-	~CVerifyNew();
-
-	virtual bool ReadSavedFile();
-};
-

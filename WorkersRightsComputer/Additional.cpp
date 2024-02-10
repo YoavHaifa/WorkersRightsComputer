@@ -28,18 +28,31 @@ bool CAdditional::SetEditRef(class CEditRef *pRef)
 }
 bool CAdditional::Compute(void)
 {
+	CString sDue;
+	bool bAdditionalSumDefined = GetInputNumber(mpDueBox, sDue, mDuePay);
+	if (mDuePay == 0)
+		bAdditionalSumDefined = false;
+
 	msToLetter = "";
 	CString sDesc;
 	mpDescBox->GetWindowTextW(sDesc);
+	if (sDesc.GetLength() < 2 && !bAdditionalSumDefined)
+	{
+		msDue += "No Description";
+		msDebug += "Assuming nothing additional, as no description found";
+		mDuePay = 0;
+		return true;
+	}
+
 	if (sDesc.GetLength() < 5)
 	{
 		msDue += "Missing Description";
 		msDebug += "Description of additional issue should be 5 characters at least";
+		mDuePay = 0;
 		return false;
 	}
-	
-	CString sDue;
-	if (!GetInputNumber(mpDueBox, sDue, mDuePay))
+
+	if (!bAdditionalSumDefined)
 	{
 		msDue += "No Paid Sum Defined";
 		msDebug += "No Paid Sum Defined";

@@ -4,6 +4,8 @@
 #include "Right.h"
 #include "WorkPeriod.h"
 #include "VacationUsed.h"
+#include "XmlDump.h"
+#include "XmlParse.h"
 
 CVacationTable gVacationTable;
 
@@ -11,22 +13,13 @@ CVacationTable::CVacationTable()
 	: mnVacationsComputed(0)
 	, mpfLog(0)
 {
-	if (InitFromFile())
-		PrintLog();
 }
-
-
 CVacationTable::~CVacationTable()
 {
 }
-bool CVacationTable::InitFromFile(void)
+bool CVacationTable::InitFromTextFile(void)
 {
-	// CString sDir = Directory::GetCurrentDirectory();
 	FILE* pfRead = CUtils::OpenInputFile(L"Vacation");
-
-	//CString sfName = L"..\\release\\Input\\Vacation.txt";
-
-	//FILE *pfRead = MyFOpenWithErrorBox(sfName, L"r", L"Vacation Data");
 	if (!pfRead)
 		return false;
 
@@ -59,16 +52,68 @@ bool CVacationTable::InitFromFile(void)
 
 		mn++;
 	}
+	PrintLog("FromText");
 	return true;
 }
-bool CVacationTable::PrintLog(void)
+void CVacationTable::SaveXmlFile(void)
+{
+	CString sDirName(CUtils::GetInputPath());
+	CXMLDump dump(sDirName, L"VacationBySeniority", L"YearlyRates");
+
+	for (int i = 0; i < mn; i++)
+	{
+		CXMLDumpScope scope(L"rate_start", dump);
+		dump.Write(L"n_years", map[i]->mYears);
+		dump.Write(L"from_year", map[i]->mFromYear);
+		dump.Write(L"from_month", map[i]->mFromMonth);
+		dump.Write(L"six_days", map[i]->m6);
+		dump.Write(L"five_days", map[i]->m5);
+	}
+}
+bool CVacationTable::InitFromXmlFile(void)
+{
+	mn = 0;
+
+	CString sfName(CUtils::GetInputPath());
+	sfName += L"VacationBySeniority";
+	sfName += L".YearlyRates.xml";
+	CXMLParse parse(sfName, true /*bUnicode*/);
+	CXMLParseNode* pRoot = parse.GetRoot();
+	if (!pRoot)
+	{
+		CUtils::MessBox(parse.GetName(), L"Missing Input File");
+		return false;
+	}
+
+	bool bOK = true;
+	CXMLParseNode* pStart = pRoot->GetFirst(L"rate_start");
+	while (pStart)
+	{
+		map[mn] = new CVacationVetek;
+		pStart->GetValue(L"n_years", map[mn]->mYears);
+		pStart->GetValue(L"from_year", map[mn]->mFromYear);
+		pStart->GetValue(L"from_month", map[mn]->mFromMonth);
+		pStart->GetValue(L"six_days", map[mn]->m6);
+		pStart->GetValue(L"five_days", map[mn]->m5);
+
+		mn++;
+		pStart = pRoot->GetNext(L"rate_start", pStart);
+	}
+	PrintLog("FromXml");
+	return true;
+}
+bool CVacationTable::PrintLog(const char* zAt)
 {
 	if (mn < 1)
 		return false;
 
-	FILE *pfLog = CUtils::OpenLogFile(L"Rates_VacationTable");
+	CString sfName(L"VacationTable_YearlyRates_");
+	sfName += zAt;
+	FILE *pfLog = CUtils::OpenLogFile(sfName);
 	if (!pfLog)
 		return false;
+
+	fprintf(pfLog, "Seniority, six, five, from year, month\n");
 
 	for (int i = 0; i < mn; i++)
 	{
@@ -89,6 +134,17 @@ bool CVacationTable::PrintLog(void)
 	}
 	fclose(pfLog);
 	return true;
+}
+double CVacationTable::GetNDaysPerYear(int seniority, double nDaysPerWeek)
+{
+	// Yoav writes in 23 September 2023:
+	// After 2017 there was no change in vacation days for seniority
+	// This allows use to compute due vacation by years instead of months
+	// It was required for easy addition of maternity leave on yearly basis
+	int year = 2020;
+	int month = 1;
+	double nDaysPerMonth = GetNDaysPerMonth(seniority,nDaysPerWeek, year, month);
+	return nDaysPerMonth * 12;
 }
 double CVacationTable::GetNDaysPerMonth(int seniority, double nDaysPerWeek, int year, int month)
 {
@@ -135,56 +191,54 @@ bool CVacationTable::StartComputingForUsedVacations()
 		return false;
 
 	mDueVacationLeft = 0;
-	mNextComputeFrom = gWorkPeriod.mFirst;
+	mNextMonthToComputeFrom = gWorkPeriod.mFirst;
 
 	return true;
 }
-
-
 bool CVacationTable::ComputeNextVacation(CVacationUsed &vacation)
 {
 	if (!gWorkPeriod.IsValid())
 	{
-		vacation.mnPaid = 0;
+		vacation.mnPaidDays = 0;
 		return false;
 	}
 
 	gWorkPeriod.Debug(L"CVacationTable::ComputeNextVacation");
 	mpfLog = CUtils::OpenLogFile(L"ComputeVacations", mnVacationsComputed > 0);
-	if (mpfLog && mnVacationsComputed == 0)
-	{
-		CString sPeriod = gWorkPeriod.GetShortSummary();
-		fwprintf(mpfLog, L"%s\n\n", (const wchar_t *)sPeriod);
-	}
+	if (mnVacationsComputed == 0)
+		gWorkPeriod.ShortLog(mpfLog);
 	if (mpfLog)
 	{ 
 		fprintf(mpfLog, "<ComputeNextVacation> %d\n", mnVacationsComputed);
 		vacation.ShortLog(mpfLog);
 	}
 
-	if (!mNextComputeFrom.IsOnPrevMonthsTo(vacation.mFirstDay))
+	if (!mNextMonthToComputeFrom.IsOnPrevMonthsTo(vacation.mFirstDay))
 	{
 		if (mpfLog)
 			fprintf(mpfLog, "No new month to compute vacation - due vacation %.2f", mDueVacationLeft);
 	}
 	else
 	{
+		// Compute due paid vacation 
 		gWorkPeriod.Debug(L"CVacationTable::ComputeNextVacation 1");
-		while (mNextComputeFrom.IsOnPrevMonthsTo(vacation.mFirstDay))
+		while (mNextMonthToComputeFrom.IsOnPrevMonthsTo(vacation.mFirstDay))
 		{
 			if (mpfLog)
-				fprintf(mpfLog, "%2d/%4d - ", mNextComputeFrom.mMonth, mNextComputeFrom.mYear);
-			CMonthInfo *pMonthInfo = gWorkPeriod.GetMonthInfoFor(mNextComputeFrom);
+				fprintf(mpfLog, "%2d/%4d - ", mNextMonthToComputeFrom.mMonth, mNextMonthToComputeFrom.mYear);
+			CMonthInfo *pMonthInfo = gWorkPeriod.GetMonthInfoFor(mNextMonthToComputeFrom);
 			double duePerMonth = GetNDaysPerMonth(pMonthInfo->mSeniorityMonths / 12,
-				gWorkPeriod.mnWorkDaysPerWeek, mNextComputeFrom.mYear, mNextComputeFrom.mMonth);
+				gWorkPeriod.mnWorkDaysPerWeek, mNextMonthToComputeFrom.mYear, mNextMonthToComputeFrom.mMonth);
 
 			gWorkPeriod.Debug(L"CVacationTable::ComputeNextVacation 3");
 			if (pMonthInfo->IsPartial())
 			{
-				double dueFrac = duePerMonth * pMonthInfo->mFraction;
+				double monthFraction = pMonthInfo->GetFraction();
+				double dueFrac = duePerMonth * monthFraction;
 				mDueVacationLeft += dueFrac;
 				if (mpfLog)
-					fprintf(mpfLog, "due %.2f * fraction %.2f --> %.2f --> %.2f\n", duePerMonth, pMonthInfo->mFraction, dueFrac, mDueVacationLeft);
+					fprintf(mpfLog, "due %.2f * fraction %.2f --> %.2f --> %.2f\n", 
+						duePerMonth, monthFraction, dueFrac, mDueVacationLeft);
 			}
 			else
 			{
@@ -193,23 +247,30 @@ bool CVacationTable::ComputeNextVacation(CVacationUsed &vacation)
 					fprintf(mpfLog, "due %.2f --> %.2f\n", duePerMonth, mDueVacationLeft);
 			}
 			gWorkPeriod.Debug(L"CVacationTable::ComputeNextVacation 5");
-			mNextComputeFrom.AddMonth();
+			mNextMonthToComputeFrom.AddMonth();
 		}
 	}
 	gWorkPeriod.Debug(L"CVacationTable::ComputeNextVacation 7");
-	if (mDueVacationLeft > vacation.mnWorkDays)
-		vacation.mnPaid = vacation.mnWorkDays;
-	else
-		vacation.SetPartiallyPaid((int)mDueVacationLeft);
+	if (!vacation.mbIsMaternityLeave)
+	{
+		if (mDueVacationLeft >= vacation.mnWorkDays)
+			vacation.mnPaidDays = vacation.mnWorkDays;
+		else
+			vacation.SetPartiallyPaid((int)mDueVacationLeft);
+
+		mDueVacationLeft -= vacation.mnPaidDays;
+	}
+	vacation.UpdateMonthlyInfo();
 
 	gWorkPeriod.Debug(L"CVacationTable::ComputeNextVacation 9");
-	mDueVacationLeft -= vacation.mnPaid;
 	vacation.LongLog(mpfLog);
-
 	mnVacationsComputed++;
-	fprintf(mpfLog, "Left Vacation %.2f\n", mDueVacationLeft);
-	fprintf(mpfLog, "\n");
-	fclose(mpfLog);
+	if (mpfLog)
+	{
+		fprintf(mpfLog, "Left Vacation %.2f\n", mDueVacationLeft);
+		fprintf(mpfLog, "\n");
+		fclose(mpfLog);
+	}
 	gWorkPeriod.Debug(L"CVacationTable::ComputeNextVacation END");
 	return true;
 }

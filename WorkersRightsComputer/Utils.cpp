@@ -5,6 +5,7 @@
 
 bool CUtils::umbCreateConsoleWindow = false;
 bool CUtils::umbInstallationError = false;
+CString CUtils::msApplicationPath;
 
 CUtils::CUtils(void)
 {
@@ -26,50 +27,39 @@ CString CUtils::GetBaseDir(void)
 		GetCurrentDirectory(255, zBuf);
 		usBaseDir = zBuf;
 		usBaseDir.Replace(L"WorkersRightsComputer\\WorkersRightsComputer", L"WorkersRightsComputer\\WorkersRights_v\\");
-		if (usBaseDir.Right(5) == L"Debug")
+		usBaseDir.Replace(L"WorkersRightsComputer\\x64\\Debug", L"WorkersRightsComputer\\WorkersRights_v\\");
+		usBaseDir.Replace(L"WorkersRightsComputer\\x64\\Release", L"WorkersRightsComputer\\WorkersRights_v\\");
+		if (usBaseDir.Right(5).MakeLower() == L"debug")
 			usBaseDir = usBaseDir.Left(usBaseDir.GetLength() - 5);
-		if (usBaseDir.Right(7) == L"Release")
+		if (usBaseDir.Right(7).MakeLower() == L"release")
 			usBaseDir = usBaseDir.Left(usBaseDir.GetLength() - 7);
 	}
 	return usBaseDir;
+}
+const CString& CUtils::GetInputPath()
+{
+	static CString usInputPath;
+
+	if (usInputPath.IsEmpty())
+	{
+		usInputPath = GetBaseDir();
+		usInputPath += "input\\";
+	}
+	return usInputPath;
 }
 FILE* CUtils::OpenInputFile(const wchar_t* zName)
 {
 	if (umbInstallationError)
 		return NULL;
 
-	static CString sInputPath;
-	if (sInputPath.IsEmpty())
-	{
-		sInputPath = GetBaseDir();
-		sInputPath += "input\\";
-	}
-	CString sfName = sInputPath + zName;
+	CString sfName(GetInputPath());
+	sfName += zName;
 	sfName += ".txt";
 	FILE* pf = MyFOpenWithErrorBox(sfName, L"r", L"Input");
 	if (!pf)
 		ReportInstallationError();
 	return pf;
 }
-/*
-FILE* CUtils::OpenLogFile(const char* zName)
-{
-	if (umbInstallationError)
-		return NULL;
-
-	static CString sLogPath;
-	if (sLogPath.IsEmpty())
-	{
-		sLogPath = GetBaseDir();
-		sLogPath += "Log\\";
-	}
-	CString sfName = sLogPath + zName;
-	sfName += ".log";
-	FILE* pf = MyFOpenWithErrorBox(sfName, L"r", L"Log");
-	if (!pf)
-		ReportInstallationError();
-	return pf;
-} */
 
 FILE * CUtils::TryOpenStreamReader(const wchar_t *zfName, const wchar_t *zDesc, bool bReportError)
 {
@@ -91,32 +81,6 @@ FILE * CUtils::TryOpenStreamWriter(const wchar_t *zfName, const wchar_t *zDesc, 
 		ReportFileOpenError(zfName, zDesc, false);
 	return pf;
 }
-/*
-FILE * CUtils::OpenInputFile(const wchar_t *zName, const wchar_t *zExtension)
-{
-	CString sfName(L".\\Input\\");
-	sfName += zName;
-	sfName += L".";
-	sfName += zExtension;
-	FILE *pf = TryOpenStreamReader(sfName,L"Input", false);
-	if (pf)
-		return pf;
-
-	sfName = L"..\\release\\Input\\";
-	sfName += zName;
-	sfName += L".";
-	sfName += zExtension;
-	return TryOpenStreamReader(sfName,L"Input");
-} */
-/*
-FILE * CUtils::OpenLetterInput(const wchar_t *zName, const wchar_t *zExtension)
-{
-	CString sfName = L"..\\release\\Input\\Letter\\";
-	sfName += zName;
-	sfName += L".";
-	sfName += zExtension;
-	return TryOpenStreamReader(sfName,L"Input");
-} */
 FILE * CUtils::OpenOutputFile(const wchar_t *zName, const wchar_t *zExtension)
 {
 	CString sfName(CRight::GetSaveDir());
@@ -160,14 +124,6 @@ FILE * CUtils::OpenSpecialLogFile(const wchar_t *zName)
 	sfName += L".log";
 	return TryOpenStreamWriter(sfName, L"log", false, false);
 }
-/*
-FILE * CUtils::OpenSaveFileRead(const wchar_t *zName)
-{
-	CString sfName = L"..\\release\\Save\\";
-	sfName += zName;
-	sfName += L".txt";
-	return TryOpenStreamReader(sfName, L"read saved");
-} */
 void CUtils::ReportFileOpenError(const wchar_t *zfName, const wchar_t *zDesc, bool bRead)
 {
 	static int nErr = 0;
@@ -480,7 +436,7 @@ void CUtils::DisplayLastError(const wchar_t *zErrorDesc)
 }
 CString CUtils::GetApplicationPath(void)
 {
-	return CString(L"ApplicationPath");
+	return msApplicationPath;
 }
 bool CUtils::CreateThread(DWORD(WINAPI startFunc)(LPVOID), LPVOID lpParameter, HANDLE *pohThread)
 {
@@ -573,4 +529,76 @@ bool CUtils::CreateProcess(const wchar_t * zProgram, const wchar_t * zParameters
 void CUtils::OpenTextFile(const wchar_t * zfName)
 {
 	CUtils::CreateProcess(L"notepad", zfName);
+}
+bool CUtils::ReadCommandLine(const CString& sCommand, CString& osfName)
+{
+	CString msAppFile;
+	CString sRest = sCommand;
+	if (!ReadFileNameFromCommandLine(sRest, msAppFile, sRest))
+		return false;
+
+	msApplicationPath = CFileName::GetPath(msAppFile);
+	SetCurrentDirectory(msApplicationPath);
+	CString sBaseDir = GetBaseDir();
+
+	if (!ReadFileNameFromCommandLine(sRest, osfName, sRest))
+		return false;
+	if (!CFileName::StaticIsOfType(osfName, L"xml"))
+	{
+		MessBox(osfName, L"Workers Rights Computer can open only ""xml"" files");
+		exit(1);
+	}
+	return (!osfName.IsEmpty());
+}
+static int GetMinFind(int i1, int i2)
+{
+	if (i1 < 0)
+		return i2;
+	if (i2 < 0)
+		return i1;
+	return min(i1, i2);
+}
+bool CUtils::ReadFileNameFromCommandLine(const CString& sCommand, CString& osfName, CString& osRest)
+{
+	unsigned char quot2 = (unsigned char)0x93;
+	unsigned char quot3 = (unsigned char)0x94;
+	CString sRest(sCommand);
+
+	while (!sRest.IsEmpty())
+	{
+		unsigned char first = (unsigned char)sRest[0];
+		if (first == ' ' || first == '\t' || first == '\n')
+			sRest = sRest.Right(sRest.GetLength() - 1);
+		else if (first == '"' || first == quot2)
+		{
+			sRest = sRest.Right(sRest.GetLength() - 1);
+			int iAfter = sRest.Find('"');
+			iAfter = GetMinFind(iAfter, sRest.Find(quot2));
+			iAfter = GetMinFind(iAfter, sRest.Find(quot3));
+
+			CString sTry = sRest.Left(iAfter);
+			sRest = sRest.Right(sRest.GetLength() - iAfter - 1);
+			if (CFileName::Exist(sTry))
+			{
+				osfName = sTry;
+				osRest = sRest;
+				return true;
+			}
+		}
+		else // Any other first character
+		{
+			int iAfter = sRest.Find(' ');
+			if (iAfter < 1)
+				iAfter = sRest.GetLength();
+			CString sTry = sRest.Left(iAfter);
+			sRest = sRest.Right(sRest.GetLength() - iAfter);
+			if (CFileName::Exist(sTry))
+			{
+				osfName = sTry;
+				osRest = sRest;
+				return true;
+			}
+		}
+	}
+	return false;
 }

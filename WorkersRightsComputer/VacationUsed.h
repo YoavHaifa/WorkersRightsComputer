@@ -1,28 +1,28 @@
 #pragma once
-#include "MyTime.h"
+#include "DaysSpan.h"
 
-class CVacationUsed
+class CVacationUsed : public CDaysSpan
 {
 public:
-	CVacationUsed(CMyTime firstDay, CMyTime lastDay);
+	CVacationUsed(CMyTime &firstDay, CMyTime &lastDay);
 	~CVacationUsed();
 
-	CMyTime mFirstDay;
-	CMyTime mFirstDayUnpaid;
-	CMyTime mLastDay;
-	CString GetText();
-	int mnDays;
-	int mnWorkDays;
-	void Compute();
-	int mnPaid;
-	int mnUnPaid;
-	int mnUnpaidCalendarDays;
+	virtual void SaveToXml(class CXMLDump& xmlDump);
+	virtual CString GetText();
+	virtual void ShortLog(FILE* pf, bool bNewLine = true);
+	virtual void LongLog(FILE* pf);
+
+	bool mbIsMaternityLeave;
+
+	CDaysSpan mUnpaidSpan;
+	int mnPaidDays;
+	int mnUnPaidWorkDays;
 	int mnUnpaidUsedForSeverance;
-	void ShortLog(FILE *pf);
-	void LongLog(FILE *pf);
 	void SetPartiallyPaid(int nPaidDays);
 
+	void FindUnpaidSpan();
 	int CountDaysOfUnpaidVacation(CMyTime& first, CMyTime& last);
-	void AddToWorkSpan(class CWorkSpan& workSpan);
+	virtual void AddToWorkSpan(class CWorkSpan& workSpan);
+	virtual void UpdateMonthlyInfo();
 };
 

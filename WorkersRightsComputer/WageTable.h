@@ -18,17 +18,17 @@ public:
 	CWageTable();
 
 	void Clear();
-	bool IsValid(void);
+	bool IsValid();
 	bool Prepare(const wchar_t* zAt);
 	void Log(const wchar_t* zAt);
 
-	double PayPerMonthAtWorkEnd(void);
-	double PayPerDayAtWorkEnd(void);
-	double ComputeMonthlyPay(int year, int month);
-	double ComputeHolidayPrice(int year, int month);
+	double PayPerMonthAtWorkEnd();
+	double PayPerDayAtWorkEnd();
+	double ComputeMonthlyPay(const class CMyTime &date);
+	double ComputeHolidayPrice(const class CMyTime& date);
 
 private:
-	double ComputeHolidayPriceBaseWage(int year, int month);
+	double ComputeHolidayPriceBaseWage(const class CMyTime& date);
 
 	int mn;
 	static const int YEAR0 = 1950;

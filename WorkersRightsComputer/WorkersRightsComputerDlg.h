@@ -17,8 +17,9 @@ public:
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_WORKERSRIGHTSCOMPUTER_DIALOG };
 #endif
+	CString msStartFile;
 
-	protected:
+protected:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV support
 
 
@@ -41,6 +42,8 @@ public:
 	afx_msg void OnBnClickedButtonSave();
 	afx_msg void OnBnClickedButtonLoad();
 	bool VerifyThatNotInSave();
+	void OnLoad();
+
 	CEdit mEditFirstName;
 	CEdit mEditFamilyName;
 	CEdit mEditID;
@@ -48,20 +51,21 @@ public:
 	CEdit mEditLastYearWork;
 	CEdit mEditLastYearPaid;
 	CEdit mEditLastYearFrom;
-	CEdit mEditPrevYearWork;
-	CEdit mEditPrevYearPaid;
-	CEdit mEditPrevYearFrom;
+	//CEdit mEditPrevYearWork;
+	//CEdit mEditPrevYearPaid;
+	//CEdit mEditPrevYearFrom;
 	CEdit mEditAdditionalDesc;
 	CEdit mEditAdditionalSum;
 	CEdit mEditPaidDesc;
 	CEdit mEditPaidSum;
 	CEdit mEditVacationPrevYears;
 	CEdit mEditRecuperationPrevYears;
+	CEdit mEditNDaysPaidLastYear;
 
 	CList<CEditRef *, CEditRef *> mEditBoxes;
 	CComboBox mComboHolidays;
 	afx_msg void OnBnClickedButtonReset();
-	void ResetAllInputs(void);
+	void ResetAllInputs(bool bLoading);
 
 	CButton mAllowSevLess;
 	CButton mDemandVac4Prev;
@@ -87,11 +91,15 @@ public:
 	afx_msg void OnFileLoad();
 
 	afx_msg void OnTestCreatedir();
-	afx_msg void OnFileLoadoldcase();
+	//afx_msg void OnFileLoadoldcase();
 	void OnInputChange();
+	void OnInputChange(bool bJustLoaded);
+	void OnRadioPaidVacationForLastYearChange();
 	bool mbDisableComputations;
 	bool mbSaveInProcess;
-	CEdit mEditPrevNYears;
+	bool mbSaveFailed;
+
+	//CEdit mEditPrevNYears;
 	static DWORD WINAPI StaticThreadFunc(LPVOID);
 	afx_msg void OnTestVerifybatch();
 	afx_msg void OnTestWritehtml();
@@ -100,6 +108,7 @@ public:
 	CButton mRadiID;
 	CButton mRadioPassport;
 	CEdit mFilledBy;
+	CEdit mFilledByHebrew;
 	CEdit mAddress;
 	CEdit mEmail;
 	void SaveToXml(class CXMLDump& xmlDump);
@@ -108,12 +117,19 @@ public:
 	void WriteEditorToLetter(class CHtmlWriter& html);
 	afx_msg void OnTestLoadtxt();
 	// Allows user to set special rate per holidays
-	CEdit mEditPayPerEachHolyDay;
-	CButton mVacationPaid4LastYear;
+	// CEdit mEditPayPerEachHolyDay;
+	CButton mVacationPaidAll4LastYear;
+	CButton mVacationPaidDays4LastYear;
+	CButton mVacationPaidNone4LastYear;
 	CButton mRecuperationPaid4LastYear;
-	afx_msg void OnBnClickedCheckPaidVacation();
-	afx_msg void OnBnClickedCheckPaidRecup();
+	//afx_msg void OnBnClickedCheckPaidVacation();
+	//afx_msg void OnBnClickedCheckPaidRecup();
 	afx_msg void OnBnClickedCheckLiveIn();
+	afx_msg void OnBnClickedButtonPrevYearsHolidays();
+	afx_msg void OnBnClickedCheckCaregiver();
+	afx_msg void OnBnClickedButtonVacationsPrevYears();
+	afx_msg void OnEnChangeEditVacationYears();
+	afx_msg void OnEnChangeEditRecuperationYears();
 };
 
 extern CWorkersRightsComputerDlg *gpDlg;

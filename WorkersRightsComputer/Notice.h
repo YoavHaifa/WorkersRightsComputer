@@ -6,20 +6,29 @@
 class CNotice : public CRight
 {
 public:
-	CNotice(void);
-	virtual ~CNotice(void);
-	virtual bool Compute(void) override;
-	virtual CString GetDecriptionForLetter(void)override;
-	virtual CString GetDecriptionForLetterHebrew(void)override;
+	CNotice();
+	virtual ~CNotice();
+	virtual bool Compute() override;
+	virtual CString GetDecriptionForLetter()override;
+	virtual CString GetDecriptionForLetterHebrew()override;
 
-	bool mbDemandFullMonthAnyway;
+	bool ComputeDemandFullMonth();
+	bool ComputeForLessThanAYear();
+	void CheckForPaidDaysAfterNotice();
+	void CountWorkDaysToPay();
+
 	bool mbDemandFullMonth;
 	double mDueNoticeDays;
 
-	double mDueWorkDayToPay;
+	double mDueWorkDaysToPay;
 	double mPayPerDay;
 
 	int mnDaysPaidAfterNotice;
 	CMyTime mLastDayOfNotice;
+	bool mbAvoidRoundingLastHalfDay;
+
+	double mFamilyRatio;
+	CString msFamilyRatio;
+	static const int umn3MonthsForFamilyPart = 3;
 };
 

@@ -8,7 +8,8 @@ public:
 	CMyTime(int year, int month, int day);
 	~CMyTime();
 
-	void SetNow(void);
+	bool IsValid();
+	void SetNow();
 	void Set(CTime time);
 	void SetDate(CTime time);
 	void Set(int year, int month, int day);
@@ -19,11 +20,12 @@ public:
 	void WriteInLine(FILE* pf);
 	void Log(FILE* pf);
 	void LogLine(FILE* pf, const wchar_t*zText);
-	void Reset(void);
+	void Reset();
 	bool operator > (CMyTime &other);
 	bool operator < (CMyTime &other);
 	bool operator <= (CMyTime &other);
-	bool operator >= (CMyTime &other);
+	bool operator >= (CMyTime& other);
+	bool operator == (CMyTime& other);
 	CMyTime & operator = (CTime &time);
 
 	CTime mTime;
@@ -33,26 +35,31 @@ public:
 	int mHour; // Just for debug - should be always 0!
 	int mDayOfWeek;
 	void AddYears(int n);
-	void AddMonth(void);
+	void AddMonth();
 	void AddMonths(int n);
 	void AddMonths(CMyTime &oldTime, int n);
 	void AddDays(int n);
-	void SubDay(void);
-	void AddDay(void);
-	CMyTime NextDay(void);
-	CMyTime PrevDay(void);
+	void SubDay();
+	void AddDay();
+	CMyTime NextDay();
+	CMyTime PrevDay();
+	CMyTime NextMonth();
+	CMyTime FirstDayOfMonth()const;
+	CMyTime LastDayOfMonth()const;
 	CTimeSpan Subtract(CMyTime &other);
-	CString ToString(void);
-	CString ToMonthString(void);
-	CString ToHebrewString(void);
+	CString ToString();
+	CString ToMonthString();
+	CString ToHebrewString();
 	bool mbInitialized;
 	CString GetShortString();
-	int GetNMonthsBefore(CMyTime& dayAfter, int *pnExtraDays = NULL);
+	int GetNMonthsUntil(CMyTime& lastDay, int* pnExtraDays = NULL);
+	int GetNMonthsBefore(CMyTime& dayAfter, int* pnExtraDays = NULL);
+	double GetNWeeksUntil(CMyTime& lastDay);
 	int GetNDaysUntil(CMyTime& lastDay);
 	int GetNDaysBefore(CMyTime& dayAfter);
 	bool IsWorkingDay();
-	double AdvanceToNextMonth(void);
-	void ToPrevMonth(void);
+	double AdvanceToNextMonth();
+	void ToPrevMonth();
 	bool IsOnPrevMonthsTo(CMyTime &time);
 	bool MonthContains(CMyTime date);
 	void SetClearDate();

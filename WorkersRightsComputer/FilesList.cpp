@@ -307,6 +307,25 @@ int CFilesList::PurgeNonDir(void)
 	}
 	return (int)mList.GetSize();
 }
+bool CFilesList::Find(const wchar_t* zwText, CString& osfName)
+{
+	CString sToFind(zwText);
+	sToFind.MakeLower();
+
+	POSITION pos = mList.GetHeadPosition();
+	while (pos)
+	{
+		CString* psfName = mList.GetNext(pos);
+		CString sfName(*psfName);
+		sfName.MakeLower();
+		if (sfName.Find(sToFind) >= 0)
+		{
+			osfName = *psfName;
+			return true;
+		}
+	}
+	return false;
+}
 CString CFilesList::GetBiggest(void)
 {
 	if (mList.GetSize() != mFactorsList.GetSize())

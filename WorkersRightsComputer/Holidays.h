@@ -1,8 +1,9 @@
 #pragma once
 
 #include "right.h"
+#include "MyTime.h"
 
-class CHoliday
+class CHoliday : public CMyTime
 {
 public:
 	CHoliday(const wchar_t *zName)
@@ -12,9 +13,6 @@ public:
 	{
 	}
 	CString msName;
-	int mYear;
-	int mMonth;
-	int mDay;
 	bool mbAllYears;
 	bool mbInLastYear;
 	bool mbInLastYearPaySum;
@@ -28,17 +26,22 @@ public:
 	CHolidays(void);
 	bool IsValid(void) {return mbValid;}
 	virtual	bool SetEditRef(class CEditRef *pRef) override;
+	bool InitDefinition();
 	virtual bool Compute(void) override;
 	virtual CString GetDecriptionForLetter(void)override;
 	virtual CString GetDecriptionForLetterHebrew(void)override;
 
-	bool InitFromFile(const wchar_t *zfName);
-	bool InitFromFileInternals(FILE *pfRead, FILE *pfLog);
 	void PrintLog();
 	int NInLastYear(void);
+	CString GetSelection() { return msSelection; }
+	bool Is(const CString &sSelection) { return msSelection == sSelection; }
 
 	static const int MAX_HOLIDAYS_PER_YEAR = 9;
-	static const int MAX_HOLIDAYS_DEFINED = 200;
+	static const int MAX_HOLIDAYS_DEFINED = 300;
+
+private:
+	bool InitFromFile(const wchar_t *zfName);
+	bool InitFromFileInternals(FILE *pfRead, FILE *pfLog);
 
 	bool mbValid;
 
@@ -50,28 +53,26 @@ public:
 	CEdit *mpNDaysPaidPrevYearsBox;
 	CEdit *mpPrevYearsFromBox;
 	CEdit* mpPrevNYearsBox;
-	CEdit* mpPayRatePerHolidayBox;
 
 	int mn;
 	CString msfName;
 	CHoliday *map[MAX_HOLIDAYS_DEFINED];
-	int mnWorkedLastYear;
-	int mnPaidLastYear;
 	int mnInLastYear;
 
 	double mnDaysToPay;
 	double mMinPayPerDay;
 	double mMaxPayPerDay;
-	double mRateSetByUser;
+	bool mbCheckForWorkedHolodays;
+
 	void RememberPayParDay(double value);
 	bool ComputeHolidayPrice(class CHoliday& holiday);
 
-	void ComputePayLastYear(void);
-	void ComputePayPrevYears(void);
+	void ComputePayLastYear();
+	void ComputePayPrevYears();
+	int AddPay4PrevYear(int i);
+	int GetNWorkedHolidays(class CWorkYear* pYear);
 
 	void AddToDebug(int i, bool bPrice);
-	void SetNPaidLastYear(int nPaid){mnPaidLastYear = nPaid;}
-	void SetNWorkedLastYear(int nWorked){mnWorkedLastYear = nWorked;}
 	CString msSelection;
 };
 

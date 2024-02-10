@@ -2,6 +2,7 @@
 #include "YearlyRates.h"
 #include "Utils.h"
 #include "Right.h"
+#include "XMLDump.h"
 
 CYearlyRates::CYearlyRates(const wchar_t *zName, int firstYear)
 	: msName(zName)
@@ -13,7 +14,7 @@ CYearlyRates::CYearlyRates(const wchar_t *zName, int firstYear)
 		ma[i] = 0;
 		mabDefined[i] = false;
 	}
-	InitFromFile();
+	InitFromTextFile();
 	PrintLog();
 }
 double CYearlyRates::RatePerYear(int year)
@@ -45,14 +46,8 @@ bool CYearlyRates::PrintLog(void)
 	fclose(pfWrite);
 	return true;
 }
-bool CYearlyRates::InitFromFile(void)
+bool CYearlyRates::InitFromTextFile(void)
 {
-	/*
-	CString sfName = L"..\\release\\Input\\Rates";
-	sfName += msName;
-	sfName += L".txt";
-
-	FILE *pfRead = MyFOpenWithErrorBox(sfName, L"r", L"rates input"); */
 	CString sfName = L"Rates";
 	sfName += msName;
 	FILE* pfRead = CUtils::OpenInputFile(sfName);
@@ -65,14 +60,16 @@ bool CYearlyRates::InitFromFile(void)
 		mabDefined[i] = false;
 	}
 
+	mnDefs = 0;
 	int iLastYear = 0;
 	double iLastValue = 0;
 	CString sLine = CUtils::ReadLine(pfRead);
 	while (sLine.Left(3) != L"end")
 	{
 		int year = _wtoi(sLine);
-		year -= mFirstYear;
-		if (year < 0)
+		maDefYear[mnDefs] = year;
+		int iYear = year - mFirstYear;
+		if (iYear < 0)
 		{
 			CUtils::MessBox(L"Rate Year Too Early", L"Input Error");
 			break;
@@ -82,19 +79,21 @@ bool CYearlyRates::InitFromFile(void)
 		if (sLine.Left(3) == L"end")
 			break;
 		double value = _wtof(sLine);
+		maDefRate[mnDefs] = value;
 		
-		if (year < MAX_RATES)
+		if (iYear < MAX_RATES)
 		{
-			for (int iFill = year; iFill >= 0 && !mabDefined[iFill]; iFill--)
+			for (int iFill = iYear; iFill >= 0 && !mabDefined[iFill]; iFill--)
 			{
 				ma[iFill] = value;
 			}
-			mabDefined[year] = true;
-			if (year > iLastYear)
+			mabDefined[iYear] = true;
+			if (iYear > iLastYear)
 			{
-				iLastYear = year;
+				iLastYear = iYear;
 				iLastValue = value;
 			}
+			mnDefs++;
 		}
 		sLine = CUtils::ReadLine(pfRead);
 	}
@@ -107,4 +106,17 @@ bool CYearlyRates::InitFromFile(void)
 	}
 	mbValid = true;
 	return true;
+}
+void CYearlyRates::SaveMonthlyXmlFile(void)
+{
+	CString sDirName(CUtils::GetInputPath());
+	CXMLDump dump(sDirName, msName, L"MonthlyRates");
+
+	for (int i = 0; i < mnDefs; i++)
+	{
+		CXMLDumpScope scope(L"rate_start", dump);
+		dump.Write(L"year", maDefYear[i]);
+		dump.Write(L"month", 1);
+		dump.Write(L"rate", maDefRate[i]);
+	}
 }
