@@ -219,7 +219,7 @@ bool CPension::DoCompute()
 	mReport.Clear();
 
 	if (!CheckForDateToStartPension())
-		return false;
+		return true; // Period too short for any payment
 
 	// Compute first part-month
 	bool bFirstIsLast = false;
@@ -233,7 +233,7 @@ bool CPension::DoCompute()
 		{
 			msDue += L"Period Too Short";
 			msDebug += L"Too short for pension pay";
-			return false;
+			return true;
 		}
 	}
 	PensionAddMonth(mStartDateForPension, nDaysInFirstMonth, true);
