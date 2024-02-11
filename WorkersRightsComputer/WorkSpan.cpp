@@ -59,7 +59,7 @@ bool CWorkSpan::ClipByWorkPeriod()
 	if (CDaysSpan::ClipByWorkPeriodEnd())
 	{
 		if (mpfLog)
-			mLastDay.LogLine(mpfLog, L"CLIP LAST YEAR: last day %s");
+			mLastDay.LogLine(mpfLog, L"CLIP THIS YEAR: last day %s");
 		mbLast = true;
 		return true;
 	}

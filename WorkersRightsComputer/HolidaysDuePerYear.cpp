@@ -80,7 +80,7 @@ void CHolidaysDuePerYear::Init(CWorkYear* pWorkYear)
 	// Update Period
 	CString s;
 	if (mId == 0)
-		s = "Last Year: ";
+		s = "This Year: ";
 	else
 		s.Format(L"Prev Year %d: ", mId);
 	s += pWorkYear->mFirstDay.ToHebrewString();

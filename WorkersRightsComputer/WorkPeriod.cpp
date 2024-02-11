@@ -11,6 +11,7 @@
 #include "WorkYears.h"
 #include "Wage.h"
 #include "HolidaysDue.h"
+#include "VacationDaysDue.h"
 
 CWorkPeriod gWorkPeriod;
 
@@ -329,6 +330,7 @@ void CWorkPeriod::LoadFromXml(class CXMLParseNode* pRoot)
 	Compute(L"LoadFromXml1");
 
 	gHolidaysDue.LoadFromXml(pWorkPeriodNode, pRoot);
+	gVacationDaysDue.LoadFromXml(pRoot);
 
 	Compute(L"LoadFromXml2");
 }

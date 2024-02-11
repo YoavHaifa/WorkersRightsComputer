@@ -442,7 +442,7 @@ bool CVerify::ReadCurrentHolidaysNames(void)
 			;
 		else if (sLine.Left(2) == L"n ")
 			;
-		else if (sLine.Left(13) == L"Pay Last Year")
+		else if (sLine.Left(13) == L"Pay This Year")
 			break;
 		else if (sLine.Left(19) == L"ComputePayPrevYears")
 			break;

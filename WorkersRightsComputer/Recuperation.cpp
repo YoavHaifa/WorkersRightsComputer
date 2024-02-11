@@ -98,17 +98,17 @@ bool CRecuperation::Compute(void)
 
 	double lastYearFraction = 0;
 	if (mpbPaid4LastYear->IsChecked())
-		LogLine(L"Last Year Recuperation Paid");
+		LogLine(L"This Year Recuperation Paid");
 	else
 	{
 		lastYearFraction = gWorkYears.GetLastYearAsFraction();
-		LogLine(L"Last Year Fraction", lastYearFraction, 3);
-		LogLine(L"Last Year Seniority", gWorkYears.mn);
+		LogLine(L"This Year Fraction", lastYearFraction, 3);
+		LogLine(L"This Year Seniority", gWorkYears.mn);
 
 		int intDaysPerYear = mpSeniority->ma[gWorkYears.mn];
 		LogLine(L"Days per year", intDaysPerYear);
 		mDueDays = lastYearFraction * intDaysPerYear;
-		LogLine(L"N Due Days for last year", mDueDays, 3);
+		LogLine(L"N Due Days for this year", mDueDays, 3);
 
 		//int rateYear = gWorkPeriod.mLast.mYear;
 		//if(gWorkPeriod.mLast.mMonth < MONTH_OF_NEW_RATE)
@@ -143,7 +143,7 @@ bool CRecuperation::Compute(void)
 	mbValid = true;
 
 	if (mpbPaid4LastYear->IsChecked())
-		msDebug += L"Last Year Recuperation Paid";
+		msDebug += L"This Year Recuperation Paid";
 	else
 	{
 		msDebug += L" partYear ";

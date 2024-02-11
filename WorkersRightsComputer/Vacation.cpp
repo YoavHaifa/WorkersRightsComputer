@@ -147,7 +147,7 @@ bool CVacation::ComputeByShortRule()
 	LogLine(L"Short period: n working days", gWorkYears.mnWorkingDays);
 	LogLine(L"pay per day", mPayPerDay);
 	LogLine(L"per cent", SHORT_RULE_PER_CENT);
-	msDue += L"(Short period last year) ";
+	msDue += L"(Short period this year) ";
 	msDesc += L"Short Period: ";
 	msDescHebrew += L"תקופה קצרה: ";
 	msDesc += ToString(gWorkYears.mnWorkingDays);
@@ -180,7 +180,7 @@ bool CVacation::ComputeInternals()
 	mnYearsForVacation = mnYearsOfUnpaidVacation;
 	LogLine(L"N Previous Years for vacation", mnYearsForVacation);
 	
-	// Add last year
+	// Add this year
 	mnMonthsForVacation = mnYearsForVacation * 12 + gWorkYears.mnMonthsInLastYear;
 	mnSeniority++;
 	LogLine(L"N months for vacation", mnMonthsForVacation);
@@ -226,7 +226,7 @@ void CVacation::ComputeBackByYears()
 	mnYearsForVacation = mnYearsOfUnpaidVacation + 1;
 	LogLine(L"n years for vacation", mnYearsForVacation);
 
-	// Compute last year first
+	// Compute this year first
 	mnDueDays = 0;
 	for (int iFromLast = 0; iFromLast < mnYearsForVacation; iFromLast++)
 	{

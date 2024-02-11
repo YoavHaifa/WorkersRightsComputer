@@ -10,7 +10,7 @@ public:
 
 	CWorkYear* mpPrev;
 	int mSeniority;
-	double mFraction; // Only the last year may be < 1
+	double mFraction; // Only the last (this) year may be < 1
 	int mnUnpaidVacationCalendarDaysForSeverance;
 	static const int MIN_MONTHS_FOR_UNPAID_VACATION_DAYS_FOR_SEVERANCE = 10;
 	static const int MAX_14_UNPAID_VACATION_DAYS_FOR_SEVERANCE = 14;

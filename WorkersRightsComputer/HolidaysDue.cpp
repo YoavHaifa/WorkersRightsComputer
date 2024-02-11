@@ -45,7 +45,7 @@ CHolidaysDue::CHolidaysDue()
 		IDC_EDIT_HOLIDAYS_PREVY_WORK7, IDC_EDIT_HOLIDAYS_PREVY_PAID7, 
 		IDC_EDIT_HOLIDAYS_PREVY_FROM7, IDC_EDIT_HOLIDAYS_PREVY_DUE7));
 
-	mpLastYear = mHolidaysPerYears.GetHead();
+	mpThisYear = mHolidaysPerYears.GetHead();
 
 	maMainDlgFields[0] = IDC_STATIC_HOLIDAY_LAST;
 	maMainDlgFields[1] = IDC_EDIT_HOLIDAYS_PREVY_WORK;
@@ -78,13 +78,13 @@ void CHolidaysDue::UpdateMainDialog()
 	}
 
 	// Set content to relevant fields
-	mpLastYear->UpdateGui(gpDlg);
+	mpThisYear->UpdateGui(gpDlg);
 	UpdateSum();
 	mSumPrev.UpdateShortText(gpDlg, IDC_STATIC_HOLIDAY_PREVS);
 }
 void CHolidaysDue::OnMainDialogChange(CMyDialogEx* pMainDlg)
 {
-	mpLastYear->OnGuiChange(pMainDlg);
+	mpThisYear->OnGuiChange(pMainDlg);
 }
 void CHolidaysDue::Reset()
 {
@@ -116,10 +116,7 @@ void CHolidaysDue::SetWorkPeriod()
 			mbPeriodAndHolidaysDefined = true;
 		}
 	}
-}
-void CHolidaysDue::SetSavedWorkPeriod()
-{
-	SetWorkPeriod();
+
 	SetYearsByWorkPeriod();
 }
 bool CHolidaysDue::VerifyWorkPeriod(CMyDialogEx* pMainDlg)
@@ -149,7 +146,6 @@ bool CHolidaysDue::VerifyWorkPeriod(CMyDialogEx* pMainDlg)
 
 	Reset();
 	SetWorkPeriod();
-	SetYearsByWorkPeriod();
 	UpdateMainDialog();
 	return true; // Changed
 }
@@ -172,12 +168,12 @@ void CHolidaysDue::SetYearsByWorkPeriod()
 		iFromLast++;
 	}
 
-	// Init number of holidays in last year
+	// Init number of holidays in this year
 	CHolidays* pHolidays = gAllRights.GetHolidays();
 	if (!pHolidays)
 		return;
 	int nInLast = pHolidays->NInLastYear();
-	mpLastYear->SetNInYear(nInLast);
+	mpThisYear->SetNInYear(nInLast);
 
 	mSum.mbRelevant = true;
 	mSumPrev.mbRelevant = mn > 1;
@@ -245,7 +241,7 @@ void CHolidaysDue::SaveToXml(CXMLDump& xmlDump)
 }
 void CHolidaysDue::LoadFromXml(CXMLParseNode* pWorkPeriod, CXMLParseNode* pRoot)
 {
-	SetSavedWorkPeriod();
+	SetWorkPeriod();
 
 	CXMLParseNode* pHolidaysDueNode = pWorkPeriod->GetFirst(L"HolidaysDue");
 	if (!pHolidaysDueNode)
@@ -275,12 +271,12 @@ void CHolidaysDue::LoadFromOldXml(CXMLParseNode* pRoot)
 	if (!pMainDlgNode)
 		return;
 
-	// Init last year
+	// Init this year
 	int nLastWorked = 0;
 	int nLastPaid = 0;
 	pMainDlgNode->GetValue(L"LastYearWork", nLastWorked);
 	pMainDlgNode->GetValue(L"LastYearPaid", nLastPaid);
-	mpLastYear->SetValues(nLastWorked, nLastPaid);
+	mpThisYear->SetValues(nLastWorked, nLastPaid);
 
 	// Init previous years
 	int nPrevWorked = 0;
@@ -297,7 +293,7 @@ void CHolidaysDue::LoadFromOldXml(CXMLParseNode* pRoot)
 	}
 
 	POSITION pos = mHolidaysPerYears.GetHeadPosition();
-	mHolidaysPerYears.GetNext(pos); // Skip first (which is "last year")
+	mHolidaysPerYears.GetNext(pos); // Skip first (which is "this year")
 	while (pos && nPrevYears > 0)
 	{
 		CHolidaysDuePerYear* pYear = mHolidaysPerYears.GetNext(pos);
@@ -307,13 +303,13 @@ void CHolidaysDue::LoadFromOldXml(CXMLParseNode* pRoot)
 }
 int CHolidaysDue::GetNDueLastYear()
 {
-	if (!mpLastYear)
+	if (!mpThisYear)
 	{
-		CUtils::MessBox(L"<CHolidaysDue::GetNDueLastYear> mpLastYear is NULL", L"SW Error");
+		CUtils::MessBox(L"<CHolidaysDue::GetNDueLastYear> mpThisYear is NULL", L"SW Error");
 		return 0;
 	}
 
-	return mpLastYear->GetDue();
+	return mpThisYear->GetDue();
 }
 int CHolidaysDue::GetNPrevYears()
 {

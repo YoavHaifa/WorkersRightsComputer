@@ -10,7 +10,6 @@ public:
 
 	void Reset();
 	bool VerifyWorkPeriod(class CMyDialogEx* pMainDlg);
-	void SetSavedWorkPeriod();
 	void SetWorkPeriod();
 	void InitDialog(CMyDialogEx* pDlg);
 	void OnGuiChange(int iYear, CMyDialogEx* pDlg);
@@ -43,7 +42,7 @@ private:
 	CList <class CHolidaysDuePerYear*, CHolidaysDuePerYear*> mHolidaysPerYears;
 	CHolidaysDuePerYear mSum;
 	CHolidaysDuePerYear mSumPrev;
-	CHolidaysDuePerYear* mpLastYear;
+	CHolidaysDuePerYear* mpThisYear;
 
 	static const int N_MAIN_DLG_FIELDS = 11;
 	unsigned int maMainDlgFields[N_MAIN_DLG_FIELDS];

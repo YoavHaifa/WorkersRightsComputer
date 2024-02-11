@@ -302,18 +302,18 @@ void CHolidays::ComputePayLastYear(void)
 	}
 
 	int nToSum = gHolidaysDue.GetNDueLastYear();
-	LogLine(L"n days due in last year", nToSum);
+	LogLine(L"n days due in this year", nToSum);
 	if (nToSum > MAX_HOLIDAYS_PER_YEAR)
 	{
 		nToSum = MAX_HOLIDAYS_PER_YEAR;
-		LogLine(L"n days due in last year reduced to max allowed", nToSum);
+		LogLine(L"n days due in this year reduced to max allowed", nToSum);
 	}
 	if (nToSum < 1)
 	{
 		msDebug = "Holiday Pay - None";
 		nToSum = 0;
 		msDue += msSelection;
-		msDue += " - None last year ";
+		msDue += " - None this year ";
 		return;
 	}
 
@@ -350,7 +350,7 @@ void CHolidays::ComputePayLastYear(void)
 			break;
 
 	}
-	LogLine(L"Pay Last Year", mDuePay);
+	LogLine(L"Pay This Year", mDuePay);
 
 	msDebug += L" SUM(";
 	msDebug += ToString(nSummed);
@@ -358,7 +358,7 @@ void CHolidays::ComputePayLastYear(void)
 
 	//msDue += L" - ";
 	msDue += msSelection;
-	msDue += L" - Last Year ";
+	msDue += L" - This Year ";
 	msDue += ToString(nSummed);
 	msDue += L" days ";
 }
@@ -412,7 +412,7 @@ int CHolidays::GetNWorkedHolidays(CWorkYear* pYear)
 }
 void CHolidays::ComputePayPrevYears()
 {
-	int nPrevYears = gHolidaysDue.GetNPrevYears() - 1; // excluding last year
+	int nPrevYears = gHolidaysDue.GetNPrevYears() - 1; // excluding this year
 	LogLine(L"nPrevYears with holidays", nPrevYears);
 	if (nPrevYears < 1)
 		return;
@@ -479,13 +479,13 @@ bool CHolidays::Compute(void)
 	// TEMP - This edit box role is not clear -
 	// Should it be written from SW or the text should be read from user text?????
 	mpNDaysInLastYearBox->SetWindowText (ToString(mnInLastYear));
-	LogLine(L"n days in last year", mnInLastYear);
+	LogLine(L"n days in this year", mnInLastYear);
 
 	//if (GetIntFromEditBox(mpNDaysPaidLastYearBox, L"mpNDaysPaidLastYearBox", mnPaidLastYear))
-	//	LogLine(L"n paid last year", mnPaidLastYear);
+	//	LogLine(L"n paid this year", mnPaidLastYear);
 
 	//if (GetIntFromEditBox(mpNDaysWorkedLastYearBox, L"mpNDaysWorkedLastYearBox", mnWorkedLastYear))
-	//	LogLine(L"n worked last year", mnWorkedLastYear);
+	//	LogLine(L"n worked this year", mnWorkedLastYear);
 
 	ComputePayLastYear();
 	ComputePayPrevYears();
