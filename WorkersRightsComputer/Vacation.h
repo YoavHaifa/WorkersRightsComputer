@@ -19,7 +19,7 @@ public:
 	static const double MIN_FRACTION_FOR_ROUND_UP;
 
 	CEdit* mpPrevYearsBox;
-	CEdit* mpLastYearsPaidDaysBox;
+	CEdit* mpThisYearsPaidDaysBox;
 
 	double mnYearsForVacation;
 	double mnMonthsForVacation;
@@ -27,16 +27,15 @@ public:
 	int mnSeniority;
 
 	bool mbUseShortRule;
-	bool mbLastYearAllPaid;
-	bool mbLastYearDaysPaid;
-	bool mnLastYearDaysPaid;
+	bool mbThisYearAllPaid;
+	bool mbThisYearDaysPaid;
 	double mnDueDays;
 	CButtonRef* mpbDemandForPreviousYears;
-	CButtonRef* mpbAllPaid4LastYear;
-	CButtonRef* mpbDaysPaid4LastYear;
-	double mnYearsOfUnpaidVacation;
+	CButtonRef* mpbAllPaid4ThisYear;
+	CButtonRef* mpbDaysPaid4ThisYear;
+	double mnPrevYearsOfUnpaidVacation;
 	double mnDaysOfPaidVacation;
-	double mnDaysPaidLastYear;
+	double mnDaysPaidThisYear;
 	CString msDesc;
 	CString msDescHebrew;
 
