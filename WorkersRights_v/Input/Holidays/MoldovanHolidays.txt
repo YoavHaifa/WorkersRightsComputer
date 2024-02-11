@@ -1,4 +1,44 @@
 Catholic Crhistmas
+2024
+12
+25
+National Language Day
+2024
+8
+31
+Independence Day
+2024
+8
+27
+Victory Day
+2024
+5
+9
+International Solidarity Day of Workers
+2024
+5
+1
+Orthodox Easter Monday
+2024 
+5
+6
+Orthodox Easter
+2024
+5
+5
+International Womens Day
+2024
+3
+8
+Orthodox Christmas Day
+2024
+1
+7
+New Year
+2024
+1
+1
+Catholic Crhistmas
 2023
 12
 25
@@ -416,42 +456,6 @@ Christmas
 07
 New Year's Day
 2013
-01
-1
-Limba Noastra
-2012
-08
-31
-Independence Day Moldova
-2012
-08
-27
-Victory and Commemoration Day
-2012
-05
-9
-Labour Day
-2012
-05
-1
-Orthodox Easter Monday
-2012
-05
-16
-International Women's Day
-2012
-03
-8
-Christmas
-2012
-01
-08
-Christmas
-2012
-01
-07
-New Year's Day
-2012
 01
 1
 end

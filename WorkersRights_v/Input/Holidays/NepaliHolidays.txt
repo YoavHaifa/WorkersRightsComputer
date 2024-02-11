@@ -1,4 +1,68 @@
 TiharII
+2024
+11
+3
+Tihar I
+2024
+11
+2
+Laxmi Puja (Tihar)
+2024
+11
+1
+Ekadashi
+2024
+10
+14
+Dahsami
+2024
+10
+13
+Nawami
+2024
+10
+12
+Astami
+2024
+10
+11
+Dashain Festival Phoolpati Phulpat
+2024
+10
+10
+Constitution Day
+2024
+9
+17
+Janai Purnima Rakshya Bandhan
+2024
+8
+19
+Republic Day 
+2024
+5
+29
+Buddha Jayanti(Buddha Day
+2024
+5
+15
+International Workers Day
+2024
+5
+1
+Nepali New Year
+2024
+4
+14
+International Womens Day/Maha Shivaratri/Nari Dibas
+2024
+3
+8
+Martyrs Memorial Day
+2024
+1
+30
+TiharII
 2023
 11
 17
@@ -23,7 +87,7 @@ Nawami
 10
 23
 Astami
-2022
+2023
 10
 22
 Dashain Festival Phoolpati Phulpat
@@ -762,68 +826,4 @@ Martyrs' Day
 2013
 01
 30
-Vijaya Dashami
-2012
-11
-24
-Govardhan Puja
-2012
-11
-14
-Lakshmi Puja
-2012
-11
-13
-Constitution Day
-2012
-11
-09
-Maha Navami
-2012
-10
-23
-Ghatasthapana
-2012
-10
-16
-Fulpati Saptami
-2012
-10
-01
-Krishna Janmashtami
-2012
-08
-10
-Buddha Jauanti
-2012
-04
-28
-Navabarsha (New Year's Day)
-2012
-04
-14
-Chaite Dashain
-2012
-04
-01
-Holi
-2012
-03
-8
-Shivaratri
-2012
-02
-20
-Rashtriya Prajatantra Divas
-2012
-02
-18
-Martyrs' Day
-2012
-01
-30
-Basant Panchami
-2012
-01
-28
 end
