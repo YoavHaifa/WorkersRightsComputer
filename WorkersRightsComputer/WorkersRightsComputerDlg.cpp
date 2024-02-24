@@ -275,12 +275,18 @@ BOOL CWorkersRightsComputerDlg::OnInitDialog()
 
 	GotoDlgCtrl(GetDlgItem(IDC_EDIT_FIRST_NAME));
 	SetCheck(IDC_CHECK_CAREGIVER, true);
+	if (gConfig.mbCaregiversOnly)
+		Disable(IDC_CHECK_CAREGIVER);
+	
+	SetVisible(IDC_BUTTON_VACATIONS_PREV_YEARS, gConfig.mbAllowPartialPrevYearsVacation);
 	return FALSE;  // return TRUE  unless you set the focus to a control
 }
 void CWorkersRightsComputerDlg::OnLoad()
 {
 	SetCheck(IDC_CHECK_LIVE_IN, gWorkPeriod.mbLiveIn);
 	SetCheck(IDC_CHECK_CAREGIVER, gWorkPeriod.mbCaregiver);
+	if (gConfig.mbCaregiversOnly && gWorkPeriod.mbCaregiver)
+		Disable(IDC_CHECK_CAREGIVER);
 }
 void CWorkersRightsComputerDlg::OnSysCommand(UINT nID, LPARAM lParam)
 {
@@ -751,7 +757,14 @@ void CWorkersRightsComputerDlg::OnBnClickedCheckLiveIn()
 }
 void CWorkersRightsComputerDlg::OnBnClickedCheckCaregiver()
 {
-	gWorkPeriod.mbCaregiver = IsChecked(IDC_CHECK_CAREGIVER);
+	bool bChecked = IsChecked(IDC_CHECK_CAREGIVER);
+	if (gConfig.mbCaregiversOnly && !bChecked)
+	{
+		SetCheck(IDC_CHECK_CAREGIVER, true);
+		Disable(IDC_CHECK_CAREGIVER);
+	}
+	else
+		gWorkPeriod.mbCaregiver = bChecked;
 }
 void CWorkersRightsComputerDlg::OnBnClickedButtonPrevYearsHolidays()
 {

@@ -126,6 +126,7 @@
 #define IDC_EDIT_COMMENT1               1093
 #define IDC_EDIT_LAST_YEAR_VACATION_DAYS 1093
 #define IDC_EDIT_MATERNITY_N_PAID_WEEKS 1093
+#define IDC_EDIT_COMPANY_HOURLY_RATE    1093
 #define IDC_EDIT_COMMENT2               1094
 #define IDC_EDIT_COMMENT2_              1094
 #define IDC_EDIT_LAST_YEAR_VACATION_DAYS2 1094
@@ -245,7 +246,10 @@
 #define IDC_STATIC_VACPY_DUE4           1191
 #define IDC_STATIC_VACPY_PAID           1192
 #define IDC_STATIC_VACPY_PAID2          1193
+#define IDC_RADIO_COMPANY_MINIMUM       1193
 #define IDC_STATIC_VACPY_PAID3          1194
+#define IDC_RADIO2                      1194
+#define IDC_RADIO_COMPANY_HOURLY        1194
 #define IDC_STATIC_VACPY_PAID4          1195
 #define ID_FILE_EXIT                    32771
 #define ID_COMPUTE_ALL                  32772
@@ -265,7 +269,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        154
 #define _APS_NEXT_COMMAND_VALUE         32782
-#define _APS_NEXT_CONTROL_VALUE         1193
+#define _APS_NEXT_CONTROL_VALUE         1195
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

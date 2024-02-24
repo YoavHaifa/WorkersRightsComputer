@@ -9,9 +9,14 @@ public:
 	int miVersion;
 	int miLegacyVersion;
 	bool mbBackwardCompatibilityMode;
+
 	CString msSaveRoot;
 
+	// Flags from Configuration file
 	bool mb14DaysUnpaidVacation4SeveranceDefault;
+	bool mbCaregiversOnly;
+	bool mbAllowPartialPrevYearsVacation;
+
 	//int mNMonthsForFullVacation;
 	CString msFilledBy;
 	CString msFilledByHebrew;

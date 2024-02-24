@@ -46,6 +46,9 @@ public:
 	bool mbLiveIn;
 	bool mbExtraHolidayHoursForLiveInApplied;
 
+	// Special modes used in this case
+	bool mbPartialVacationForPrevYearsDefined;
+
 	int CountDaysToEndOfMonth(CMyTime &date);
 	int CountWorkDaysToEndOfMonthFrom(CMyTime &firstDate);
 	void SaveToXml(class CXMLDump &xmlDump);
@@ -66,7 +69,7 @@ public:
 
 	bool IncludesMonthButNotFirst(int year, int month);
 
-	void SetWeekDaysPaidByCompany(class CCompanyPartPeriod *pFrom, class CCompanyPartPeriod *pUntil);
+	void SetWeekDaysPaidByCompany(class CCompanyPartPeriod * pCompanyPart, class CCompanyPartPeriod *pUntil);
 	double ComputeFamilyPart();
 	double ComputeFamilyPartLastMonths(int nMonths);
 	void WriteLastSalary(class CHtmlWriter& html);

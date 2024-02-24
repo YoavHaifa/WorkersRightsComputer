@@ -1,5 +1,6 @@
 ﻿#include "stdafx.h"
 #include "FamilyPart.h"
+#include "CompanyPartPeriod.h"
 #include "WorkPeriod.h"
 #include "Utils.h"
 #include "XMLDump.h"
@@ -85,8 +86,16 @@ bool CFamilyPart::CheckStartTime(CMyTime& startTime)
 	}
 	return true;
 }
-bool CFamilyPart::AddPeriod(CMyTime& startTime, CCompanyPartPeriod* pNewPeriod)
+bool CFamilyPart::AddPeriod(CCompanyPartPeriod* pNewPeriod)
 {
+	CMyTime& startTime = pNewPeriod->mFrom;
+
+	if (!CheckStartTime(startTime))
+	{
+		delete pNewPeriod;
+		return false;
+	}
+
 	if (mPeriods.IsEmpty())
 	{
 		mPeriods.AddTail(pNewPeriod);
@@ -98,7 +107,7 @@ bool CFamilyPart::AddPeriod(CMyTime& startTime, CCompanyPartPeriod* pNewPeriod)
 		CMyTime april18(2018, 4, 1);
 		if (startTime < april18 && gWorkPeriod.mLast > april18)
 		{
-			CCompanyPartPeriod* pDummyPeriod = new CCompanyPartPeriod(april18.mTime, 0, 0, true);
+			CCompanyPartPeriod* pDummyPeriod = new CCompanyPartPeriod(april18.mTime);
 			mPeriods.AddTail(pDummyPeriod);
 		}
 		return true;
@@ -125,24 +134,6 @@ bool CFamilyPart::AddPeriod(CMyTime& startTime, CCompanyPartPeriod* pNewPeriod)
 	// Add last
 	mPeriods.AddTail(pNewPeriod);
 	return true;
-}
-bool CFamilyPart::AddPeriod(CTime startTime, double hoursPerWeek)
-{
-	CMyTime start(startTime);
-	if (!CheckStartTime(start))
-		return false;
-
-	CCompanyPartPeriod *pNewPeriod = new CCompanyPartPeriod(startTime, hoursPerWeek, 0);
-	return AddPeriod(start, pNewPeriod);
-}
-bool CFamilyPart::AddPeriodPC(CTime startTime, double perCentByCompany)
-{
-	CMyTime start(startTime);
-	if (!CheckStartTime(start))
-		return false;
-
-	CCompanyPartPeriod *pNewPeriod = new CCompanyPartPeriod(startTime, 0, perCentByCompany);
-	return AddPeriod(start, pNewPeriod);
 }
 CString CFamilyPart::GetFullText()
 {
@@ -210,12 +201,8 @@ void CFamilyPart::SaveToXml(CXMLDump &xmlDump)
 	while (pos)
 	{
 		CCompanyPartPeriod *pPeriod = mPeriods.GetNext(pos);
-		if (!pPeriod->mbDummyForApril18)
+			pPeriod->SaveToXml(xmlDump);
 		{
-			CXMLDumpScope scope1(L"Period", xmlDump);
-			xmlDump.Write(L"From", pPeriod->mFrom);
-			xmlDump.Write(L"CompanyHoursPerWeek", pPeriod->mCompanyHoursPerWeek);
-			xmlDump.Write(L"CompanyPart", pPeriod->mCompanyPart);
 		}
 	}
 	xmlDump.Write(L"bAskOnlyForFamilyPart", mbAskOnlyForFamilyPart);
@@ -228,27 +215,18 @@ void CFamilyPart::LoadFromXml(class CXMLParseNode* pRoot)
 		return;
 
 	mbLoadingFromXml = true;
-	CXMLParseNode* pPeriod = pMain->GetFirst(L"Period");
-	while (pPeriod)
+	CXMLParseNode* pPeriodNode = pMain->GetFirst(L"Period");
+	while (pPeriodNode)
 	{
-		CMyTime from;
-		double companyHoursPerWeek = 0;
-		double companyPart = 0;
-		if (pPeriod->GetValue(L"From", from))
-		{
-			if (pPeriod->GetValue(L"CompanyHoursPerWeek", companyHoursPerWeek))
-			{
-				if (companyHoursPerWeek > 0)
-					AddPeriod(from.mTime, companyHoursPerWeek);
-				else if (pPeriod->GetValue(L"CompanyPart", companyPart))
-					AddPeriodPC(from.mTime, companyPart*100);
-			}
-		}
-		pPeriod = pMain->GetNext(L"Period", pPeriod);
+		CCompanyPartPeriod* pNewPeriod = new CCompanyPartPeriod(pPeriodNode);
+		AddPeriod(pNewPeriod);
+
+		pPeriodNode = pMain->GetNext(L"Period", pPeriodNode);
 	}
 	pMain->GetValue(L"bAskOnlyForFamilyPart", mbAskOnlyForFamilyPart);
 	mbLoadingFromXml = false;
 }
+/*
 void CFamilyPart::Save(FILE *pfSave)
 {
 	if (mPeriods.IsEmpty())
@@ -271,25 +249,6 @@ void CFamilyPart::Save(FILE *pfSave)
 		fwprintf(pfSave, L"bAskOnlyForFamilyPart\n");
 
 	fwprintf(pfSave, L"EndFamilyPart\n");
-}
-/*
-void CFamilyPart::Restore(FILE *pfRead)
-{
-	Clear();
-	CString s = CUtils::ReadLine(pfRead);
-	while (s == "Period")
-	{
-		CMyTime from;
-		from.Read(pfRead);
-		double nHours = CUtils::ReadFloat(pfRead);
-		AddPeriod(from.mTime, nHours);
-		s = CUtils::ReadLine(pfRead);
-	}
-	if (s == "bAskOnlyForFamilyPart")
-	{
-		mbAskOnlyForFamilyPart = true;
-		s = CUtils::ReadLine(pfRead); // read last line
-	}
 }*/
 void CFamilyPart::WriteToLetter(CHtmlWriter &writer)
 {

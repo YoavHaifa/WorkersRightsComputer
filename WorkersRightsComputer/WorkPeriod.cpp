@@ -6,6 +6,7 @@
 #include "UsedVacations.h"
 #include "HtmlWriter.h"
 #include "FamilyPart.h"
+#include "CompanyPartPeriod.h"
 #include "XMLDump.h"
 #include "XMLParse.h"
 #include "WorkYears.h"
@@ -31,6 +32,7 @@ CWorkPeriod::CWorkPeriod()
 	, mbLiveIn(true)
 	, mbCaregiver(false)
 	, mbExtraHolidayHoursForLiveInApplied(false)
+	, mbPartialVacationForPrevYearsDefined(false)
 {
 	Reset();
 
@@ -269,6 +271,7 @@ void CWorkPeriod::SaveToXml(CXMLDump &xmlDump)
 	xmlDump.Write(L"b_live_in", mbLiveIn);
 	xmlDump.Write(L"b_caregiver", mbCaregiver);
 	xmlDump.Write(L"b_extra_holiday_hours_for_live_in_applied", mbExtraHolidayHoursForLiveInApplied);
+	xmlDump.Write(L"b_partial_vacation_for_prev_years_defined", mbPartialVacationForPrevYearsDefined);
 
 	{
 		CXMLDumpScope scope(L"Days", xmlDump);
@@ -579,7 +582,7 @@ bool CWorkPeriod::IncludesMonthButNotFirst(int year, int month)
 		return false;
 	return true;
 }
-void CWorkPeriod::SetWeekDaysPaidByCompany(class CCompanyPartPeriod *pFrom, class CCompanyPartPeriod *pUntil)
+void CWorkPeriod::SetWeekDaysPaidByCompany(class CCompanyPartPeriod *pCompanyPart, class CCompanyPartPeriod *pUntil)
 {
 	if (!maMonths[0].mbInitializedBeforeVacation)
 	{
@@ -588,12 +591,12 @@ void CWorkPeriod::SetWeekDaysPaidByCompany(class CCompanyPartPeriod *pFrom, clas
 	}
 	for (int i = 0; i < MAX_MONTHS; i++)
 	{
-		if (maMonths[i].mLastDay.IsMonthBefore(pFrom->mFrom))
+		if (maMonths[i].mLastDay.IsMonthBefore(pCompanyPart->mFrom))
 			continue;
 		if (pUntil && !maMonths[i].mLastDay.IsMonthBefore(pUntil->mFrom))
 			return;
-		maMonths[i].mHoursPerWeekPaidByCompany = pFrom->mCompanyHoursPerWeek;
-		maMonths[i].mRatioPaidByCompany = pFrom->mCompanyPart;
+		maMonths[i].mHoursPerWeekPaidByCompany = pCompanyPart->mHoursPerWeek;
+		maMonths[i].mRatioPaidByCompany = pCompanyPart->mFraction;
 		if (maMonths[i].mbLast)
 			return;
 	}

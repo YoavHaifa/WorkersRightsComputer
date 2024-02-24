@@ -189,6 +189,7 @@
     <ClInclude Include="AllRights.h" />
     <ClInclude Include="Comments.h" />
     <ClInclude Include="CommentsDlg.h" />
+    <ClInclude Include="CompanyPartPeriod.h" />
     <ClInclude Include="Config.h" />
     <ClInclude Include="DaysSpan.h" />
     <ClInclude Include="HolidaysDue.h" />
@@ -257,6 +258,7 @@
     <ClCompile Include="AllRights.cpp" />
     <ClCompile Include="Comments.cpp" />
     <ClCompile Include="CommentsDlg.cpp" />
+    <ClCompile Include="CompanyPartPeriod.cpp" />
     <ClCompile Include="Config.cpp" />
     <ClCompile Include="DaysSpan.cpp" />
     <ClCompile Include="HolidaysDue.cpp" />

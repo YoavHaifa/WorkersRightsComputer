@@ -24,10 +24,22 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	void UpdateText();
-	CDateTimeCtrl mStartPeriod;
+	void AddPeriod(bool bByHour);
+	bool CheckInputValue(int id, double& oValue, double minVal, double maxVal, const wchar_t* zWhat);
+	CDateTimeCtrl mStartPeriodGUI;
+
+	// Information for next period - Company part
+	CTime mStartTime;
+	double mHoursPerWeek;
+	double mPC;
+	bool mbMinimum;
+	double mHourlyWage;
+
 	afx_msg void OnBnClickedButtonAddPeriod();
 	afx_msg void OnBnClickedButtonFamilyPartClear();
 	afx_msg void OnBnClickedButtonAddPeriodPercent();
 	afx_msg void OnBnClickedButtonFamilyPartClearLast();
 	void ClearForEdit();
+	afx_msg void OnBnClickedRadioCompanyMinimum();
+	afx_msg void OnBnClickedRadioCompanyHourly();
 };

@@ -11,6 +11,8 @@ CConfig::CConfig(void)
 	, miVersion(135)
 	, miLegacyVersion(0)
 	, mbBackwardCompatibilityMode(false)
+	, mbCaregiversOnly(true)
+	, mbAllowPartialPrevYearsVacation(false)
 {
 }
 void CConfig::InitFromXml()
@@ -27,7 +29,12 @@ void CConfig::InitFromXml()
 
 	pRoot->GetValue(L"version", msVersion);
 	pRoot->GetValue(L"save_dir", msSaveRoot);
+
+	// Control internal computationsand GUI
 	pRoot->GetValue(L"b_14_days_severance", mb14DaysUnpaidVacation4SeveranceDefault);
+	pRoot->GetValue(L"b_caregivers_only", mbCaregiversOnly);
+	pRoot->GetValue(L"b_partial_prev_years_vacation", mbAllowPartialPrevYearsVacation);
+
 	//pRoot->GetValue(L"n_months_for_full_vacation", mNMonthsForFullVacation);
 
 	RestoreState();

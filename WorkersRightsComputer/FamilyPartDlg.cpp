@@ -5,6 +5,7 @@
 #include "WorkersRightsComputer.h"
 #include "FamilyPartDlg.h"
 #include "FamilyPart.h"
+#include "CompanyPartPeriod.h"
 #include "WorkPeriod.h"
 #include "afxdialogex.h"
 
@@ -26,7 +27,7 @@ CFamilyPartDlg::~CFamilyPartDlg()
 void CFamilyPartDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
-	DDX_Control(pDX, IDC_DATETIMEPICKER1, mStartPeriod);
+	DDX_Control(pDX, IDC_DATETIMEPICKER1, mStartPeriodGUI);
 }
 
 
@@ -35,6 +36,8 @@ BEGIN_MESSAGE_MAP(CFamilyPartDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_FAMILY_PART_CLEAR, &CFamilyPartDlg::OnBnClickedButtonFamilyPartClear)
 	ON_BN_CLICKED(IDC_BUTTON_ADD_PERIOD_PERCENT, &CFamilyPartDlg::OnBnClickedButtonAddPeriodPercent)
 	ON_BN_CLICKED(IDC_BUTTON_FAMILY_PART_CLEAR_LAST, &CFamilyPartDlg::OnBnClickedButtonFamilyPartClearLast)
+	ON_BN_CLICKED(IDC_RADIO_COMPANY_MINIMUM, &CFamilyPartDlg::OnBnClickedRadioCompanyMinimum)
+	ON_BN_CLICKED(IDC_RADIO_COMPANY_HOURLY, &CFamilyPartDlg::OnBnClickedRadioCompanyHourly)
 END_MESSAGE_MAP()
 
 BOOL CFamilyPartDlg::OnInitDialog()
@@ -54,7 +57,7 @@ void CFamilyPartDlg::UpdateText()
 	{
 		if (gWorkPeriod.mFirst.mbInitialized)
 		{
-			mStartPeriod.SetTime(&gWorkPeriod.mFirst.mTime);
+			mStartPeriodGUI.SetTime(&gWorkPeriod.mFirst.mTime);
 		}
 		ClearForEdit();
 	}
@@ -64,63 +67,71 @@ void CFamilyPartDlg::UpdateText()
 
 	SetCheck(IDC_CHECK_FAMILY_PART, gFamilyPart.mbAskOnlyForFamilyPart);
 }
-void CFamilyPartDlg::OnBnClickedButtonAddPeriod()
+bool CFamilyPartDlg::CheckInputValue(int id, double& oValue, double minVal, double maxVal, const wchar_t* zWhat)
 {
-	CString s(GetText(IDC_EDIT_HOURS_BY_COMPANY));
+	oValue = 0;
+	CString s(GetText(id));
 	if (!isdigit(s[0]))
 	{
-		MessageBox(L"Please define number of hours per week", L"Input Error");
-		return;
+		CString s(L"Please define ");
+		s += zWhat;
+		MessageBox(s, L"Input Error");
+		return false;
 	}
-	double hoursPerWeek = _wtof(s);
-	if (hoursPerWeek < 0 || hoursPerWeek > 43)
+	double value = _wtof(s);
+	if (value < minVal || value > maxVal)
 	{
-		MessageBox(L"Illegal number of hours per week", L"Input Error");
-		return;
+		CString s(L"Illegal value for ");
+		s += zWhat;
+		MessageBox(s, L"Input Error");
+		return false;
+	}
+	oValue = value;
+	return true;
+}
+void CFamilyPartDlg::AddPeriod(bool bByHour)
+{
+	mPC = 0;
+	mHoursPerWeek = 0;
+
+	if (bByHour)
+	{
+		if (!CheckInputValue(IDC_EDIT_HOURS_BY_COMPANY, mHoursPerWeek, 0, 43, L"number of company hours per week"))
+			return;
+	}
+	else //  By PC
+	{
+		if (!CheckInputValue(IDC_EDIT_PERCENT_BY_COMPANY, mPC, 0, 100, L"company percent"))
+			return;
 	}
 
-	CTime timeTime;
-	DWORD dwResult = mStartPeriod.GetTime(timeTime);
-	if (dwResult == GDT_VALID)
-	{
-		gFamilyPart.AddPeriod(timeTime, hoursPerWeek);
-	}
-	else
+	DWORD dwResult = mStartPeriodGUI.GetTime(mStartTime);
+	if (dwResult != GDT_VALID)
 	{
 		MessageBox(L"Illegal date for period start", L"Input Error");
 		return;
 	}
+	mbMinimum = IsChecked(IDC_RADIO_COMPANY_MINIMUM);
+	if (mbMinimum)
+		mHourlyWage = 0;
+	else
+	{
+		if (!CheckInputValue(IDC_EDIT_COMPANY_HOURLY_RATE, mHourlyWage, 1, 1000, L"company wage per hour"))
+			return;
+	}
+
+	CCompanyPartPeriod* pNewPeriod = new CCompanyPartPeriod(*this);
+	gFamilyPart.AddPeriod(pNewPeriod);
 	UpdateText();
 	ClearForEdit();
 }
+void CFamilyPartDlg::OnBnClickedButtonAddPeriod()
+{
+	AddPeriod(true);
+}
 void CFamilyPartDlg::OnBnClickedButtonAddPeriodPercent()
 {
-	CString s(GetText(IDC_EDIT_PERCENT_BY_COMPANY));
-	if (!isdigit(s[0]))
-	{
-		MessageBox(L"Please define number of hours per week", L"Input Error");
-		return;
-	}
-	double perCent = _wtof(s);
-	if (perCent < 0 || perCent > 100)
-	{
-		MessageBox(L"Illegal value for percent", L"Input Error");
-		return;
-	}
-
-	CTime timeTime;
-	DWORD dwResult = mStartPeriod.GetTime(timeTime);
-	if (dwResult == GDT_VALID)
-	{
-		gFamilyPart.AddPeriodPC(timeTime, perCent);
-	}
-	else
-	{
-		MessageBox(L"Illegal date for period start", L"Input Error");
-		return;
-	}
-	UpdateText();
-	ClearForEdit();
+	AddPeriod(false);
 }
 void CFamilyPartDlg::OnBnClickedButtonFamilyPartClear()
 {
@@ -136,4 +147,17 @@ void CFamilyPartDlg::ClearForEdit()
 {
 	SetText(IDC_EDIT_HOURS_BY_COMPANY, L"");
 	SetText(IDC_EDIT_PERCENT_BY_COMPANY, L"");
+	SetText(IDC_EDIT_COMPANY_HOURLY_RATE, L"");
+	SetCheck(IDC_RADIO_COMPANY_MINIMUM, true); 
+	SetCheck(IDC_RADIO_COMPANY_HOURLY, false);
+	SetInvisible(IDC_EDIT_COMPANY_HOURLY_RATE);
+}
+void CFamilyPartDlg::OnBnClickedRadioCompanyMinimum()
+{
+	SetText(IDC_EDIT_COMPANY_HOURLY_RATE, L"");
+	SetInvisible(IDC_EDIT_COMPANY_HOURLY_RATE);
+}
+void CFamilyPartDlg::OnBnClickedRadioCompanyHourly()
+{
+	SetVisible(IDC_EDIT_COMPANY_HOURLY_RATE);
 }

@@ -207,6 +207,8 @@ void CWorkPeriodDlg::OnDtnDatetimechangeDatetimepickerNotice(NMHDR * /*pNMHDR*/,
 }
 int CWorkPeriodDlg::UpdateText()
 {
+	UpdateDataFromDialog();
+
 	CString str;
 	CString sAll;
 
@@ -533,16 +535,13 @@ bool CWorkPeriodDlg::SetWageForWholePeriod()
 	{
 		if (GetParameter(IDC_EDIT_MONTH_SALARY, wage, 0, 1000000))
 		{
-			if (wage > 0)
-			{
-				gWage.SetMonthlyWage(wage);
-				return true;
-			}
-			else
-			{
-				CUtils::MessBox(L"Monthly wage is not defined", L"Input Error");
-				return false;
-			}
+			gWage.SetMonthlyWage(wage);
+			return true;
+		}
+		else
+		{
+			CUtils::MessBox(L"Monthly wage is not defined", L"Input Error");
+			return false;
 		}
 		return false;
 	}
