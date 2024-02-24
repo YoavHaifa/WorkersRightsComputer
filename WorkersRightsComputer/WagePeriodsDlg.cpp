@@ -66,8 +66,8 @@ void CWagePeriodsDlg::SetTimes()
 	else if (gWage.NPeriods() >= 1)
 	{
 		CWagePeriod* pLast = gWage.GetLastPeriod();
-		mStartPeriod.SetTime(&pLast->mFirst.mTime);
-		mLastInPeriod.SetTime(&pLast->mLast.mTime);
+		mStartPeriod.SetTime(&pLast->mFirstDay.mTime);
+		mLastInPeriod.SetTime(&pLast->mLastDay.mTime);
 	}
 }
 void CWagePeriodsDlg::UpdateState(const char* zTitle)

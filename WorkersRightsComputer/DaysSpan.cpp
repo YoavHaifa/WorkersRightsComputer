@@ -7,15 +7,15 @@ CDaysSpan::CDaysSpan()
 	, mnWorkDays(0)
 {
 }
-CDaysSpan::CDaysSpan(CMyTime& firstDay, CMyTime& lastDay)
+CDaysSpan::CDaysSpan(const CMyTime& firstDay, const CMyTime& lastDay)
 {
 	InitDaysSpan(firstDay, lastDay);
 }
-CDaysSpan::CDaysSpan(CDaysSpan& other)
+CDaysSpan::CDaysSpan(const CDaysSpan& other)
 {
 	InitDaysSpan(other.mFirstDay, other.mLastDay);
 }
-void CDaysSpan::InitDaysSpan(CMyTime& firstDay, CMyTime& lastDay)
+void CDaysSpan::InitDaysSpan(const CMyTime& firstDay, const CMyTime& lastDay)
 {
 	mFirstDay = firstDay;
 	mLastDay = lastDay;
@@ -52,7 +52,7 @@ bool CDaysSpan::Overlaps(CDaysSpan& other)
 		return false;
 	return true; // Overlap
 }
-bool CDaysSpan::Contains(CDaysSpan& other)
+bool CDaysSpan::Contains(const CDaysSpan& other)
 {
 	if (mnDays < 1) // Empty
 		return false;
@@ -63,7 +63,7 @@ bool CDaysSpan::Contains(CDaysSpan& other)
 		return false;
 	return true; // Contains
 }
-bool CDaysSpan::Contains(CMyTime& day)
+bool CDaysSpan::Contains(const CMyTime& day)
 {
 	if (mnDays < 1) // Empty
 		return false;

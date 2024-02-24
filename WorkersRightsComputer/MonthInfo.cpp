@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "MonthInfo.h"
 #include "WorkPeriod.h"
+#include "Wage.h"
+#include "MinWage.h"
 #include "Utils.h"
 
 
@@ -93,24 +95,65 @@ bool CMonthInfo::IsPartial(void)
 {
 	return (mMonthFraction < 1);
 }
-double CMonthInfo::GetCompanyRatio(double* poCompanyHours, double* poCompanyRatio)
+double CMonthInfo::GetFamilyRatio(CString* posCompanyRatio)
 {
+	// If nothing else is defined
+	double familyRatio = 1;
+	if (posCompanyRatio)
+		*posCompanyRatio = "0";
+
 	if (mHoursPerWeekPaidByCompany > 0)
 	{
 		// Defined by hours
-		if (poCompanyHours)
-			*poCompanyHours = mHoursPerWeekPaidByCompany;
-		return mHoursPerWeekPaidByCompany / mHoursPerWeek;
+		if (posCompanyRatio)
+		{
+			char zBuf[128];
+			sprintf_s(zBuf, sizeof(zBuf), "%5.2f", mHoursPerWeekPaidByCompany);
+			*posCompanyRatio = zBuf;
+		}
+		familyRatio = 1 - mHoursPerWeekPaidByCompany / mHoursPerWeek;
+	}
+	else if (mRatioPaidByCompany)
+	{
+		// Defined by ratio
+		if (posCompanyRatio)
+		{
+			char zBuf[128];
+			sprintf_s(zBuf, sizeof(zBuf), "%5.2f%%", mRatioPaidByCompany * 100);
+			*posCompanyRatio = zBuf;
+		}
+		familyRatio = 1.0 - mRatioPaidByCompany;
 	}
 
-	// Defined by ratio
-	if (poCompanyRatio)
-		*poCompanyRatio = mRatioPaidByCompany;
-	return mRatioPaidByCompany;
-}
-double CMonthInfo::GetFamilyPart(double* poCompanyHours, double* poCompanyRatio)
-{
-	return 1 - GetCompanyRatio(poCompanyHours, poCompanyRatio);
+	if (familyRatio < 1.0)
+	{
+		double monthlyAgreed = gWage.GetMonthlyWageFor(mFirstDay);
+		if (monthlyAgreed > 0)
+		{
+			double fullCompanyPay = gMinWage.GetMonthlyWage(mFirstDay);
+			if (mHourlyRateByCompany > 0)
+			{
+				int nWorkHoursInFullMonth = gWorkPeriod.GetWorkingHoursInFullMonth(mFirstDay);
+				fullCompanyPay = mHourlyRateByCompany * nWorkHoursInFullMonth;
+			}
+			if (monthlyAgreed > fullCompanyPay)
+			{
+				double ratioParallelEmployment = fullCompanyPay / monthlyAgreed;
+				double ratioFamilyAlone = 1 - ratioParallelEmployment;
+				double familyRatioInParellel = familyRatio;
+				familyRatio = ratioParallelEmployment * familyRatio + ratioFamilyAlone;
+				if (posCompanyRatio)
+				{
+					char zBuf[128];
+					sprintf_s(zBuf, sizeof(zBuf), ", Agreed %5.2f > %5.2f: Initial Family %5.2f%% of %5.2f%% parallel + %5.2f%%", 
+						monthlyAgreed, fullCompanyPay,
+						familyRatioInParellel * 100, ratioParallelEmployment * 100, ratioFamilyAlone * 100);
+					*posCompanyRatio += zBuf;
+				}
+			}
+		}
+	}
+	return familyRatio;
 }
 void CMonthInfo::Log(FILE* pf)
 {

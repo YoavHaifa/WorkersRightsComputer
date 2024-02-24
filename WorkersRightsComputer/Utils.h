@@ -20,18 +20,14 @@ public:
 	static void ReportInstallationError(void);
 	static const CString& GetInputPath();
 	static FILE* OpenInputFile(const wchar_t* zName);
-	//static FILE* OpenLogFile(const char* zName);
 
 	static FILE * TryOpenStreamReader(const wchar_t *zfName, const wchar_t *zDesc, bool bReportError = true);
 	static FILE * TryOpenStreamWriter(const wchar_t *zfName, const wchar_t *zDesc, bool bAppend = false, bool bReportError = true);
 
-	// static FILE * OpenLetterInput(const wchar_t *zName, const wchar_t *zExtension);
-	//static FILE * OpenInputFile(const wchar_t *zName, const wchar_t *zExtension);
 	static FILE * OpenOutputFile(const wchar_t *zName, const wchar_t *zExtension);
 	static FILE* OpenLogFile(const wchar_t* zName, bool bAppend = false);
 	static FILE* TryOpenLogFile(const wchar_t* zName, const wchar_t* zAt = NULL, bool bAppend = false);
 	static FILE * OpenSpecialLogFile(const wchar_t *zName);
-	// static FILE * OpenSaveFileRead(const wchar_t *zName);
 
 	static void ReportFileOpenError(const wchar_t *zfName, const wchar_t *zDesc, bool bRead);
 

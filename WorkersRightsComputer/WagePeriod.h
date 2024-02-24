@@ -1,5 +1,6 @@
 #pragma once
-#include "MyTime.h"
+//#include "MyTime.h"
+#include "DaysSpan.h"
 
 typedef enum EWageMode
 {
@@ -10,7 +11,7 @@ typedef enum EWageMode
 	WAGE_LAST
 } EWageMode;
 
-class CWagePeriod
+class CWagePeriod : public CDaysSpan
 {
 public:
 	CWagePeriod(EWageMode eMode);
@@ -35,11 +36,12 @@ public:
 	bool ComesJustAfter(const CWagePeriod& other);
 	bool Check();
 
-	CMyTime GetFirstMonth() { return mFirst; }
-	CMyTime GetLastMonth() { return mLast; }
+	CMyTime GetFirstMonth() { return mFirstDay; }
+	CMyTime GetLastMonth() { return mLastDay; }
 	bool GetNextMonth(CMyTime &ioTime);
 
-	double GetMonthlyWage(const CMyTime &time);
+	double GetMonthlyWage(const CMyTime& time);
+	double GetAgreedMonthlyWage();
 	CString GetSMode();
 
 private:
@@ -49,14 +51,13 @@ private:
 	static int umNewId;
 	int mId;
 
-	CMyTime mFirst;
-	CMyTime mLast;
+	//CMyTime mFirst;
+	//CMyTime mLast;
 
 	EWageMode meMode; // Must be "MIN", "MONTHLY" or "HOURLY"
 
 	double mMonthlyWage;
 	double mHourlyWage;
 	double mnHoursPerMonth;
-	double mMonthlyBonus;
 };
 

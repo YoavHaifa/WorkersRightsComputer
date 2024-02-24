@@ -258,16 +258,16 @@ void CMyTime::SubDay()
 		Set(mTime + span);
 	}
 }
-CMyTime & CMyTime::operator = (CTime &time)
+CMyTime & CMyTime::operator = (const CTime &time)
 {
 	Set(time);
 	return *this;
 }
-bool CMyTime::operator < (CMyTime &other)
+bool CMyTime::operator < (const CMyTime &other)const
 {
 	return other > *this;
 }
-bool CMyTime::operator > (CMyTime &other)
+bool CMyTime::operator > (const CMyTime& other)const
 {
 	if (mYear > other.mYear)
 		return true;
@@ -281,11 +281,11 @@ bool CMyTime::operator > (CMyTime &other)
 		return true;
 	return false;
 }
-bool CMyTime::operator >= (CMyTime &other)
+bool CMyTime::operator >= (const CMyTime& other)const
 {
 	return other <= *this;
 }
-bool CMyTime::operator <= (CMyTime& other)
+bool CMyTime::operator <= (const CMyTime& other)const
 {
 	if (mYear > other.mYear)
 		return false;
@@ -299,7 +299,7 @@ bool CMyTime::operator <= (CMyTime& other)
 		return false;
 	return true;
 }
-bool CMyTime::operator == (CMyTime& other)
+bool CMyTime::operator == (const CMyTime& other)const
 {
 	if (mYear != other.mYear)
 		return false;

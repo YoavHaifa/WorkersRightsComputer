@@ -24,7 +24,8 @@ public:
 	void SaveToXml(class CXMLDump& xmlDump);
 	void LoadFromXml(class CXMLParseNode* pMain);
 
-	double GetMonthlyWage();
+	double GetMonthlyWageFor(const CMyTime& time);
+	double GetMonthlyWageForWholePeriod();
 	double GetHourlyWage();
 	double GetHoursPerMonth();
 

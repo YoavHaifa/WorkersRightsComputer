@@ -120,11 +120,10 @@ void CPension::PensionAddMonth(CMyTime& date, int nDays /* if 0 - full */, bool 
 	double pensionDue = monthlyPay * penRate * part;
 
 	double familyPart = 0;
-	double companyHours = 0;
-	double companyRatio = 0;
+	CString sCompanyPart;
 	if (gFamilyPart.mbAskOnlyForFamilyPart)
 	{
-		familyPart = pInfo->GetFamilyPart(&companyHours, &companyRatio);
+		familyPart = pInfo->GetFamilyRatio(&sCompanyPart);
 		pensionDue *= familyPart;
 	}
 	mPensionDue += pensionDue;
@@ -166,7 +165,7 @@ void CPension::PensionAddMonth(CMyTime& date, int nDays /* if 0 - full */, bool 
 		OnYearEnd();
 	if (gFamilyPart.mbAskOnlyForFamilyPart)
 		mDueFromFamily += (pensionDue + severanceDue);
-	mReport.AddMonth(date, monthlyPay, part, penRate, sevRate, familyPart, companyHours, companyRatio);
+	mReport.AddMonth(date, monthlyPay, part, penRate, sevRate, familyPart, (const wchar_t *)sCompanyPart);
 }
 bool CPension::CheckForDateToStartPension()
 {

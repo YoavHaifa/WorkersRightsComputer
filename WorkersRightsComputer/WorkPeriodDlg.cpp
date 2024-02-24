@@ -104,7 +104,7 @@ void CWorkPeriodDlg::SetWageGui()
 		case WAGE_MONTHLY:
 			mRadioMonthly.SetCheck(BST_CHECKED);
 			SetWageMode(IDC_RADIO_MONTHLY);
-			mMonthlySalary.SetWindowTextW(CRight::ToString(gWage.GetMonthlyWage()));
+			mMonthlySalary.SetWindowTextW(CRight::ToString(gWage.GetMonthlyWageForWholePeriod()));
 			break;
 		case WAGE_HOURLY:
 			mRadioHourly.SetCheck(BST_CHECKED);

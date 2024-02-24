@@ -73,7 +73,7 @@ CString CCompanyPartPeriod::GetLine(CCompanyPartPeriod* pPrev)
 
 	if (hours > 0)
 		sprintf_s(zBuf, sizeof(zBuf),
-			"From %2d/%4d - %5.2f / %5.2f --> %5.2f%%", mFrom.mMonth, mFrom.mYear, hours, mWorkingHoursPerWeek, partPC);
+			"From %2d/%4d - %5.2f / %d --> %5.2f%%", mFrom.mMonth, mFrom.mYear, hours, mWorkingHoursPerWeek, partPC);
 	else
 		sprintf_s(zBuf, sizeof(zBuf),
 			"From %2d/%4d --> %5.2f%%", mFrom.mMonth, mFrom.mYear, partPC);

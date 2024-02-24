@@ -311,22 +311,6 @@ void CWorkPeriod::LoadFromXml(class CXMLParseNode* pRoot)
 
 	gWage.LoadFromXml(pWorkPeriodNode);
 
-	/*
-	bool bHourly = false;
-	if (pWorkPeriodNode->GetValue(L"bMinWage", mbMinWage))
-	{
-	}
-	else if (pWorkPeriodNode->GetValue(L"bMonthlyWage", mbMonthlyWage))
-	{
-		pWorkPeriodNode->GetValue(L"MonthlyWage", mMonthlyWage);
-	}
-	else if (pWorkPeriodNode->GetValue(L"bHourlyWage", bHourly))
-	{
-		pWorkPeriodNode->GetValue(L"HourlyWage", mHourlyWage);
-		pWorkPeriodNode->GetValue(L"HoursPerWeek", mHoursPerWeek);
-	}*/
-
-
 	gUsedVacations.LoadFromXml(pWorkPeriodNode);
 
 	gFamilyPart.LoadFromXml(pWorkPeriodNode);
@@ -582,11 +566,11 @@ bool CWorkPeriod::IncludesMonthButNotFirst(int year, int month)
 		return false;
 	return true;
 }
-void CWorkPeriod::SetWeekDaysPaidByCompany(class CCompanyPartPeriod *pCompanyPart, class CCompanyPartPeriod *pUntil)
+void CWorkPeriod::SetPartPaidByCompany(class CCompanyPartPeriod *pCompanyPart, class CCompanyPartPeriod *pUntil)
 {
 	if (!maMonths[0].mbInitializedBeforeVacation)
 	{
-		CUtils::MessBox(L"<SetWeekDaysPaidByCompany> Months array not initialized", L"SW Error");
+		CUtils::MessBox(L"<SetPartPaidByCompany> Months array not initialized", L"SW Error");
 		return;
 	}
 	for (int i = 0; i < MAX_MONTHS; i++)
@@ -597,50 +581,86 @@ void CWorkPeriod::SetWeekDaysPaidByCompany(class CCompanyPartPeriod *pCompanyPar
 			return;
 		maMonths[i].mHoursPerWeekPaidByCompany = pCompanyPart->mHoursPerWeek;
 		maMonths[i].mRatioPaidByCompany = pCompanyPart->mFraction;
+		maMonths[i].mHourlyRateByCompany = pCompanyPart->mHourlyWage;
 		if (maMonths[i].mbLast)
 			return;
 	}
 }
 double CWorkPeriod::ComputeFamilyPart()
 {
+	FILE* pfLog = CUtils::OpenOutputFile(L"FamilyPart", L"csv");
+	if (pfLog)
+	{
+		fprintf(pfLog, "<ComputeFamilyPart> for all period\n");
+		fprintf(pfLog, "iMonth, family, fraction, sumFrac, sum family, company, computation\n");
+	}
 	double sumFractions = 0;
-	double sumCompanyRatio = 0;
+	double sumFamilyRatio = 0;
 
 	for (int i = 0; i < MAX_MONTHS; i++)
 	{
-		double companyRatio = maMonths[i].GetCompanyRatio();
+		CString sCompanyPart;
+		double familyRatio = maMonths[i].GetFamilyRatio(&sCompanyPart);
 		double monthFraction = maMonths[i].GetFraction();
 		sumFractions += monthFraction;
-		sumCompanyRatio += companyRatio * monthFraction;
+		sumFamilyRatio += familyRatio * monthFraction;
+		if (pfLog)
+		{
+			fwprintf(pfLog, L"%d, %5.2f%%, %5.2f, %5.2f, %5.2f, %s\n", i, familyRatio*100,
+				monthFraction, sumFractions, sumFamilyRatio, (const wchar_t*)sCompanyPart);
+		}
 		if (maMonths[i].mbLast)
 			break;
 	}
 
-	double companyTotalRatio = sumCompanyRatio / sumFractions;
-	return 1 - companyTotalRatio;
+	if (sumFractions > 0)
+		sumFamilyRatio = sumFamilyRatio / sumFractions;
+	if (pfLog)
+	{
+		fprintf(pfLog, "==> %5.2f%%\n", sumFamilyRatio*100);
+		fclose(pfLog);
+	}
+	return sumFamilyRatio;
 }
 double CWorkPeriod::ComputeFamilyPartLastMonths(int nMonthsWanted)
 {
 	double sumFractions = 0;
-	double sumCompanyRatio = 0;
+	double sumFamilyRatio = 0;
+	FILE* pfLog = CUtils::OpenOutputFile(L"FamilyPartLastMonths", L"csv");
+	if (pfLog)
+	{
+		fprintf(pfLog, "<ComputeFamilyPartLastMonths> for %d months\n", nMonthsWanted);
+		fprintf(pfLog, "iMonth, family, fraction, sumFrac, sum family, company, computation\n");
+	}
 
 	double missingFraction = nMonthsWanted;
 	int iLast = mnMonthsDetailed - 1;
 
 	for (int iMonth = iLast; iMonth >= 0 && missingFraction > 0; iMonth--)
 	{
-		double companyRatio = maMonths[iMonth].GetCompanyRatio();
+		CString sCompanyPart;
+		double familyRatio = maMonths[iMonth].GetFamilyRatio(&sCompanyPart);
 		double fraction = min(maMonths[iMonth].GetFraction(), missingFraction);
 
 		sumFractions += fraction;
 		missingFraction -= fraction;
-		sumCompanyRatio += companyRatio * fraction;
+		sumFamilyRatio += familyRatio * fraction;
+		if (pfLog)
+		{
+			fwprintf(pfLog, L"%d, %5.2f%%, %5.2f, %5.2f, %5.2f, %s\n", iMonth, familyRatio*100, 
+				fraction, sumFractions, sumFamilyRatio, (const wchar_t *)sCompanyPart);
+		}
 	}
 
-	double companyTotalRatio = 0;
 	if (sumFractions > 0)
-		companyTotalRatio = sumCompanyRatio / sumFractions;
-	return 1 - companyTotalRatio;
+		sumFamilyRatio = sumFamilyRatio / sumFractions;
+
+	if (pfLog)
+	{
+		fprintf(pfLog, "==> %5.2f%%\n", sumFamilyRatio*100);
+		fclose(pfLog);
+	}
+	return sumFamilyRatio;
 }
 bool CWorkPeriod::HasFullYearWithNotice()
 {

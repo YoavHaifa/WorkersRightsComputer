@@ -10,8 +10,7 @@ public:
 	void InitFirst();
 	void InitNext(CMonthInfo &prev);
 	bool IsPartial(void);
-	double GetCompanyRatio(double *poCompanyHours = NULL, double* poCompanyRatio = NULL);
-	double GetFamilyPart(double* poCompanyHours, double* poCompanyRatio);
+	double GetFamilyRatio(CString *posCompanyRatio = NULL);
 	void Log(FILE* pf);
 	void LogFraction(FILE* pf);
 	double GetFraction() { return mMonthFraction; }
@@ -26,8 +25,12 @@ public:
 	int mnDaysWorked;
 	int mnDaysWorkedForPension;
 	int mHoursPerWeek;
+
+	// Company part for computing family part
 	double mHoursPerWeekPaidByCompany;
 	double mRatioPaidByCompany;
+	double mHourlyRateByCompany;
+
 	void SetUnpaid(int nAnpaidDaysToAdd);
 	void SetNoPension(int nDaysToAdd);
 	int GetNRelevantDaysIn(CDaysSpan &span, bool bPension);

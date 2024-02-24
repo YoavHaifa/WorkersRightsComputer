@@ -5,18 +5,17 @@ class CDaysSpan
 {
 public:
 	CDaysSpan();
-	CDaysSpan(CMyTime& firstDay, CMyTime& lastDay);
-	CDaysSpan(CDaysSpan& other);
+	CDaysSpan(const CMyTime& firstDay, const CMyTime& lastDay);
+	CDaysSpan(const CDaysSpan& other);
 
-	void InitDaysSpan(CMyTime& firstDay, CMyTime& lastDay);
-	//void InitDaysSpanWithVacations(CMyTime& firstDay, CMyTime& lastDay);
+	void InitDaysSpan(const CMyTime& firstDay, const CMyTime& lastDay);
 	void SetMonth(const CMyTime &date);
 
 	bool ClipByWorkPeriodEnd();
 
 	bool Overlaps(CDaysSpan& other);
-	bool Contains(CDaysSpan& other);
-	bool Contains(CMyTime& day);
+	bool Contains(const CDaysSpan& other);
+	bool Contains(const CMyTime& day);
 	bool Intersect(CDaysSpan& other, CDaysSpan& oCommon);
 
 	void UpdateMonthlyInfo4Unpaid(bool bNoPension);

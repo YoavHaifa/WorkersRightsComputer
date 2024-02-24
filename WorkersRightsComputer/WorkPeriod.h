@@ -69,7 +69,7 @@ public:
 
 	bool IncludesMonthButNotFirst(int year, int month);
 
-	void SetWeekDaysPaidByCompany(class CCompanyPartPeriod * pCompanyPart, class CCompanyPartPeriod *pUntil);
+	void SetPartPaidByCompany(class CCompanyPartPeriod * pCompanyPart, class CCompanyPartPeriod *pUntil);
 	double ComputeFamilyPart();
 	double ComputeFamilyPartLastMonths(int nMonths);
 	void WriteLastSalary(class CHtmlWriter& html);

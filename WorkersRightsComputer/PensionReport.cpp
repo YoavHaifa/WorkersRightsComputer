@@ -8,14 +8,13 @@
 CPensionReportPeriod::CPensionReportPeriod(const CMyTime& date,
 	double monthlyPay, double part, 
 	double pensionRate, double severanceRate, 
-	double familyPart, double companyHours, double companyRatio)
+	double familyPart, const wchar_t* zCompanyPart)
 	: mMonthlyPay(monthlyPay)
 	, mMonthParts(part)
 	, mPensionRate(pensionRate)
 	, mSeveranceRate(severanceRate)
 	, mFamilyPart(familyPart)
-	, mCompanyHours(companyHours)
-	, mCompanyRatio(companyRatio)
+	, msCompanyPart(zCompanyPart)
 	, mDuePension(0)
 	, mDueSeverance(0)
 	, mDueFromFamily(0)
@@ -53,6 +52,8 @@ void CPensionReportPeriod::WriteToLetter(CHtmlWriter& html, bool bPension)
 	html.Write2Tab(zBuf);
 
 	if (gFamilyPart.mbAskOnlyForFamilyPart)
+		html.Write2Tab(msCompanyPart);
+	/*
 	{
 		if (mCompanyHours > 0)
 			html.Write2Tab("%5.2f", mCompanyHours);
@@ -60,7 +61,7 @@ void CPensionReportPeriod::WriteToLetter(CHtmlWriter& html, bool bPension)
 			html.Write2Tab("%5.2f%%", mCompanyRatio * 100);
 		else
 			html.Write2Tab("%d", 0);
-	}
+	}*/
 
 	html.Write2Tab(mMonthlyPay);
 	html.Write2Tab("%5.3f", mMonthParts);
@@ -117,14 +118,14 @@ void CPensionReport::Clear()
 	mpLast = NULL;
 }
 void CPensionReport::AddMonth(const CMyTime& date, double monthlyPay, double part,
-	double pensionRate, double severanceRate, double familyPart, double companyHours, double companyRatio)
+	double pensionRate, double severanceRate, double familyPart, const wchar_t* zCompanyPart)
 {
 	if (mpLast && mpLast->Is(monthlyPay, pensionRate, severanceRate, familyPart))
 		mpLast->Add(date, part);
 	else
 	{
 		mpLast = new CPensionReportPeriod(date, monthlyPay, part,
-			pensionRate, severanceRate, familyPart, companyHours, companyRatio);
+			pensionRate, severanceRate, familyPart, zCompanyPart);
 		mPeriods.AddTail(mpLast);
 	}
 }

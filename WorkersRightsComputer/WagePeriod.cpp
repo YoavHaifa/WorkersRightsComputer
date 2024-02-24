@@ -20,26 +20,22 @@ const wchar_t* azWageMode[] =
 int CWagePeriod::umNewId = 1;
 
 CWagePeriod::CWagePeriod(EWageMode eMode)
-	: meMode(eMode)
-	, mFirst(gWorkPeriod.mFirst)
-	, mLast(gWorkPeriod.mLast)
+	: CDaysSpan(gWorkPeriod.mFirst, gWorkPeriod.mLast)
+	, meMode(eMode)
 	, mMonthlyWage(0)
 	, mHourlyWage(0)
 	, mnHoursPerMonth(0)
-	, mMonthlyBonus(0)
 	, mId(umNewId++)
 {
 	static int un = 0;
 	un++;
 }
 CWagePeriod::CWagePeriod(EWageMode eMode, const CMyTime& first, const CMyTime& last, double wage, double nHours)
-	: meMode(eMode)
-	, mFirst(first)
-	, mLast(last)
+	: CDaysSpan(first, last)
+	, meMode(eMode)
 	, mMonthlyWage(0)
 	, mHourlyWage(0)
 	, mnHoursPerMonth(0)
-	, mMonthlyBonus(0)
 	, mId(umNewId++)
 {
 	if (meMode == WAGE_MONTHLY)
@@ -93,12 +89,11 @@ CWagePeriod::CWagePeriod(CXMLParseNode* pNode)
 		bError = true;
 		sError = "Failed to find mode for wage period";
 	}
-	pNode->GetValue(L"monthly_bonus", mMonthlyBonus);
 
 	if (!bError)
 	{
-		pNode->GetValue(L"first", mFirst);
-		pNode->GetValue(L"last", mLast);
+		pNode->GetValue(L"first", mFirstDay);
+		pNode->GetValue(L"last", mLastDay);
 	}
 
 	if (bError)
@@ -108,32 +103,31 @@ CWagePeriod::CWagePeriod(CXMLParseNode* pNode)
 }
 bool CWagePeriod::IsValid()
 {
-	return mFirst.IsValid() && mLast.IsValid();
+	return mFirstDay.IsValid() && mLastDay.IsValid();
 }
 void CWagePeriod::Copy(const CWagePeriod& other)
 {
 	meMode = other.meMode;
-	mFirst = other.mFirst;
-	mLast = other.mLast;
+	mFirstDay = other.mFirstDay;
+	mLastDay = other.mLastDay;
 	mMonthlyWage = other.mMonthlyWage;
 	mHourlyWage = other.mHourlyWage;
 	mnHoursPerMonth = other.mnHoursPerMonth;
-	mMonthlyBonus = other.mMonthlyBonus;
 }
 void CWagePeriod::SetFirst()
 {
-	mFirst = gWorkPeriod.mFirst;
+	mFirstDay = gWorkPeriod.mFirst;
 }
 void CWagePeriod::SetLast()
 {
-	mLast = gWorkPeriod.mLast;
+	mLastDay = gWorkPeriod.mLast;
 }
 void CWagePeriod::SaveToXml(class CXMLDump& xmlDump)
 {
 	CXMLDumpScope mainScope(L"Period", xmlDump);
 	xmlDump.Write(L"mode", azWageMode[meMode]);
-	xmlDump.Write(L"first", mFirst);
-	xmlDump.Write(L"last", mLast);
+	xmlDump.Write(L"first", mFirstDay);
+	xmlDump.Write(L"last", mLastDay);
 
 	switch (meMode)
 	{
@@ -147,8 +141,6 @@ void CWagePeriod::SaveToXml(class CXMLDump& xmlDump)
 	default:
 		break;
 	}
-	if (mMonthlyBonus > 0)
-		xmlDump.Write(L"monthly_bonus", mMonthlyBonus);
 }
 CString CWagePeriod::GetSMode()
 {
@@ -157,9 +149,9 @@ CString CWagePeriod::GetSMode()
 CString CWagePeriod::GetStateTextLine()
 {
 	CString s;
-	s = mFirst.ToMonthString();
+	s = mFirstDay.ToMonthString();
 	s += " - ";
-	s += mLast.ToMonthString();
+	s += mLastDay.ToMonthString();
 
 	s += ": ";
 	s += azWageMode[meMode];
@@ -206,17 +198,17 @@ bool CWagePeriod::MayUniteWith(const CWagePeriod& other)
 }
 bool CWagePeriod::ComesJustAfter(const CWagePeriod& other)
 {
-	CMyTime wantedMonth = other.mLast.GetMonthAfter();
-	return mFirst.IsMonthSame(wantedMonth);
+	CMyTime wantedMonth = other.mLastDay.GetMonthAfter();
+	return mFirstDay.IsMonthSame(wantedMonth);
 }
 bool CWagePeriod::Check()
 {
-	return mFirst <= mLast;
+	return mFirstDay <= mLastDay;
 }
 bool CWagePeriod::GetNextMonth(CMyTime& ioTime)
 {
 	CMyTime nextMonth = ioTime.GetMonthAfter();
-	if (mLast.IsMonthBefore(nextMonth))
+	if (mLastDay.IsMonthBefore(nextMonth))
 		return false;
 	ioTime = nextMonth;
 	return true;
@@ -233,5 +225,18 @@ double CWagePeriod::GetMonthlyWage(const CMyTime &time)
 		return mHourlyWage * mnHoursPerMonth;
 	}
 	CUtils::MessBox(L"<CWagePeriod::GetMonthlyWage> bad mode", L"SW Error");
+	return 0;
+}
+double CWagePeriod::GetAgreedMonthlyWage()
+{
+	switch (meMode)
+	{
+	case WAGE_MONTHLY:
+		return mMonthlyWage;
+	case WAGE_HOURLY:
+		return mHourlyWage * mnHoursPerMonth;
+	default:
+		break;
+	}
 	return 0;
 }

@@ -78,7 +78,7 @@ bool CWage::AddPeriod(CWagePeriod* pNewPeriod)
 	{
 		POSITION prevPos = pos;
 		CWagePeriod* pPeriod = mPeriods.GetNext(pos);
-		if (pPeriod->mLast < pNewPeriod->mFirst)
+		if (pPeriod->mLastDay < pNewPeriod->mFirstDay)
 			continue;
 		if (prevPos)
 		{
@@ -98,38 +98,38 @@ void CWage::ClearOverlap(CWagePeriod &newPeriod)
 	{
 		POSITION prevPos = pos;
 		CWagePeriod* pPeriod = mPeriods.GetNext(pos);
-		if (pPeriod->mLast.IsMonthBefore(newPeriod.mFirst))
+		if (pPeriod->mLastDay.IsMonthBefore(newPeriod.mFirstDay))
 			continue;
 
 		// current period doesn't end before new
-		if (pPeriod->mFirst.IsMonthBefore(newPeriod.mFirst))
+		if (pPeriod->mFirstDay.IsMonthBefore(newPeriod.mFirstDay))
 		{
 			// Current period starts before new - it should be shortened or split
 			bool bSplit = false;
-			if (newPeriod.mLast.IsMonthBefore(pPeriod->mLast))
+			if (newPeriod.mLastDay.IsMonthBefore(pPeriod->mLastDay))
 			{ // Split old period that contains the new
 				CWagePeriod* pLaterPeriod = new CWagePeriod(*pPeriod);
-				pLaterPeriod->mFirst = newPeriod.mLast.GetMonthAfter();
+				pLaterPeriod->mFirstDay = newPeriod.mLastDay.GetMonthAfter();
 				if (pos)
 					mPeriods.InsertBefore(pos, pLaterPeriod);
 				else
 					mPeriods.AddTail(pLaterPeriod);
 				bSplit = true;
 			}
-			pPeriod->mLast = newPeriod.mFirst.GetMonthBefore();
+			pPeriod->mLastDay = newPeriod.mFirstDay.GetMonthBefore();
 			if (bSplit)
 				return;
 			continue;
 		}
 
 		// Current period starts after new
-		if (newPeriod.mLast.IsMonthBefore(pPeriod->mFirst))
+		if (newPeriod.mLastDay.IsMonthBefore(pPeriod->mFirstDay))
 			return; // Finished. Assume all periods are in clear ascending order
 
-		if (newPeriod.mLast.IsMonthBefore(pPeriod->mLast))
+		if (newPeriod.mLastDay.IsMonthBefore(pPeriod->mLastDay))
 		{
 			// Only last part of old period will stay
-			pPeriod->mFirst = newPeriod.mLast.GetMonthAfter();
+			pPeriod->mFirstDay = newPeriod.mLastDay.GetMonthAfter();
 			return;
 		}
 
@@ -169,12 +169,12 @@ void CWage::LoadFromXml(CXMLParseNode* pMain)
 	if (IsValid())
 		gWageTable.Prepare(L"LoadFromXml");
 }
-double CWage::GetMonthlyWage()
+double CWage::GetMonthlyWageForWholePeriod()
 {
 	if (mPeriods.GetSize() == 1)
 		return mPeriods.GetHead()->mMonthlyWage;
 
-	CUtils::MessBox(L"Monthly wage not well defined", L"SW Error");
+	CUtils::MessBox(L"Monthly wage for whole period not well defined", L"SW Error");
 	return 0;
 }
 double CWage::GetHourlyWage()
@@ -191,6 +191,23 @@ double CWage::GetHoursPerMonth()
 		return mPeriods.GetHead()->mnHoursPerMonth;
 
 	CUtils::MessBox(L"Hours per month not well defined", L"SW Error");
+	return 0;
+}
+double CWage::GetMonthlyWageFor(const CMyTime& time)
+{
+	int nPeriods = (int)mPeriods.GetSize();
+
+	int i = 0;
+	POSITION pos = mPeriods.GetHeadPosition();
+	while (pos)
+	{
+		CWagePeriod* pPeriod = mPeriods.GetNext(pos);
+		if (i == nPeriods - 1) // Last
+			return pPeriod->GetAgreedMonthlyWage();
+		if (pPeriod->Contains(time))
+			return pPeriod->GetAgreedMonthlyWage();
+		i++;
+	}
 	return 0;
 }
 CString CWage::GetStateDesc()
@@ -237,7 +254,7 @@ bool CWage::UniteAdjacentPair()
 		CWagePeriod* pPeriod = mPeriods.GetNext(pos);
 		if (pPrevPeriod && pPeriod->MayUniteWith(*pPrevPeriod))
 		{
-			pPrevPeriod->mLast = pPeriod->mLast;
+			pPrevPeriod->mLastDay = pPeriod->mLastDay;
 			mPeriods.RemoveAt(prevPos);
 			return true;
 		}

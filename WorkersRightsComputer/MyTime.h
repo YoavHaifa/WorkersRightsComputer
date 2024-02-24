@@ -21,12 +21,12 @@ public:
 	void Log(FILE* pf);
 	void LogLine(FILE* pf, const wchar_t*zText);
 	void Reset();
-	bool operator > (CMyTime &other);
-	bool operator < (CMyTime &other);
-	bool operator <= (CMyTime &other);
-	bool operator >= (CMyTime& other);
-	bool operator == (CMyTime& other);
-	CMyTime & operator = (CTime &time);
+	bool operator > (const CMyTime &other)const;
+	bool operator < (const CMyTime &other)const;
+	bool operator <= (const CMyTime &other)const;
+	bool operator >= (const CMyTime& other)const;
+	bool operator == (const CMyTime& other)const;
+	CMyTime & operator = (const CTime &time);
 
 	CTime mTime;
 	int mYear;
