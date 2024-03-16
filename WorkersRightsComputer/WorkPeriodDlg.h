@@ -29,12 +29,13 @@ public:
 	CDateTimeCtrl mEndDate;
 	CDateTimeCtrl mNoticeDate;
 	afx_msg void OnDtnDatetimechangeDatetimepickerStart(NMHDR *pNMHDR, LRESULT *pResult);
-	int UpdateText();
+	void UpdateText();
 	CEdit mShow;
 	afx_msg void OnDtnDatetimechangeDatetimepickerEnd(NMHDR *pNMHDR, LRESULT *pResult);
 	bool mbStartSet;
 	bool mbEndSet;
 	bool mbNoticeSet;
+	bool mbDialogInitialized;
 	afx_msg void OnDtnDatetimechangeDatetimepickerNotice(NMHDR *pNMHDR, LRESULT *pResult);
 	CEdit mMonthlySalary;
 	CEdit mHourlySalary;

@@ -196,6 +196,7 @@
     <ClInclude Include="HolidaysDuePerYear.h" />
     <ClInclude Include="LetterSavedDlg.h" />
     <ClInclude Include="MaternityLeave.h" />
+    <ClInclude Include="MonthlyFamilyPart.h" />
     <ClInclude Include="MyFolderDialog.h" />
     <ClInclude Include="OnOpenDlg.h" />
     <ClInclude Include="Paid.h" />
@@ -265,6 +266,7 @@
     <ClCompile Include="HolidaysDuePerYear.cpp" />
     <ClCompile Include="LetterSavedDlg.cpp" />
     <ClCompile Include="MaternityLeave.cpp" />
+    <ClCompile Include="MonthlyFamilyPart.cpp" />
     <ClCompile Include="MyFolderDialog.cpp" />
     <ClCompile Include="OnOpenDlg.cpp" />
     <ClCompile Include="Paid.cpp" />

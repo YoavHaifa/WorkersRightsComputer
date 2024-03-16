@@ -4,6 +4,7 @@
 #include "Wage.h"
 #include "MinWage.h"
 #include "Utils.h"
+#include "MonthlyFamilyPart.h"
 
 
 CMonthInfo::CMonthInfo()
@@ -95,12 +96,14 @@ bool CMonthInfo::IsPartial(void)
 {
 	return (mMonthFraction < 1);
 }
-double CMonthInfo::GetFamilyRatio(CString* posCompanyRatio)
+double CMonthInfo::GetFamilyRatio(CString* posCompanyRatio, double* poCompanyHourlyWage)
 {
 	// If nothing else is defined
 	double familyRatio = 1;
 	if (posCompanyRatio)
 		*posCompanyRatio = "0";
+	if (poCompanyHourlyWage)
+		*poCompanyHourlyWage = mHourlyRateByCompany;
 
 	if (mHoursPerWeekPaidByCompany > 0)
 	{
@@ -154,6 +157,9 @@ double CMonthInfo::GetFamilyRatio(CString* posCompanyRatio)
 		}
 	}
 	return familyRatio;
+}
+void CMonthInfo::GetFamilyRatio(class CMonthlyFamilyPart& oMonthlyFamilyPart)
+{
 }
 void CMonthInfo::Log(FILE* pf)
 {

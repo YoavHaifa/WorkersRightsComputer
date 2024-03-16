@@ -17,6 +17,10 @@ CFamilyPart::CFamilyPart()
 	, mbLoadingFromXml(false)
 {
 }
+CFamilyPart::CFamilyPart(CFamilyPart& other)
+{
+	Copy(other);
+}
 CFamilyPart::~CFamilyPart()
 {
 	Clear();
@@ -31,6 +35,25 @@ void CFamilyPart::Clear(void)
 	mbDefined = false;
 	SetRatio(0);
 	mbAskOnlyForFamilyPart = false;
+}
+void CFamilyPart::Copy(CFamilyPart& other)
+{
+	Clear();
+
+	// Copy all fields
+	mbAskOnlyForFamilyPart = other.mbAskOnlyForFamilyPart;
+	mRatio = other.mRatio;
+	msRatio = other.msRatio;
+	mbDefined = other.mbDefined;
+	mbLoadingFromXml = false;
+
+	// Copy periods
+	POSITION pos = other.mPeriods.GetHeadPosition();
+	while (pos)
+	{
+		CCompanyPartPeriod* pOtherPeriod = other.mPeriods.GetNext(pos);
+		mPeriods.AddTail(new CCompanyPartPeriod(*pOtherPeriod));
+	}
 }
 void CFamilyPart::ClearLast(void)
 {
@@ -85,6 +108,13 @@ bool CFamilyPart::CheckStartTime(CMyTime& startTime)
 		return false;
 	}
 	return true;
+}
+CCompanyPartPeriod* CFamilyPart::GetLastPeriod()
+{
+	if (mPeriods.IsEmpty())
+		return NULL;
+
+	return mPeriods.GetTail();
 }
 bool CFamilyPart::AddPeriod(CCompanyPartPeriod* pNewPeriod)
 {

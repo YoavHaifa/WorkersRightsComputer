@@ -8,7 +8,7 @@ public:
 
 	bool IsValid();
 
-	void SetMinWage(void);
+	bool SetMinWage(void);
 	void SetMonthlyWage(double wage);
 	void SetHourlyWage(double wagePerHour, double nHoursPerWeek);
 
@@ -42,11 +42,11 @@ public:
 private:
 	class CWagePeriod* mpFirst;
 	class CWagePeriod* mpLast;
-	void SetSingle(EWageMode eMode, double wage = 0, double nHours = 0);
+	bool SetSingle(EWageMode eMode, double wage = 0, double nHours = 0);
 	CList<class CWagePeriod*, class CWagePeriod*> mPeriods;
 	void Clear();
 	void ClearOverlap(CWagePeriod& newPeriod);
-	void Update();
+	bool Update();
 	void UniteAdjacentFileds();
 	bool UniteAdjacentPair();
 public:

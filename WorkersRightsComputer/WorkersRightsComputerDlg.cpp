@@ -285,8 +285,13 @@ void CWorkersRightsComputerDlg::OnLoad()
 {
 	SetCheck(IDC_CHECK_LIVE_IN, gWorkPeriod.mbLiveIn);
 	SetCheck(IDC_CHECK_CAREGIVER, gWorkPeriod.mbCaregiver);
-	if (gConfig.mbCaregiversOnly && gWorkPeriod.mbCaregiver)
-		Disable(IDC_CHECK_CAREGIVER);
+	if (gConfig.mbCaregiversOnly)
+	{
+		if (gWorkPeriod.mbCaregiver)
+			Disable(IDC_CHECK_CAREGIVER);
+		else
+			Enable(IDC_CHECK_CAREGIVER);
+	}
 }
 void CWorkersRightsComputerDlg::OnSysCommand(UINT nID, LPARAM lParam)
 {
@@ -762,6 +767,7 @@ void CWorkersRightsComputerDlg::OnBnClickedCheckCaregiver()
 	{
 		SetCheck(IDC_CHECK_CAREGIVER, true);
 		Disable(IDC_CHECK_CAREGIVER);
+		gWorkPeriod.mbCaregiver = true;
 	}
 	else
 		gWorkPeriod.mbCaregiver = bChecked;

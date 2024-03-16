@@ -77,36 +77,60 @@ bool CMyDialogEx::GetParameter(int id, int &oValue, int minValue, int maxValue)
     }
 	return false;
 }
+bool CMyDialogEx::GetParameter(int id, float& oValue)
+{
+	CWnd* pWnd = GetDlgItem(id);
+	if (!pWnd)
+		return false;
+
+	CString s;
+	pWnd->GetWindowText(s);
+	oValue = (float)_wtof(s);
+	return true;
+}
 bool CMyDialogEx::GetParameter(int id, float &oValue, float minValue, float maxValue)
 {
-    CWnd *pWnd = GetDlgItem(id);
-    if (pWnd)
-    {
-        CString s;
-        pWnd->GetWindowText(s);
-		float n = (float)_wtof(s);
-		if ( n >= minValue && n <= maxValue)
-		{
-			oValue = n;
-			return true;
-		}
-    }
+	float value;
+	if (!GetParameter(id, value))
+		return false;
+
+	if (value >= minValue && value <= maxValue)
+	{
+		oValue = value;
+		return true;
+	}
 	return false;
+}
+bool CMyDialogEx::VerifyParameter(int id, double wantedValue)
+{
+	float value;
+	if (!GetParameter(id, value))
+		return false;
+
+	return value == wantedValue;
+}
+bool CMyDialogEx::GetParameter(int id, double& oValue)
+{
+	CWnd* pWnd = GetDlgItem(id);
+	if (!pWnd)
+		return false;
+
+	CString s;
+	pWnd->GetWindowText(s);
+	oValue = _wtof(s);
+	return true;
 }
 bool CMyDialogEx::GetParameter(int id, double &oValue, double minValue, double maxValue)
 {
-    CWnd *pWnd = GetDlgItem(id);
-    if (pWnd)
-    {
-        CString s;
-        pWnd->GetWindowText(s);
-		double n = _wtof(s);
-		if ( n >= minValue && n <= maxValue)
-		{
-			oValue = n;
-			return true;
-		}
-    }
+	double value;
+	if (!GetParameter(id, value))
+		return false;
+
+	if (value >= minValue && value <= maxValue)
+	{
+		oValue = value;
+		return true;
+	}
 	return false;
 }
 bool CMyDialogEx::GetParameter(int id, int &oValue)
@@ -233,6 +257,11 @@ CString CMyDialogEx::GetTextOptional(int id)
 		return s;
 	}
 	return CString(_T(""));
+}
+bool CMyDialogEx::VerifyText(int id, const CString& sText)
+{
+	CString sFound = GetText(id);
+	return sFound == sText;
 }
 CString CMyDialogEx::GetText(int id)
 {

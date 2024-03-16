@@ -10,7 +10,8 @@ public:
 	void InitFirst();
 	void InitNext(CMonthInfo &prev);
 	bool IsPartial(void);
-	double GetFamilyRatio(CString *posCompanyRatio = NULL);
+	double GetFamilyRatio(CString* posCompanyRatio = NULL, double* poHourlyWage = NULL);
+	void GetFamilyRatio(class CMonthlyFamilyPart &oMonthlyFamilyPart);
 	void Log(FILE* pf);
 	void LogFraction(FILE* pf);
 	double GetFraction() { return mMonthFraction; }

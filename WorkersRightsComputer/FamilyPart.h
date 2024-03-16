@@ -6,12 +6,15 @@ class CFamilyPart
 {
 public:
 	CFamilyPart();
+	CFamilyPart(CFamilyPart &other);
 	~CFamilyPart();
 
 	void Clear(void);
+	void Copy(CFamilyPart &other);
 	void ClearLast(void);
 	bool CheckStartTime(class CMyTime &startTime);
 	bool AddPeriod(class CCompanyPartPeriod* pNewPeriod);
+	class CCompanyPartPeriod* GetLastPeriod();
 
 	double GetRatio() { return mRatio; }
 	void SetRatio(double ratio);

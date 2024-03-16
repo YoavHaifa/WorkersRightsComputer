@@ -592,7 +592,7 @@ double CWorkPeriod::ComputeFamilyPart()
 	if (pfLog)
 	{
 		fprintf(pfLog, "<ComputeFamilyPart> for all period\n");
-		fprintf(pfLog, "iMonth, family, fraction, sumFrac, sum family, company, computation\n");
+		fprintf(pfLog, "iMonth, family, fraction, sumFrac, sum family, company, hourly wage, computation\n");
 	}
 	double sumFractions = 0;
 	double sumFamilyRatio = 0;
@@ -600,14 +600,20 @@ double CWorkPeriod::ComputeFamilyPart()
 	for (int i = 0; i < MAX_MONTHS; i++)
 	{
 		CString sCompanyPart;
-		double familyRatio = maMonths[i].GetFamilyRatio(&sCompanyPart);
+		double companyHourlyRate = 0;
+		double familyRatio = maMonths[i].GetFamilyRatio(&sCompanyPart, &companyHourlyRate);
 		double monthFraction = maMonths[i].GetFraction();
+
 		sumFractions += monthFraction;
 		sumFamilyRatio += familyRatio * monthFraction;
+
 		if (pfLog)
 		{
-			fwprintf(pfLog, L"%d, %5.2f%%, %5.2f, %5.2f, %5.2f, %s\n", i, familyRatio*100,
+			fwprintf(pfLog, L"%d, %5.2f%%, %5.2f, %5.2f, %5.2f, %s", i, familyRatio*100,
 				monthFraction, sumFractions, sumFamilyRatio, (const wchar_t*)sCompanyPart);
+			if (companyHourlyRate > 0)
+				fwprintf(pfLog, L", %5.2f", companyHourlyRate);
+			fwprintf(pfLog, L"\n");
 		}
 		if (maMonths[i].mbLast)
 			break;
@@ -630,7 +636,7 @@ double CWorkPeriod::ComputeFamilyPartLastMonths(int nMonthsWanted)
 	if (pfLog)
 	{
 		fprintf(pfLog, "<ComputeFamilyPartLastMonths> for %d months\n", nMonthsWanted);
-		fprintf(pfLog, "iMonth, family, fraction, sumFrac, sum family, company, computation\n");
+		fprintf(pfLog, "iMonth, family, fraction, sumFrac, sum family, company, hourly wage, computation\n");
 	}
 
 	double missingFraction = nMonthsWanted;
@@ -639,16 +645,21 @@ double CWorkPeriod::ComputeFamilyPartLastMonths(int nMonthsWanted)
 	for (int iMonth = iLast; iMonth >= 0 && missingFraction > 0; iMonth--)
 	{
 		CString sCompanyPart;
-		double familyRatio = maMonths[iMonth].GetFamilyRatio(&sCompanyPart);
+		double companyHourlyRate = 0;
+		double familyRatio = maMonths[iMonth].GetFamilyRatio(&sCompanyPart, &companyHourlyRate);
 		double fraction = min(maMonths[iMonth].GetFraction(), missingFraction);
 
 		sumFractions += fraction;
 		missingFraction -= fraction;
 		sumFamilyRatio += familyRatio * fraction;
+
 		if (pfLog)
 		{
-			fwprintf(pfLog, L"%d, %5.2f%%, %5.2f, %5.2f, %5.2f, %s\n", iMonth, familyRatio*100, 
+			fwprintf(pfLog, L"%d, %5.2f%%, %5.2f, %5.2f, %5.2f, %s", iMonth, familyRatio*100, 
 				fraction, sumFractions, sumFamilyRatio, (const wchar_t *)sCompanyPart);
+			if (companyHourlyRate > 0)
+				fwprintf(pfLog, L", %5.2f", companyHourlyRate);
+			fwprintf(pfLog, L"\n");
 		}
 	}
 

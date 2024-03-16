@@ -29,6 +29,17 @@ CCompanyPartPeriod::CCompanyPartPeriod(class CXMLParseNode* pPeriodNode)
 	LoadFromXml(pPeriodNode);
 	mWorkingHoursPerWeek = gWorkPeriod.GetWorkingHoursInFullWeek(mFrom);
 }
+CCompanyPartPeriod::CCompanyPartPeriod(const CCompanyPartPeriod& other)
+	: mFrom(other.mFrom)
+	, mHoursPerWeek(other.mHoursPerWeek)
+	, mPC(other.mPC)
+	, mFraction(other.mFraction)
+	, mbCompanyPaysMinimumWage(other.mbCompanyPaysMinimumWage)
+	, mHourlyWage(other.mHourlyWage)
+	, mbDummyForApril18(other.mbDummyForApril18)
+	, mWorkingHoursPerWeek(other.mWorkingHoursPerWeek)
+{
+}
 CCompanyPartPeriod::CCompanyPartPeriod(CTime start)
 	: mFrom(start)
 	, mHoursPerWeek(0)
@@ -54,6 +65,9 @@ void CCompanyPartPeriod::UpdateFrom(CCompanyPartPeriod& other)
 {
 	mHoursPerWeek = other.mHoursPerWeek;
 	mFraction = other.mFraction;
+	mbCompanyPaysMinimumWage = other.mbCompanyPaysMinimumWage;
+	mHourlyWage = other.mHourlyWage;
+
 	mbDummyForApril18 = false;
 }
 CString CCompanyPartPeriod::GetLine(CCompanyPartPeriod* pPrev)

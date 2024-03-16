@@ -21,6 +21,9 @@ public:
 	bool GetParameter(int id, double &oValue, double minValue, double maxValue);
 	void GetParameter(int id, bool& bFlag);
 	bool GetParameter(int id, CString& sText);
+	bool GetParameter(int id, float& oValue);
+	bool GetParameter(int id, double& oValue);
+	bool VerifyParameter(int id, double value);
 
 	bool IsChecked(int id);
 	void SetCheck(int id, bool bCheck);
@@ -31,6 +34,7 @@ public:
 	bool SetText(int id, const wchar_t* zText);
 	bool SetText(int id, const wchar_t * zText1, const wchar_t * zText2);
 	bool GetItemText(int id, CString &sText);
+	bool VerifyText(int id, const CString& sText);
 	CString GetText(int id);
 	CString GetTextOptional(int id);
 	void SetStatusWindow(int id);

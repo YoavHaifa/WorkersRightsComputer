@@ -248,9 +248,9 @@
 #define IDC_STATIC_VACPY_PAID2          1193
 #define IDC_RADIO_COMPANY_MINIMUM       1193
 #define IDC_STATIC_VACPY_PAID3          1194
-#define IDC_RADIO2                      1194
 #define IDC_RADIO_COMPANY_HOURLY        1194
 #define IDC_STATIC_VACPY_PAID4          1195
+#define IDC_STATIC_FP_EDITING           1195
 #define ID_FILE_EXIT                    32771
 #define ID_COMPUTE_ALL                  32772
 #define ID_FILE_LOAD                    32773
@@ -269,7 +269,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        154
 #define _APS_NEXT_COMMAND_VALUE         32782
-#define _APS_NEXT_CONTROL_VALUE         1195
+#define _APS_NEXT_CONTROL_VALUE         1196
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

@@ -34,16 +34,21 @@ void CWage::Clear()
 		mPeriods.RemoveTail();
 	}
 }
-void CWage::SetSingle(EWageMode eMode, double wage, double nHours)
+bool CWage::SetSingle(EWageMode eMode, double wage, double nHours)
 {
 	Clear();
-	CWagePeriod* pPeriod = new CWagePeriod(eMode, 
-		gWorkPeriod.mFirst, gWorkPeriod.mLast, wage, nHours);
-	mPeriods.AddTail(pPeriod);
+	if (gWorkPeriod.IsValid())
+	{
+		CWagePeriod* pPeriod = new CWagePeriod(eMode, 
+			gWorkPeriod.mFirst, gWorkPeriod.mLast, wage, nHours);
+		mPeriods.AddTail(pPeriod);
+		return true;
+	}
+	return false;
 }
-void CWage::SetMinWage(void)
+bool CWage::SetMinWage(void)
 {
-	SetSingle(WAGE_MIN);
+	return SetSingle(WAGE_MIN);
 }
 void CWage::SetMonthlyWage(double wage)
 {
@@ -225,16 +230,20 @@ CString CWage::GetStateDesc()
 	CheckList();
 	return s;
 }
-void CWage::Update()
+bool CWage::Update()
 {
 	if (mPeriods.IsEmpty())
-		SetMinWage();
+	{
+		if (!SetMinWage())
+			return false;
+	}
 
 	mpFirst = mPeriods.GetHead();
 	mpFirst->SetFirst();
 
 	mpLast = mPeriods.GetTail();
 	mpLast->SetLast();
+	return true;
 }
 void CWage::UniteAdjacentFileds()
 {
@@ -339,6 +348,7 @@ bool CWage::VerifyWorkPeriod()
 			bShouldCheck = true;
 		}
 	}
-	Update();
+	if (!Update())
+		return false;
 	return gWageTable.Prepare(L"VerifyWorkPeriod");
 }

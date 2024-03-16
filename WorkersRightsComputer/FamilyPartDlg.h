@@ -1,5 +1,6 @@
 #pragma once
 #include "MyDialogEx.h"
+#include "FamilyPart.h"
 
 
 // CFamilyPartDlg dialog
@@ -12,6 +13,8 @@ public:
 	CFamilyPartDlg(CWnd* pParent = nullptr);   // standard constructor
 	virtual ~CFamilyPartDlg();
 	virtual BOOL OnInitDialog();
+	virtual void OnOK();
+	virtual void OnCancel();
 
 // Dialog Data
 #ifdef AFX_DESIGN_TIME
@@ -35,6 +38,13 @@ public:
 	bool mbMinimum;
 	double mHourlyWage;
 
+	void OnEdit();
+	bool mbUnsavedChanges;
+	bool mbInitialized;
+	bool mbAvoidInfiniteLoop;
+
+	CFamilyPart mSavedDefinitions;
+
 	afx_msg void OnBnClickedButtonAddPeriod();
 	afx_msg void OnBnClickedButtonFamilyPartClear();
 	afx_msg void OnBnClickedButtonAddPeriodPercent();
@@ -42,4 +52,8 @@ public:
 	void ClearForEdit();
 	afx_msg void OnBnClickedRadioCompanyMinimum();
 	afx_msg void OnBnClickedRadioCompanyHourly();
+	afx_msg void OnDtnDatetimechangeDatetimepicker1(NMHDR* pNMHDR, LRESULT* pResult);
+	afx_msg void OnEnChangeEditHoursByCompany();
+	afx_msg void OnEnChangeEditPercentByCompany();
+	afx_msg void OnEnChangeEditCompanyHourlyRate();
 };

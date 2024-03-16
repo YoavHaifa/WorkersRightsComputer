@@ -21,6 +21,7 @@ IMPLEMENT_DYNAMIC(CWorkPeriodDlg, CDialogEx)
 
 CWorkPeriodDlg::CWorkPeriodDlg(CWnd* pParent /*=nullptr*/)
 	: CWageDefBaseDlg(IDD_DIALOG_WORK_PERIOD, pParent)
+	, mbDialogInitialized(false)
 {
 	mapCheckDays[0] = &mCheckSunday;
 	mapCheckDays[1] = &mCheckMonday;
@@ -169,6 +170,7 @@ BOOL CWorkPeriodDlg::OnInitDialog()
 
 	SetWageGui();
 
+	mbDialogInitialized = true;
 	UpdateText();
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
@@ -205,8 +207,11 @@ void CWorkPeriodDlg::OnDtnDatetimechangeDatetimepickerNotice(NMHDR * /*pNMHDR*/,
 	UpdateText();
 	*pResult = 0;
 }
-int CWorkPeriodDlg::UpdateText()
+void CWorkPeriodDlg::UpdateText()
 {
+	if (!mbDialogInitialized)
+		return;
+
 	UpdateDataFromDialog();
 
 	CString str;
@@ -266,8 +271,6 @@ int CWorkPeriodDlg::UpdateText()
 	}
 
 	mShow.SetWindowText(sAll);
-	//CWnd wnd = GetDialogEl
-	return 0;
 }
 void CWorkPeriodDlg::OnBnClickedRadioMinWage()
 {
