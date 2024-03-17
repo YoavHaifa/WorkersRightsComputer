@@ -10,6 +10,7 @@
 #include "UsedVacations.h"
 #include "WageTable.h"
 #include "WorkPeriod.h"
+#include "MonthlyFamilyPart.h"
 
 CPension *gpPension = NULL;
 
@@ -96,8 +97,10 @@ void CPension::PensionAddMonth(CMyTime& date, int nDays /* if 0 - full */, bool 
 	//int year = yearAndMonth.mYear;
 	//int month = yearAndMonth.mMonth;
 	double part = 1;
-	CMonthInfo* pInfo = gWorkPeriod.GetMonthInfoFor(date);
-	double monthFraction = pInfo->GetFractionForPension();
+	CMonthInfo* pMonthInfo = gWorkPeriod.GetMonthInfoFor(date);
+	double monthFraction = pMonthInfo->GetFractionForPension();
+	CMonthlyFamilyPart monthlyFamilyPart(*pMonthInfo);
+
 	if (bFirst)
 	{
 		if (nDays > 0)
@@ -120,10 +123,9 @@ void CPension::PensionAddMonth(CMyTime& date, int nDays /* if 0 - full */, bool 
 	double pensionDue = monthlyPay * penRate * part;
 
 	double familyPart = 0;
-	CString sCompanyPart;
 	if (gFamilyPart.mbAskOnlyForFamilyPart)
 	{
-		familyPart = pInfo->GetFamilyRatio(&sCompanyPart);
+		familyPart = monthlyFamilyPart.mFamilyRatio;
 		pensionDue *= familyPart;
 	}
 	mPensionDue += pensionDue;
@@ -165,7 +167,7 @@ void CPension::PensionAddMonth(CMyTime& date, int nDays /* if 0 - full */, bool 
 		OnYearEnd();
 	if (gFamilyPart.mbAskOnlyForFamilyPart)
 		mDueFromFamily += (pensionDue + severanceDue);
-	mReport.AddMonth(date, monthlyPay, part, penRate, sevRate, familyPart, (const wchar_t *)sCompanyPart);
+	mReport.AddMonth(date, monthlyPay, part, penRate, sevRate, familyPart, (const wchar_t *)monthlyFamilyPart.msCompanyRatio);
 }
 bool CPension::CheckForDateToStartPension()
 {

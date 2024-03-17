@@ -13,6 +13,7 @@
 #include "Wage.h"
 #include "HolidaysDue.h"
 #include "VacationDaysDue.h"
+#include "MonthlyFamilyPart.h"
 
 CWorkPeriod gWorkPeriod;
 
@@ -592,29 +593,19 @@ double CWorkPeriod::ComputeFamilyPart()
 	if (pfLog)
 	{
 		fprintf(pfLog, "<ComputeFamilyPart> for all period\n");
-		fprintf(pfLog, "iMonth, family, fraction, sumFrac, sum family, company, hourly wage, computation\n");
+		CMonthlyFamilyPart::LogTitle(pfLog);
 	}
 	double sumFractions = 0;
 	double sumFamilyRatio = 0;
 
 	for (int i = 0; i < MAX_MONTHS; i++)
 	{
-		CString sCompanyPart;
-		double companyHourlyRate = 0;
-		double familyRatio = maMonths[i].GetFamilyRatio(&sCompanyPart, &companyHourlyRate);
-		double monthFraction = maMonths[i].GetFraction();
+		CMonthlyFamilyPart monthly(maMonths[i]);
 
-		sumFractions += monthFraction;
-		sumFamilyRatio += familyRatio * monthFraction;
+		sumFractions += monthly.mMonthFraction;
+		sumFamilyRatio += monthly.mFamilyRatio * monthly.mMonthFraction;
 
-		if (pfLog)
-		{
-			fwprintf(pfLog, L"%d, %5.2f%%, %5.2f, %5.2f, %5.2f, %s", i, familyRatio*100,
-				monthFraction, sumFractions, sumFamilyRatio, (const wchar_t*)sCompanyPart);
-			if (companyHourlyRate > 0)
-				fwprintf(pfLog, L", %5.2f", companyHourlyRate);
-			fwprintf(pfLog, L"\n");
-		}
+		monthly.LogLine(pfLog, i, sumFractions, sumFamilyRatio);
 		if (maMonths[i].mbLast)
 			break;
 	}
@@ -644,23 +635,14 @@ double CWorkPeriod::ComputeFamilyPartLastMonths(int nMonthsWanted)
 
 	for (int iMonth = iLast; iMonth >= 0 && missingFraction > 0; iMonth--)
 	{
-		CString sCompanyPart;
-		double companyHourlyRate = 0;
-		double familyRatio = maMonths[iMonth].GetFamilyRatio(&sCompanyPart, &companyHourlyRate);
-		double fraction = min(maMonths[iMonth].GetFraction(), missingFraction);
+		CMonthlyFamilyPart monthly(maMonths[iMonth]);
 
+		double fraction = min(monthly.mMonthFraction, missingFraction);
 		sumFractions += fraction;
+		sumFamilyRatio += monthly.mFamilyRatio * fraction;
 		missingFraction -= fraction;
-		sumFamilyRatio += familyRatio * fraction;
 
-		if (pfLog)
-		{
-			fwprintf(pfLog, L"%d, %5.2f%%, %5.2f, %5.2f, %5.2f, %s", iMonth, familyRatio*100, 
-				fraction, sumFractions, sumFamilyRatio, (const wchar_t *)sCompanyPart);
-			if (companyHourlyRate > 0)
-				fwprintf(pfLog, L", %5.2f", companyHourlyRate);
-			fwprintf(pfLog, L"\n");
-		}
+		monthly.LogLine(pfLog, iMonth, sumFractions, sumFamilyRatio);
 	}
 
 	if (sumFractions > 0)

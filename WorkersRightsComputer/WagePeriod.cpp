@@ -94,6 +94,7 @@ CWagePeriod::CWagePeriod(CXMLParseNode* pNode)
 	{
 		pNode->GetValue(L"first", mFirstDay);
 		pNode->GetValue(L"last", mLastDay);
+		InitDaysSpan(mFirstDay, mLastDay);
 	}
 
 	if (bError)

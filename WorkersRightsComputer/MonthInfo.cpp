@@ -96,6 +96,7 @@ bool CMonthInfo::IsPartial(void)
 {
 	return (mMonthFraction < 1);
 }
+/*
 double CMonthInfo::GetFamilyRatio(CString* posCompanyRatio, double* poCompanyHourlyWage)
 {
 	// If nothing else is defined
@@ -157,10 +158,7 @@ double CMonthInfo::GetFamilyRatio(CString* posCompanyRatio, double* poCompanyHou
 		}
 	}
 	return familyRatio;
-}
-void CMonthInfo::GetFamilyRatio(class CMonthlyFamilyPart& oMonthlyFamilyPart)
-{
-}
+}*/
 void CMonthInfo::Log(FILE* pf)
 {
 	fwprintf(pf, L"%3d: %d/%02d - ", mi, mFirstDay.mYear, mFirstDay.mMonth);
