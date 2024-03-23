@@ -237,6 +237,8 @@ bool CPension::DoCompute()
 			return true;
 		}
 	}
+	// Add first part-month
+	CMonthlyFamilyPart::StartComputingPension();
 	PensionAddMonth(mStartDateForPension, nDaysInFirstMonth, true);
 
 	if (!bFirstIsLast)
@@ -246,6 +248,7 @@ bool CPension::DoCompute()
 		while ((countMonths.mYear < gWorkPeriod.mLast.mYear)
 			|| (countMonths.mYear == gWorkPeriod.mLast.mYear &&  countMonths.mMonth < gWorkPeriod.mLast.mMonth))
 		{
+			// Add regular full month
 			PensionAddMonth(countMonths, 0);
 			countMonths.AddMonth();
 		}
@@ -256,6 +259,7 @@ bool CPension::DoCompute()
 			OnYearEnd();
 	}
 
+	CMonthlyFamilyPart::EndComputingPension();
 	mDuePay = mSeveranceDue + mPensionDue;
 	return true;
 }

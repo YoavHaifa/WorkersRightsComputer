@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "DaysSpan.h"
 #include "WorkPeriod.h"
+#include "XMLParse.h"
+#include "XMLDump.h"
 
 CDaysSpan::CDaysSpan()
 	: mnDays(0)
@@ -14,6 +16,21 @@ CDaysSpan::CDaysSpan(const CMyTime& firstDay, const CMyTime& lastDay)
 CDaysSpan::CDaysSpan(const CDaysSpan& other)
 {
 	InitDaysSpan(other.mFirstDay, other.mLastDay);
+}
+CDaysSpan::CDaysSpan(CXMLParseNode* pNode)
+{
+	if (!pNode->GetValue(L"FirstDay", mFirstDay))
+		pNode->GetValue(L"first", mFirstDay);
+
+	if (!pNode->GetValue(L"LastDay", mLastDay))
+		pNode->GetValue(L"last", mLastDay);
+
+	InitDaysSpan(mFirstDay, mLastDay);
+}
+void CDaysSpan::SaveToXml(class CXMLDump& xmlDump)
+{
+	xmlDump.Write(L"FirstDay", mFirstDay);
+	xmlDump.Write(L"LastDay", mLastDay);
 }
 void CDaysSpan::InitDaysSpan(const CMyTime& firstDay, const CMyTime& lastDay)
 {

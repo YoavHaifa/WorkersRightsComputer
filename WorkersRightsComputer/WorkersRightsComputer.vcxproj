@@ -203,6 +203,7 @@
     <ClInclude Include="PrevYearsHolidaysDlg.h" />
     <ClInclude Include="PrevYearsVacationsDlg.h" />
     <ClInclude Include="RightResult.h" />
+    <ClInclude Include="StringsList.h" />
     <ClInclude Include="VacationDaysDue.h" />
     <ClInclude Include="VacationDuePerYear.h" />
     <ClInclude Include="Wage.h" />
@@ -273,6 +274,7 @@
     <ClCompile Include="PrevYearsHolidaysDlg.cpp" />
     <ClCompile Include="PrevYearsVacationsDlg.cpp" />
     <ClCompile Include="RightResult.cpp" />
+    <ClCompile Include="StringsList.cpp" />
     <ClCompile Include="VacationDaysDue.cpp" />
     <ClCompile Include="VacationDuePerYear.cpp" />
     <ClCompile Include="Wage.cpp" />

@@ -627,7 +627,7 @@ double CWorkPeriod::ComputeFamilyPartLastMonths(int nMonthsWanted)
 	if (pfLog)
 	{
 		fprintf(pfLog, "<ComputeFamilyPartLastMonths> for %d months\n", nMonthsWanted);
-		fprintf(pfLog, "iMonth, family, fraction, sumFrac, sum family, company, hourly wage, computation\n");
+		CMonthlyFamilyPart::LogTitle(pfLog);
 	}
 
 	double missingFraction = nMonthsWanted;

@@ -52,7 +52,8 @@ CWagePeriod::CWagePeriod(const CWagePeriod& other)
 	Copy(other);
 }
 CWagePeriod::CWagePeriod(CXMLParseNode* pNode)
-	: meMode(WAGE_UNDEF)
+	: CDaysSpan(pNode)
+	, meMode(WAGE_UNDEF)
 	, mMonthlyWage(0)
 	, mHourlyWage(0)
 	, mnHoursPerMonth(0)
@@ -90,13 +91,6 @@ CWagePeriod::CWagePeriod(CXMLParseNode* pNode)
 		sError = "Failed to find mode for wage period";
 	}
 
-	if (!bError)
-	{
-		pNode->GetValue(L"first", mFirstDay);
-		pNode->GetValue(L"last", mLastDay);
-		InitDaysSpan(mFirstDay, mLastDay);
-	}
-
 	if (bError)
 	{
 		CUtils::MessBox(L"Failed to restored saved wage period", L"Save/Restore Error");
@@ -127,8 +121,7 @@ void CWagePeriod::SaveToXml(class CXMLDump& xmlDump)
 {
 	CXMLDumpScope mainScope(L"Period", xmlDump);
 	xmlDump.Write(L"mode", azWageMode[meMode]);
-	xmlDump.Write(L"first", mFirstDay);
-	xmlDump.Write(L"last", mLastDay);
+	CDaysSpan::SaveToXml(xmlDump);
 
 	switch (meMode)
 	{

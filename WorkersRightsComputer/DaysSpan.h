@@ -7,9 +7,12 @@ public:
 	CDaysSpan();
 	CDaysSpan(const CMyTime& firstDay, const CMyTime& lastDay);
 	CDaysSpan(const CDaysSpan& other);
+	CDaysSpan(class CXMLParseNode* pNode);
 
 	void InitDaysSpan(const CMyTime& firstDay, const CMyTime& lastDay);
 	void SetMonth(const CMyTime &date);
+
+	void SaveToXml(class CXMLDump& xmlDump);
 
 	bool ClipByWorkPeriodEnd();
 

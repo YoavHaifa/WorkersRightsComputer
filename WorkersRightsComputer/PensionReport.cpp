@@ -3,7 +3,7 @@
 #include "HtmlWriter.h"
 #include "Pension.h"
 #include "FamilyPart.h"
-
+#include "MonthlyFamilyPart.h"
 
 CPensionReportPeriod::CPensionReportPeriod(const CMyTime& date,
 	double monthlyPay, double part, 
@@ -162,6 +162,7 @@ void CPensionReport::WriteToLetterPension(CHtmlWriter& html)
 	}
 	html.EndTabLine();
 	html.EndPensionTable();
+	CMonthlyFamilyPart::WriteCommentsToLetter(html);
 }
 void CPensionReport::WriteToLetterSeverance(CHtmlWriter& html)
 {

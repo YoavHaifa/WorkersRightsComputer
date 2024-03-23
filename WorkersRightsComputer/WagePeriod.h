@@ -1,5 +1,4 @@
 #pragma once
-//#include "MyTime.h"
 #include "DaysSpan.h"
 
 typedef enum EWageMode
