@@ -104,10 +104,45 @@ void CSaver::SaveToXml(void)
 	gComments.SaveToXml(xmlDump);
 
 	gAllRights.SaveToXml(xmlDump);
+
+	// Print time of save
+	time_t saveTime = time(NULL);
+	wchar_t wzBuf[256];
+	_wctime_s(wzBuf, 256, &saveTime);
+	xmlDump.Write(L"save_time", wzBuf);
+
 	xmlDump.Write(L"software_version", gConfig.msVersion);
 	xmlDump.Write(L"i_software_version", gConfig.miVersion);
 
 	xmlDump.Close();
+	SaveXmlAsOldCopy(xmlDump.msName);
+}
+void CSaver::SaveXmlAsOldCopy(const wchar_t* zfName)
+{
+	CFileName fName(zfName);
+	CString sPrivate = fName.Private();
+	if (sPrivate == "Last.xml")
+		return;
+
+	CString sPath = fName.Path();
+	CString sSavePath = sPath + "\\OldSaves";
+	if (!CUtils::VerifyDirectory(sSavePath))
+		return;
+
+	wchar_t wsBuf[256];
+	int MAX_SAVES = 100;
+	CString sSavePattern = sSavePath + "\\" + fName.PrivateWithoutType() + "_%02d.xml";
+	int i = 1;
+	for (; i <= MAX_SAVES; i++)
+	{
+		swprintf_s(wsBuf, 256, (const wchar_t*)sSavePattern, i);
+		if (!CFileName::Exist(wsBuf))
+			break;
+	}
+	if (i > MAX_SAVES)
+		return;
+
+	CopyFile(zfName, wsBuf, true);
 }
 void CSaver::SaveEditBox(FILE *pfSave, CEditRef *pRef)
 {
