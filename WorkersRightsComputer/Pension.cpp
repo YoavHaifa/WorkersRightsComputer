@@ -1,6 +1,5 @@
 ﻿#include "StdAfx.h"
 #include "Pension.h"
-#include "YearlyRates.h"
 #include "MonthlyRates.h"
 #include "Utils.h"
 #include "MonthInfo.h"

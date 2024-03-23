@@ -19,13 +19,18 @@ public:
 
 	bool IsValid(void);
 
-	bool InitFromFile(void);
-	void PrintLog(void);
-	double ComputeMonthlyPay(const class CMyTime& date);
+	bool InitFromXmlFile(void);
+	//bool InitFromTextFile(void);
+	//void PrintLog(void);
+	//double ComputeMonthlyPay(const class CMyTime& date);
 	double GetMonthlyWage(const class CMyTime& date);
 
-	int mn;
-	CLevel **map;
+private:
+	//void SaveMonthlyXmlFile();
+	class CMonthlyRates* mpMonthlyRates;
+
+	//int mn;
+	//CLevel **map;
 };
 
 extern CMinWage gMinWage;

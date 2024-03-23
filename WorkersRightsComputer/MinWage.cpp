@@ -3,19 +3,29 @@
 #include "Holidays.h"
 #include "Utils.h"
 #include "WorkPeriod.h"
+#include "XMLParse.h"
+#include "XMLDump.h"
+#include "MonthlyRates.h"
 
 CMinWage gMinWage;
 
 CMinWage::CMinWage(void)
+	: mpMonthlyRates(NULL)
 {
-	// ALLOW_DAD
-	// InitFromFile();
 }
 bool CMinWage::IsValid(void)
 {
-	return mn > 0;
+	return mpMonthlyRates->mbValid;
 }
-bool CMinWage::InitFromFile(void)
+bool CMinWage::InitFromXmlFile(void)
+{
+	if (!mpMonthlyRates)
+		mpMonthlyRates = new CMonthlyRates(L"MinWage", 1950);
+
+	return mpMonthlyRates->mbValid;
+}
+/*
+bool CMinWage::InitFromTextFile(void)
 {
 	static bool bFailed = false;
 	static bool bRead = false;
@@ -43,8 +53,24 @@ bool CMinWage::InitFromFile(void)
 
 	PrintLog();
 	bRead = true;
+	SaveMonthlyXmlFile();
 	return true;
-}
+}*/
+/*
+void CMinWage::SaveMonthlyXmlFile(void)
+{
+	CString sDirName(CUtils::GetInputPath());
+	CXMLDump dump(sDirName, L"MinWage", L"MonthlyRates");
+
+	for (int i = mn-1; i >= 0; i--)
+	{
+		CXMLDumpScope scope(L"rate_start", dump);
+		dump.Write(L"year", map[i]->mYear);
+		dump.Write(L"month", map[i]->mMonth);
+		dump.Write(L"rate", map[i]->mWage);
+	}
+}*/
+/*
 void CMinWage::PrintLog(void)
 {
 	FILE *pfWrite = CUtils::OpenLogFile(L"MinWage");
@@ -59,7 +85,8 @@ void CMinWage::PrintLog(void)
 		map[i]->Log(pfWrite);
 	}
 	fclose(pfWrite);
-}
+}*/
+/*
 double CMinWage::ComputeMonthlyPay(const CMyTime &date)
 {
 	if (mn < 1)
@@ -78,8 +105,9 @@ double CMinWage::ComputeMonthlyPay(const CMyTime &date)
 	}
 
 	return (map[mn - 1]->mWage);
-}
+}*/
 double CMinWage::GetMonthlyWage(const CMyTime& time)
 {
-	return ComputeMonthlyPay(time);
+	return mpMonthlyRates->RatePerMonth(time);
+	//return ComputeMonthlyPay(time);
 }

@@ -32,7 +32,8 @@ bool CAllRights::Init()
 {
 	Clear();
 
-	gMinWage.InitFromFile();
+	//gMinWage.InitFromTextFile();
+	gMinWage.InitFromXmlFile();
 
 	mRights.AddTail(new CSeverance);
 	mRights.AddTail(new CNotice);

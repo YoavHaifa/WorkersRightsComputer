@@ -15,7 +15,6 @@ public:
 	virtual CString GetDecriptionForLetterHebrew(void)override;
 
 	class CMonthlyRates *mpPensionRates;
-	//class CYearlyRates* mpSeveranceRates;
 	class CMonthlyRates* mpSeveranceMonthlyRates;
 
 	static const int N_MONTHS_BEFORE_PAY_FROM_2008 = 9;

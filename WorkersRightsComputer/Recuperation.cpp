@@ -2,7 +2,6 @@
 #include "Recuperation.h"
 #include "WorkPeriod.h"
 #include "WorkYears.h"
-#include "YearlyRates.h"
 #include "MonthlyRates.h"
 #include "Config.h"
 
@@ -16,8 +15,6 @@ CRecuperation::CRecuperation(void)
 	miPrintOrder = 3;
 	Init();
 	mpSeniority = new CSeniority(L"Recuperation");
-	//mpRates = new CYearlyRates(L"Recuperation", 1950);
-	//mpRates->SaveMonthlyXmlFile();
 	mpMonthlyRates = new CMonthlyRates(L"Recuperation", 1950);
 }
 bool CRecuperation::SetCheckRef(CButtonRef *pButton)
