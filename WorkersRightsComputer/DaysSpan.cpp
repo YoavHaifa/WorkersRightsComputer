@@ -7,6 +7,7 @@
 CDaysSpan::CDaysSpan()
 	: mnDays(0)
 	, mnWorkDays(0)
+	, mbUndefined(true)
 {
 }
 CDaysSpan::CDaysSpan(const CMyTime& firstDay, const CMyTime& lastDay)
@@ -19,13 +20,19 @@ CDaysSpan::CDaysSpan(const CDaysSpan& other)
 }
 CDaysSpan::CDaysSpan(CXMLParseNode* pNode)
 {
+	bool bMissingDefinition = false;
 	if (!pNode->GetValue(L"FirstDay", mFirstDay))
-		pNode->GetValue(L"first", mFirstDay);
+		if (!pNode->GetValue(L"first", mFirstDay))
+			bMissingDefinition = true;
 
 	if (!pNode->GetValue(L"LastDay", mLastDay))
-		pNode->GetValue(L"last", mLastDay);
+		if (!pNode->GetValue(L"last", mLastDay))
+			bMissingDefinition = true;
 
-	InitDaysSpan(mFirstDay, mLastDay);
+	if (bMissingDefinition)
+		mbUndefined = true;
+	else
+		InitDaysSpan(mFirstDay, mLastDay);
 }
 void CDaysSpan::SaveToXml(class CXMLDump& xmlDump)
 {
@@ -36,9 +43,22 @@ void CDaysSpan::InitDaysSpan(const CMyTime& firstDay, const CMyTime& lastDay)
 {
 	mFirstDay = firstDay;
 	mLastDay = lastDay;
-	mDayAfter = mLastDay.NextDay();
-	mnDays = mFirstDay.GetNDaysBefore(mDayAfter);
-	mnWorkDays = gWorkPeriod.CountWorkingDays(mFirstDay, mLastDay);
+	if (mFirstDay.mTime == 0 || mLastDay.mTime == 0)
+	{
+		mFirstDay.Set(0);
+		mLastDay.Set(0);
+		mDayAfter.Set(0);
+		mnDays = 0;
+		mnWorkDays = 0;
+		mbUndefined = true;
+	}
+	else
+	{
+		mDayAfter = mLastDay.NextDay();
+		mnDays = mFirstDay.GetNDaysBefore(mDayAfter);
+		mnWorkDays = gWorkPeriod.CountWorkingDays(mFirstDay, mLastDay);
+		mbUndefined = false;
+	}
 }
 void CDaysSpan::SetMonth(const CMyTime& date)
 {

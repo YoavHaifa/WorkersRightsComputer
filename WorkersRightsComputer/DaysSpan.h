@@ -30,5 +30,6 @@ public:
 	CMyTime mDayAfter;
 	int mnDays;
 	int mnWorkDays;
+	bool mbUndefined;
 };
 

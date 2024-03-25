@@ -6,6 +6,7 @@
 #include "MinWage.h"
 #include "WorkPeriod.h"
 #include "HtmlWriter.h"
+#include "Config.h"
 
 bool CMonthlyFamilyPart::umbComputingPension = false;
 int CMonthlyFamilyPart::umiCommentIndex = 0;
@@ -71,11 +72,20 @@ void CMonthlyFamilyPart::Compute()
                 mRatioParallelEmployment = mFullCompanyPay / mMonthlyWage;
                 mRatioFamilyAlone = 1 - mRatioParallelEmployment;
                 mFamilyRatioInParellel = mFamilyRatio;
-                mFamilyRatio = mRatioParallelEmployment * mFamilyRatio + mRatioFamilyAlone;
+                if (!gConfig.mbBackwardCompatibilityMode || gConfig.miLegacyVersion >= 135)
+                {
+                    mFamilyRatio = mRatioParallelEmployment * mFamilyRatio + mRatioFamilyAlone;
 
-                // Prepare explanation
-                sprintf_s(zBuf, sizeof(zBuf), "Initial Family %5.2f%% of %5.2f%% parallel + %5.2f%%",
-                    mFamilyRatioInParellel * 100, mRatioParallelEmployment * 100, mRatioFamilyAlone * 100);
+                    // Prepare explanation
+                    sprintf_s(zBuf, sizeof(zBuf), "Initial Family %5.2f%% of %5.2f%% parallel + %5.2f%% paid by family",
+                        mFamilyRatioInParellel * 100, mRatioParallelEmployment * 100, mRatioFamilyAlone * 100);
+                }
+                else
+                {
+                    sprintf_s(zBuf, sizeof(zBuf), "gConfig.mbBackwardCompatibilityMode: ignore %5.2f%% paid by family alone",
+                        mRatioFamilyAlone * 100);
+                }
+
 
                 bool bNewExplanation = false;
                 if (umsLastExplanation != zBuf)
@@ -103,7 +113,7 @@ void CMonthlyFamilyPart::Compute()
                     wsh += L" מתוך ";
                     swprintf_s(wzBuf, 128, L"%5.2f%%", mRatioParallelEmployment * 100);
                     wsh += wzBuf;
-                    wsh += L" בתוספת העסקה בנפרד  ";
+                    wsh += L" חלק מהשכר ששולם על ידי המשפחה בלבד  ";
                     swprintf_s(wzBuf, 128, L"%5.2f%%", mRatioFamilyAlone * 100);
                     wsh += wzBuf;
                     umHebrewComments.AddTail(wsh);
@@ -116,24 +126,31 @@ void CMonthlyFamilyPart::LogTitle(FILE* pf)
 {
     StartNewSeries();
     if (pf)
-        fprintf(pf, "iMonth, family, fraction, sumFrac, sum family, company, wage, hourly wage, full, computation\n");
+    {
+        fprintf(pf, "iMonth, month, year, ");
+        fprintf(pf, "family, fraction, sumFrac, sum family, company, wage, hourly wage, full, computation\n");
+    }
 }
 void CMonthlyFamilyPart::LogLine(FILE* pf, int i, double sumFractions, double sumFamilyRatio)
 {
     if (!pf)
         return;
 
-    fwprintf(pf, L"%d, %5.2f%%, %5.2f, %5.2f, %5.2f, %s", i+1, mFamilyRatio * 100,
+    fwprintf(pf, L"%d, %d, %d, ", i + 1, mFirstDay.mMonth, mFirstDay.mYear);
+    fwprintf(pf, L"%5.2f%%, %5.2f, %5.2f, %5.2f, %s", mFamilyRatio * 100,
         mMonthFraction, sumFractions, sumFamilyRatio, (const wchar_t*)msCompanyRatio);
+        
+    fwprintf(pf, L", %5.2f", mMonthlyWage);
 
     if (mHourlyRateByCompany > 0)
-    {
-        fwprintf(pf, L", %5.2f", mMonthlyWage);
         fwprintf(pf, L", %5.2f", mHourlyRateByCompany);
-        fwprintf(pf, L", %5.2f", mFullCompanyPay);
-        if (mbCompanyRatioExplained)
-            fwprintf(pf, L", %s", (const wchar_t*)umsLastExplanation);
-    }
+    else
+        fwprintf(pf, L", min");
+
+    fwprintf(pf, L", %5.2f", mFullCompanyPay);
+
+    if (mbCompanyRatioExplained)
+        fwprintf(pf, L", %s", (const wchar_t*)umsLastExplanation);
 
     fprintf(pf, "\n");
 }

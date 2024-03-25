@@ -25,7 +25,10 @@ void CVerify::StartVerifyBatch(const wchar_t *zfName)
 }
 void CVerify::OpenBatchReport(const CString& sPath)
 {
-	CString sReportFileName(sPath + L"VerifyBatchReport.csv");
+	CString sfName(L"VerifyBatchReport");
+	sfName += gConfig.msVersion;
+	sfName += L".csv";
+	CString sReportFileName(sPath + sfName);
 	umpfReport = MyFOpenWithErrorBox(sReportFileName, L"w", L"Log");
 
 	// Write report title
@@ -37,6 +40,7 @@ void CVerify::OpenBatchReport(const CString& sPath)
 		CRight* pRight = gAllRights.mRights.GetNext(pos);
 		fwprintf(umpfReport, L"%s, diff, ", (const wchar_t *)pRight->msName);
 	}
+	fwprintf(umpfReport, L"sum diff, finally, version, name");
 	fprintf(umpfReport, "\n");
 }
 DWORD WINAPI CVerify::StaticVerifyBatch(LPVOID)
@@ -44,7 +48,10 @@ DWORD WINAPI CVerify::StaticVerifyBatch(LPVOID)
 	CString sPath = CFileName::GetPath(umsfName);
 	sPath = CFileName::GetPath(sPath);
 
-	CString sLogFileName(sPath + L"VerifyBatch.log");
+	CString sfName(L"VerifyBatch_");
+	sfName += gConfig.msVersion;
+	sfName += L".log";
+	CString sLogFileName(sPath + sfName);
 	FILE *pfLog = MyFOpenWithErrorBox(sLogFileName, L"w", L"Log");
 	if (!pfLog)
 		return 0;
@@ -75,7 +82,7 @@ DWORD WINAPI CVerify::StaticVerifyBatch(LPVOID)
 			{
 				CString sCurPath = CFileName::GetPath((const wchar_t *)*psfName);
 				CString sLast = CFileName::GetPrivate(sCurPath);
-				fwprintf(umpfReport, L"%s\n", (const wchar_t *)sLast);
+				fwprintf(umpfReport, L"%d, %s\n", gConfig.miLegacyVersion, (const wchar_t *)sLast);
 				fflush(umpfReport);
 			}
 			delete pVerify;
@@ -496,6 +503,7 @@ void CVerify::IdentifyLegacyVersion(CXMLParseNode* pRoot)
 {
 	// Identify legacy version
 	int iVersion = 0;
+	gConfig.miLegacyVersion = 0;
 	if (pRoot->GetValue(L"i_software_version", iVersion))
 	{
 		gConfig.miLegacyVersion = iVersion;
@@ -509,6 +517,12 @@ void CVerify::IdentifyLegacyVersion(CXMLParseNode* pRoot)
 				gConfig.miLegacyVersion = 133;
 			else if (sSWVersion.Find(L"v1.3.2") >= 0)
 				gConfig.miLegacyVersion = 132;
+			else if (sSWVersion.Find(L"v1.2.2") >= 0)
+				gConfig.miLegacyVersion = 122;
+			else if (sSWVersion.Find(L"v1.2.0") >= 0)
+				gConfig.miLegacyVersion = 120;
+			else if (sSWVersion.Find(L"v1.1.3") >= 0)
+				gConfig.miLegacyVersion = 113;
 			else
 				gConfig.miLegacyVersion = 131;
 		}
