@@ -146,7 +146,7 @@ void CPensionReport::WriteToLetterPension(CHtmlWriter& html)
 	}
 	// Sum Line
 	html.StartTabLine();
-	html.Write2TabEH(L"Sum", L"סך הכל");
+	html.Write2TabEH(L"Sum", L"סך הכל", true /*bBold*/);
 	html.Write2Tab(" ");
 	if (gFamilyPart.mbAskOnlyForFamilyPart)
 		html.Write2Tab(" ");
@@ -154,11 +154,11 @@ void CPensionReport::WriteToLetterPension(CHtmlWriter& html)
 	html.Write2Tab(" ");
 	html.Write2Tab(" ");
 	html.Write2Tab(" ");
-	html.Write2Tab(sumPension);
+	html.Write2TabBold(sumPension);
 	if (gFamilyPart.mbAskOnlyForFamilyPart)
 	{
 		html.Write2Tab(" ");
-		html.Write2Tab(sumFromFamily);
+		html.Write2TabBold(sumFromFamily);
 	}
 	html.EndTabLine();
 	html.EndPensionTable();
@@ -181,7 +181,7 @@ void CPensionReport::WriteToLetterSeverance(CHtmlWriter& html)
 	}
 	// Sum Line
 	html.StartTabLine();
-	html.Write2TabEH(L"Sum", L"סך הכל");
+	html.Write2TabEH(L"Sum", L"סך הכל", true /*bBold*/);
 	html.Write2Tab(" ");
 	if (gFamilyPart.mbAskOnlyForFamilyPart)
 		html.Write2Tab(" ");
@@ -191,12 +191,12 @@ void CPensionReport::WriteToLetterSeverance(CHtmlWriter& html)
 	if (gpPension->mbSeverance)
 	{
 		html.Write2Tab(" ");
-		html.Write2Tab(sumSeverance);
+		html.Write2TabBold(sumSeverance);
 	}
 	if (gFamilyPart.mbAskOnlyForFamilyPart)
 	{
 		html.Write2Tab(" ");
-		html.Write2Tab(sumFromFamily);
+		html.Write2TabBold(sumFromFamily);
 	}
 	html.EndTabLine();
 	html.EndPensionTable();

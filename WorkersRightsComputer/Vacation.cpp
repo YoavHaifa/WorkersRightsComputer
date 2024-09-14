@@ -9,7 +9,7 @@
 const double CVacation::MIN_FRACTION_FOR_ROUND_UP = 0.9;
 
 CVacation::CVacation()
-	: CRight(L"Vacation", L"חופש")
+	: CRight(L"Vacation", L"פדיון חופשה")
 	, mnDueDays(0)
 	, mPayPerDay(0)
 {

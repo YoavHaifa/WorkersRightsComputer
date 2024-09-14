@@ -350,7 +350,7 @@ void CPension::WriteToLetter(class CHtmlWriter& html)
 	{
 		html.StartParagraph();
 		html.StartBold();
-		html.WriteLineEH(L"Severance Fund", L"קרן פיצויים");
+		html.WriteLineEH(L"Pension - Severance Fund", L"פנסיה - קרן פיצויים");
 		html.EndBold();
 		mReport.WriteToLetterSeverance(html);
 		html.EndParagraph();

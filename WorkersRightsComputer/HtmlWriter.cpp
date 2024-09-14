@@ -375,10 +375,21 @@ void CHtmlWriter::Write2Tab(const char* zText)
 	s += "</td>";
 	WriteL(s);
 }
-void CHtmlWriter::Write2TabEH(const wchar_t* zText, const wchar_t* zHebrewText)
+void CHtmlWriter::Write2TabBold(const char* zText)
+{
+	CString s("<td><b>");
+	s += zText;
+	s += "</b></td>";
+	WriteL(s);
+}
+void CHtmlWriter::Write2TabEH(const wchar_t* zText, const wchar_t* zHebrewText, bool bBold)
 {
 	Write(L"<td>");
+	if (bBold)
+		Write(L"<b>");
 	WriteEH(zText, zHebrewText);
+	if (bBold)
+		Write(L"</b>");
 	WriteLine(L"</td>");
 }
 void CHtmlWriter::Write2Tab(double value)
@@ -386,6 +397,12 @@ void CHtmlWriter::Write2Tab(double value)
 	char zBuf[128];
 	sprintf_s(zBuf, 128, "%.2f", value);
 	Write2Tab(zBuf);
+}
+void CHtmlWriter::Write2TabBold(double value)
+{
+	char zBuf[128];
+	sprintf_s(zBuf, 128, "%.2f", value);
+	Write2TabBold(zBuf);
 }
 void CHtmlWriter::Write2Tab(const char *zFormat, double value)
 {
@@ -405,20 +422,32 @@ bool CHtmlWriter::OpenHebrewLetter()
 	mpfHebrewWrite = MyFOpenWithErrorBox(msfHebrewName, L"w, ccs=UNICODE", L"HTML Unicode");
 	return mpfHebrewWrite != NULL;
 }
-void CHtmlWriter::WriteItemToHtmlTable(CString sItem, CString sItemHebrew, bool bInvertDirection)
+void CHtmlWriter::WriteItemToHtmlTable(CString sItem, CString sItemHebrew, bool bInvertDirection, bool bBold)
 {
 	CString s(bInvertDirection ? "<td style=""direction:rtl;"">" : "<td style=""direction:ltr;"">");
+	if (bBold)
+		s += "<b>";
 	s += sItem;
+	if (bBold)
+		s += "</b>";
 	s += "</td>";
 	CString sh(bInvertDirection ? "<td style=""direction:ltr;"">" : "<td style=""direction:rtl;"">");
+	if (bBold)
+		sh += "<b>";
 	sh += sItemHebrew;
+	if (bBold)
+		sh += "</b>";
 	sh += "</td>";
 	WriteLEH(s, sh);
 }
-void CHtmlWriter::WriteNumericItemToHtmlTable(double value)
+void CHtmlWriter::WriteNumericItemToHtmlTable(double value, bool bBold)
 {
 	CString s(value > 0? "<td style=""direction:rtl;"">" : "<td style=""direction:l2r;"">");
+	if (bBold)
+		s += "<b>";
 	s += CRight::ToString(value);
+	if (bBold)
+		s += "</b>";
 	s += "</td>";
 	WriteLEH(s, s);
 }

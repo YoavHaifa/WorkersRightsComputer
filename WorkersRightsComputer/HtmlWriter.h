@@ -38,15 +38,17 @@ public:
 	void EndPensionTable(void);
 	void Write2Tab(CString &sItem);
 	void Write2Tab(const char* zText);
-	void Write2TabEH(const wchar_t* zText, const wchar_t* zHebrewText);
+	void Write2TabBold(const char* zText);
+	void Write2TabEH(const wchar_t* zText, const wchar_t* zHebrewText, bool bBold = false);
 	void Write2Tab(double value);
+	void Write2TabBold(double value);
 	void Write2Tab(const char *zFormat, double value);
 
 	bool OpenHebrewLetter();
 	bool mbEng;
 	bool mbHeb;
-	void WriteItemToHtmlTable(CString sItem, CString sItemHebrew, bool bInvertDirection = false);
-	void WriteNumericItemToHtmlTable(double value);
+	void WriteItemToHtmlTable(CString sItem, CString sItemHebrew, bool bInvertDirection = false, bool bBold = false);
+	void WriteNumericItemToHtmlTable(double value, bool bBold = false);
 
 	static CString umsHtmlDir;
 };

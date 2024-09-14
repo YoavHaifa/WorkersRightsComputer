@@ -234,14 +234,14 @@ void CAllRights::WriteTotalLineToHtmlTable(CHtmlWriter &html)
 {
 	html.WriteL(L"<tr>");
 	
-	html.WriteItemToHtmlTable(CString(L"Total Due"), CString(L"סך הכל"));
+	html.WriteItemToHtmlTable(CString(L"Total Due"), CString(L"סך הכל"), false, true);
 
 	CString sEmpty(L"");
-	html.WriteItemToHtmlTable(sEmpty, sEmpty);
+	html.WriteItemToHtmlTable(sEmpty, sEmpty, false, true);
 
-	html.WriteNumericItemToHtmlTable(mSumDue);
+	html.WriteNumericItemToHtmlTable(mSumDue, true);
 
-	html.WriteItemToHtmlTable(CString(L"סך הכל"), CString("Total Due"), true);
+	html.WriteItemToHtmlTable(CString(L"סך הכל"), CString("Total Due"), true, true);
 
 	html.WriteL(L"</tr>");
 }
