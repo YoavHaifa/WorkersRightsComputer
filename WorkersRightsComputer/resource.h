@@ -21,6 +21,7 @@
 #define IDD_DIALOG_PREV_HOLIDAYS        146
 #define IDD_DIALOG_COMMENTS             148
 #define IDD_DIALOG_PREV_YEARS_VACATIONS 152
+#define IDD_DIALOG_REAL_HOLIDAYS        154
 #define IDC_WORK_PERIOD                 1000
 #define IDC_DATETIMEPICKER_START        1001
 #define IDC_EMPLOYER                    1001
@@ -251,6 +252,11 @@
 #define IDC_RADIO_COMPANY_HOURLY        1194
 #define IDC_STATIC_VACPY_PAID4          1195
 #define IDC_STATIC_FP_EDITING           1195
+#define IDC_RADIO_HOLIDAYS_RELATIVE     1196
+#define IDC_RADIO_HOLIDAYS_BY_DAYS      1197
+#define IDC_RADIO_HOLIDAYS_NONE         1198
+#define IDC_BUTTON2                     1199
+#define IDC_BUTTON_DEFINE_HOLIDAYS_BY_DAY 1199
 #define ID_FILE_EXIT                    32771
 #define ID_COMPUTE_ALL                  32772
 #define ID_FILE_LOAD                    32773
@@ -267,9 +273,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        154
+#define _APS_NEXT_RESOURCE_VALUE        156
 #define _APS_NEXT_COMMAND_VALUE         32782
-#define _APS_NEXT_CONTROL_VALUE         1196
+#define _APS_NEXT_CONTROL_VALUE         1200
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

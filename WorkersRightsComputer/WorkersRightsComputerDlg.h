@@ -63,7 +63,6 @@ public:
 	CEdit mEditNDaysPaidLastYear;
 
 	CList<CEditRef *, CEditRef *> mEditBoxes;
-	CComboBox mComboHolidays;
 	afx_msg void OnBnClickedButtonReset();
 	void ResetAllInputs(bool bLoading);
 
@@ -73,7 +72,6 @@ public:
 	CButton mEntitledOnly2Sev;
 	CButton mHadPensionBefore;
 	CList<CButtonRef *, CButtonRef *> mButtons;
-	void InitHolidaysCombo();
 	afx_msg void OnBnClickedCheckSeveranceLessThanYear();
 	afx_msg void OnBnClickedCheckVacationYears();
 	afx_msg void OnBnClickedCheckRecuperationYears();

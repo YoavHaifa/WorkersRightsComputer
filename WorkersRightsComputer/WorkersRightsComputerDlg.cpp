@@ -29,6 +29,7 @@
 #include "HolidaysDue.h"
 #include "CommentsDlg.h"
 #include "PrevYearsVacationsDlg.h"
+#include "HolidaysByDay.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -143,7 +144,6 @@ void CWorkersRightsComputerDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT_VACATION_YEARS, mEditVacationPrevYears);
 	DDX_Control(pDX, IDC_EDIT_RECUPERATION_YEARS, mEditRecuperationPrevYears);
 	DDX_Control(pDX, IDC_EDIT_LAST_YEAR_VACATION_DAYS, mEditNDaysPaidLastYear);
-	DDX_Control(pDX, IDC_COMBO_HOLIDAYS, mComboHolidays);
 	DDX_Control(pDX, IDC_CHECK_SEVERANCE_LESS_THAN_YEAR, mAllowSevLess);
 	DDX_Control(pDX, IDC_CHECK_VACATION_YEARS, mDemandVac4Prev);
 	DDX_Control(pDX, IDC_CHECK_RECUPERATION_YEARS, mDemandRec4Prev);
@@ -244,7 +244,6 @@ BOOL CWorkersRightsComputerDlg::OnInitDialog()
 	// TODO: Add extra initialization here
 	mbDisableComputations = true;
 	OnBnClickedButtonReset();
-	InitHolidaysCombo();
 	InitializeAllRights();
 	mRadioPassport.SetCheck(1);
 	mVacationPaidNone4LastYear.SetCheck(1);
@@ -275,6 +274,7 @@ BOOL CWorkersRightsComputerDlg::OnInitDialog()
 
 	GotoDlgCtrl(GetDlgItem(IDC_EDIT_FIRST_NAME));
 	SetCheck(IDC_CHECK_CAREGIVER, true);
+	SetCheck(IDC_RADIO_HOLIDAYS_RELATIVE, true);
 	if (gConfig.mbCaregiversOnly)
 		Disable(IDC_CHECK_CAREGIVER);
 	
@@ -443,28 +443,12 @@ void CWorkersRightsComputerDlg::ResetAllInputs(bool bLoading)
 			pButton->mButton.SetCheck(BST_UNCHECKED);
 		i++;
 	}
-	mComboHolidays.SetWindowTextW(L"Select set of Holidays");
+	gHolidaysByDay.ResetAllInputs();
 	if (!bLoading)
 	{
 		mFilledBy.SetWindowTextW(gConfig.msFilledBy);
 		mFilledByHebrew.SetWindowTextW(gConfig.msFilledByHebrew);
 
-	}
-}
-void CWorkersRightsComputerDlg::InitHolidaysCombo()
-{
-	CString msDir(CUtils::GetBaseDir() + L"input\\holidays");
-	CFilesList list;
-	CUtils::ListFilesInDir(msDir, L"txt", list);
-	POSITION pos = list.GetHeadPosition();
-	while (pos)
-	{
-		CString *psName = list.GetNext(pos);
-		CFileName fName(*psName);
-		CString sPrivate = fName.PrivateWithoutType();
-		if (sPrivate.Right(8) == "Holidays")
-			sPrivate = sPrivate.Left(sPrivate.GetLength() - 8);
-		mComboHolidays.AddString(sPrivate);
 	}
 }
 void CWorkersRightsComputerDlg::OnBnClickedCheckSeveranceLessThanYear()

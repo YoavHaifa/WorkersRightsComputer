@@ -1,7 +1,6 @@
 // PrevYearsHolidaysDlg.cpp : implementation file
 //
 
-//#include "pch.h"
 #include "stdafx.h"
 #include "WorkersRightsComputer.h"
 #include "PrevYearsHolidaysDlg.h"

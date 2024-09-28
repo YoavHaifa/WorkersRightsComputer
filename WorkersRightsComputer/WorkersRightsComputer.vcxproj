@@ -192,6 +192,7 @@
     <ClInclude Include="CompanyPartPeriod.h" />
     <ClInclude Include="Config.h" />
     <ClInclude Include="DaysSpan.h" />
+    <ClInclude Include="HolidaysByDay.h" />
     <ClInclude Include="HolidaysDue.h" />
     <ClInclude Include="HolidaysDuePerYear.h" />
     <ClInclude Include="LetterSavedDlg.h" />
@@ -202,6 +203,7 @@
     <ClInclude Include="Paid.h" />
     <ClInclude Include="PrevYearsHolidaysDlg.h" />
     <ClInclude Include="PrevYearsVacationsDlg.h" />
+    <ClInclude Include="RealHolidaysDlg.h" />
     <ClInclude Include="RightResult.h" />
     <ClInclude Include="StringsList.h" />
     <ClInclude Include="VacationDaysDue.h" />
@@ -263,6 +265,7 @@
     <ClCompile Include="CompanyPartPeriod.cpp" />
     <ClCompile Include="Config.cpp" />
     <ClCompile Include="DaysSpan.cpp" />
+    <ClCompile Include="HolidaysByDay.cpp" />
     <ClCompile Include="HolidaysDue.cpp" />
     <ClCompile Include="HolidaysDuePerYear.cpp" />
     <ClCompile Include="LetterSavedDlg.cpp" />
@@ -273,6 +276,7 @@
     <ClCompile Include="Paid.cpp" />
     <ClCompile Include="PrevYearsHolidaysDlg.cpp" />
     <ClCompile Include="PrevYearsVacationsDlg.cpp" />
+    <ClCompile Include="RealHolidaysDlg.cpp" />
     <ClCompile Include="RightResult.cpp" />
     <ClCompile Include="StringsList.cpp" />
     <ClCompile Include="VacationDaysDue.cpp" />
