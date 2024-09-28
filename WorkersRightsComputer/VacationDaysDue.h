@@ -5,7 +5,7 @@ class CVacationDaysDue
 public:
 	CVacationDaysDue();
 
-	bool VerifyWorkPeriod(class CMyDialogEx* pMainDlg);
+	bool VerifyWorkPeriod();
 	void Reset();
 	void InitDialog(class CMyDialogEx* pDlg);
 

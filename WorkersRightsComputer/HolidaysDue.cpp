@@ -104,6 +104,10 @@ void CHolidaysDue::Reset()
 }
 void CHolidaysDue::SetWorkPeriod()
 {
+	DecideModeByMainDlg();
+	if (!mbHolidaysByDay)
+		return;
+
 	mFirstInPeriod = gWorkPeriod.mFirst;
 	mLastInPeriod = gWorkPeriod.mLast;
 	CHolidays* pHolidays = gAllRights.GetHolidays();
@@ -119,8 +123,31 @@ void CHolidaysDue::SetWorkPeriod()
 
 	SetYearsByWorkPeriod();
 }
-bool CHolidaysDue::VerifyWorkPeriod(CMyDialogEx* pMainDlg)
+void CHolidaysDue::DecideModeByMainDlg()
 {
+	mbNoHolidays = false;
+	mbHolidaysByDay = false;
+	mbHolidaysRelative = false;
+
+	if (gpDlg->IsChecked(IDC_RADIO_HOLIDAYS_NONE))
+	{
+		mbNoHolidays = true;
+	}
+	else if (gpDlg->IsChecked(IDC_RADIO_HOLIDAYS_BY_DAYS))
+	{
+		mbHolidaysByDay = true;
+	}
+	else // Relative is the default
+	{
+		mbHolidaysRelative = true;
+	}
+}
+bool CHolidaysDue::VerifyWorkPeriod()
+{
+	DecideModeByMainDlg();
+	if (!mbHolidaysByDay)
+		return true;
+
 	CHolidays* pHolidays = gAllRights.GetHolidays();
 	if (!pHolidays)
 		return false;

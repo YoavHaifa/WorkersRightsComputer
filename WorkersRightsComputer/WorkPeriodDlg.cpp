@@ -23,13 +23,6 @@ CWorkPeriodDlg::CWorkPeriodDlg(CWnd* pParent /*=nullptr*/)
 	: CWageDefBaseDlg(IDD_DIALOG_WORK_PERIOD, pParent)
 	, mbDialogInitialized(false)
 {
-	mapCheckDays[0] = &mCheckSunday;
-	mapCheckDays[1] = &mCheckMonday;
-	mapCheckDays[2] = &mCheckTuesday;
-	mapCheckDays[3] = &mCheckWednesday;
-	mapCheckDays[4] = &mCheckThursday;
-	mapCheckDays[5] = &mCheckFriday;
-	mapCheckDays[6] = &mCheckSaturday;
 }
 CWorkPeriodDlg::~CWorkPeriodDlg()
 {
@@ -44,13 +37,6 @@ void CWorkPeriodDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT_MONTH_SALARY, mMonthlySalary);
 	DDX_Control(pDX, IDC_EDIT_HOUR_SALARY, mHourlySalary);
 	DDX_Control(pDX, IDC_EDIT_HOURS_PER_MONTH, mHoursPerWeek);
-	DDX_Control(pDX, IDC_CHECK_SUNDAY, mCheckSunday);
-	DDX_Control(pDX, IDC_CHECK_MONDAY, mCheckMonday);
-	DDX_Control(pDX, IDC_CHECK_TUESDAY, mCheckTuesday);
-	DDX_Control(pDX, IDC_CHECK_WEDNESDAY, mCheckWednesday);
-	DDX_Control(pDX, IDC_CHECK_THURSDAY, mCheckThursday);
-	DDX_Control(pDX, IDC_CHECK_FRIDAY, mCheckFriday);
-	DDX_Control(pDX, IDC_CHECK_SATURDAY, mCheckSaturday);
 
 	DDX_Control(pDX, IDC_RADIO_MIN_WAGE, mRadioMinWage);
 	DDX_Control(pDX, IDC_RADIO_MONTHLY, mRadioMonthly);
@@ -160,14 +146,6 @@ BOOL CWorkPeriodDlg::OnInitDialog()
 	}
 	SetCheck(IDC_CHECK_NO_NOTICE, gWorkPeriod.mbSkipNotice);
 
-	for (int iDay = 0; iDay < 7; iDay++)
-	{
-		if (gWorkPeriod.maWorkingDays[iDay] > 0)
-			mapCheckDays[iDay]->SetCheck(BST_CHECKED);
-		else
-			mapCheckDays[iDay]->SetCheck(BST_UNCHECKED);
-	}
-
 	SetWageGui();
 
 	mbDialogInitialized = true;
@@ -256,7 +234,7 @@ void CWorkPeriodDlg::UpdateText()
 		}
 	}
 
-	sAll += GetDaysText();
+	//sAll += GetDaysText();
 
 	sAll += gUsedVacations.GetVacationsShortText();
 	sAll += "\r\n";
@@ -368,14 +346,6 @@ bool CWorkPeriodDlg::UpdateDataFromDialog(void)
 	flags = mNoticeDate.GetTime(time);
 	gWorkPeriod.mNotice.SetDate(time);
 
-	for (int iDay = 0; iDay < 7; iDay++)
-	{
-		if (mapCheckDays[iDay]->GetCheck() == BST_CHECKED)
-			gWorkPeriod.SetWorkingDay(iDay, 1);
-		else
-			gWorkPeriod.SetWorkingDay(iDay, 0);
-	}
-
 	bool bOK = SetWageForWholePeriod();
 	bOK &= gWage.VerifyWorkPeriod();
 	return bOK;
@@ -392,54 +362,6 @@ void CWorkPeriodDlg::OnBnClickedOk()
 {
 	if (UpdateDataFromDialog())
 		CMyDialogEx::OnOK();
-}
-CString CWorkPeriodDlg::GetDaysText()
-{
-	int nDays = 0;
-	CString sDays(_T("("));
-	for (int iDay = 0; iDay < 7; iDay++)
-	{
-		if (mapCheckDays[iDay]->GetCheck() == BST_CHECKED)
-		{
-			nDays++;
-			if (nDays > 1)
-				sDays += L", ";
-			switch (iDay)
-			{
-			case 0:
-				sDays += L"Sun";
-				break;
-			case 1:
-				sDays += L"Mon";
-				break;
-			case 2:
-				sDays += L"Tue";
-				break;
-			case 3:
-				sDays += L"Wed";
-				break;
-			case 4:
-				sDays += L"Thu";
-				break;
-			case 5:
-				sDays += L"Fri";
-				break;
-			case 6:
-				sDays += L"Sat";
-				break;
-			}
-		}
-	}
-	sDays += L")";
-	if (nDays < 1)
-		return CString();
-
-	wchar_t zBuf[512];
-	swprintf_s(zBuf, sizeof(zBuf)/sizeof(wchar_t), L"%d working days per week ", nDays);
-	CString s(zBuf);
-	s += sDays;
-	s += L"\r\n";
-	return s;
 }
 void CWorkPeriodDlg::OnBnClickedCheckSunday()
 {

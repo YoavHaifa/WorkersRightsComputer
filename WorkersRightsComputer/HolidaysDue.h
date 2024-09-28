@@ -9,7 +9,7 @@ public:
 	CHolidaysDue();
 
 	void Reset();
-	bool VerifyWorkPeriod(class CMyDialogEx* pMainDlg);
+	bool VerifyWorkPeriod();
 	void SetWorkPeriod();
 	void InitDialog(CMyDialogEx* pDlg);
 	void OnGuiChange(int iYear, CMyDialogEx* pDlg);
@@ -26,6 +26,12 @@ public:
 	int GetNDuePrevYear(int i);
 
 private:
+	void DecideModeByMainDlg();
+
+	bool mbNoHolidays;
+	bool mbHolidaysByDay;
+	bool mbHolidaysRelative;
+
 	void LoadFromOldXml(CXMLParseNode* pRoot);
 	void SetYearsByWorkPeriod();
 

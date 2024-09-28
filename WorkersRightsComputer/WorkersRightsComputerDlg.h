@@ -77,10 +77,8 @@ public:
 	afx_msg void OnBnClickedCheckRecuperationYears();
 	afx_msg void OnBnClickedCheckOnlySeverance();
 	afx_msg void OnBnClickedCheckActivePension();
-	afx_msg void OnCbnSelchangeComboHolidays();
 	afx_msg void OnEnChangeEditHolidaysLastyWork();
 	void InitializeAllRights();
-	CString GetHolidaysSet();
 	void DisplaySummary(const wchar_t *zText);
 	CEdit mSummary;
 	bool mbInitialized;
@@ -98,7 +96,6 @@ public:
 	bool mbSaveFailed;
 
 	//CEdit mEditPrevNYears;
-	static DWORD WINAPI StaticThreadFunc(LPVOID);
 	afx_msg void OnTestVerifybatch();
 	afx_msg void OnTestWritehtml();
 	afx_msg void OnBnClickedEmployer();

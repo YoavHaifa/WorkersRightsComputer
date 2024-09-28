@@ -42,7 +42,7 @@ void CVacationDaysDue::LoadFromXml(CXMLParseNode* /*pRoot*/)
 {
 	SetYearsByWorkPeriod();
 }
-bool CVacationDaysDue::VerifyWorkPeriod(class CMyDialogEx* /*pMainDlg*/)
+bool CVacationDaysDue::VerifyWorkPeriod()
 {
 	SetYearsByWorkPeriod();
 	return true;

@@ -178,7 +178,6 @@ BEGIN_MESSAGE_MAP(CWorkersRightsComputerDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_CHECK_RECUPERATION_YEARS, &CWorkersRightsComputerDlg::OnBnClickedCheckRecuperationYears)
 	ON_BN_CLICKED(IDC_CHECK_ONLY_SEVERANCE, &CWorkersRightsComputerDlg::OnBnClickedCheckOnlySeverance)
 	ON_BN_CLICKED(IDC_CHECK_ACTIVE_PENSION, &CWorkersRightsComputerDlg::OnBnClickedCheckActivePension)
-	ON_CBN_SELCHANGE(IDC_COMBO_HOLIDAYS, &CWorkersRightsComputerDlg::OnCbnSelchangeComboHolidays)
 	ON_EN_CHANGE(IDC_EDIT_HOLIDAYS_PREVY_WORK, &CWorkersRightsComputerDlg::OnEnChangeEditHolidaysLastyWork)
 	ON_EN_CHANGE(IDC_EDIT_HOLIDAYS_PREVY_PAID, &CWorkersRightsComputerDlg::OnEnChangeEditHolidaysLastyWork)
 	ON_EN_CHANGE(IDC_EDIT_HOLIDAYS_PREVY_FROM, &CWorkersRightsComputerDlg::OnEnChangeEditHolidaysLastyWork)
@@ -251,7 +250,7 @@ BOOL CWorkersRightsComputerDlg::OnInitDialog()
 	CString sTitle(L"Workers Rights Computer - Experimental Beta Version ");
 	SetTitle(sTitle + gConfig.msVersion);
 
-	CUtils::CreateThread(&StaticThreadFunc, NULL);
+	//CUtils::CreateThread(&StaticThreadFunc, NULL);
 	OnLoad();
 
 	gpDlg = this;
@@ -390,7 +389,7 @@ void CWorkersRightsComputerDlg::OnBnClickedWorkPeriod()
 		}
 		OnInputChange();
 	}
-	gHolidaysDue.VerifyWorkPeriod(this);
+	gHolidaysDue.VerifyWorkPeriod();
 }
 void CWorkersRightsComputerDlg::OnBnClickedButtonSave()
 {
@@ -493,13 +492,6 @@ void CWorkersRightsComputerDlg::OnBnClickedCheckActivePension()
 {
 	OnInputChange();
 }
-void CWorkersRightsComputerDlg::OnCbnSelchangeComboHolidays()
-{
-	CString s;
-	mComboHolidays.GetWindowTextW(s);
-	CString s1 = GetText(IDC_COMBO_HOLIDAYS);
-	OnInputChange();
-}
 void CWorkersRightsComputerDlg::OnEnChangeEditHolidaysLastyWork()
 {
 	OnInputChange();
@@ -525,12 +517,6 @@ void CWorkersRightsComputerDlg::InitializeAllRights()
 		if (pRef->mbConnect)
 			gAllRights.SetCheckRef(pRef);
 	}
-}
-CString CWorkersRightsComputerDlg::GetHolidaysSet()
-{
-	CString sSelection;
-	mComboHolidays.GetWindowTextW(sSelection);
-	return sSelection;
 }
 void CWorkersRightsComputerDlg::DisplaySummary(const wchar_t *zText)
 {
@@ -583,7 +569,7 @@ void CWorkersRightsComputerDlg::OnInputChange(bool bJustLoaded)
 		return;
 	ubInChange = true;
 
-	gHolidaysDue.VerifyWorkPeriod(this);
+	gHolidaysDue.VerifyWorkPeriod();
 	if (!bJustLoaded)
 		gHolidaysDue.OnMainDialogChange(this);
 
@@ -595,20 +581,6 @@ void CWorkersRightsComputerDlg::OnRadioPaidVacationForLastYearChange()
 	if (!IsChecked(IDC_RADIO_LAST_YEAR_VACATION_DAYS))
 		Clear(IDC_EDIT_LAST_YEAR_VACATION_DAYS);
 	OnInputChange();
-}
-DWORD WINAPI CWorkersRightsComputerDlg::StaticThreadFunc(LPVOID)
-{
-	static int count = 0;
-	count++;
-	while (1)
-	{
-		Sleep(100);
-		CString s = gpDlg->GetHolidaysSet();
-		if (!s.IsEmpty() && s != "Select set of Holidays")
-			if (s != gAllRights.GetHolidaysSelection())
-				gpDlg->OnInputChange();
-	}
-	return 0;
 }
 void CWorkersRightsComputerDlg::OnTestVerifybatch()
 {
@@ -657,12 +629,6 @@ void CWorkersRightsComputerDlg::SaveToXml(CXMLDump &xmlDump)
 			xmlDump.Write((const wchar_t *)pRef->msName, (const wchar_t *)sText);
 		}
 	}
-	// Holidays
-	CString sText;
-	mComboHolidays.GetWindowText(sText);
-	if (sText.IsEmpty())
-		sText = L"-";
-	xmlDump.Write(L"Holidays", (const wchar_t *)sText);
 
 	{
 		CXMLDumpScope scope(L"Buttons", xmlDump);
@@ -676,6 +642,10 @@ void CWorkersRightsComputerDlg::SaveToXml(CXMLDump &xmlDump)
 				xmlDump.Write((const wchar_t *)pRef->msName, L"not_checked");
 		}
 	}
+
+	// Holidays by day
+	if (IsChecked(IDC_RADIO_HOLIDAYS_BY_DAYS))
+		gHolidaysByDay.SaveToXml(xmlDump);
 }
 bool CWorkersRightsComputerDlg::LoadFromXml(CXMLParseNode* pRoot)
 {
@@ -696,19 +666,31 @@ bool CWorkersRightsComputerDlg::LoadFromXml(CXMLParseNode* pRoot)
 	}
 
 	if (pMain->GetValue(L"Holidays", sText))
-		mComboHolidays.SetWindowTextW(sText);
-
-	CXMLParseNode* pButtons = pMain->GetFirst(L"Buttons");
-	if (!pButtons)
-		return false;
-	pos = mButtons.GetHeadPosition();
-	while (pos)
 	{
-		CButtonRef* pRef = mButtons.GetNext(pos);
-		if (pButtons->GetValue((const wchar_t*)pRef->msName, sText))
-			pRef->mButton.SetCheck(sText == L"checked" ? BST_CHECKED : 0);
+		// Where is the contoller of this mode?
+		gHolidaysByDay.SetSelectionFromOldSave(sText);
 	}
-	return true;
+
+	bool bOK = true;
+	CXMLParseNode* pButtons = pMain->GetFirst(L"Buttons");
+	if (pButtons)
+	{
+		pos = mButtons.GetHeadPosition();
+		while (pos)
+		{
+			CButtonRef* pRef = mButtons.GetNext(pos);
+			if (pButtons->GetValue((const wchar_t*)pRef->msName, sText))
+				pRef->mButton.SetCheck(sText == L"checked" ? BST_CHECKED : 0);
+		}
+	}
+	else 
+		bOK = false;
+
+	CXMLParseNode* pHolidaysByDay = pMain->GetFirst(L"HolidaysByDay");
+	if (pHolidaysByDay)
+		gHolidaysByDay.LoadFromXml(pHolidaysByDay);
+
+	return bOK;
 }
 void CWorkersRightsComputerDlg::OnTestLoadxml()
 {
@@ -763,7 +745,7 @@ void CWorkersRightsComputerDlg::OnBnClickedButtonPrevYearsHolidays()
 	if (!pHolidays)
 		return;
 
-	gHolidaysDue.VerifyWorkPeriod(this);
+	gHolidaysDue.VerifyWorkPeriod();
 	CPrevYearsHolidaysDlg dlg;
 	if (dlg.DoModal() == IDOK)
 	{

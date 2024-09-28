@@ -31,7 +31,7 @@ const wchar_t *uasDaysNames[7] =
 CWorkPeriod::CWorkPeriod()
 	: mbSkipNotice(false)
 	, mbLiveIn(true)
-	, mbCaregiver(false)
+	, mbCaregiver(true)
 	, mbExtraHolidayHoursForLiveInApplied(false)
 	, mbPartialVacationForPrevYearsDefined(false)
 {

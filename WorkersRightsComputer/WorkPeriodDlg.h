@@ -52,23 +52,12 @@ public:
 	bool UpdateDataFromDialog(void);
 	bool SetWageForWholePeriod();
 
-	// Radio buttons for working days
-	CButton mCheckSunday;
-	CButton mCheckMonday;
-	CButton mCheckTuesday;
-	CButton mCheckWednesday;
-	CButton mCheckThursday;
-	CButton mCheckFriday;
-	CButton mCheckSaturday;
-	CButton *mapCheckDays[7];
-
 	// Radio buttons for wage definition mode
 	CButton mRadioMinWage;
 	CButton mRadioMonthly;
 	CButton mRadioHourly;
 	CButton mRadioWagePeriods;
 
-	CString GetDaysText();
 	afx_msg void OnBnClickedCheckSunday();
 	afx_msg void OnBnClickedCheckMonday();
 	afx_msg void OnBnClickedCheckTuesday();

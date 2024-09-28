@@ -7,6 +7,7 @@
 #include "WorkersRightsComputerDlg.h"
 #include "HolidaysDue.h"
 #include "UsedVacations.h"
+#include "HolidaysByDay.h"
 
 
 void CHoliday::Log(FILE *pf)
@@ -451,7 +452,7 @@ void CHolidays::RememberPayParDay(double value)
 }
 bool CHolidays::InitDefinition()
 {
-	CString sWantedSet(gpDlg->GetHolidaysSet());
+	CString sWantedSet(gHolidaysByDay.GetHolidaysSet());
 	if (mbValid && msSelection == sWantedSet)
 		return true;
 
