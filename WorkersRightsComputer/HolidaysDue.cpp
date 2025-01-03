@@ -19,6 +19,9 @@ CHolidaysDue::CHolidaysDue()
 	, mSumPrev()
 	, mbDefinedBySpecialDialog(false)
 	, mbPeriodAndHolidaysDefined(false)
+	, mbHolidaysRelative(true)
+	, mbNoHolidays(false)
+	, mbHolidaysByDay(false)
 {
 	mHolidaysPerYears.AddTail(new CHolidaysDuePerYear(IDC_STATIC_PY,
 		IDC_EDIT_HOLIDAYS_PREVY_WORK, IDC_EDIT_HOLIDAYS_PREVY_PAID, 
@@ -65,7 +68,7 @@ void CHolidaysDue::UpdateMainDialog()
 		return;
 
 	// Should we see holidays at all?
-	if (mbPeriodAndHolidaysDefined)
+	if (mbPeriodAndHolidaysDefined || mbHolidaysRelative)
 	{
 		for (int i = 0; i < N_MAIN_DLG_FIELDS; i++)
 			gpDlg->SetVisible(maMainDlgFields[i]);

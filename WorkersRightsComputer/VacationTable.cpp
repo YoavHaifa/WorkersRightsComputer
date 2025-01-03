@@ -187,7 +187,7 @@ bool CVacationTable::StartComputingForUsedVacations()
 	gWorkPeriod.Debug(L"CVacationTable::StartComputingForUsedVacations");
 
 	mnVacationsComputed = 0;
-	if (!gWorkPeriod.IsValid())
+	if (!gWorkPeriod.PeriodIsValid())
 		return false;
 
 	mDueVacationLeft = 0;
@@ -197,7 +197,7 @@ bool CVacationTable::StartComputingForUsedVacations()
 }
 bool CVacationTable::ComputeNextVacation(CVacationUsed &vacation)
 {
-	if (!gWorkPeriod.IsValid())
+	if (!gWorkPeriod.PeriodIsValid())
 	{
 		vacation.mnPaidDays = 0;
 		return false;

@@ -452,7 +452,7 @@ void CWorkersRightsComputerDlg::ResetAllInputs(bool bLoading)
 }
 void CWorkersRightsComputerDlg::OnBnClickedCheckSeveranceLessThanYear()
 {
-	if (!gWorkPeriod.IsValid())
+	if (!gWorkPeriod.PeriodIsValid())
 	{
 		SetCheck(IDC_CHECK_SEVERANCE_LESS_THAN_YEAR, false);
 		CUtils::MessBox(L"Please define working period first", L"Notice");

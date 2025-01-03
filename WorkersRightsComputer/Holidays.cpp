@@ -450,8 +450,11 @@ void CHolidays::RememberPayParDay(double value)
 			mMinPayPerDay = value;
 	}
 }
-bool CHolidays::InitDefinition()
+bool CHolidays::InitDefinitionByDay()
 {
+	if (!gHolidaysDue.RequiresDefintionByDay())
+		return true;
+
 	CString sWantedSet(gHolidaysByDay.GetHolidaysSet());
 	if (mbValid && msSelection == sWantedSet)
 		return true;
@@ -473,7 +476,7 @@ bool CHolidays::Compute(void)
 	mMinPayPerDay = 0;
 	mMaxPayPerDay = 0;
 
-	if (!InitDefinition())
+	if (!InitDefinitionByDay())
 		return true;
 
 	mnInLastYear = NInLastYear();

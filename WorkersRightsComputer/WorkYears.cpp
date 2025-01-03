@@ -27,7 +27,7 @@ void CWorkYears::DivideWorkPeriodToWorkYears(void)
 	mYearsForSeverance = 0;
 	mnDaysForSeveranceAddedForUnpaidVacations = 0;
 	mbAllowPartYearSeverance = false;
-	if (!gWorkPeriod.IsValid())
+	if (!gWorkPeriod.PeriodIsValid())
 		return;
 
 	maYears[0].InitFirst();

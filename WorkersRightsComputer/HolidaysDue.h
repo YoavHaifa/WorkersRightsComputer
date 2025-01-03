@@ -25,6 +25,8 @@ public:
 	int GetNPrevYears();
 	int GetNDuePrevYear(int i);
 
+	bool RequiresDefintionByDay() { return mbHolidaysByDay; }
+
 private:
 	void DecideModeByMainDlg();
 

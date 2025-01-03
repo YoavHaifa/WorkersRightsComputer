@@ -26,7 +26,7 @@ public:
 	CHolidays(void);
 	bool IsValid(void) {return mbValid;}
 	virtual	bool SetEditRef(class CEditRef *pRef) override;
-	bool InitDefinition();
+	bool InitDefinitionByDay();
 	virtual bool Compute(void) override;
 	virtual CString GetDecriptionForLetter(void)override;
 	virtual CString GetDecriptionForLetterHebrew(void)override;

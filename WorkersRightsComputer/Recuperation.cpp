@@ -72,7 +72,7 @@ bool CRecuperation::Compute(void)
 	msDue = L"Recuperation: ";
 	mDueDays = 0;
 
-	if (!gWorkPeriod.IsValid())
+	if (!gWorkPeriod.PeriodIsValid())
 	{
 		mbValid = false;
 		msDue += L"??";

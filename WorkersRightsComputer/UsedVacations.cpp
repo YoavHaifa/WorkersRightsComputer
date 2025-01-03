@@ -174,7 +174,7 @@ void CUsedVacations::LoadFromXml(CXMLParseNode* pRoot)
 }
 void CUsedVacations::Compute()
 {
-	if (!gWorkPeriod.IsValid())
+	if (!gWorkPeriod.PeriodIsValid())
 		return;
 
 	gWorkPeriod.InitDetailsForEachMonth();

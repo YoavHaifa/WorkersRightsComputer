@@ -13,7 +13,7 @@ public:
 	CString GetPeriodForLetter();
 	CString GetPeriodForLetterHebrew();
 
-	bool IsValid(bool bMustDefineDays = true);
+	bool PeriodIsValid();
 	bool Compute(const wchar_t *zAt = NULL);
 	bool IsBeforeDate(CMyTime &date, int year, int month, int day);
 	bool IsAfterDate(CMyTime &date, int year, int month, int day);

@@ -57,6 +57,7 @@ BEGIN_MESSAGE_MAP(CWorkPeriodDlg, CDialogEx)
 	ON_EN_CHANGE(IDC_EDIT_HOUR_SALARY, &CWorkPeriodDlg::OnEnChangeEditHourSalary)
 	ON_EN_CHANGE(IDC_EDIT_HOURS_PER_MONTH, &CWorkPeriodDlg::OnEnChangeEditHoursPerMonth)
 	ON_BN_CLICKED(IDOK, &CWorkPeriodDlg::OnBnClickedOk)
+	/*
 	ON_BN_CLICKED(IDC_CHECK_SUNDAY, &CWorkPeriodDlg::OnBnClickedCheckSunday)
 	ON_BN_CLICKED(IDC_CHECK_MONDAY, &CWorkPeriodDlg::OnBnClickedCheckMonday)
 	ON_BN_CLICKED(IDC_CHECK_TUESDAY, &CWorkPeriodDlg::OnBnClickedCheckTuesday)
@@ -64,6 +65,7 @@ BEGIN_MESSAGE_MAP(CWorkPeriodDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_CHECK_THURSDAY, &CWorkPeriodDlg::OnBnClickedCheckThursday)
 	ON_BN_CLICKED(IDC_CHECK_FRIDAY, &CWorkPeriodDlg::OnBnClickedCheckFriday)
 	ON_BN_CLICKED(IDC_CHECK_SATURDAY, &CWorkPeriodDlg::OnBnClickedCheckSaturday)
+	*/
 	ON_BN_CLICKED(IDOK3, &CWorkPeriodDlg::OnBnClickedOk3)
 	ON_BN_CLICKED(IDC_BUTTON_FAMILY_PART, &CWorkPeriodDlg::OnBnClickedButtonFamilyPart)
 	ON_BN_CLICKED(IDC_CHECK_NO_NOTICE, &CWorkPeriodDlg::OnBnClickedCheckNoNotice)
@@ -360,9 +362,28 @@ bool CWorkPeriodDlg::UpdateDataFromDialog(void)
 }
 void CWorkPeriodDlg::OnBnClickedOk()
 {
+	if (!mbStartSet)
+	{
+		CUtils::MessBox(L"Work period not fully defined - missing start", L"Notice");
+		return;
+	}
+	if (!mbEndSet)
+	{
+		CUtils::MessBox(L"Work period not fully defined - missing end", L"Notice");
+		return;
+	}
+	if (!mbNoticeSet && !IsChecked(IDC_CHECK_NO_NOTICE))
+	{
+		CUtils::MessBox(L"Work period not fully defined - missing notice", L"Notice");
+		return;
+	}
 	if (UpdateDataFromDialog())
+	{
+		gWorkPeriod.Compute(L"OnWPDlgOk");
 		CMyDialogEx::OnOK();
+	}
 }
+/*
 void CWorkPeriodDlg::OnBnClickedCheckSunday()
 {
 	UpdateText();
@@ -390,13 +411,13 @@ void CWorkPeriodDlg::OnBnClickedCheckFriday()
 void CWorkPeriodDlg::OnBnClickedCheckSaturday()
 {
 	UpdateText();
-}
+}*/
 void CWorkPeriodDlg::OnBnClickedOk3()
 {
 	if (!UpdateDataFromDialog())
 		return;
 
-	if (!gWorkPeriod.IsValid())
+	if (!gWorkPeriod.PeriodIsValid())
 	{
 		CUtils::MessBox(L"Work period not fully defined", L"Notice");
 		return;
@@ -426,7 +447,7 @@ void CWorkPeriodDlg::OnBnClickedCheckNoNotice()
 void CWorkPeriodDlg::OnBnClickedButtonEditWage()
 {
 	UpdateDataFromDialog();
-	if (!gWorkPeriod.IsValid(false /*!bMustDefineDays*/))
+	if (!gWorkPeriod.PeriodIsValid())
 	{
 		CUtils::MessBox(L"Please define work period", L"Notice");
 		return;

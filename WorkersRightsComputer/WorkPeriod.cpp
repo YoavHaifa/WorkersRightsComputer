@@ -42,7 +42,7 @@ CWorkPeriod::CWorkPeriod()
 
 	mnDaysInMonthForDailySalary = 25;
 }
-bool CWorkPeriod::IsValid(bool bMustDefineDays)
+bool CWorkPeriod::PeriodIsValid()
 {
 	mbNegative = false;
 	if (!mFirst.mbInitialized || !mLast.mbInitialized)
@@ -53,11 +53,12 @@ bool CWorkPeriod::IsValid(bool bMustDefineDays)
 		mbNegative = true;
 		return false;
 	}
+	/*
 	if (bMustDefineDays)
 	{
 		if (mnWorkDaysPerWeek < 0.05)
 			return false;
-	}
+	}*/
 
 	return true;
 }
@@ -107,7 +108,7 @@ bool CWorkPeriod::Compute(const wchar_t* zAt)
 
 	mbNegative = false;
 
-	if (!IsValid())
+	if (!PeriodIsValid())
 	{
 		if (!mFirst.mbInitialized)
 			mSpanString = "Enter first day at work";
@@ -177,7 +178,7 @@ bool CWorkPeriod::LastYearContains(CHoliday & holiday)
 		return false;
 	}
 	holiday.mbInLastYear = false;
-	if (!IsValid())
+	if (!PeriodIsValid())
 		return false;
 
 	if (gWorkYears.LastYearDoContains(holiday))

@@ -343,7 +343,7 @@ bool CVacation::Compute()
 	msDesc = L"";
 	msDescHebrew = L"";
 
-	if (!gWorkPeriod.IsValid())
+	if (!gWorkPeriod.PeriodIsValid())
 	{
 		msDue += L"Define Work Period...";
 		return false;

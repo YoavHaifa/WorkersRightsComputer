@@ -147,7 +147,7 @@ bool CAllRights::ComputeInternal()
 		pRight->Init();
 	}
 
-	if (!gWorkPeriod.IsValid())
+	if (!gWorkPeriod.PeriodIsValid())
 	{
 		if (gpDlg)
 			gpDlg->DisplaySummary(L"Please define work period");
@@ -249,7 +249,7 @@ CHolidays* CAllRights::GetHolidays()
 {
 	if (!mpHolidays)
 		return NULL;
-	if (!mpHolidays->InitDefinition())
+	if (!mpHolidays->InitDefinitionByDay())
 		return NULL;
 	return mpHolidays;
 }

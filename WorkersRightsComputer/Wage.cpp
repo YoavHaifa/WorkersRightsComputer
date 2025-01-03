@@ -37,7 +37,7 @@ void CWage::Clear()
 bool CWage::SetSingle(EWageMode eMode, double wage, double nHours)
 {
 	Clear();
-	if (gWorkPeriod.IsValid())
+	if (gWorkPeriod.PeriodIsValid())
 	{
 		CWagePeriod* pPeriod = new CWagePeriod(eMode, 
 			gWorkPeriod.mFirst, gWorkPeriod.mLast, wage, nHours);
