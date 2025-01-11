@@ -67,7 +67,7 @@ bool CSaver::Save(const wchar_t *zfName)
 		dlg.SetFileName(msfName);
 		dlg.SetWarning(L"Work Period not well defined. Letter can't be prepared.");
 		dlg.DoModal();
-		return false;
+		return true;
 	}
 
 	if (gAllRights.mbComputedOK)

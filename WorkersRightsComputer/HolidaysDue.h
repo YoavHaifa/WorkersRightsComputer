@@ -27,12 +27,13 @@ public:
 
 	bool RequiresDefintionByDay() { return mbHolidaysByDay; }
 
-private:
-	void DecideModeByMainDlg();
-
 	bool mbNoHolidays;
 	bool mbHolidaysByDay;
 	bool mbHolidaysRelative;
+
+private:
+	void SetInvisible();
+	void DecideModeByMainDlg();
 
 	void LoadFromOldXml(CXMLParseNode* pRoot);
 	void SetYearsByWorkPeriod();

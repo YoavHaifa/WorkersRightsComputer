@@ -2,6 +2,8 @@
 #include "MyTime.h"
 #include "MonthInfo.h"
 
+static const int N_WEEK_DAYS = 7;
+
 class CWorkPeriod
 {
 public:
@@ -28,8 +30,10 @@ public:
 
 	static const int N_WEEK_DAYS = 7;
 	double maWorkingDays[N_WEEK_DAYS];
+	bool mbWorkingDaysDefinedByUser;
 	void SetWorkingDay(int iDay, double fraction);
 	void ComputeWorkingDays();
+	void SetNWorkingDaysPerWeek(double n);
 
 	int mnMonthsDetailed;
 	bool mbNegative;

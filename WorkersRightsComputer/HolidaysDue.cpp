@@ -62,13 +62,22 @@ CHolidaysDue::CHolidaysDue()
 	maMainDlgFields[9] = IDC_BUTTON_PREV_YEARS_HOLIDAYS;
 	maMainDlgFields[10] = IDC_CHECK_LIVE_IN;
 }
+void CHolidaysDue::SetInvisible()
+{
+
+}
 void CHolidaysDue::UpdateMainDialog()
 {
 	if (!gpDlg)
 		return;
 
+	if (mbNoHolidays)
+	{
+		SetInvisible();
+		return;
+	}
+
 	// Should we see holidays at all?
-	/*
 	if (mbPeriodAndHolidaysDefined || mbHolidaysRelative)
 	{
 		for (int i = 0; i < N_MAIN_DLG_FIELDS; i++)
@@ -76,10 +85,9 @@ void CHolidaysDue::UpdateMainDialog()
 	}
 	else
 	{
-		for (int i = 0; i < N_MAIN_DLG_FIELDS; i++)
-			gpDlg->SetInvisible(maMainDlgFields[i]);
+		SetInvisible();
 		return;
-	}*/
+	}
 
 	// Set content to relevant fields
 	mpThisYear->UpdateGui(gpDlg);
@@ -109,20 +117,25 @@ void CHolidaysDue::Reset()
 void CHolidaysDue::SetWorkPeriod()
 {
 	DecideModeByMainDlg();
-	if (!mbHolidaysByDay)
-		return;
 
 	mFirstInPeriod = gWorkPeriod.mFirst;
 	mLastInPeriod = gWorkPeriod.mLast;
-	CHolidays* pHolidays = gAllRights.GetHolidays();
-	if (pHolidays)
+	if (mbHolidaysByDay)
 	{
-		CString sSelection = pHolidays->GetSelection();
-		if (!sSelection.IsEmpty())
+		CHolidays* pHolidays = gAllRights.GetHolidays();
+		if (pHolidays)
 		{
-			msHolidaysSelection = sSelection;
-			mbPeriodAndHolidaysDefined = true;
+			CString sSelection = pHolidays->GetSelection();
+			if (!sSelection.IsEmpty())
+			{
+				msHolidaysSelection = sSelection;
+				mbPeriodAndHolidaysDefined = true;
+			}
 		}
+	}
+	else if (mbHolidaysRelative)
+	{
+		mbPeriodAndHolidaysDefined = true;
 	}
 
 	SetYearsByWorkPeriod();
@@ -149,20 +162,28 @@ void CHolidaysDue::DecideModeByMainDlg()
 bool CHolidaysDue::VerifyWorkPeriod()
 {
 	DecideModeByMainDlg();
-	if (!mbHolidaysByDay)
-		return true;
-
-	CHolidays* pHolidays = gAllRights.GetHolidays();
-	if (!pHolidays)
-		return false;
 
 	bool bNewPeriod = true;
 	if ((mFirstInPeriod == gWorkPeriod.mFirst)
 		&& (mLastInPeriod == gWorkPeriod.mLast))
 		bNewPeriod = false;
 
-	if (!bNewPeriod	&& (pHolidays->Is(msHolidaysSelection)))
-		return false;
+	if (!bNewPeriod)
+	{
+		if (mbHolidaysByDay)
+		{
+			CHolidays* pHolidays = gAllRights.GetHolidays();
+			if (!pHolidays)
+				return false;
+
+			if (pHolidays->Is(msHolidaysSelection))
+				return false;
+		}
+		else if (mbHolidaysRelative)
+		{
+			return false;
+		}
+	}
 
 	// New work period - initialize to "undefined"
 	if (mbDefinedBySpecialDialog)

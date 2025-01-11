@@ -257,7 +257,7 @@ bool CMonthInfo::Debug(const wchar_t* zAt)
 		return false;
 	}
 
-	int nOff = mnDays / 7;
+	int nOff = mnDays / N_WEEK_DAYS;
 	if (mnWorkDays > mnDays - nOff)
 	{
 		wchar_t zBuf[128];

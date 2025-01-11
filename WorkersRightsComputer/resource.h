@@ -156,7 +156,6 @@
 #define IDC_STATIC_FILE_NAME            1102
 #define IDC_EDIT_CONTACT_EMAIL          1103
 #define IDC_BUTTON_PREV_YEARS_HOLIDAYS  1103
-#define IDC_STATIC_FILE_NAME2           1103
 #define IDC_STATIC_NO_LETTER            1103
 #define IDC_EDIT_OPERATOR_ENGLISH       1104
 #define IDC_EDIT_OPERATOR_HEBREW        1105
@@ -259,6 +258,9 @@
 #define IDC_RADIO_HOLIDAYS_NONE         1198
 #define IDC_BUTTON2                     1199
 #define IDC_BUTTON_DEFINE_HOLIDAYS_BY_DAY 1199
+#define IDC_RADIO_6_DAYS_WEEKLY         1200
+#define IDC_RADIO2                      1201
+#define IDC_RADIO_5_DAYS_WEEKLY         1201
 #define ID_FILE_EXIT                    32771
 #define ID_COMPUTE_ALL                  32772
 #define ID_FILE_LOAD                    32773
@@ -277,7 +279,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        156
 #define _APS_NEXT_COMMAND_VALUE         32782
-#define _APS_NEXT_CONTROL_VALUE         1200
+#define _APS_NEXT_CONTROL_VALUE         1202
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

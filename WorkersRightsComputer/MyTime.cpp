@@ -385,7 +385,9 @@ bool CMyTime::IsWorkingDay()
 {
 	if (mDayOfWeek < 1)
 		return false;
-	return (gWorkPeriod.maWorkingDays[mDayOfWeek - 1] > 0);
+	if (gWorkPeriod.mbWorkingDaysDefinedByUser)
+		return (gWorkPeriod.maWorkingDays[mDayOfWeek - 1] > 0);
+	return mDayOfWeek <= gWorkPeriod.mnWorkDaysPerWeek;
 }
 double CMyTime::AdvanceToNextMonth()
 {

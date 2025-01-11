@@ -34,11 +34,11 @@ CWorkPeriod::CWorkPeriod()
 	, mbCaregiver(true)
 	, mbExtraHolidayHoursForLiveInApplied(false)
 	, mbPartialVacationForPrevYearsDefined(false)
+	, mnWorkDaysPerWeek(6)
 {
 	Reset();
 
 	mSpanString = "---";
-	mnWorkDaysPerWeek = 0;
 
 	mnDaysInMonthForDailySalary = 25;
 }
@@ -84,8 +84,7 @@ void CWorkPeriod::Reset()
 	mLast.Reset();
 	mNotice.Reset();
 
-	for (int i = 0; i < 7; i++)
-		maWorkingDays[i] = 0;
+	SetNWorkingDaysPerWeek(6);
 
 	gWage.SetMinWage();
 	gUsedVacations.ClearAllVacations();
@@ -191,13 +190,33 @@ void CWorkPeriod::SetWorkingDay(int iDay, double fraction)
 	maWorkingDays[iDay] = fraction;
 	Compute();
 }
-void CWorkPeriod::ComputeWorkingDays()
+void CWorkPeriod::SetNWorkingDaysPerWeek(double n)
 {
-	mnWorkDaysPerWeek = 0;
 	for (int i = 0; i < N_WEEK_DAYS; i++)
 	{
-		mnWorkDaysPerWeek += maWorkingDays[i];
+		if (i < n)
+			maWorkingDays[i] = 1;
+		else
+			maWorkingDays[i] = 0;
 	}
+	mnWorkDaysPerWeek = n;
+	mbWorkingDaysDefinedByUser = false;
+}
+void CWorkPeriod::ComputeWorkingDays()
+{
+	if (!mbWorkingDaysDefinedByUser)
+		return;
+
+	double count = 0;
+	for (int i = 0; i < N_WEEK_DAYS; i++)
+	{
+		count += maWorkingDays[i];
+	}
+
+	if (count >= 5)
+		mnWorkDaysPerWeek = count;
+	else
+		SetNWorkingDaysPerWeek(6);
 
 	if (mnWorkDaysPerWeek <= 5)
 		mnDaysInMonthForDailySalary = 21.6666;
@@ -274,7 +293,10 @@ void CWorkPeriod::SaveToXml(CXMLDump &xmlDump)
 	xmlDump.Write(L"b_caregiver", mbCaregiver);
 	xmlDump.Write(L"b_extra_holiday_hours_for_live_in_applied", mbExtraHolidayHoursForLiveInApplied);
 	xmlDump.Write(L"b_partial_vacation_for_prev_years_defined", mbPartialVacationForPrevYearsDefined);
+	xmlDump.Write(L"n_work_days_per_week", mnWorkDaysPerWeek);
+	xmlDump.Write(L"b_work_days_defined_by_user", mbWorkingDaysDefinedByUser);
 
+	if (!mbWorkingDaysDefinedByUser)
 	{
 		CXMLDumpScope scope(L"Days", xmlDump);
 		for (int iDay = 0; iDay < 7; iDay++)
@@ -300,16 +322,25 @@ void CWorkPeriod::LoadFromXml(class CXMLParseNode* pRoot)
 	pWorkPeriodNode->GetValue(L"b_skip_notice", mbSkipNotice);
 	pWorkPeriodNode->GetValue(L"b_live_in", mbLiveIn);
 	pWorkPeriodNode->GetValue(L"b_caregiver", mbCaregiver);
+	mnWorkDaysPerWeek = 6;
+	pWorkPeriodNode->GetValue(L"n_work_days_per_week", mnWorkDaysPerWeek);
+	mbWorkingDaysDefinedByUser = true;
+	pWorkPeriodNode->GetValue(L"b_work_days_defined_by_user", mbWorkingDaysDefinedByUser);
 
-	CXMLParseNode* pDays = pWorkPeriodNode->GetFirst(L"Days");
-	if (pDays)
+	if (mbWorkingDaysDefinedByUser)
 	{
-		for (int iDay = 0; iDay < 7; iDay++)
+		CXMLParseNode* pDays = pWorkPeriodNode->GetFirst(L"Days");
+		if (pDays)
 		{
-			pDays->GetValue(uasDaysNames[iDay], maWorkingDays[iDay]);
+			for (int iDay = 0; iDay < 7; iDay++)
+			{
+				pDays->GetValue(uasDaysNames[iDay], maWorkingDays[iDay]);
+			}
 		}
+		ComputeWorkingDays();
 	}
-	ComputeWorkingDays();
+	else
+		SetNWorkingDaysPerWeek(mnWorkDaysPerWeek);
 
 	gWage.LoadFromXml(pWorkPeriodNode);
 
@@ -377,7 +408,7 @@ CString CWorkPeriod::GetDaysText()
 {
 	int nDays = 0;
 	CString sDays(_T("("));
-	for (int iDay = 0; iDay < 7; iDay++)
+	for (int iDay = 0; iDay < N_WEEK_DAYS; iDay++)
 	{
 		if (maWorkingDays[iDay] > 0)
 		{
@@ -543,7 +574,7 @@ void CWorkPeriod::Log(const wchar_t *zAt)
 	fprintf(pfLog, "\n");
 
 	fprintf(pfLog, "Work Days per week: %.2f\n", mnWorkDaysPerWeek);
-	for (int i = 0; i < 7; i++)
+	for (int i = 0; i < N_WEEK_DAYS; i++)
 		fprintf(pfLog, "%d: %s\n", i + 1, maWorkingDays[i] ? "Yes" : "No");;
 	fprintf(pfLog, "\n");
 

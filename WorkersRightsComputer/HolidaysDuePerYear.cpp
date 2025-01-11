@@ -5,6 +5,7 @@
 #include "XMLParse.h"
 #include "WorkYear.h"
 #include "Holidays.h"
+#include "HolidaysDue.h"
 
 int CHolidaysDuePerYear::umId = -2; // First to be constructed is "mSum" - not real year!
 
@@ -123,10 +124,21 @@ void CHolidaysDuePerYear::SetInvisible(CMyDialogEx* pDlg)
 bool CHolidaysDuePerYear::ValidateValues()
 {
 	bool bChanged = false;
-	if (mWorked.mValue > mInYear.mValue)
+	if (gHolidaysDue.mbHolidaysByDay)
 	{
-		mWorked.mValue = mInYear.mValue;
-		bChanged = true;
+		if (mWorked.mValue > mInYear.mValue)
+		{
+			mWorked.mValue = mInYear.mValue;
+			bChanged = true;
+		}
+	}
+	else // Estimation of holidays in year is only relative and might be overriden
+	{
+		if (mWorked.mValue > CHolidays::MAX_HOLIDAYS_PER_YEAR)
+		{
+			mWorked.mValue = CHolidays::MAX_HOLIDAYS_PER_YEAR;
+			bChanged = true;
+		}
 	}
 	if (mPaid.mValue > mWorked.mValue)
 	{

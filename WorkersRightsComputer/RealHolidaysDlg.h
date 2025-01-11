@@ -22,6 +22,8 @@ public:
 #endif
 
 protected:
+	static const int N_WEEK_DAYS = 7;
+
 	friend class CHolidaysByDay;
 
 	// Radio buttons for working days
@@ -32,7 +34,7 @@ protected:
 	CButton mCheckThursday;
 	CButton mCheckFriday;
 	CButton mCheckSaturday;
-	CButton* mapCheckDays[7];
+	CButton* mapCheckDays[N_WEEK_DAYS];
 
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 	virtual BOOL OnInitDialog();

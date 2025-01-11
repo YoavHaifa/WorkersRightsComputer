@@ -94,10 +94,11 @@ BOOL CWorkersRightsComputerApp::InitInstance()
 	}
 
 	// Delete the shell manager created above.
+	/*
 	if (pShellManager != nullptr)
 	{
 		delete pShellManager;
-	}
+	}*/
 
 #if !defined(_AFXDLL) && !defined(_AFX_NO_MFC_CONTROLS_IN_DIALOGS)
 	ControlBarCleanUp();

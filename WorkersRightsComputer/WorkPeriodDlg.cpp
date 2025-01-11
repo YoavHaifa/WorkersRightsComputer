@@ -73,6 +73,8 @@ BEGIN_MESSAGE_MAP(CWorkPeriodDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_RADIO_DIFF_WAGES, &CWorkPeriodDlg::OnBnClickedRadioDiffWages)
 	ON_BN_CLICKED(IDC_BUTTON_SET_WAGE, &CWorkPeriodDlg::OnBnClickedButtonSetWage)
 	ON_BN_CLICKED(IDC_CHECK_MONTHLY_BONUS, &CWorkPeriodDlg::OnBnClickedCheckMonthlyBonus)
+	ON_BN_CLICKED(IDC_RADIO_6_DAYS_WEEKLY, &CWorkPeriodDlg::OnBnClickedRadio6DaysWeekly)
+	ON_BN_CLICKED(IDC_RADIO_5_DAYS_WEEKLY, &CWorkPeriodDlg::OnBnClickedRadio5DaysWeekly)
 END_MESSAGE_MAP()
 
 void CWorkPeriodDlg::SetWageGui()
@@ -148,6 +150,11 @@ BOOL CWorkPeriodDlg::OnInitDialog()
 	}
 	SetCheck(IDC_CHECK_NO_NOTICE, gWorkPeriod.mbSkipNotice);
 
+	if (gWorkPeriod.mnWorkDaysPerWeek == 5)
+		SetChecked(IDC_RADIO_5_DAYS_WEEKLY);
+	else
+		SetChecked(IDC_RADIO_6_DAYS_WEEKLY);
+
 	SetWageGui();
 
 	mbDialogInitialized = true;
@@ -220,9 +227,14 @@ void CWorkPeriodDlg::UpdateText()
 			sAll += "\r\n";
 		}
 	}
+	if (gWorkPeriod.mnWorkDaysPerWeek == 6)
+		sAll += "6 working days per week\r\n";
+	else if (gWorkPeriod.mnWorkDaysPerWeek == 5)
+		sAll += "5 working days per week\r\n";
+
 	if (gWorkPeriod.mbSkipNotice)
 	{
-		sAll += "Do not demand notice.\r\n";
+		sAll += "Do not demand notice\r\n";
 	}
 	else if (mbNoticeSet)
 	{
@@ -522,10 +534,21 @@ bool CWorkPeriodDlg::SetWageForWholePeriod()
 	}
 	return true;
 }
-
 void CWorkPeriodDlg::OnBnClickedCheckMonthlyBonus()
 {
 	bool bMonthly = IsChecked(IDC_CHECK_MONTHLY_BONUS);
 	SetVisible(IDC_STATIC_MONTHLY_BONUS_TEXT, bMonthly);
 	SetVisible(IDC_EDIT_MONTHLY_BONUS, bMonthly);
+}
+void CWorkPeriodDlg::OnBnClickedRadio6DaysWeekly()
+{
+	gWorkPeriod.SetNWorkingDaysPerWeek(6);
+	UnCheck(IDC_RADIO_5_DAYS_WEEKLY);
+	UpdateText();
+}
+void CWorkPeriodDlg::OnBnClickedRadio5DaysWeekly()
+{
+	gWorkPeriod.SetNWorkingDaysPerWeek(5);
+	UnCheck(IDC_RADIO_6_DAYS_WEEKLY);
+	UpdateText();
 }

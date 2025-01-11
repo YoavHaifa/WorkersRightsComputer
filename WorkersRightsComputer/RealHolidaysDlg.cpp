@@ -50,7 +50,7 @@ BOOL CRealHolidaysDlg::OnInitDialog()
 	CDialogEx::OnInitDialog();
 	InitHolidaysCombo();
 
-	for (int iDay = 0; iDay < 7; iDay++)
+	for (int iDay = 0; iDay < N_WEEK_DAYS; iDay++)
 	{
 		if (gWorkPeriod.maWorkingDays[iDay] > 0)
 			mapCheckDays[iDay]->SetCheck(BST_CHECKED);
@@ -92,7 +92,7 @@ void CRealHolidaysDlg::OnCbnSelchangeComboHolidays()
 }
 bool CRealHolidaysDlg::UpdateDataFromDialog(void)
 {
-	for (int iDay = 0; iDay < 7; iDay++)
+	for (int iDay = 0; iDay < N_WEEK_DAYS; iDay++)
 	{
 		if (mapCheckDays[iDay]->GetCheck() == BST_CHECKED)
 			gWorkPeriod.SetWorkingDay(iDay, 1);
@@ -105,7 +105,7 @@ CString CRealHolidaysDlg::GetDaysText()
 {
 	int nDays = 0;
 	CString sDays(_T("("));
-	for (int iDay = 0; iDay < 7; iDay++)
+	for (int iDay = 0; iDay < N_WEEK_DAYS; iDay++)
 	{
 		if (mapCheckDays[iDay]->GetCheck() == BST_CHECKED)
 		{
@@ -149,51 +149,3 @@ CString CRealHolidaysDlg::GetDaysText()
 	s += L"\r\n";
 	return s;
 }
-/*
-CString CWorkPeriod::GetDaysText()
-{
-	int nDays = 0;
-	CString sDays(_T("("));
-	for (int iDay = 0; iDay < 7; iDay++)
-	{
-		if (maWorkingDays[iDay] > 0)
-		{
-			nDays++;
-			if (nDays > 1)
-				sDays += L", ";
-			switch (iDay)
-			{
-			case 0:
-				sDays += L"Sun";
-				break;
-			case 1:
-				sDays += L"Mon";
-				break;
-			case 2:
-				sDays += L"Tue";
-				break;
-			case 3:
-				sDays += L"Wed";
-				break;
-			case 4:
-				sDays += L"Thu";
-				break;
-			case 5:
-				sDays += L"Fri";
-				break;
-			case 6:
-				sDays += L"Sat";
-				break;
-			}
-		}
-	}
-	sDays += L")";
-	if (nDays < 1)
-		return CString();
-
-	wchar_t zBuf[512];
-	swprintf_s(zBuf, sizeof(zBuf) / sizeof(wchar_t), L"%d days/week ", nDays);
-	CString s(zBuf);
-	s += sDays;
-	return s;
-}*/

@@ -74,4 +74,6 @@ public:
 	afx_msg void OnBnClickedRadioDiffWages();
 	afx_msg void OnBnClickedButtonSetWage();
 	afx_msg void OnBnClickedCheckMonthlyBonus();
+	afx_msg void OnBnClickedRadio6DaysWeekly();
+	afx_msg void OnBnClickedRadio5DaysWeekly();
 };

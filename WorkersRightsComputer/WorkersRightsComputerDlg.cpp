@@ -633,7 +633,7 @@ void CWorkersRightsComputerDlg::SaveToXml(CXMLDump &xmlDump)
 			CEditRef *pRef = mEditBoxes.GetNext(pos);
 			pRef->mEdit.GetWindowText(sText);
 			if (sText.IsEmpty())
-				sText = L"0";
+				sText = L" ";
 			xmlDump.Write((const wchar_t *)pRef->msName, (const wchar_t *)sText);
 		}
 	}
