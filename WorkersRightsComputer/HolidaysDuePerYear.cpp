@@ -106,8 +106,8 @@ void CHolidaysDuePerYear::UpdateGui(CMyDialogEx* pDlg)
 			pData->UpdateGui(pDlg);
 		}
 	}
-	else
-		SetInvisible(pDlg);
+	//else
+	//	SetInvisible(pDlg);
 }
 void CHolidaysDuePerYear::SetInvisible(CMyDialogEx* pDlg)
 {

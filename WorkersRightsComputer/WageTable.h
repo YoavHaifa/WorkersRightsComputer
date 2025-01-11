@@ -25,7 +25,8 @@ public:
 	double PayPerMonthAtWorkEnd();
 	double PayPerDayAtWorkEnd();
 	double ComputeMonthlyPay(const class CMyTime &date);
-	double ComputeHolidayPrice(const class CMyTime& date);
+	double ComputeHolidayPricePerDate(const class CMyTime& date);
+	double ComputeHolidayPriceOnWorkEnd();
 
 private:
 	double ComputeHolidayPriceBaseWage(const class CMyTime& date);

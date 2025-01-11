@@ -249,7 +249,7 @@ CHolidays* CAllRights::GetHolidays()
 {
 	if (!mpHolidays)
 		return NULL;
-	if (!mpHolidays->InitDefinitionByDay())
+	if (!mpHolidays->InitDefinition())
 		return NULL;
 	return mpHolidays;
 }

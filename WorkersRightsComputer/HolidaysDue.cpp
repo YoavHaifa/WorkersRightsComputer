@@ -68,6 +68,7 @@ void CHolidaysDue::UpdateMainDialog()
 		return;
 
 	// Should we see holidays at all?
+	/*
 	if (mbPeriodAndHolidaysDefined || mbHolidaysRelative)
 	{
 		for (int i = 0; i < N_MAIN_DLG_FIELDS; i++)
@@ -78,7 +79,7 @@ void CHolidaysDue::UpdateMainDialog()
 		for (int i = 0; i < N_MAIN_DLG_FIELDS; i++)
 			gpDlg->SetInvisible(maMainDlgFields[i]);
 		return;
-	}
+	}*/
 
 	// Set content to relevant fields
 	mpThisYear->UpdateGui(gpDlg);
@@ -202,7 +203,7 @@ void CHolidaysDue::SetYearsByWorkPeriod()
 	CHolidays* pHolidays = gAllRights.GetHolidays();
 	if (!pHolidays)
 		return;
-	int nInLast = pHolidays->NInLastYear();
+	int nInLast = pHolidays->ComputeNInLastYear();
 	mpThisYear->SetNInYear(nInLast);
 
 	mSum.mbRelevant = true;

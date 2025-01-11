@@ -23,6 +23,14 @@ protected:
 
 	DECLARE_MESSAGE_MAP()
 public:
-	CString msFileName;
+
 	void SetFileName(CString& sfName);
+	void SetWarning(const wchar_t* zWarning);
+	void SetNewTitle(const wchar_t* zTitle);
+	afx_msg void OnStnClickedStaticNoLetter();
+
+private:
+	CString msFileName;
+	CString msWarning;
+	CString msTitle;
 };

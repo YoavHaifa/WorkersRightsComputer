@@ -26,13 +26,17 @@ public:
 	CHolidays(void);
 	bool IsValid(void) {return mbValid;}
 	virtual	bool SetEditRef(class CEditRef *pRef) override;
-	bool InitDefinitionByDay();
-	virtual bool Compute(void) override;
+	bool InitDefinition();
+	virtual bool Compute() override;
+
+	void ComputeNInLastYearByDay();
+	void ComputeNInLastYearRelative();
+	int ComputeNInLastYear();
+
 	virtual CString GetDecriptionForLetter(void)override;
 	virtual CString GetDecriptionForLetterHebrew(void)override;
 
 	void PrintLog();
-	int NInLastYear(void);
 	CString GetSelection() { return msSelection; }
 	bool Is(const CString &sSelection) { return msSelection == sSelection; }
 
@@ -65,9 +69,11 @@ private:
 	bool mbCheckForWorkedHolodays;
 
 	void RememberPayParDay(double value);
-	bool ComputeHolidayPrice(class CHoliday& holiday);
+	//void ComputeHolidayPrice(class CHoliday& holiday);
 
-	void ComputePayLastYear();
+	bool CheckAnyHolidayThisYear();
+	void ComputePayLastYearByDay();
+	void ComputePayLastYearRelative();
 	void ComputePayPrevYears();
 	int AddPay4PrevYear(int i);
 	int GetNWorkedHolidays(class CWorkYear* pYear);

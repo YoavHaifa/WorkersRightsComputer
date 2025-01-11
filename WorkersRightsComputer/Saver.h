@@ -14,12 +14,14 @@ private:
 	void SaveXmlAsOldCopy(const wchar_t *zfName);
 	void SaveEditBox(FILE *pfSave, class CEditRef *pRef);
 	void SaveButton(FILE *pfSave, class CButtonRef *pRef);
-	void WriteLetter(void);
+	bool WriteLetter();
+	bool VerifySaveDirAndSaveToXml();
 
 	bool LoadFromXmlFile(void);
 
 	FILE *mpfWrite;
 	CString msSaveId;
+	CString msSaveDir;
 	CString msfName;
 	FILE *mpfRead;
 };

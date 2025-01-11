@@ -80,8 +80,6 @@ bool CHtmlWriter::WriteLetterFromTemplate(const wchar_t* zfName)
 	dlg.SetFileName(msfName);
 	dlg.DoModal();
 
-	//CUtils::MessBox(msfName, L"Letter Saved");
-
 	return n > 0;
 }
 void CHtmlWriter::ReplaceTemplateVariable(void)

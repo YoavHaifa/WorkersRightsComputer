@@ -156,6 +156,8 @@
 #define IDC_STATIC_FILE_NAME            1102
 #define IDC_EDIT_CONTACT_EMAIL          1103
 #define IDC_BUTTON_PREV_YEARS_HOLIDAYS  1103
+#define IDC_STATIC_FILE_NAME2           1103
+#define IDC_STATIC_NO_LETTER            1103
 #define IDC_EDIT_OPERATOR_ENGLISH       1104
 #define IDC_EDIT_OPERATOR_HEBREW        1105
 #define IDC_STATIC_PY                   1110

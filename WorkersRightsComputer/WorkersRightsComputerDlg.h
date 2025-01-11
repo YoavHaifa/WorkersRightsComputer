@@ -9,7 +9,7 @@
 // CWorkersRightsComputerDlg dialog
 class CWorkersRightsComputerDlg : public CMyDialogEx
 {
-// Construction
+	// Construction
 public:
 	CWorkersRightsComputerDlg(CWnd* pParent = nullptr);	// standard constructor
 
@@ -43,6 +43,8 @@ public:
 	afx_msg void OnBnClickedButtonLoad();
 	bool VerifyThatNotInSave();
 	void OnLoad();
+	bool GetSaveId(CString& sSaveId);
+	bool AddFieldToSaveId(CString& sSaveId, int fieldId, const wchar_t* zName, bool bMust);
 
 	CEdit mEditFirstName;
 	CEdit mEditFamilyName;
@@ -62,7 +64,7 @@ public:
 	CEdit mEditRecuperationPrevYears;
 	CEdit mEditNDaysPaidLastYear;
 
-	CList<CEditRef *, CEditRef *> mEditBoxes;
+	CList<CEditRef*, CEditRef*> mEditBoxes;
 	afx_msg void OnBnClickedButtonReset();
 	void ResetAllInputs(bool bLoading);
 
@@ -71,7 +73,7 @@ public:
 	CButton mDemandRec4Prev;
 	CButton mEntitledOnly2Sev;
 	CButton mHadPensionBefore;
-	CList<CButtonRef *, CButtonRef *> mButtons;
+	CList<CButtonRef*, CButtonRef*> mButtons;
 	afx_msg void OnBnClickedCheckSeveranceLessThanYear();
 	afx_msg void OnBnClickedCheckVacationYears();
 	afx_msg void OnBnClickedCheckRecuperationYears();
@@ -79,7 +81,7 @@ public:
 	afx_msg void OnBnClickedCheckActivePension();
 	afx_msg void OnEnChangeEditHolidaysLastyWork();
 	void InitializeAllRights();
-	void DisplaySummary(const wchar_t *zText);
+	void DisplaySummary(const wchar_t* zText);
 	CEdit mSummary;
 	bool mbInitialized;
 	afx_msg void OnComputeAll();
@@ -107,7 +109,7 @@ public:
 	CEdit mAddress;
 	CEdit mEmail;
 	void SaveToXml(class CXMLDump& xmlDump);
-	bool LoadFromXml(class CXMLParseNode *pRoot);
+	bool LoadFromXml(class CXMLParseNode* pRoot);
 	afx_msg void OnTestLoadxml();
 	void WriteEditorToLetter(class CHtmlWriter& html);
 	afx_msg void OnTestLoadtxt();
@@ -125,6 +127,9 @@ public:
 	afx_msg void OnBnClickedButtonVacationsPrevYears();
 	afx_msg void OnEnChangeEditVacationYears();
 	afx_msg void OnEnChangeEditRecuperationYears();
+	CButton mHolidaysRelative;
+	CButton mHolidaysByDay;
+	CButton mHolidaysNone;
 };
 
-extern CWorkersRightsComputerDlg *gpDlg;
+extern CWorkersRightsComputerDlg* gpDlg;

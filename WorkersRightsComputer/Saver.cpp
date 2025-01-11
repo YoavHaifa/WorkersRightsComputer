@@ -14,6 +14,7 @@
 #include "FileName.h"
 #include "Comments.h"
 #include "HolidaysDue.h"
+#include "LetterSavedDlg.h"
 
 
 CSaver::CSaver()
@@ -52,10 +53,26 @@ bool CSaver::Save(const wchar_t *zfName)
 
 	SaveToXml();
 
+	// Get Worker's name for save dir & files
+	if (!gpDlg->GetSaveId(msSaveId))
+		return false;
+
+	if (!VerifySaveDirAndSaveToXml())
+		return false;
+
+	if (!gWorkPeriod.PeriodIsValid())
+	{
+		CLetterSavedDlg dlg;
+		dlg.SetNewTitle(L"Case Saved - but not enough information to compute rights");
+		dlg.SetFileName(msfName);
+		dlg.SetWarning(L"Work Period not well defined. Letter can't be prepared.");
+		dlg.DoModal();
+		return false;
+	}
+
 	if (gAllRights.mbComputedOK)
 	{
-		WriteLetter();
-		return true;
+		return WriteLetter();
 	}
 
 	CString s(L"Last Computation Failed, Letter Not Saved.\r\n");
@@ -160,47 +177,41 @@ void CSaver::SaveButton(FILE *pfSave, CButtonRef *pRef)
 	else
 		fwprintf(pfSave, L"not_checked\n");
 }
-void CSaver::WriteLetter()
+bool CSaver::VerifySaveDirAndSaveToXml()
 {
-	// Get Worker's name for save dir & files
-	msSaveId = gpDlg->GetText(IDC_EDIT_FIRST_NAME);
-	msSaveId += "_";
-	msSaveId += gpDlg->GetText(IDC_EDIT_FAMILY_NAME);
-	msSaveId += "_";
-	msSaveId += gpDlg->GetText(IDC_EDIT_ID);
-	msSaveId.Replace(L" ", L"_");
-
-	// SAVE
 	// Set Target Directory
-	CString sSaveDir(gConfig.msSaveRoot);
-	sSaveDir += "\\";
-	sSaveDir += msSaveId;
-	CUtils::VerifyDirectory(sSaveDir);
-	sSaveDir += "\\";
+	msSaveDir = gConfig.msSaveRoot;
+	msSaveDir += "\\";
+	msSaveDir += msSaveId;
+	if (!CUtils::VerifyDirectory(msSaveDir))
+		return false;
+
+	msSaveDir += "\\";
 
 	msSaveId += "_";
-	msfName = sSaveDir;
+	msfName = msSaveDir;
 	msfName += msSaveId;
 	msfName += L"save.xml";
 	SaveToXml();
-
-	if (!gWorkPeriod.PeriodIsValid())
-		return;
-
-	CString sLogDir = sSaveDir + "Log";
+	return true;
+}
+bool CSaver::WriteLetter()
+{
+	CString sLogDir = msSaveDir + "Log";
 	CUtils::VerifyDirectory(sLogDir);
 	sLogDir += "\\";
 
 	CRight::SetSaveDirAndName(sLogDir, msSaveId);
 	gpDlg->OnInputChange(); //  Recompute all and save all relevant logs to special dir
 
-	CString sLetterFileName(sSaveDir);
+	CString sLetterFileName(msSaveDir);
 	sLetterFileName += msSaveId;
 	sLetterFileName += L"letter_english.html";
 	CHtmlWriter writer;
 	writer.WriteLetterFromTemplate(sLetterFileName);
 
 	CRight::ResetSaveDirAndName();
+	return true;
 }
 bool CSaver::LoadFromXmlFile()
 {

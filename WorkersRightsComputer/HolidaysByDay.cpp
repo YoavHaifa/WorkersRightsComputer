@@ -15,8 +15,9 @@ CHolidaysByDay::CHolidaysByDay()
 }
 void CHolidaysByDay::SetSelectionFromOldSave(const CString& sText)
 {
-	mpDlg->mComboHolidays.SetWindowTextW(sText);
-
+	msSelectedHolidays = sText;
+	mbDefined = true;
+	//mpDlg->mComboHolidays.SetWindowTextW(sText);
 }
 bool CHolidaysByDay::LoadFromXml(class CXMLParseNode* pNode)
 {
@@ -25,26 +26,32 @@ bool CHolidaysByDay::LoadFromXml(class CXMLParseNode* pNode)
 void CHolidaysByDay::SaveToXml(class CXMLDump& xmlDump)
 {
 	CXMLDumpScope mainScope(L"HolidaysByDay", xmlDump);
+	xmlDump.Write(L"Holidays", (const wchar_t*)msSelectedHolidays);
 
+	/*
 	CString sText;
 	mpDlg->mComboHolidays.GetWindowText(sText);
 	if (sText.IsEmpty())
 		sText = L"-";
 	xmlDump.Write(L"Holidays", (const wchar_t*)sText);
+	*/
 
 }
 void CHolidaysByDay::ResetAllInputs()
 {
 	if (mbDefined)
-		mpDlg->mComboHolidays.SetWindowTextW(L"Select set of Holidays");
+		msSelectedHolidays = L"Select set of Holidays";
+		//mpDlg->mComboHolidays.SetWindowTextW(L"Select set of Holidays");
 }
 CString CHolidaysByDay::GetHolidaysSet()
 {
 	if (!mbDefined)
 		return CString(L"Holidays not defined");
+	return msSelectedHolidays;
+	/*
 	CString sSelection;
 	mpDlg->mComboHolidays.GetWindowTextW(sSelection);
-	return sSelection;
+	return sSelection;*/
 }
 bool CHolidaysByDay::UpdateDataFromDialog()
 {

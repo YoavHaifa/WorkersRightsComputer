@@ -34,7 +34,11 @@ bool CWageTable::IsValid(void)
 	}
 	return bValid;
 }
-double CWageTable::ComputeHolidayPrice(const CMyTime& date)
+double CWageTable::ComputeHolidayPriceOnWorkEnd()
+{
+	return ComputeHolidayPricePerDate(gWorkPeriod.mLast);
+}
+double CWageTable::ComputeHolidayPricePerDate(const CMyTime& date)
 {
 	double baseWage = ComputeHolidayPriceBaseWage(date);
 

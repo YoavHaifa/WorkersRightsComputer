@@ -26,6 +26,8 @@ public:
 	bool VerifyParameter(int id, double value);
 
 	bool IsChecked(int id);
+	void SetChecked(int id);
+	void UnCheck(int id);
 	void SetCheck(int id, bool bCheck);
 	void SetMenuCheck(int id, bool bCheck);
 

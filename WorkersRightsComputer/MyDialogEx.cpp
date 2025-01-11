@@ -174,6 +174,14 @@ bool CMyDialogEx::IsChecked(int id)
 	bool bChecked = (pButton->GetCheck() != 0);
     return bChecked;
 }
+void CMyDialogEx::SetChecked(int id)
+{
+	SetCheck(id, true);
+}
+void CMyDialogEx::UnCheck(int id)
+{
+	SetCheck(id, false);
+}
 void CMyDialogEx::SetCheck(int id, bool bCheck)
 {
     CButton *pWnd=(CButton *)GetDlgItem(id);

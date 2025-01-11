@@ -122,6 +122,11 @@ CWorkersRightsComputerDlg::CWorkersRightsComputerDlg(CWnd* pParent /*=nullptr*/)
 	mButtons.AddTail(new CButtonRef(L"PaidDaysLastYVacation", mVacationPaidDays4LastYear, NULL));
 	mButtons.AddTail(new CButtonRef(L"PaidNoneLastYVacation", mVacationPaidNone4LastYear, NULL, false));
 	mButtons.AddTail(new CButtonRef(L"PaidLastYRecuperation", mRecuperationPaid4LastYear, NULL));
+
+	// Add buttons to support holidays relative to work period without specific country
+	mButtons.AddTail(new CButtonRef(L"HolidaysRelative", mHolidaysRelative, NULL, false));
+	mButtons.AddTail(new CButtonRef(L"HolidaysByDay", mHolidaysByDay, NULL, false));
+	mButtons.AddTail(new CButtonRef(L"HolidaysNone", mHolidaysNone, NULL, false));
 }
 
 void CWorkersRightsComputerDlg::DoDataExchange(CDataExchange* pDX)
@@ -134,9 +139,6 @@ void CWorkersRightsComputerDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT_TEL, mEditTel);
 	DDX_Control(pDX, IDC_EDIT_HOLIDAYS_PREVY_PAID, mEditLastYearPaid);
 	DDX_Control(pDX, IDC_EDIT_HOLIDAYS_PREVY_FROM, mEditLastYearFrom);
-	//DDX_Control(pDX, IDC_EDIT_HOLIDAYS_PREVY_WORK, mEditPrevYearWork);
-	//DDX_Control(pDX, IDC_EDIT_HOLIDAYS_PREVY_PAID, mEditPrevYearPaid);
-	//DDX_Control(pDX, IDC_EDIT_HOLIDAYS_PREVY_FROM, mEditPrevYearFrom);
 	DDX_Control(pDX, IDC_EDIT_ADDITIONAL_DESC, mEditAdditionalDesc);
 	DDX_Control(pDX, IDC_EDIT_ADDITIONAL_SUM, mEditAdditionalSum);
 	DDX_Control(pDX, IDC_EDIT_PAID_DESC, mEditPaidDesc);
@@ -162,6 +164,9 @@ void CWorkersRightsComputerDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_RADIO_LAST_YEAR_VACATION_DAYS, mVacationPaidDays4LastYear);
 	DDX_Control(pDX, IDC_RADIO_LAST_YEAR_VACATION_NONE, mVacationPaidNone4LastYear);
 	DDX_Control(pDX, IDC_CHECK_PAID_RECUP, mRecuperationPaid4LastYear);
+	DDX_Control(pDX, IDC_RADIO_HOLIDAYS_RELATIVE, mHolidaysRelative);
+	DDX_Control(pDX, IDC_RADIO_HOLIDAYS_BY_DAYS, mHolidaysByDay);
+	DDX_Control(pDX, IDC_RADIO_HOLIDAYS_NONE, mHolidaysNone);
 }
 
 BEGIN_MESSAGE_MAP(CWorkersRightsComputerDlg, CDialogEx)
@@ -246,6 +251,7 @@ BOOL CWorkersRightsComputerDlg::OnInitDialog()
 	InitializeAllRights();
 	mRadioPassport.SetCheck(1);
 	mVacationPaidNone4LastYear.SetCheck(1);
+	mHolidaysRelative.SetCheck(1);
 	gConfig.InitFromXml();
 	CString sTitle(L"Workers Rights Computer - Experimental Beta Version ");
 	SetTitle(sTitle + gConfig.msVersion);
@@ -366,13 +372,10 @@ void CWorkersRightsComputerDlg::OnCancel()
 	if (dlg.Ask())
 		CDialogEx::OnCancel();
 }
-
 void CWorkersRightsComputerDlg::OnFileExit()
 {
 	exit(0);
 }
-
-
 void CWorkersRightsComputerDlg::OnBnClickedWorkPeriod()
 {
 	CWorkPeriodDlg dlg;
@@ -428,7 +431,7 @@ void CWorkersRightsComputerDlg::ResetAllInputs(bool bLoading)
 	while (pos)
 	{
 		CEditRef* pEdit = mEditBoxes.GetNext(pos);
-		pEdit->mEdit.SetWindowTextW(L"0");
+		pEdit->mEdit.SetWindowTextW(pEdit->msDefault);
 	}
 
 	static int i = 0;
@@ -438,6 +441,11 @@ void CWorkersRightsComputerDlg::ResetAllInputs(bool bLoading)
 		CButtonRef* pButton = mButtons.GetNext(pos);
 		if (pButton->msName == "PaidNoneLastYVacation")
 			pButton->mButton.SetCheck(BST_CHECKED);
+		else if (pButton->msName == "HolidaysRelative")
+			pButton->mButton.SetCheck(BST_CHECKED);
+		else if (pButton->msName == "RadioPass")
+			pButton->mButton.SetCheck(BST_CHECKED);
+		
 		else
 			pButton->mButton.SetCheck(BST_UNCHECKED);
 		i++;
@@ -669,6 +677,9 @@ bool CWorkersRightsComputerDlg::LoadFromXml(CXMLParseNode* pRoot)
 	{
 		// Where is the contoller of this mode?
 		gHolidaysByDay.SetSelectionFromOldSave(sText);
+		SetChecked(IDC_RADIO_HOLIDAYS_BY_DAYS);
+		UnCheck(IDC_RADIO_HOLIDAYS_RELATIVE);
+		UnCheck(IDC_RADIO_HOLIDAYS_NONE);
 	}
 
 	bool bOK = true;
@@ -764,4 +775,35 @@ void CWorkersRightsComputerDlg::OnEnChangeEditVacationYears()
 void CWorkersRightsComputerDlg::OnEnChangeEditRecuperationYears()
 {
 	OnInputChange();
+}
+bool CWorkersRightsComputerDlg::AddFieldToSaveId(CString& sSaveId, int fieldId, const wchar_t* zName, bool bMust)
+{
+	CString s = gpDlg->GetText(fieldId);
+	if (s.IsEmpty())
+	{
+		if (bMust)
+		{
+			CUtils::MessBox(zName, L"Warning: Missing Definition");
+			return false;
+		}
+		return true;
+	}
+
+	if (!sSaveId.IsEmpty())
+		sSaveId += "_";
+	sSaveId += s;
+	return true;
+}
+bool CWorkersRightsComputerDlg::GetSaveId(CString& sSaveId)
+{
+	sSaveId = L"";
+
+	// Get Worker's name for save dir & files
+	if (!AddFieldToSaveId(sSaveId, IDC_EDIT_FIRST_NAME, L"First Name", true))
+		return false;
+	if (!AddFieldToSaveId(sSaveId, IDC_EDIT_FAMILY_NAME, L"Family Name", true))
+		return false;
+	AddFieldToSaveId(sSaveId, IDC_EDIT_ID, L"id", false);
+	sSaveId.Replace(L" ", L"_");
+	return true;
 }

@@ -6,11 +6,13 @@ class CEditRef
 public:
 	CEditRef(const wchar_t *zName, CEdit &edit, const wchar_t *zOldName = NULL, bool bConnect = true)
 		: msName(zName)
+		, msDefault(L"")
 		, mEdit(edit)
 		, msOldName(zOldName)
 		, mbConnect(bConnect)
 	{}
 	CString msName;
+	CString msDefault;
 	CEdit &mEdit;
 	bool mbConnect;
 	CString msOldName;

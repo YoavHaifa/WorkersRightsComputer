@@ -84,6 +84,8 @@ bool CHolidays::InitFromFile(const wchar_t *zfName)
 	CString sSelected(zfName);
 	if (sSelected.Left(6) == "Select")
 		return false;
+	if (sSelected.Left(20) == "Holidays not defined")
+		return false;
 
 	mbValid = false;
 	CString sfName = CUtils::GetBaseDir();
@@ -248,8 +250,9 @@ void CHolidays::AddToDebug(int i, bool bPrice)
 	msDebug += s;
 	msDebug += "\n";
 }
-int CHolidays::NInLastYear(void)
+void CHolidays::ComputeNInLastYearByDay()
 {
+	mnInLastYear = 0;
 	msDebug = L"Holidays:";
 	FILE *pfWrite = CUtils::TryOpenLogFile(L"HolidaysInLastYear");
 	if (pfWrite)
@@ -262,43 +265,79 @@ int CHolidays::NInLastYear(void)
 	{
 		if (pfWrite)
 			fclose(pfWrite);
-		return 0;
+		return;
 	}
 
-	int n = 0;
 	for (int i = 0; i < mn; i++)
 	{
 		if (gWorkPeriod.LastYearContains(*map[i]))
 		{
-			n++;
+			mnInLastYear++;
 			if (pfWrite)
 				map[i]->Log(pfWrite);
 			AddToDebug(i,false);
 		}
 	}
 
-	if ( n > MAX_HOLIDAYS_PER_YEAR )
+	if (mnInLastYear > MAX_HOLIDAYS_PER_YEAR )
 	{
-		n = MAX_HOLIDAYS_PER_YEAR;
+		mnInLastYear = MAX_HOLIDAYS_PER_YEAR;
 		if (pfWrite)
-			fprintf(pfWrite, "Max Holidays Per Year: %d\n", n);
+			fprintf(pfWrite, "Max Holidays Per Year: %d\n", mnInLastYear);
 	}
 	if (pfWrite)
 	{
-		fprintf(pfWrite, "Return %d", n);
+		fprintf(pfWrite, "Set mnInLastYear %d", mnInLastYear);
 		fclose(pfWrite);
 	}
-	return n;
 }
+bool CHolidays::CheckAnyHolidayThisYear()
+{
+	int n = gHolidaysDue.GetNDueLastYear();
+	if (n >= 1)
+		return true;
 
-void CHolidays::ComputePayLastYear(void)
+	LogLine(L"n days due in this year", n);
+	msDebug = "Holiday Pay - None this year";
+	if (gHolidaysDue.RequiresDefintionByDay())
+		msDue += msSelection;
+	else
+		msDue += L"Relative";
+	msDue += " - None this year ";
+	return false;
+}
+void CHolidays::ComputePayLastYearRelative()
+{
+	mnDaysToPay = gHolidaysDue.GetNDueLastYear();
+
+	double payPerDay = gWageTable.ComputeHolidayPriceOnWorkEnd();
+	//double payPerDay = gWageTable.PayPerDayAtWorkEnd();
+	LogLine(L"n days due in this year", mnDaysToPay);
+
+	mDuePay = mnDaysToPay * payPerDay;
+
+	msDebug = L"Holidays Pay:\n";
+	msDebug += L"This year ";
+	msDebug += ToString(mnDaysToPay);
+	msDebug += L" days * ";
+	msDebug += ToString(payPerDay);
+	msDebug += L" per day\n";
+
+	msDue += L"Relative";
+	msDue += L" - This Year ";
+	msDue += ToString(mnDaysToPay);
+	msDue += L" days ";
+
+}
+void CHolidays::ComputePayLastYearByDay(void)
 {
 	for (int i = 0; i < mn; i++)
 	{
 		map[i]->mbInLastYearPaySum = false;
 		if (map[i]->mbInLastYear)
 		{
-			ComputeHolidayPrice(*map[i]);
+			map[i]->mPrice = gWageTable.ComputeHolidayPricePerDate(*map[i]);
+			//ComputeHolidayPrice(*map[i]);
 		}
 	}
 
@@ -308,14 +347,6 @@ void CHolidays::ComputePayLastYear(void)
 	{
 		nToSum = MAX_HOLIDAYS_PER_YEAR;
 		LogLine(L"n days due in this year reduced to max allowed", nToSum);
-	}
-	if (nToSum < 1)
-	{
-		msDebug = "Holiday Pay - None";
-		nToSum = 0;
-		msDue += msSelection;
-		msDue += " - None this year ";
-		return;
 	}
 
 	msDebug = "Holidays Pay:\n";
@@ -357,7 +388,6 @@ void CHolidays::ComputePayLastYear(void)
 	msDebug += ToString(nSummed);
 	msDebug += L")=";
 
-	//msDue += L" - ";
 	msDue += msSelection;
 	msDue += L" - This Year ";
 	msDue += ToString(nSummed);
@@ -388,7 +418,7 @@ int CHolidays::AddPay4PrevYear(int iPrev)
 	if (nDue > 0)
 	{
 		CMyTime payDate = gWorkYears.GetPrevYearEnd(iPrev);
-		double payPerDay = gWageTable.ComputeHolidayPrice(payDate);
+		double payPerDay = gWageTable.ComputeHolidayPricePerDate(payDate);
 		double payPerYear = payPerDay * nDue;
 		RememberPayParDay(payPerDay);
 		LogLine(L"pay per day in prev year", payPerDay);
@@ -450,7 +480,7 @@ void CHolidays::RememberPayParDay(double value)
 			mMinPayPerDay = value;
 	}
 }
-bool CHolidays::InitDefinitionByDay()
+bool CHolidays::InitDefinition()
 {
 	if (!gHolidaysDue.RequiresDefintionByDay())
 		return true;
@@ -470,28 +500,42 @@ bool CHolidays::InitDefinitionByDay()
 
 	return true;
 }
-bool CHolidays::Compute(void)
+void CHolidays::ComputeNInLastYearRelative()
+{
+	double lastYearFraction = gWorkYears.GetLastYearAsFraction();
+	double fractionPerDay = 1.0 / MAX_HOLIDAYS_PER_YEAR;
+	mnInLastYear = (int)ceil(lastYearFraction / fractionPerDay);
+}
+int CHolidays::ComputeNInLastYear()
+{
+	if (gHolidaysDue.RequiresDefintionByDay())
+		ComputeNInLastYearByDay();
+	else
+		ComputeNInLastYearRelative();
+	return mnInLastYear;
+}
+bool CHolidays::Compute()
 {
 	mnDaysToPay = 0;
 	mMinPayPerDay = 0;
 	mMaxPayPerDay = 0;
 
-	if (!InitDefinitionByDay())
+	if (!InitDefinition())
 		return true;
 
-	mnInLastYear = NInLastYear();
-	// TEMP - This edit box role is not clear -
-	// Should it be written from SW or the text should be read from user text?????
+	ComputeNInLastYear();
 	mpNDaysInLastYearBox->SetWindowText (ToString(mnInLastYear));
 	LogLine(L"n days in this year", mnInLastYear);
 
-	//if (GetIntFromEditBox(mpNDaysPaidLastYearBox, L"mpNDaysPaidLastYearBox", mnPaidLastYear))
-	//	LogLine(L"n paid this year", mnPaidLastYear);
+	// Compute holiday pay for last year
+	if (CheckAnyHolidayThisYear())
+	{
+		if (gHolidaysDue.RequiresDefintionByDay())
+			ComputePayLastYearByDay();
+		else
+			ComputePayLastYearRelative();
+	}
 
-	//if (GetIntFromEditBox(mpNDaysWorkedLastYearBox, L"mpNDaysWorkedLastYearBox", mnWorkedLastYear))
-	//	LogLine(L"n worked this year", mnWorkedLastYear);
-
-	ComputePayLastYear();
 	ComputePayPrevYears();
 
 	msDebug += ToString(mDuePay);
@@ -538,11 +582,8 @@ CString CHolidays::GetDecriptionForLetterHebrew(void)
 
 	return s;
 }
-bool CHolidays::ComputeHolidayPrice(CHoliday& holiday)
+/*
+void CHolidays::ComputeHolidayPrice(CHoliday& holiday)
 {
-	//if (mRateSetByUser > 0)
-	//	holiday.mPrice = mRateSetByUser;
-	//else
-	holiday.mPrice = gWageTable.ComputeHolidayPrice(holiday);
-	return true;
-}
+	holiday.mPrice = gWageTable.ComputeHolidayPricePerDate(holiday);
+}*/
