@@ -64,7 +64,8 @@ CHolidaysDue::CHolidaysDue()
 }
 void CHolidaysDue::SetInvisible()
 {
-
+	for (int i = 0; i < N_MAIN_DLG_FIELDS; i++)
+		gpDlg->SetInvisible(maMainDlgFields[i]);
 }
 void CHolidaysDue::UpdateMainDialog()
 {

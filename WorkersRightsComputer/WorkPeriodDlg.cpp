@@ -248,8 +248,6 @@ void CWorkPeriodDlg::UpdateText()
 		}
 	}
 
-	//sAll += GetDaysText();
-
 	sAll += gUsedVacations.GetVacationsShortText();
 	sAll += "\r\n";
 
@@ -395,35 +393,6 @@ void CWorkPeriodDlg::OnBnClickedOk()
 		CMyDialogEx::OnOK();
 	}
 }
-/*
-void CWorkPeriodDlg::OnBnClickedCheckSunday()
-{
-	UpdateText();
-}
-void CWorkPeriodDlg::OnBnClickedCheckMonday()
-{
-	UpdateText();
-}
-void CWorkPeriodDlg::OnBnClickedCheckTuesday()
-{
-	UpdateText();
-}
-void CWorkPeriodDlg::OnBnClickedCheckWednesday()
-{
-	UpdateText();
-}
-void CWorkPeriodDlg::OnBnClickedCheckThursday()
-{
-	UpdateText();
-}
-void CWorkPeriodDlg::OnBnClickedCheckFriday()
-{
-	UpdateText();
-}
-void CWorkPeriodDlg::OnBnClickedCheckSaturday()
-{
-	UpdateText();
-}*/
 void CWorkPeriodDlg::OnBnClickedOk3()
 {
 	if (!UpdateDataFromDialog())

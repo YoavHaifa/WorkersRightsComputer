@@ -1,9 +1,9 @@
 #pragma once
-
+#include "MyDialogEx.h"
 
 // CRealHolidaysDlg dialog
 
-class CRealHolidaysDlg : public CDialogEx
+class CRealHolidaysDlg : public CMyDialogEx
 {
 	DECLARE_DYNAMIC(CRealHolidaysDlg)
 
@@ -11,10 +11,7 @@ public:
 	CRealHolidaysDlg(CWnd* pParent = nullptr);   // standard constructor
 	virtual ~CRealHolidaysDlg();
 
-	bool LoadFromXml(class CXMLParseNode* pRoot);
-
-	bool UpdateDataFromDialog(void);
-	CString GetDaysText();
+	bool UpdateDaysDataFromDialog(void);
 
 // Dialog Data
 #ifdef AFX_DESIGN_TIME
@@ -38,10 +35,19 @@ protected:
 
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 	virtual BOOL OnInitDialog();
+	virtual void OnOK();
 
 	CComboBox mComboHolidays;
 	void InitHolidaysCombo();
 	afx_msg void OnCbnSelchangeComboHolidays();
+
+	afx_msg void OnBnClickedCheckSunday();
+	afx_msg void OnBnClickedCheckMonday();
+	afx_msg void OnBnClickedCheckTuesday();
+	afx_msg void OnBnClickedCheckWednesday();
+	afx_msg void OnBnClickedCheckThursday();
+	afx_msg void OnBnClickedCheckFriday();
+	afx_msg void OnBnClickedCheckSaturday();
 
 	DECLARE_MESSAGE_MAP()
 };

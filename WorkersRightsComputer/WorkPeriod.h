@@ -28,12 +28,11 @@ public:
 
 	CString mSpanString;
 
-	static const int N_WEEK_DAYS = 7;
-	double maWorkingDays[N_WEEK_DAYS];
 	bool mbWorkingDaysDefinedByUser;
-	void SetWorkingDay(int iDay, double fraction);
+	void SetWorkingDayByUser(int iDay, int OneOrZero);
 	void ComputeWorkingDays();
 	void SetNWorkingDaysPerWeek(double n);
+	bool IsWorkingDay(int iDay);
 
 	int mnMonthsDetailed;
 	bool mbNegative;
@@ -83,6 +82,7 @@ public:
 private:
 	static const int MAX_MONTHS = 600;
 	CMonthInfo maMonths[MAX_MONTHS];
+	double maWorkingDays[N_WEEK_DAYS];
 };
 
 extern CWorkPeriod gWorkPeriod;

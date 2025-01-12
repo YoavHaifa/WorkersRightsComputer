@@ -9,18 +9,18 @@ public:
 	void SaveToXml(class CXMLDump& xmlDump);
 
 	void SetSelectionFromOldSave(const CString& sText);
+	void SetSelectionByUser(const CString& sText);
 	void ResetAllInputs();
 	CString GetHolidaysSet();
 	bool UpdateDataFromDialog();
-	CString GetDaysText();
+	bool IsHolidaysSetDefined();
+
+	CString msSelectedHolidays;
 
 private:
 	//static DWORD WINAPI StaticThreadFunc(LPVOID);
 
 	bool mbDefined;
-	CString msSelectedHolidays;
-
-	class CRealHolidaysDlg* mpDlg;
 };
 
 extern CHolidaysByDay gHolidaysByDay;

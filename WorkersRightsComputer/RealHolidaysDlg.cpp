@@ -8,6 +8,7 @@
 #include "Utils.h"
 #include "FilesList.h"
 #include "WorkPeriod.h"
+#include "HolidaysByDay.h"
 
 
 // CRealHolidaysDlg dialog
@@ -15,7 +16,7 @@
 IMPLEMENT_DYNAMIC(CRealHolidaysDlg, CDialogEx)
 
 CRealHolidaysDlg::CRealHolidaysDlg(CWnd* pParent /*=nullptr*/)
-	: CDialogEx(IDD_DIALOG_REAL_HOLIDAYS, pParent)
+	: CMyDialogEx(IDD_DIALOG_REAL_HOLIDAYS, pParent)
 {
 	mapCheckDays[0] = &mCheckSunday;
 	mapCheckDays[1] = &mCheckMonday;
@@ -49,10 +50,11 @@ BOOL CRealHolidaysDlg::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 	InitHolidaysCombo();
+	mComboHolidays.SetWindowTextW(gHolidaysByDay.msSelectedHolidays);
 
 	for (int iDay = 0; iDay < N_WEEK_DAYS; iDay++)
 	{
-		if (gWorkPeriod.maWorkingDays[iDay] > 0)
+		if (gWorkPeriod.IsWorkingDay(iDay))
 			mapCheckDays[iDay]->SetCheck(BST_CHECKED);
 		else
 			mapCheckDays[iDay]->SetCheck(BST_UNCHECKED);
@@ -60,9 +62,23 @@ BOOL CRealHolidaysDlg::OnInitDialog()
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
+void CRealHolidaysDlg::OnOK()
+{
+	OnCbnSelchangeComboHolidays();
+	gWorkPeriod.Compute();
+	CDialogEx::OnOK();
+}
+
 
 BEGIN_MESSAGE_MAP(CRealHolidaysDlg, CDialogEx)
 	ON_CBN_SELCHANGE(IDC_COMBO_HOLIDAYS, &CRealHolidaysDlg::OnCbnSelchangeComboHolidays)
+	ON_BN_CLICKED(IDC_CHECK_SUNDAY, &CRealHolidaysDlg::OnBnClickedCheckSunday)
+	ON_BN_CLICKED(IDC_CHECK_MONDAY, &CRealHolidaysDlg::OnBnClickedCheckMonday)
+	ON_BN_CLICKED(IDC_CHECK_TUESDAY, &CRealHolidaysDlg::OnBnClickedCheckTuesday)
+	ON_BN_CLICKED(IDC_CHECK_WEDNESDAY, &CRealHolidaysDlg::OnBnClickedCheckWednesday)
+	ON_BN_CLICKED(IDC_CHECK_THURSDAY, &CRealHolidaysDlg::OnBnClickedCheckThursday)
+	ON_BN_CLICKED(IDC_CHECK_FRIDAY, &CRealHolidaysDlg::OnBnClickedCheckFriday)
+	ON_BN_CLICKED(IDC_CHECK_SATURDAY, &CRealHolidaysDlg::OnBnClickedCheckSaturday)
 END_MESSAGE_MAP()
 
 
@@ -87,65 +103,44 @@ void CRealHolidaysDlg::OnCbnSelchangeComboHolidays()
 {
 	CString s;
 	mComboHolidays.GetWindowTextW(s);
-	//CString s1 = GetText(IDC_COMBO_HOLIDAYS);
-	//OnInputChange();
+	gHolidaysByDay.SetSelectionByUser(s);
 }
-bool CRealHolidaysDlg::UpdateDataFromDialog(void)
+bool CRealHolidaysDlg::UpdateDaysDataFromDialog()
 {
 	for (int iDay = 0; iDay < N_WEEK_DAYS; iDay++)
 	{
 		if (mapCheckDays[iDay]->GetCheck() == BST_CHECKED)
-			gWorkPeriod.SetWorkingDay(iDay, 1);
+			gWorkPeriod.SetWorkingDayByUser(iDay, 1);
 		else
-			gWorkPeriod.SetWorkingDay(iDay, 0);
+			gWorkPeriod.SetWorkingDayByUser(iDay, 0);
 	}
 	return true;
 }
-CString CRealHolidaysDlg::GetDaysText()
+void CRealHolidaysDlg::OnBnClickedCheckSunday()
 {
-	int nDays = 0;
-	CString sDays(_T("("));
-	for (int iDay = 0; iDay < N_WEEK_DAYS; iDay++)
-	{
-		if (mapCheckDays[iDay]->GetCheck() == BST_CHECKED)
-		{
-			nDays++;
-			if (nDays > 1)
-				sDays += L", ";
-			switch (iDay)
-			{
-			case 0:
-				sDays += L"Sun";
-				break;
-			case 1:
-				sDays += L"Mon";
-				break;
-			case 2:
-				sDays += L"Tue";
-				break;
-			case 3:
-				sDays += L"Wed";
-				break;
-			case 4:
-				sDays += L"Thu";
-				break;
-			case 5:
-				sDays += L"Fri";
-				break;
-			case 6:
-				sDays += L"Sat";
-				break;
-			}
-		}
-	}
-	sDays += L")";
-	if (nDays < 1)
-		return CString();
-
-	wchar_t zBuf[512];
-	swprintf_s(zBuf, sizeof(zBuf) / sizeof(wchar_t), L"%d working days per week ", nDays);
-	CString s(zBuf);
-	s += sDays;
-	s += L"\r\n";
-	return s;
+	UpdateDaysDataFromDialog();
+}
+void CRealHolidaysDlg::OnBnClickedCheckMonday()
+{
+	UpdateDaysDataFromDialog();
+}
+void CRealHolidaysDlg::OnBnClickedCheckTuesday()
+{
+	UpdateDaysDataFromDialog();
+}
+void CRealHolidaysDlg::OnBnClickedCheckWednesday()
+{
+	UpdateDaysDataFromDialog();
+}
+void CRealHolidaysDlg::OnBnClickedCheckThursday()
+{
+	UpdateDaysDataFromDialog();
+}
+void CRealHolidaysDlg::OnBnClickedCheckFriday()
+{
+	UpdateDaysDataFromDialog();
+}
+void CRealHolidaysDlg::OnBnClickedCheckSaturday()
+{
+	UpdateDaysDataFromDialog();
 }

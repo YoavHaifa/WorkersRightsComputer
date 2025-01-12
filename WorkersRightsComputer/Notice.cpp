@@ -134,10 +134,10 @@ void CNotice::CountWorkDaysToPay()
 		msDebug += L" (Full Month)";
 		LogLine(L"n due days was > n days in salary month", gWorkPeriod.mnDaysInMonthForDailySalary);
 	}
-	int nWeeksChecked = (nDaysChecked + gWorkPeriod.N_WEEK_DAYS - 1) / gWorkPeriod.N_WEEK_DAYS;
-	if (mDueWorkDaysToPay > (gWorkPeriod.N_WEEK_DAYS - 1)* nWeeksChecked)
+	int nWeeksChecked = (nDaysChecked + N_WEEK_DAYS - 1) / N_WEEK_DAYS;
+	if (mDueWorkDaysToPay > (N_WEEK_DAYS - 1)* nWeeksChecked)
 	{
-		mDueWorkDaysToPay = (gWorkPeriod.N_WEEK_DAYS - 1) * nWeeksChecked;
+		mDueWorkDaysToPay = (N_WEEK_DAYS - 1) * nWeeksChecked;
 		msDebug += L" (No more than 6 days per week)";
 		LogLine(L"n weeks checked", nWeeksChecked);
 		LogLine(L"n due days < (gWorkPeriod.N_WEEK_DAYS - 1) * nWeeksChecked", mDueWorkDaysToPay);

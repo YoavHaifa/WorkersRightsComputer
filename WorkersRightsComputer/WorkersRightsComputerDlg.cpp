@@ -30,6 +30,7 @@
 #include "CommentsDlg.h"
 #include "PrevYearsVacationsDlg.h"
 #include "HolidaysByDay.h"
+#include "RealHolidaysDlg.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -211,6 +212,10 @@ BEGIN_MESSAGE_MAP(CWorkersRightsComputerDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_VACATIONS_PREV_YEARS, &CWorkersRightsComputerDlg::OnBnClickedButtonVacationsPrevYears)
 	ON_EN_CHANGE(IDC_EDIT_VACATION_YEARS, &CWorkersRightsComputerDlg::OnEnChangeEditVacationYears)
 	ON_EN_CHANGE(IDC_EDIT_RECUPERATION_YEARS, &CWorkersRightsComputerDlg::OnEnChangeEditRecuperationYears)
+	ON_BN_CLICKED(IDC_BUTTON_DEFINE_HOLIDAYS_BY_DAY, &CWorkersRightsComputerDlg::OnBnClickedButtonDefineHolidaysByDay)
+	ON_BN_CLICKED(IDC_RADIO_HOLIDAYS_NONE, &CWorkersRightsComputerDlg::OnBnClickedRadioHolidaysNone)
+	ON_BN_CLICKED(IDC_RADIO_HOLIDAYS_RELATIVE, &CWorkersRightsComputerDlg::OnBnClickedRadioHolidaysRelative)
+	ON_BN_CLICKED(IDC_RADIO_HOLIDAYS_BY_DAYS, &CWorkersRightsComputerDlg::OnBnClickedRadioHolidaysByDays)
 END_MESSAGE_MAP()
 
 
@@ -284,6 +289,8 @@ BOOL CWorkersRightsComputerDlg::OnInitDialog()
 		Disable(IDC_CHECK_CAREGIVER);
 	
 	SetVisible(IDC_BUTTON_VACATIONS_PREV_YEARS, gConfig.mbAllowPartialPrevYearsVacation);
+
+	gHolidaysDue.OnMainDialogChange(this);
 	return FALSE;  // return TRUE  unless you set the focus to a control
 }
 void CWorkersRightsComputerDlg::OnLoad()
@@ -392,6 +399,7 @@ void CWorkersRightsComputerDlg::OnBnClickedWorkPeriod()
 		}
 		OnInputChange();
 	}
+	gHolidaysDue.OnMainDialogChange(this);
 	gHolidaysDue.VerifyWorkPeriod();
 }
 void CWorkersRightsComputerDlg::OnBnClickedButtonSave()
@@ -806,4 +814,33 @@ bool CWorkersRightsComputerDlg::GetSaveId(CString& sSaveId)
 	AddFieldToSaveId(sSaveId, IDC_EDIT_ID, L"id", false);
 	sSaveId.Replace(L" ", L"_");
 	return true;
+}
+
+void CWorkersRightsComputerDlg::OnBnClickedButtonDefineHolidaysByDay()
+{
+	if (!gWorkPeriod.PeriodIsValid())
+		return;
+
+	CRealHolidaysDlg dlg;
+	dlg.DoModal();
+
+	OnInputChange();
+}
+void CWorkersRightsComputerDlg::OnBnClickedRadioHolidaysNone()
+{
+	gHolidaysDue.OnMainDialogChange(this);
+	OnInputChange();
+}
+void CWorkersRightsComputerDlg::OnBnClickedRadioHolidaysRelative()
+{
+	gHolidaysDue.OnMainDialogChange(this);
+	OnInputChange();
+}
+void CWorkersRightsComputerDlg::OnBnClickedRadioHolidaysByDays()
+{
+	gHolidaysDue.OnMainDialogChange(this);
+	if (!gHolidaysByDay.IsHolidaysSetDefined())
+		OnBnClickedButtonDefineHolidaysByDay();
+	else
+		OnInputChange();
 }

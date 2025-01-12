@@ -130,6 +130,10 @@ public:
 	CButton mHolidaysRelative;
 	CButton mHolidaysByDay;
 	CButton mHolidaysNone;
+	afx_msg void OnBnClickedButtonDefineHolidaysByDay();
+	afx_msg void OnBnClickedRadioHolidaysNone();
+	afx_msg void OnBnClickedRadioHolidaysRelative();
+	afx_msg void OnBnClickedRadioHolidaysByDays();
 };
 
 extern CWorkersRightsComputerDlg* gpDlg;

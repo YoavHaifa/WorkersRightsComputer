@@ -8,7 +8,7 @@ CConfig gConfig;
 
 CConfig::CConfig(void)
 	: mb14DaysUnpaidVacation4SeveranceDefault(false)
-	, miVersion(136)
+	, miVersion(140)
 	, miLegacyVersion(0)
 	, mbBackwardCompatibilityMode(false)
 	, mbCaregiversOnly(true)

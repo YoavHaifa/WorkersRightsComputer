@@ -58,14 +58,6 @@ public:
 	CButton mRadioHourly;
 	CButton mRadioWagePeriods;
 
-	/*
-	afx_msg void OnBnClickedCheckSunday();
-	afx_msg void OnBnClickedCheckMonday();
-	afx_msg void OnBnClickedCheckTuesday();
-	afx_msg void OnBnClickedCheckWednesday();
-	afx_msg void OnBnClickedCheckThursday();
-	afx_msg void OnBnClickedCheckFriday();
-	afx_msg void OnBnClickedCheckSaturday();*/
 	afx_msg void OnBnClickedOk3();
 	afx_msg void OnBnClickedButtonFamilyPart();
 	//CDateTimeCtrl mLastSalaryDate;

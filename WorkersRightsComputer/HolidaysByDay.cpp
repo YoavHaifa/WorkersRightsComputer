@@ -2,7 +2,7 @@
 #include "HolidaysByDay.h"
 #include "XmlDump.h"
 #include "XmlParse.h"
-#include "RealHolidaysDlg.h"
+//#include "RealHolidaysDlg.h"
 #include "AllRights.h"
 
 CHolidaysByDay gHolidaysByDay;
@@ -11,13 +11,16 @@ CString msNotSelected(L"");
 CHolidaysByDay::CHolidaysByDay()
 	: mbDefined(false)
 {
-	mpDlg = new CRealHolidaysDlg();
 }
 void CHolidaysByDay::SetSelectionFromOldSave(const CString& sText)
 {
 	msSelectedHolidays = sText;
 	mbDefined = true;
-	//mpDlg->mComboHolidays.SetWindowTextW(sText);
+}
+void CHolidaysByDay::SetSelectionByUser(const CString& sText)
+{
+	msSelectedHolidays = sText;
+	mbDefined = true;
 }
 bool CHolidaysByDay::LoadFromXml(class CXMLParseNode* pNode)
 {
@@ -27,39 +30,25 @@ void CHolidaysByDay::SaveToXml(class CXMLDump& xmlDump)
 {
 	CXMLDumpScope mainScope(L"HolidaysByDay", xmlDump);
 	xmlDump.Write(L"Holidays", (const wchar_t*)msSelectedHolidays);
-
-	/*
-	CString sText;
-	mpDlg->mComboHolidays.GetWindowText(sText);
-	if (sText.IsEmpty())
-		sText = L"-";
-	xmlDump.Write(L"Holidays", (const wchar_t*)sText);
-	*/
-
 }
 void CHolidaysByDay::ResetAllInputs()
 {
 	if (mbDefined)
 		msSelectedHolidays = L"Select set of Holidays";
-		//mpDlg->mComboHolidays.SetWindowTextW(L"Select set of Holidays");
 }
 CString CHolidaysByDay::GetHolidaysSet()
 {
 	if (!mbDefined)
 		return CString(L"Holidays not defined");
 	return msSelectedHolidays;
-	/*
-	CString sSelection;
-	mpDlg->mComboHolidays.GetWindowTextW(sSelection);
-	return sSelection;*/
 }
-bool CHolidaysByDay::UpdateDataFromDialog()
+bool CHolidaysByDay::IsHolidaysSetDefined()
 {
-	return mpDlg->UpdateDataFromDialog();
-}
-CString CHolidaysByDay::GetDaysText()
-{
-	return mpDlg->GetDaysText();
+	if (!mbDefined)
+		return false;
+	if (msSelectedHolidays.IsEmpty())
+		return false;
+	return true;
 }
 /*
 DWORD WINAPI CHolidaysByDay::StaticThreadFunc(LPVOID)

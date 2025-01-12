@@ -185,10 +185,10 @@ bool CWorkPeriod::LastYearContains(CHoliday & holiday)
 
 	return holiday.mbInLastYear;
 }
-void CWorkPeriod::SetWorkingDay(int iDay, double fraction)
+void CWorkPeriod::SetWorkingDayByUser(int iDay, int OneOrZero)
 {
-	maWorkingDays[iDay] = fraction;
-	Compute();
+	maWorkingDays[iDay] = OneOrZero;
+	mbWorkingDaysDefinedByUser = true;
 }
 void CWorkPeriod::SetNWorkingDaysPerWeek(double n)
 {
@@ -698,4 +698,10 @@ bool CWorkPeriod::HasFullYearWithNotice()
 	}
 
 	return gWorkYears.HasFullYearWithNotice(mLastDayOfNotice);
+}
+bool CWorkPeriod::IsWorkingDay(int iDay)
+{
+	if (mbWorkingDaysDefinedByUser)
+		return maWorkingDays[iDay] > 0;
+	return iDay < mnWorkDaysPerWeek;
 }
