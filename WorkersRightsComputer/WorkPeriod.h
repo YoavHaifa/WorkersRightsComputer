@@ -82,6 +82,7 @@ public:
 private:
 	static const int MAX_MONTHS = 600;
 	CMonthInfo maMonths[MAX_MONTHS];
+
 	double maWorkingDays[N_WEEK_DAYS];
 };
 

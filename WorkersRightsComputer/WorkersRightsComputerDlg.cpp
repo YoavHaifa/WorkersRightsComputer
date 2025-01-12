@@ -290,7 +290,7 @@ BOOL CWorkersRightsComputerDlg::OnInitDialog()
 	
 	SetVisible(IDC_BUTTON_VACATIONS_PREV_YEARS, gConfig.mbAllowPartialPrevYearsVacation);
 
-	gHolidaysDue.OnMainDialogChange(this);
+	gHolidaysDue.SetInvisible();
 	return FALSE;  // return TRUE  unless you set the focus to a control
 }
 void CWorkersRightsComputerDlg::OnLoad()
@@ -684,7 +684,7 @@ bool CWorkersRightsComputerDlg::LoadFromXml(CXMLParseNode* pRoot)
 	if (pMain->GetValue(L"Holidays", sText))
 	{
 		// Where is the contoller of this mode?
-		gHolidaysByDay.SetSelectionFromOldSave(sText);
+		gHolidaysByDay.SetSelectionFromSave(sText);
 		SetChecked(IDC_RADIO_HOLIDAYS_BY_DAYS);
 		UnCheck(IDC_RADIO_HOLIDAYS_RELATIVE);
 		UnCheck(IDC_RADIO_HOLIDAYS_NONE);
@@ -704,10 +704,6 @@ bool CWorkersRightsComputerDlg::LoadFromXml(CXMLParseNode* pRoot)
 	}
 	else 
 		bOK = false;
-
-	CXMLParseNode* pHolidaysByDay = pMain->GetFirst(L"HolidaysByDay");
-	if (pHolidaysByDay)
-		gHolidaysByDay.LoadFromXml(pHolidaysByDay);
 
 	return bOK;
 }
@@ -829,15 +825,18 @@ void CWorkersRightsComputerDlg::OnBnClickedButtonDefineHolidaysByDay()
 void CWorkersRightsComputerDlg::OnBnClickedRadioHolidaysNone()
 {
 	gHolidaysDue.OnMainDialogChange(this);
+	gHolidaysDue.SetInvisible();
 	OnInputChange();
 }
 void CWorkersRightsComputerDlg::OnBnClickedRadioHolidaysRelative()
 {
+	gHolidaysDue.SetVisible();
 	gHolidaysDue.OnMainDialogChange(this);
 	OnInputChange();
 }
 void CWorkersRightsComputerDlg::OnBnClickedRadioHolidaysByDays()
 {
+	gHolidaysDue.SetVisible();
 	gHolidaysDue.OnMainDialogChange(this);
 	if (!gHolidaysByDay.IsHolidaysSetDefined())
 		OnBnClickedButtonDefineHolidaysByDay();

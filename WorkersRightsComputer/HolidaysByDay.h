@@ -5,10 +5,10 @@ class CHolidaysByDay
 public:
 	CHolidaysByDay();
 
-	bool LoadFromXml(class CXMLParseNode* pNode);
+	//bool LoadFromXml(class CXMLParseNode* pNode);
 	void SaveToXml(class CXMLDump& xmlDump);
 
-	void SetSelectionFromOldSave(const CString& sText);
+	void SetSelectionFromSave(const CString& sText);
 	void SetSelectionByUser(const CString& sText);
 	void ResetAllInputs();
 	CString GetHolidaysSet();

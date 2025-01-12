@@ -66,6 +66,13 @@ void CHolidaysDue::SetInvisible()
 {
 	for (int i = 0; i < N_MAIN_DLG_FIELDS; i++)
 		gpDlg->SetInvisible(maMainDlgFields[i]);
+	gpDlg->SetText(IDC_EDIT_HOLIDAYS_PREVY_WORK, L"0");
+	gpDlg->SetText(IDC_EDIT_HOLIDAYS_PREVY_PAID, L"0");
+}
+void CHolidaysDue::SetVisible()
+{
+	for (int i = 0; i < N_MAIN_DLG_FIELDS; i++)
+		gpDlg->SetVisible(maMainDlgFields[i]);
 }
 void CHolidaysDue::UpdateMainDialog()
 {
@@ -81,8 +88,7 @@ void CHolidaysDue::UpdateMainDialog()
 	// Should we see holidays at all?
 	if (mbPeriodAndHolidaysDefined || mbHolidaysRelative)
 	{
-		for (int i = 0; i < N_MAIN_DLG_FIELDS; i++)
-			gpDlg->SetVisible(maMainDlgFields[i]);
+		SetVisible();
 	}
 	else
 	{

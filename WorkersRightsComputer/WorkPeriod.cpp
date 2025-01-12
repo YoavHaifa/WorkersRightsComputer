@@ -296,10 +296,10 @@ void CWorkPeriod::SaveToXml(CXMLDump &xmlDump)
 	xmlDump.Write(L"n_work_days_per_week", mnWorkDaysPerWeek);
 	xmlDump.Write(L"b_work_days_defined_by_user", mbWorkingDaysDefinedByUser);
 
-	if (!mbWorkingDaysDefinedByUser)
+	if (mbWorkingDaysDefinedByUser)
 	{
 		CXMLDumpScope scope(L"Days", xmlDump);
-		for (int iDay = 0; iDay < 7; iDay++)
+		for (int iDay = 0; iDay < N_WEEK_DAYS; iDay++)
 		{
 			xmlDump.Write(uasDaysNames[iDay], maWorkingDays[iDay] > 0 ? 1: 0);
 		}
@@ -332,7 +332,7 @@ void CWorkPeriod::LoadFromXml(class CXMLParseNode* pRoot)
 		CXMLParseNode* pDays = pWorkPeriodNode->GetFirst(L"Days");
 		if (pDays)
 		{
-			for (int iDay = 0; iDay < 7; iDay++)
+			for (int iDay = 0; iDay < N_WEEK_DAYS; iDay++)
 			{
 				pDays->GetValue(uasDaysNames[iDay], maWorkingDays[iDay]);
 			}

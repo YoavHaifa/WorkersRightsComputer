@@ -12,7 +12,7 @@ CHolidaysByDay::CHolidaysByDay()
 	: mbDefined(false)
 {
 }
-void CHolidaysByDay::SetSelectionFromOldSave(const CString& sText)
+void CHolidaysByDay::SetSelectionFromSave(const CString& sText)
 {
 	msSelectedHolidays = sText;
 	mbDefined = true;
@@ -22,14 +22,11 @@ void CHolidaysByDay::SetSelectionByUser(const CString& sText)
 	msSelectedHolidays = sText;
 	mbDefined = true;
 }
-bool CHolidaysByDay::LoadFromXml(class CXMLParseNode* pNode)
-{
-	return true;
-}
 void CHolidaysByDay::SaveToXml(class CXMLDump& xmlDump)
 {
-	CXMLDumpScope mainScope(L"HolidaysByDay", xmlDump);
-	xmlDump.Write(L"Holidays", (const wchar_t*)msSelectedHolidays);
+	//CXMLDumpScope mainScope(L"HolidaysByDay", xmlDump);
+	if (mbDefined)
+		xmlDump.Write(L"Holidays", (const wchar_t*)msSelectedHolidays);
 }
 void CHolidaysByDay::ResetAllInputs()
 {
