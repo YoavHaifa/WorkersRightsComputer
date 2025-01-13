@@ -313,6 +313,7 @@ void CHolidays::ComputePayLastYearRelative()
 	double payPerDay = gWageTable.ComputeHolidayPriceOnWorkEnd();
 	//double payPerDay = gWageTable.PayPerDayAtWorkEnd();
 	LogLine(L"n days due in this year", mnDaysToPay);
+	RememberPayParDay(payPerDay);
 
 	mDuePay = mnDaysToPay * payPerDay;
 
